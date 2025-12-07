@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Building2, Sliders, Music2, Radio, Users, Disc3, Wrench, ExternalLink, Play, Images, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
+import { getGearById, getRelatedGear, gearCategories } from "@/data/gear";
 import { gearImages } from "@/assets/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,15 +10,13 @@ const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const gearItem = id ? getGearById(id) : null;
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   if (!gearItem) {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Header />
-        <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 md:px-8">
+        <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <p className="font-mono text-muted-foreground">
               {language === 'en' ? 'Gear not found' : 'Equipo no encontrado'}
             </p>
@@ -34,113 +31,106 @@ const GearDetail = () => {
   }
 
   const relatedItems = getRelatedGear(gearItem.relatedGear);
+  const localImage = gearImages[gearItem.id];
+  const imageSrc = localImage || gearItem.imageUrl;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
+      <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <Link 
             to="/gear" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-8 group"
+            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-6 sm:mb-8 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             {language === 'en' ? 'Back to Gear' : 'Volver a Equipo'}
           </Link>
 
-          {/* Hero Section */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Image - Links to official product site */}
-            {(() => {
-              // Use local image if available, fallback to imageUrl
-              const localImage = gearImages[gearItem.id];
-              const imageSrc = localImage || gearItem.imageUrl;
-              
-              return (
-                <a 
-                  href={gearItem.officialUrl || '#'}
-                  target={gearItem.officialUrl ? '_blank' : undefined}
-                  rel="noopener noreferrer"
-                  className={`aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
-                >
-                  {imageSrc ? (
-                    <>
-                      <img 
-                        src={imageSrc} 
-                        alt={gearItem.name}
-                        className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          target.style.display = 'none';
-                          const fallback = target.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.classList.remove('hidden');
-                        }}
-                      />
-                      <div className="hidden text-center p-8 flex-col items-center justify-center h-full">
-                        <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                        <p className="font-mono text-xs text-muted-foreground">
-                          {gearItem.name}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center p-8 flex flex-col items-center justify-center h-full">
-                      <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                      <p className="font-mono text-xs text-muted-foreground">
-                        {gearItem.name}
-                      </p>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-                  {/* Official site indicator */}
-                  {gearItem.officialUrl && (
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="bg-background/90 border border-border px-3 py-1 flex items-center gap-2">
-                        <ExternalLink className="w-3 h-3" />
-                        <span className="font-mono text-xs">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
-                      </div>
-                    </div>
-                  )}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex flex-wrap gap-2">
-                      {gearItem.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="font-mono text-xs bg-background/90 border border-border px-2 py-1"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+          {/* Hero Section - Responsive Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
+            {/* Main Image */}
+            <a 
+              href={gearItem.officialUrl || '#'}
+              target={gearItem.officialUrl ? '_blank' : undefined}
+              rel="noopener noreferrer"
+              className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
+            >
+              {imageSrc ? (
+                <>
+                  <img 
+                    src={imageSrc} 
+                    alt={gearItem.name}
+                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.classList.remove('hidden');
+                    }}
+                  />
+                  <div className="hidden text-center p-6 flex-col items-center justify-center h-full">
+                    <Sliders className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground/50" />
+                    <p className="font-mono text-xs text-muted-foreground">{gearItem.name}</p>
                   </div>
-                </a>
-              );
-            })()}
+                </>
+              ) : (
+                <div className="text-center p-6 flex flex-col items-center justify-center h-full">
+                  <Sliders className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground/50" />
+                  <p className="font-mono text-xs text-muted-foreground">{gearItem.name}</p>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+              
+              {/* Official site indicator */}
+              {gearItem.officialUrl && (
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="bg-background/90 border border-border px-2 sm:px-3 py-1 flex items-center gap-2">
+                    <ExternalLink className="w-3 h-3" />
+                    <span className="font-mono text-[10px] sm:text-xs hidden sm:inline">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Tags */}
+              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {gearItem.tags.slice(0, 5).map(tag => (
+                    <span
+                      key={tag}
+                      className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </a>
 
             {/* Gear Info */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
+                <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-2">
                   // {gearCategories[gearItem.category][language]}
                 </div>
-                <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight mb-2 hover:animate-glitch">
+                <h1 className="font-mono text-2xl sm:text-4xl lg:text-5xl xl:text-6xl uppercase tracking-tight mb-2 hover:animate-glitch break-words">
                   {gearItem.name}
                 </h1>
               </div>
 
-              <div className="flex flex-wrap gap-4 font-mono text-sm">
+              <div className="flex flex-wrap gap-3 sm:gap-4 font-mono text-xs sm:text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Building2 className="w-4 h-4" />
+                  <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   {gearItem.manufacturer}
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   {gearItem.releaseYear}
                 </div>
               </div>
 
-              <p className="font-mono text-sm leading-relaxed text-muted-foreground">
+              <p className="font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
                 {gearItem.shortDescription[language]}
               </p>
 
@@ -150,9 +140,9 @@ const GearDetail = () => {
                   href={gearItem.officialUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-colors"
+                  className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider border border-foreground px-3 sm:px-4 py-2 hover:bg-foreground hover:text-background transition-colors"
                 >
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
                   {language === 'en' ? 'Official Product Page' : 'Página Oficial'}
                 </a>
               )}
@@ -160,88 +150,88 @@ const GearDetail = () => {
           </div>
 
           {/* Technical Overview */}
-          <section className="mb-12 border-t border-border pt-8">
-            <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-              <Wrench className="w-5 h-5" />
+          <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+            <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5" />
               {language === 'en' ? 'Technical Overview' : 'Especificaciones Técnicas'}
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {gearItem.technicalOverview.synthesisType && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Synthesis Type' : 'Tipo de Síntesis'}
                   </h3>
-                  <p className="font-mono text-sm">{gearItem.technicalOverview.synthesisType}</p>
+                  <p className="font-mono text-xs sm:text-sm">{gearItem.technicalOverview.synthesisType}</p>
                 </div>
               )}
               {gearItem.technicalOverview.polyphony && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Polyphony' : 'Polifonía'}
                   </h3>
-                  <p className="font-mono text-sm">{gearItem.technicalOverview.polyphony}</p>
+                  <p className="font-mono text-xs sm:text-sm">{gearItem.technicalOverview.polyphony}</p>
                 </div>
               )}
               {gearItem.technicalOverview.architecture && (
-                <div className="border border-border p-4 md:col-span-2">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4 sm:col-span-2">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Architecture' : 'Arquitectura'}
                   </h3>
-                  <p className="font-mono text-sm text-muted-foreground">{gearItem.technicalOverview.architecture}</p>
+                  <p className="font-mono text-xs sm:text-sm text-muted-foreground">{gearItem.technicalOverview.architecture}</p>
                 </div>
               )}
               {gearItem.technicalOverview.midiSync && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     MIDI / Sync
                   </h3>
-                  <p className="font-mono text-sm">{gearItem.technicalOverview.midiSync}</p>
+                  <p className="font-mono text-xs sm:text-sm">{gearItem.technicalOverview.midiSync}</p>
                 </div>
               )}
               {gearItem.technicalOverview.sequencer && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Sequencer' : 'Secuenciador'}
                   </h3>
-                  <p className="font-mono text-sm">{gearItem.technicalOverview.sequencer}</p>
+                  <p className="font-mono text-xs sm:text-sm">{gearItem.technicalOverview.sequencer}</p>
                 </div>
               )}
               {gearItem.technicalOverview.inputsOutputs && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Inputs / Outputs' : 'Entradas / Salidas'}
                   </h3>
-                  <p className="font-mono text-sm text-muted-foreground">{gearItem.technicalOverview.inputsOutputs}</p>
+                  <p className="font-mono text-xs sm:text-sm text-muted-foreground">{gearItem.technicalOverview.inputsOutputs}</p>
                 </div>
               )}
               {gearItem.technicalOverview.modifications && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                <div className="border border-border p-3 sm:p-4">
+                  <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                     {language === 'en' ? 'Modifications' : 'Modificaciones'}
                   </h3>
-                  <p className="font-mono text-sm text-muted-foreground">{gearItem.technicalOverview.modifications}</p>
+                  <p className="font-mono text-xs sm:text-sm text-muted-foreground">{gearItem.technicalOverview.modifications}</p>
                 </div>
               )}
             </div>
 
             {/* Strengths & Limitations */}
             {(gearItem.technicalOverview.strengths || gearItem.technicalOverview.limitations) && (
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
                 {gearItem.technicalOverview.strengths && (
-                  <div className="border border-border p-4 bg-card/30">
-                    <h3 className="font-mono text-xs uppercase tracking-wider text-foreground mb-2">
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-foreground mb-1 sm:mb-2">
                       {language === 'en' ? 'Strengths' : 'Fortalezas'}
                     </h3>
-                    <p className="font-mono text-sm text-muted-foreground">{gearItem.technicalOverview.strengths}</p>
+                    <p className="font-mono text-xs sm:text-sm text-muted-foreground">{gearItem.technicalOverview.strengths}</p>
                   </div>
                 )}
                 {gearItem.technicalOverview.limitations && (
-                  <div className="border border-border p-4">
-                    <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                  <div className="border border-border p-3 sm:p-4">
+                    <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">
                       {language === 'en' ? 'Limitations' : 'Limitaciones'}
                     </h3>
-                    <p className="font-mono text-sm text-muted-foreground">{gearItem.technicalOverview.limitations}</p>
+                    <p className="font-mono text-xs sm:text-sm text-muted-foreground">{gearItem.technicalOverview.limitations}</p>
                   </div>
                 )}
               </div>
@@ -250,16 +240,16 @@ const GearDetail = () => {
 
           {/* Notable Artists */}
           {gearItem.notableArtists.length > 0 && (
-            <section className="mb-12 border-t border-border pt-8">
-              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-                <Users className="w-5 h-5" />
+            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                 {language === 'en' ? 'Notable Artists' : 'Artistas Destacados'}
               </h2>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {gearItem.notableArtists.map((artist, i) => (
-                  <div key={i} className="border border-border p-4 hover:bg-card transition-colors">
-                    <h3 className="font-mono text-sm uppercase mb-1">{artist.name}</h3>
-                    <p className="font-mono text-xs text-muted-foreground">{artist.usage}</p>
+                  <div key={i} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors">
+                    <h3 className="font-mono text-xs sm:text-sm uppercase mb-1">{artist.name}</h3>
+                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">{artist.usage}</p>
                   </div>
                 ))}
               </div>
@@ -268,24 +258,24 @@ const GearDetail = () => {
 
           {/* Famous Tracks */}
           {gearItem.famousTracks.length > 0 && (
-            <section className="mb-12 border-t border-border pt-8">
-              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-                <Disc3 className="w-5 h-5" />
+            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                <Disc3 className="w-4 h-4 sm:w-5 sm:h-5" />
                 {language === 'en' ? 'Famous Tracks' : 'Tracks Famosos'}
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {gearItem.famousTracks.map((track, i) => (
-                  <div key={i} className="border border-border p-4 hover:bg-card transition-colors group">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-mono text-sm uppercase group-hover:animate-glitch">
+                  <div key={i} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group">
+                    <div className="flex justify-between items-start mb-1 sm:mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch truncate">
                           {track.artist} — "{track.title}"
                         </h3>
-                        <span className="font-mono text-xs text-muted-foreground">{track.year}</span>
+                        <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">{track.year}</span>
                       </div>
-                      <Play className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                      <Play className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground flex-shrink-0 ml-2" />
                     </div>
-                    <p className="font-mono text-xs text-muted-foreground">{track.role}</p>
+                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">{track.role}</p>
                   </div>
                 ))}
               </div>
@@ -293,74 +283,38 @@ const GearDetail = () => {
           )}
 
           {/* Techno Applications */}
-          <section className="mb-12 border-t border-border pt-8">
-            <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-              <Radio className="w-5 h-5" />
+          <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+            <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+              <Radio className="w-4 h-4 sm:w-5 sm:h-5" />
               {language === 'en' ? 'Techno Applications' : 'Aplicaciones en Techno'}
             </h2>
-            <div className="border border-border p-6 bg-card/30">
-              <p className="font-mono text-sm leading-relaxed text-muted-foreground">
+            <div className="border border-border p-4 sm:p-6 bg-card/30">
+              <p className="font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground">
                 {gearItem.technoApplications[language]}
               </p>
             </div>
           </section>
 
-          {/* Image Gallery */}
-          {gearItem.galleryImages && gearItem.galleryImages.length > 0 && (
-            <section className="mb-12 border-t border-border pt-8">
-              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-                <Images className="w-5 h-5" />
-                {language === 'en' ? 'Gallery' : 'Galería'}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {gearItem.galleryImages.map((image, i) => (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setLightboxIndex(i);
-                      setLightboxOpen(true);
-                    }}
-                    className="aspect-square relative overflow-hidden border border-border bg-card/30 group cursor-pointer hover:border-foreground transition-colors"
-                  >
-                    <img
-                      src={image.url}
-                      alt={image.caption || `${gearItem.name} image ${i + 1}`}
-                      className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-110"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    {image.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-background/90 px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <p className="font-mono text-xs text-center truncate">{image.caption}</p>
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* Related Gear */}
           {relatedItems.length > 0 && (
-            <section className="mb-12 border-t border-border pt-8">
-              <h2 className="font-mono text-xl uppercase tracking-wide mb-6">
+            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">
                 {language === 'en' ? 'Related Gear' : 'Equipo Relacionado'}
               </h2>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {relatedItems.map((item) => (
                   <Link
                     key={item.id}
                     to={`/gear/${item.id}`}
-                    className="border border-border p-4 hover:bg-card transition-colors group"
+                    className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group"
                   >
-                    <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                    <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
                       {gearCategories[item.category][language]}
                     </span>
-                    <h3 className="font-mono text-sm uppercase group-hover:animate-glitch">
+                    <h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch">
                       {item.name}
                     </h3>
-                    <p className="font-mono text-xs text-muted-foreground mt-1">
+                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mt-1">
                       {item.manufacturer} • {item.releaseYear}
                     </p>
                   </Link>
@@ -369,14 +323,14 @@ const GearDetail = () => {
             </section>
           )}
 
-          {/* Media & Videos - Embedded */}
+          {/* YouTube Videos - Embedded */}
           {gearItem.youtubeVideos && gearItem.youtubeVideos.length > 0 && (
-            <section className="mb-12 border-t border-border pt-8">
-              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-                <Play className="w-5 h-5" />
+            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                 {language === 'en' ? 'Media & Demos' : 'Media y Demos'}
               </h2>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {gearItem.youtubeVideos.map((video, i) => {
                   // Extract YouTube video ID from URL
                   const videoId = video.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
@@ -400,12 +354,12 @@ const GearDetail = () => {
                           rel="noopener noreferrer"
                           className="aspect-video bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
                         >
-                          <Play className="w-12 h-12 text-muted-foreground" />
+                          <Play className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground" />
                         </a>
                       )}
-                      <div className="p-4">
-                        <h3 className="font-mono text-sm mb-1">{video.title}</h3>
-                        <p className="font-mono text-xs text-muted-foreground">{video.channel}</p>
+                      <div className="p-3 sm:p-4">
+                        <h3 className="font-mono text-xs sm:text-sm mb-1 line-clamp-2">{video.title}</h3>
+                        <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">{video.channel}</p>
                       </div>
                     </div>
                   );
@@ -413,74 +367,9 @@ const GearDetail = () => {
               </div>
             </section>
           )}
-
         </div>
       </main>
       <Footer />
-
-      {/* Lightbox Modal */}
-      {lightboxOpen && gearItem.galleryImages && gearItem.galleryImages.length > 0 && (
-        <div 
-          className="fixed inset-0 z-50 bg-background/95 flex items-center justify-center"
-          onClick={() => setLightboxOpen(false)}
-        >
-          {/* Close button */}
-          <button
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 p-2 border border-border hover:bg-card transition-colors z-10"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          {/* Navigation arrows */}
-          {gearItem.galleryImages.length > 1 && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLightboxIndex((prev) => 
-                    prev === 0 ? gearItem.galleryImages!.length - 1 : prev - 1
-                  );
-                }}
-                className="absolute left-4 p-3 border border-border hover:bg-card transition-colors z-10"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLightboxIndex((prev) => 
-                    prev === gearItem.galleryImages!.length - 1 ? 0 : prev + 1
-                  );
-                }}
-                className="absolute right-4 p-3 border border-border hover:bg-card transition-colors z-10"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-            </>
-          )}
-
-          {/* Image */}
-          <div 
-            className="max-w-4xl max-h-[80vh] p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={gearItem.galleryImages[lightboxIndex].url}
-              alt={gearItem.galleryImages[lightboxIndex].caption || `${gearItem.name} image`}
-              className="max-w-full max-h-[70vh] object-contain mx-auto"
-            />
-            {gearItem.galleryImages[lightboxIndex].caption && (
-              <p className="font-mono text-sm text-center mt-4 text-muted-foreground">
-                {gearItem.galleryImages[lightboxIndex].caption}
-              </p>
-            )}
-            <p className="font-mono text-xs text-center mt-2 text-muted-foreground">
-              {lightboxIndex + 1} / {gearItem.galleryImages.length}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
