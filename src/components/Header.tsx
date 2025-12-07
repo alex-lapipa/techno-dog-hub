@@ -6,7 +6,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "./LanguageToggle";
 import technoDogLogo from "@/assets/techno-dog-logo.png";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
   const { user, signOut, loading } = useAuth();
@@ -14,6 +15,7 @@ const Header = () => {
   const location = useLocation();
   const { language } = useLanguage();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleAuthClick = async () => {
     if (user) {
@@ -139,29 +141,64 @@ const Header = () => {
           <div className="flex items-center gap-4">
             <LanguageToggle />
             {!loading && (
-              <Button variant="brutalist" size="sm" onClick={handleAuthClick} className="hover:animate-glitch">
+              <Button variant="brutalist" size="sm" onClick={handleAuthClick} className="hidden sm:flex hover:animate-glitch">
                 {user ? (language === 'en' ? 'Logout' : 'Salir') : (language === 'en' ? 'Login' : 'Entrar')}
               </Button>
             )}
+            
+            {/* Mobile hamburger */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild className="lg:hidden">
+                <Button variant="ghost" size="icon" className="hover:animate-glitch">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] bg-background border-border p-0">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between p-4 border-b border-border">
+                    <span className="text-sm font-mono tracking-widest uppercase">Menu</span>
+                  </div>
+                  <nav className="flex-1 overflow-y-auto py-4">
+                    {navItems.map((item) => (
+                      <div key={item.path} className="border-b border-border/50">
+                        <Link
+                          to={item.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`block px-4 py-3 text-sm font-mono uppercase tracking-wider transition-colors hover:bg-card ${
+                            isActive(item.path) ? 'text-foreground bg-card' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {item.label[language]}
+                        </Link>
+                        {item.sub && (
+                          <div className="bg-card/50">
+                            {item.sub.map((subItem) => (
+                              <Link
+                                key={subItem.path}
+                                to={subItem.path}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-6 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                {subItem.label[language]}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </nav>
+                  <div className="p-4 border-t border-border">
+                    {!loading && (
+                      <Button variant="brutalist" size="sm" onClick={() => { handleAuthClick(); setMobileMenuOpen(false); }} className="w-full">
+                        {user ? (language === 'en' ? 'Logout' : 'Salir') : (language === 'en' ? 'Login' : 'Entrar')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </nav>
-      </div>
-      
-      {/* Mobile nav */}
-      <div className="lg:hidden border-t border-border overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-1 px-4 py-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`px-3 py-1 text-xs font-mono uppercase tracking-wider whitespace-nowrap transition-colors hover:animate-glitch ${
-                isActive(item.path) ? 'text-foreground border border-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              {item.label[language]}
-            </Link>
-          ))}
-        </div>
       </div>
     </header>
   );
