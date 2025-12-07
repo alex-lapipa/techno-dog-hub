@@ -47,15 +47,26 @@ const GearDetail = () => {
 
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Image Placeholder - For future image implementation */}
-            <div className="aspect-square relative overflow-hidden border border-border bg-card/50 flex items-center justify-center">
-              <div className="text-center p-8">
+            {/* Image */}
+            <div className="aspect-square relative overflow-hidden border border-border bg-card/50">
+              {gearItem.imageUrl ? (
+                <img 
+                  src={gearItem.imageUrl} 
+                  alt={gearItem.name}
+                  className="w-full h-full object-contain p-4"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`text-center p-8 flex flex-col items-center justify-center h-full ${gearItem.imageUrl ? 'hidden' : ''}`}>
                 <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                 <p className="font-mono text-xs text-muted-foreground">
                   {language === 'en' ? 'Equipment visualization' : 'Visualización del equipo'}
                 </p>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex flex-wrap gap-2">
                   {gearItem.tags.map(tag => (
@@ -95,6 +106,19 @@ const GearDetail = () => {
               <p className="font-mono text-sm leading-relaxed text-muted-foreground">
                 {gearItem.shortDescription[language]}
               </p>
+
+              {/* Official Link */}
+              {gearItem.officialUrl && (
+                <a 
+                  href={gearItem.officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  {language === 'en' ? 'Official Product Page' : 'Página Oficial'}
+                </a>
+              )}
             </div>
           </div>
 
@@ -272,19 +296,42 @@ const GearDetail = () => {
             </section>
           )}
 
-          {/* Media Placeholder */}
+          {/* Media & Videos */}
           <section className="mb-12 border-t border-border pt-8">
             <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
               <Play className="w-5 h-5" />
               {language === 'en' ? 'Media & Demos' : 'Media y Demos'}
             </h2>
-            <div className="border border-border border-dashed p-8 flex items-center justify-center">
-              <p className="font-mono text-xs text-muted-foreground text-center">
-                {language === 'en' 
-                  ? 'Video demos and sound examples coming soon' 
-                  : 'Demos en video y ejemplos de sonido próximamente'}
-              </p>
-            </div>
+            {gearItem.youtubeVideos && gearItem.youtubeVideos.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                {gearItem.youtubeVideos.map((video, i) => (
+                  <a
+                    key={i}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border border-border p-4 hover:bg-card transition-colors group flex items-center gap-4"
+                  >
+                    <div className="w-12 h-12 bg-destructive/20 rounded flex items-center justify-center flex-shrink-0">
+                      <Play className="w-6 h-6 text-destructive" />
+                    </div>
+                    <div>
+                      <h3 className="font-mono text-sm group-hover:animate-glitch">{video.title}</h3>
+                      <p className="font-mono text-xs text-muted-foreground">{video.channel}</p>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-muted-foreground ml-auto" />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="border border-border border-dashed p-8 flex items-center justify-center">
+                <p className="font-mono text-xs text-muted-foreground text-center">
+                  {language === 'en' 
+                    ? 'Video demos coming soon' 
+                    : 'Demos en video próximamente'}
+                </p>
+              </div>
+            )}
           </section>
 
         </div>
