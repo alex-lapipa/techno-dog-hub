@@ -26,12 +26,6 @@ serve(async (req) => {
   }
 
   try {
-    const { documents } = await req.json();
-    
-    if (!documents || !Array.isArray(documents)) {
-      throw new Error('Documents array is required');
-    }
-
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -39,7 +33,55 @@ serve(async (req) => {
       throw new Error('Missing required environment variables');
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Verify JWT and check admin role
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authorization required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Create client with user's JWT to verify auth
+    const supabaseAuth = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY') || '', {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check if user is admin using service role client
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    const { data: roleData, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError || !roleData) {
+      console.log('User is not admin:', user.id);
+      return new Response(JSON.stringify({ error: 'Admin access required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Admin verified:', user.email);
+
+    const { documents } = await req.json();
+    
+    if (!documents || !Array.isArray(documents)) {
+      throw new Error('Documents array is required');
+    }
 
     const results = [];
 
@@ -59,7 +101,7 @@ serve(async (req) => {
         const chunk = chunks[i];
 
         // Insert into database without embedding (will use full-text search)
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
           .from('documents')
           .insert({
             title: chunks.length > 1 ? `${title} (${i + 1}/${chunks.length})` : title,
