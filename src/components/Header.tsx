@@ -89,7 +89,7 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 md:px-8">
-        <nav className="flex items-center justify-between h-14">
+        <nav className="flex items-center justify-between h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img src={technoDogLogo} alt="techno.dog logo" className="w-32 h-32 logo-glow transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
