@@ -40,6 +40,10 @@ export interface GearItem {
   // New fields for official resources
   officialUrl?: string;
   imageUrl?: string;
+  galleryImages?: {
+    url: string;
+    caption?: string;
+  }[];
   youtubeVideos?: {
     title: string;
     url: string;
@@ -100,6 +104,11 @@ export const gear: GearItem[] = [
     tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic'],
     officialUrl: 'https://www.roland.com/global/products/rc_tb-303/',
     imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tb-303_top_gal.png',
+    galleryImages: [
+      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tb-303_top_gal.png', caption: 'Top view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Roland_TB-303.jpg', caption: 'Classic silver box' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/5/58/Roland_TB-303_Panel.jpg', caption: 'Control panel detail' }
+    ],
     youtubeVideos: [
       { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
       { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
@@ -146,6 +155,11 @@ export const gear: GearItem[] = [
     tags: ['analog', 'drum-machine', 'classic', 'detroit', 'kick'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-808/',
     imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-808_top_gal.png',
+    galleryImages: [
+      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tr-808_top_gal.png', caption: 'Top view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Roland_TR-808_drum_machine.jpg', caption: 'Classic 808 front panel' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Roland_TR-808_%26_909.jpg', caption: 'TR-808 with TR-909' }
+    ],
     youtubeVideos: [
       { title: 'The Roland TR-808 In Action', url: 'https://www.youtube.com/watch?v=nEDuHsCEDfs', channel: 'Doctor Mix' },
       { title: 'TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=Ov38brxRGks', channel: 'Roland' }
@@ -192,6 +206,11 @@ export const gear: GearItem[] = [
     tags: ['analog', 'drum-machine', 'classic', 'techno', 'kick', 'essential'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-909/',
     imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-909_top_gal.png',
+    galleryImages: [
+      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tr-909_top_gal.png', caption: 'Top view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Roland_TR-909.jpg', caption: 'Classic 909 front panel' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Roland_TR-909_%28large%29.jpg', caption: 'Detailed view' }
+    ],
     youtubeVideos: [
       { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' },
       { title: 'Roland TR-909 Famous Patterns', url: 'https://www.youtube.com/watch?v=ld4n-dT-qQg', channel: 'Doctor Mix' }

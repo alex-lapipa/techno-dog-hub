@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Building2, Sliders, Music2, Radio, Users, Disc3, Wrench, ExternalLink, Play } from "lucide-react";
+import { ArrowLeft, Calendar, Building2, Sliders, Music2, Radio, Users, Disc3, Wrench, ExternalLink, Play, Images, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import Header from "@/components/Header";
@@ -9,6 +10,8 @@ const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const gearItem = id ? getGearById(id) : null;
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   if (!gearItem) {
     return (
@@ -282,6 +285,42 @@ const GearDetail = () => {
             </div>
           </section>
 
+          {/* Image Gallery */}
+          {gearItem.galleryImages && gearItem.galleryImages.length > 0 && (
+            <section className="mb-12 border-t border-border pt-8">
+              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
+                <Images className="w-5 h-5" />
+                {language === 'en' ? 'Gallery' : 'Galería'}
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {gearItem.galleryImages.map((image, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setLightboxIndex(i);
+                      setLightboxOpen(true);
+                    }}
+                    className="aspect-square relative overflow-hidden border border-border bg-card/30 group cursor-pointer hover:border-foreground transition-colors"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.caption || `${gearItem.name} image ${i + 1}`}
+                      className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-110"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    {image.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-background/90 px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="font-mono text-xs text-center truncate">{image.caption}</p>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Related Gear */}
           {relatedItems.length > 0 && (
             <section className="mb-12 border-t border-border pt-8">
@@ -358,6 +397,70 @@ const GearDetail = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && gearItem.galleryImages && gearItem.galleryImages.length > 0 && (
+        <div 
+          className="fixed inset-0 z-50 bg-background/95 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 p-2 border border-border hover:bg-card transition-colors z-10"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Navigation arrows */}
+          {gearItem.galleryImages.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((prev) => 
+                    prev === 0 ? gearItem.galleryImages!.length - 1 : prev - 1
+                  );
+                }}
+                className="absolute left-4 p-3 border border-border hover:bg-card transition-colors z-10"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((prev) => 
+                    prev === gearItem.galleryImages!.length - 1 ? 0 : prev + 1
+                  );
+                }}
+                className="absolute right-4 p-3 border border-border hover:bg-card transition-colors z-10"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          {/* Image */}
+          <div 
+            className="max-w-4xl max-h-[80vh] p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={gearItem.galleryImages[lightboxIndex].url}
+              alt={gearItem.galleryImages[lightboxIndex].caption || `${gearItem.name} image`}
+              className="max-w-full max-h-[70vh] object-contain mx-auto"
+            />
+            {gearItem.galleryImages[lightboxIndex].caption && (
+              <p className="font-mono text-sm text-center mt-4 text-muted-foreground">
+                {gearItem.galleryImages[lightboxIndex].caption}
+              </p>
+            )}
+            <p className="font-mono text-xs text-center mt-2 text-muted-foreground">
+              {lightboxIndex + 1} / {gearItem.galleryImages.length}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
