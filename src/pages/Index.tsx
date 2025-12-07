@@ -41,6 +41,7 @@ const Index = () => {
     { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
     { label: { en: 'Labels', es: 'Sellos' }, path: '/labels' },
     { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
+    { label: { en: 'Gear', es: 'Equipo' }, path: '/gear' },
     { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
   ];
 
