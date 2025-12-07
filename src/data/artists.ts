@@ -237,26 +237,27 @@ export const artists: Artist[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // SOUTH AMERICA
+  // EUROPE
   // ═══════════════════════════════════════════════════════════════
 
-  // COLOMBIA
+  // GERMANY - BERLIN (Spanish-born)
   {
     id: "kwartz",
     name: "Kwartz",
-    city: "Bogotá",
-    country: "Colombia",
-    region: "South America",
-    active: "2012–present",
-    tags: ["Colombian", "dark", "hypnotic", "industrial", "Video Club"],
+    realName: "Mario Campos",
+    city: "Berlin",
+    country: "Germany",
+    region: "Europe",
+    active: "2011–present",
+    tags: ["Spanish", "dark", "hypnotic", "industrial", "PoleGroup"],
     photoUrl: "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=800",
-    bio: "Colombian producer. Dark, hypnotic industrial techno from Bogotá. Key figure in the Video Club scene. His productions carry the raw energy of South American warehouse culture.",
+    bio: "Real name Mario Campos. Born in Madrid 1989, now Berlin-based. Member of PoleGroup. His dark, hypnotic industrial techno drew attention from leading names in the scene. Released split EP with Exium in 2013.",
     labels: ["PoleGroup", "Planet Rhythm", "Mord"],
     careerHighlights: [
-      "Video Club resident",
-      "PoleGroup artist",
+      "PoleGroup member since 2013",
+      "Split EP with Exium - Fenomen",
       "Berghain debut 2018",
-      "South American techno ambassador"
+      "Berlin-based producer"
     ],
     keyReleases: [
       { title: "Systematic Oppression", label: "PoleGroup", year: 2017, format: "12\"" },
@@ -280,10 +281,6 @@ export const artists: Artist[] = [
     ],
     riderNotes: "Standard Pioneer setup. Dark venue preferred."
   },
-
-  // ═══════════════════════════════════════════════════════════════
-  // EUROPE
-  // ═══════════════════════════════════════════════════════════════
 
   // UK - BIRMINGHAM
   {
@@ -1244,13 +1241,14 @@ export const artists: Artist[] = [
   {
     id: "reeko",
     name: "Reeko",
+    realName: "Juan Rico",
     city: "Madrid",
     country: "Spain",
     region: "Europe",
-    active: "1998–present",
-    tags: ["Spanish", "Mental Disorder", "dark", "industrial"],
+    active: "1997–present",
+    tags: ["Spanish", "Mental Disorder", "dark", "industrial", "PoleGroup"],
     photoUrl: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800",
-    bio: "Madrid veteran. Founder of Mental Disorder label. Dark, industrial techno with a hypnotic edge.",
+    bio: "Madrid veteran. Real name Juan Rico. Founder of Mental Disorder label. Part of the PoleGroup gang and Selección Natural collective. One of the most prolific Spanish producers since the late 90s with a signature dark, industrial sound.",
     labels: ["Mental Disorder", "PoleGroup"],
     careerHighlights: [
       "Founded Mental Disorder label",
@@ -1595,13 +1593,13 @@ export const artists: Artist[] = [
   {
     id: "999999999",
     name: "999999999",
-    city: "Rome",
+    city: "Venice",
     country: "Italy",
     region: "Europe",
     active: "2015–present",
-    tags: ["acid", "hard", "NineTimesNine", "raw"],
+    tags: ["acid", "hard", "NineTimesNine", "raw", "industrial"],
     photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
-    bio: "Italian duo. Raw, acid-influenced productions. Smoke-twisting filth. Their live performances are legendary for their intensity.",
+    bio: "Venetian duo reshaping hard techno. Raw, acid-fused productions with industrial intensity. Known for building scenes in challenging cities like Venice. Their live hardware performances with multiple TB-303s are legendary.",
     labels: ["NineTimesNine", "Mord"],
     careerHighlights: [
       "Founded NineTimesNine label",
@@ -1763,13 +1761,14 @@ export const artists: Artist[] = [
   {
     id: "vtss",
     name: "VTSS",
+    realName: "Martyna Maja",
     city: "Warsaw",
     country: "Poland",
     region: "Europe",
     active: "2015–present",
-    tags: ["Polish", "hard", "industrial", "driving"],
+    tags: ["Polish", "hard", "industrial", "driving", "maximalist"],
     photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
-    bio: "Polish producer. Hard, industrial techno. A key figure in Poland's techno scene.",
+    bio: "Techno maximalist. Real name Martyna Maja. High-octane club rhythms maestro from Poland. A key figure in Poland's techno scene with relentless, driving sets.",
     labels: ["VTSS", "Perc Trax"],
     careerHighlights: [
       "Perc Trax artist",
@@ -1963,21 +1962,17 @@ export const artists: Artist[] = [
     riderNotes: "Extended sets preferred."
   },
 
-  // ═══════════════════════════════════════════════════════════════
-  // OCEANIA
-  // ═══════════════════════════════════════════════════════════════
-
-  // AUSTRALIA - MELBOURNE
+  // UK - LONDON (Berlin-based)
   {
     id: "dax-j",
     name: "Dax J",
-    city: "Melbourne",
-    country: "Australia",
-    region: "Oceania",
+    city: "London",
+    country: "UK",
+    region: "Europe",
     active: "2010–present",
-    tags: ["hard", "Monnom Black", "industrial", "driving"],
+    tags: ["hard", "Monnom Black", "industrial", "driving", "Berghain"],
     photoUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
-    bio: "Australian-born, Berlin-based. Founder of Monnom Black. Hard, industrial techno with driving intensity. His sets are legendary for their power.",
+    bio: "London-born, Berlin-based. Founder of Monnom Black. Hard, industrial techno with driving intensity. Berghain resident. His sets are legendary for their uncompromising power.",
     labels: ["Monnom Black", "Arts"],
     careerHighlights: [
       "Founded Monnom Black label",

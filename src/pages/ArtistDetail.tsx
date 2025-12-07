@@ -199,6 +199,12 @@ const ArtistDetail = () => {
                   ))}
                 </div>
               </div>
+              {/* Artistic representation notice */}
+              <div className="absolute top-2 right-2">
+                <span className="font-mono text-[10px] bg-background/80 text-muted-foreground px-2 py-1 border border-border/50">
+                  {language === 'en' ? 'Artistic representation' : 'Representación artística'}
+                </span>
+              </div>
             </div>
 
             {/* Artist Info */}
