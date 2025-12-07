@@ -28,56 +28,59 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Generate embedding for the query
-    console.log('Generating embedding for query:', query);
-    const embeddingResponse = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: query,
-        dimensions: 768
-      }),
-    });
+    // Use full-text search to find relevant documents
+    console.log('Searching for documents matching:', query);
+    
+    // Extract keywords from query for full-text search
+    const searchTerms = query
+      .toLowerCase()
+      .replace(/[¿?¡!.,;:]/g, '')
+      .split(' ')
+      .filter(word => word.length > 2)
+      .join(' | ');
 
-    if (!embeddingResponse.ok) {
-      const errorText = await embeddingResponse.text();
-      console.error('Embedding error:', errorText);
-      throw new Error('Failed to generate query embedding');
-    }
-
-    const embeddingData = await embeddingResponse.json();
-    const queryEmbedding = embeddingData.data?.[0]?.embedding;
-
-    if (!queryEmbedding) {
-      throw new Error('No embedding returned');
-    }
-
-    // Search for similar documents
-    console.log('Searching for similar documents...');
     const { data: documents, error: searchError } = await supabase
-      .rpc('match_documents', {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
-        match_threshold: 0.3,
-        match_count: 5
-      });
+      .from('documents')
+      .select('id, title, content, source')
+      .textSearch('content', searchTerms, { type: 'websearch', config: 'spanish' })
+      .limit(5);
 
     if (searchError) {
       console.error('Search error:', searchError);
-      throw new Error('Failed to search documents');
+      // Fallback: get all documents if full-text search fails
+      const { data: allDocs } = await supabase
+        .from('documents')
+        .select('id, title, content, source')
+        .limit(5);
+      
+      if (allDocs && allDocs.length > 0) {
+        console.log(`Fallback: using ${allDocs.length} documents`);
+      }
     }
 
     console.log(`Found ${documents?.length || 0} relevant documents`);
 
     // Build context from retrieved documents
     let context = '';
-    if (documents && documents.length > 0) {
-      context = documents
-        .map((doc: any) => `[${doc.title}]\n${doc.content}`)
+    const usedDocs = documents || [];
+    
+    if (usedDocs.length > 0) {
+      context = usedDocs
+        .map((doc: { title: string; content: string }) => `[${doc.title}]\n${doc.content}`)
         .join('\n\n---\n\n');
+    } else {
+      // If no documents found, fetch some anyway
+      const { data: fallbackDocs } = await supabase
+        .from('documents')
+        .select('id, title, content, source')
+        .limit(3);
+      
+      if (fallbackDocs && fallbackDocs.length > 0) {
+        context = fallbackDocs
+          .map((doc: { title: string; content: string }) => `[${doc.title}]\n${doc.content}`)
+          .join('\n\n---\n\n');
+        console.log(`Using ${fallbackDocs.length} fallback documents`);
+      }
     }
 
     // Create the RAG prompt
@@ -88,7 +91,7 @@ Responde siempre en español, de forma clara y concisa. Si la información no es
 indica que no tienes esa información específica pero ofrece lo que sepas del tema.
 
 CONTEXTO DE CONOCIMIENTO:
-${context || 'No hay contexto específico disponible. Responde basándote en tu conocimiento general sobre techno y festivales europeos.'}`;
+${context || 'No hay documentos en la base de conocimiento. Responde basándote en tu conocimiento general sobre techno y festivales europeos.'}`;
 
     // Generate response with AI
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -120,6 +123,8 @@ ${context || 'No hay contexto específico disponible. Responde basándote en tu 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+      const errText = await aiResponse.text();
+      console.error('AI error:', errText);
       throw new Error('AI request failed');
     }
 
@@ -131,7 +136,7 @@ ${context || 'No hay contexto específico disponible. Responde basándote en tu 
       const data = await aiResponse.json();
       return new Response(JSON.stringify({
         answer: data.choices?.[0]?.message?.content,
-        sources: documents?.map((d: any) => ({ title: d.title, source: d.source, similarity: d.similarity }))
+        sources: usedDocs.map((d: { title: string; source: string }) => ({ title: d.title, source: d.source }))
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

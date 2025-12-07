@@ -29,7 +29,7 @@ enable_confirmations = false
 verify_jwt = false
 
 [functions.ingest-documents]
-verify_jwt = true
+verify_jwt = false
 
 [functions.rag-chat]
 verify_jwt = false
