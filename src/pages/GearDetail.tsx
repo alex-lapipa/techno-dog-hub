@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play } from "lucide-react";
+import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getGearById, getRelatedGear, gearCategories } from "@/data/gear";
+import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -9,6 +9,11 @@ const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const gearItem = id ? getGearById(id) : null;
+
+  // Find prev/next gear for navigation
+  const currentIndex = gear.findIndex(g => g.id === id);
+  const prevGear = currentIndex > 0 ? gear[currentIndex - 1] : null;
+  const nextGear = currentIndex < gear.length - 1 ? gear[currentIndex + 1] : null;
 
   if (!gearItem) {
     return (
@@ -36,14 +41,58 @@ const GearDetail = () => {
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <Link 
-            to="/gear" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-6 sm:mb-8 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {language === 'en' ? 'Back to Gear' : 'Volver a Equipo'}
-          </Link>
+          {/* Navigation Row */}
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            {/* Back Link */}
+            <Link 
+              to="/gear" 
+              className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              {language === 'en' ? 'Back to Gear' : 'Volver a Equipo'}
+            </Link>
+
+            {/* Prev/Next Navigation */}
+            <div className="flex items-center gap-2">
+              {prevGear ? (
+                <Link
+                  to={`/gear/${prevGear.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={prevGear.name}
+                >
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {prevGear.name}
+                  </span>
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              )}
+
+              <span className="font-mono text-xs text-muted-foreground px-2">
+                {currentIndex + 1}/{gear.length}
+              </span>
+
+              {nextGear ? (
+                <Link
+                  to={`/gear/${nextGear.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={nextGear.name}
+                >
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {nextGear.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Hero Section - Responsive Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
