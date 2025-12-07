@@ -20,7 +20,7 @@ const Header = () => {
         <nav className="flex items-center justify-between h-14">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
-            <img src={technoDogLogo} alt="techno.dog logo" className="w-8 h-8" />
+            <img src={technoDogLogo} alt="techno.dog logo" className="w-8 h-8 logo-glow" />
             <span className="text-sm font-mono tracking-[0.2em] text-foreground group-hover:animate-glitch">
               techno.dog
             </span>

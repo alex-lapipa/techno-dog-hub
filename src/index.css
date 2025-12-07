@@ -137,6 +137,15 @@
     50% { transform: translateY(-5px); }
   }
 
+  @keyframes logo-glow {
+    0%, 100% { 
+      filter: drop-shadow(0 0 2px hsl(var(--glitch-1) / 0.5)) drop-shadow(0 0 4px hsl(var(--glitch-2) / 0.3));
+    }
+    50% { 
+      filter: drop-shadow(0 0 8px hsl(var(--glitch-1) / 0.8)) drop-shadow(0 0 16px hsl(var(--glitch-2) / 0.6)) drop-shadow(0 0 24px hsl(var(--glitch-1) / 0.4));
+    }
+  }
+
   .animate-glitch {
     animation: glitch 0.3s infinite;
   }
@@ -159,6 +168,14 @@
 
   .animate-float-slow {
     animation: float-slow 8s ease-in-out infinite;
+  }
+
+  .logo-glow {
+    transition: filter 0.3s ease;
+  }
+
+  .logo-glow:hover {
+    animation: logo-glow 1.5s ease-in-out infinite;
   }
 
   /* Scanline effect */
