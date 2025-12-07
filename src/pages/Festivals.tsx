@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { loadFestivalsSummary, loadFestivalById } from "@/data/festivals-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 const FestivalsPage = () => {
   const queryClient = useQueryClient();
+  const directoryRef = useRef<HTMLDivElement>(null);
   
   const prefetchFestival = useCallback((id: string) => {
     queryClient.prefetchQuery({
@@ -18,6 +20,7 @@ const FestivalsPage = () => {
       staleTime: 1000 * 60 * 10,
     });
   }, [queryClient]);
+  
   const { language } = useLanguage();
 
   const { data: festivals = [], isLoading } = useQuery({
@@ -29,6 +32,13 @@ const FestivalsPage = () => {
   const featuredIds = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
   const featured = festivals.filter(f => featuredIds.includes(f.id));
   const others = festivals.filter(f => !featuredIds.includes(f.id));
+
+  const rowVirtualizer = useVirtualizer({
+    count: others.length,
+    getScrollElement: () => directoryRef.current,
+    estimateSize: () => 72,
+    overscan: 5,
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -49,6 +59,7 @@ const FestivalsPage = () => {
             </p>
           </div>
 
+          {/* Featured festivals - not virtualized as it's a small fixed set */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
@@ -117,6 +128,7 @@ const FestivalsPage = () => {
             )}
           </div>
 
+          {/* Directory with virtual scrolling */}
           <div className="mb-12">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
               // {language === 'en' ? 'Full directory' : 'Directorio completo'}
@@ -135,34 +147,55 @@ const FestivalsPage = () => {
                   </div>
                 ))
               ) : (
-                others.map((festival, index) => (
-                  <Link
-                    key={festival.id}
-                    to={`/festivals/${festival.id}`}
-                    onMouseEnter={() => prefetchFestival(festival.id)}
-                    className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 -mx-4"
+                <div
+                  ref={directoryRef}
+                  className="h-[50vh] overflow-auto"
+                >
+                  <div
+                    style={{
+                      height: `${rowVirtualizer.getTotalSize()}px`,
+                      width: '100%',
+                      position: 'relative',
+                    }}
                   >
-                    <div className="flex items-center gap-6">
-                      <span className="font-mono text-xs text-muted-foreground w-8">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <div>
-                        <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
-                          {festival.name}
-                        </h3>
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {festival.city}, {festival.country}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="font-mono text-xs text-muted-foreground hidden md:block">
-                        {festival.months[0]}
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </Link>
-                ))
+                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                      const festival = others[virtualRow.index];
+                      return (
+                        <Link
+                          key={festival.id}
+                          to={`/festivals/${festival.id}`}
+                          onMouseEnter={() => prefetchFestival(festival.id)}
+                          data-index={virtualRow.index}
+                          ref={rowVirtualizer.measureElement}
+                          className="group absolute left-0 right-0 flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4"
+                          style={{
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                        >
+                          <div className="flex items-center gap-6">
+                            <span className="font-mono text-xs text-muted-foreground w-8">
+                              {String(virtualRow.index + 1).padStart(2, "0")}
+                            </span>
+                            <div>
+                              <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
+                                {festival.name}
+                              </h3>
+                              <span className="font-mono text-xs text-muted-foreground">
+                                {festival.city}, {festival.country}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="font-mono text-xs text-muted-foreground hidden md:block">
+                              {festival.months[0]}
+                            </span>
+                            <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           </div>
