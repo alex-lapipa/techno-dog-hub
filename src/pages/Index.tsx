@@ -135,17 +135,17 @@ const Index = () => {
           <div className="container mx-auto px-4 md:px-8 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Latest article teaser */}
-              <Link to="/news/bassiani-anniversary" className="group block border border-border p-6 hover:bg-card transition-colors">
+              <Link to="/news" className="group block border border-border p-6 hover:bg-card transition-colors">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
                   // {language === 'en' ? 'Latest' : 'Último'}
                 </div>
                 <h3 className="font-mono text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                  {language === 'en' ? 'Bassiani: 10 Years of Resistance' : 'Bassiani: 10 Años de Resistencia'}
+                  {language === 'en' ? 'News & Features' : 'Noticias y Reportajes'}
                 </h3>
                 <p className="font-mono text-sm text-muted-foreground mb-4">
                   {language === 'en' 
-                    ? 'The Tbilisi institution marks a decade of cultural revolution.' 
-                    : 'La institución de Tbilisi marca una década de revolución cultural.'}
+                    ? 'The latest transmissions from the underground.' 
+                    : 'Las últimas transmisiones del underground.'}
                 </p>
                 <span className="font-mono text-xs text-muted-foreground group-hover:text-foreground">
                   {language === 'en' ? 'Read →' : 'Leer →'}
