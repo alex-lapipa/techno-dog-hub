@@ -23,6 +23,8 @@ import Crews from "./pages/Crews";
 import MadStuff from "./pages/MadStuff";
 import Timeline from "./pages/Timeline";
 import Calendar from "./pages/Calendar";
+import Gear from "./pages/Gear";
+import GearDetail from "./pages/GearDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,6 +82,10 @@ const App = () => (
               <Route path="/mad/timeline" element={<Timeline />} />
               <Route path="/mad/calendar" element={<Calendar />} />
               <Route path="/mad/map" element={<MadStuff />} />
+              
+              {/* Gear */}
+              <Route path="/gear" element={<Gear />} />
+              <Route path="/gear/:id" element={<GearDetail />} />
               
               {/* Catch all */}
               <Route path="*" element={<NotFound />} />
