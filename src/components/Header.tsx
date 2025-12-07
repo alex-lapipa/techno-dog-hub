@@ -118,8 +118,8 @@ const Header = () => {
               >
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors hover:animate-glitch ${
-                    isActive(item.path) ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-shadow-neon ${
+                    isActive(item.path) ? 'text-foreground text-shadow-neon' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {item.label[language]}
