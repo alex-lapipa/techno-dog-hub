@@ -1,3 +1,12 @@
+export interface ImageAttribution {
+  url: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  sourceUrl: string;
+  sourceName: string;
+}
+
 export interface Artist {
   id: string;
   name: string;
@@ -9,6 +18,7 @@ export interface Artist {
   tags: string[];
   bio: string;
   photoUrl?: string;
+  image?: ImageAttribution;
   labels?: string[];
   collaborators?: string[];
   influences?: string[];
@@ -43,7 +53,14 @@ export const artists: Artist[] = [
     region: "North America",
     active: "1985–present",
     tags: ["Detroit", "minimal", "sci-fi", "TR-909", "three-deck"],
-    // No photoUrl - requires licensed image
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/5/52/Jeff_Mills_2010.jpg",
+      author: "Basic Sounds",
+      license: "CC BY-SA 2.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Jeff_Mills_2010.jpg",
+      sourceName: "Wikimedia Commons"
+    },
     bio: "The Wizard. Co-founder of Underground Resistance. Pioneer of minimal techno and the three-deck technique. His work transcends dance music into cinematic and orchestral territories. Mills has performed with symphony orchestras worldwide and continues to push the boundaries of what techno can be.",
     labels: ["Axis", "Underground Resistance", "Purpose Maker", "Tomorrow"],
     careerHighlights: [
@@ -292,7 +309,14 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "1994–present",
     tags: ["industrial", "Birmingham sound", "hardware", "modular"],
-    // No photoUrl - requires licensed image
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/0/05/Surgeon_%28Anthony_Child%29.jpg",
+      author: "Ali Wade",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Surgeon_(Anthony_Child).jpg",
+      sourceName: "Wikimedia Commons"
+    },
     bio: "One of the most influential figures in British techno. Co-founder of Counterbalance and Dynamic Tension. Raw, visceral sound and extended live sets. His modular synthesizer performances are legendary.",
     labels: ["Tresor", "Dynamic Tension", "Counterbalance", "Blueprint"],
     collaborators: ["Regis", "Lady Starlight", "British Murder Boys"],
@@ -1073,7 +1097,14 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "2010–present",
     tags: ["electro", "acid", "hardware", "analog"],
-    photoUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800",
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/5/57/Helena_Hauff_%40_Primavera_Sound_Festival%2C_Barcelona%2C_02.06.2016_%2836682200586%29_%28cropped%29.jpg",
+      author: "deepskyobject",
+      license: "CC BY-SA 2.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Helena_Hauff_@_Primavera_Sound_Festival,_Barcelona,_02.06.2016_(36682200586)_(cropped).jpg",
+      sourceName: "Wikimedia Commons"
+    },
     bio: "Hamburg's queen of electro and acid. Resident at Golden Pudel Club. Hardware-only performances. Uncompromising. Her vinyl sets are legendary for their energy and precision.",
     labels: ["Return to Disorder", "Ninja Tune", "Werkdiscs"],
     careerHighlights: [

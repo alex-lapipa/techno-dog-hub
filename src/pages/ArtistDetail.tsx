@@ -54,18 +54,49 @@ const ArtistDetail = () => {
 
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Artist Placeholder - No fake images */}
-            <div className="aspect-square relative overflow-hidden border border-border bg-card/30 flex items-center justify-center">
-              <div className="text-center p-8">
-                <User className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 text-muted-foreground/30" />
-                <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2 text-muted-foreground">
-                  {artist.name}
-                </h2>
-                <p className="font-mono text-xs text-muted-foreground/70">
-                  {artist.city}, {artist.country}
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+            {/* Artist Photo */}
+            <div className="aspect-square relative overflow-hidden border border-border bg-card/30">
+              {artist.image ? (
+                <>
+                  <img 
+                    src={artist.image.url} 
+                    alt={artist.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm border border-border px-2 py-1 text-xs font-mono">
+                    <a 
+                      href={artist.image.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                    >
+                      📷 {artist.image.author}
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <a 
+                      href={artist.image.licenseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground/70 hover:text-foreground transition-colors text-[10px]"
+                    >
+                      {artist.image.license}
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <User className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 text-muted-foreground/30" />
+                    <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2 text-muted-foreground">
+                      {artist.name}
+                    </h2>
+                    <p className="font-mono text-xs text-muted-foreground/70">
+                      {artist.city}, {artist.country}
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex flex-wrap gap-2">
                   {artist.tags.map(tag => (
