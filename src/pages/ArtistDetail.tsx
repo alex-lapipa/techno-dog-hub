@@ -5,7 +5,7 @@ import { getArtistById, artists } from "@/data/artists";
 import { getReleasesByArtist } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+import LazyImage from "@/components/LazyImage";
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
@@ -107,10 +107,10 @@ const ArtistDetail = () => {
             <div className="aspect-square relative overflow-hidden border border-border bg-card/30">
               {artist.image ? (
                 <>
-                  <img 
+                  <LazyImage 
                     src={artist.image.url} 
                     alt={artist.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
                   <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm border border-border px-2 py-1 text-xs font-mono">
