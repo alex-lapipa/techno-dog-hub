@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import technoDogLogo from "@/assets/techno-dog-logo.png";
 
@@ -63,6 +64,14 @@ const Footer = () => {
                   </li>
                 )
               )}
+              <li>
+                <Link
+                  to="/docs"
+                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Documentation
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

@@ -27,6 +27,7 @@ import Timeline from "./pages/Timeline";
 import Calendar from "./pages/Calendar";
 import Gear from "./pages/Gear";
 import GearDetail from "./pages/GearDetail";
+import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,9 @@ const App = () => (
               {/* Gear */}
               <Route path="/gear" element={<Gear />} />
               <Route path="/gear/:id" element={<GearDetail />} />
+              
+              {/* Documentation */}
+              <Route path="/docs" element={<Documentation />} />
               
               {/* Catch all */}
               <Route path="*" element={<NotFound />} />
