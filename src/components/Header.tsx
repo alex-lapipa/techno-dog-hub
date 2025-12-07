@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "./LanguageToggle";
 import technoDogLogo from "@/assets/techno-dog-logo.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -16,6 +16,15 @@ const Header = () => {
   const { language } = useLanguage();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleAuthClick = async () => {
     if (user) {
@@ -89,7 +98,9 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
+      scrolled ? 'bg-background shadow-lg' : 'bg-background/80 backdrop-blur-sm'
+    }`}>
       <div className="container mx-auto px-4 md:px-6">
         <nav className="flex items-center justify-between h-14">
           {/* Logo */}
