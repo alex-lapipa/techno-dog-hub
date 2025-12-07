@@ -332,8 +332,24 @@ const GearDetail = () => {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {gearItem.youtubeVideos.map((video, i) => {
-                  // Extract YouTube video ID from URL
-                  const videoId = video.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+                  // Extract YouTube video ID from various URL formats
+                  const getYouTubeId = (url: string) => {
+                    // Handle standard watch URLs
+                    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([^&\s]+)/);
+                    if (watchMatch) return watchMatch[1];
+                    
+                    // Handle short URLs
+                    const shortMatch = url.match(/(?:youtu\.be\/)([^?\s]+)/);
+                    if (shortMatch) return shortMatch[1];
+                    
+                    // Handle embed URLs
+                    const embedMatch = url.match(/(?:youtube\.com\/embed\/)([^?\s]+)/);
+                    if (embedMatch) return embedMatch[1];
+                    
+                    return null;
+                  };
+                  
+                  const videoId = getYouTubeId(video.url);
                   
                   return (
                     <div key={i} className="border border-border overflow-hidden bg-card/30">

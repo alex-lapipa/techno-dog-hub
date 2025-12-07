@@ -17,9 +17,11 @@ import FestivalDetail from "./pages/FestivalDetail";
 import Artists from "./pages/Artists";
 import ArtistDetail from "./pages/ArtistDetail";
 import Venues from "./pages/Venues";
+import VenueDetail from "./pages/VenueDetail";
 import Labels from "./pages/Labels";
 import Releases from "./pages/Releases";
 import Crews from "./pages/Crews";
+import CrewDetail from "./pages/CrewDetail";
 
 import Timeline from "./pages/Timeline";
 import Calendar from "./pages/Calendar";
@@ -61,7 +63,7 @@ const App = () => (
               
               {/* Venues */}
               <Route path="/venues" element={<Venues />} />
-              <Route path="/venues/:id" element={<Venues />} />
+              <Route path="/venues/:id" element={<VenueDetail />} />
               
               {/* Labels */}
               <Route path="/labels" element={<Labels />} />
@@ -75,7 +77,7 @@ const App = () => (
               
               {/* Crews */}
               <Route path="/crews" element={<Crews />} />
-              <Route path="/crews/:id" element={<Crews />} />
+              <Route path="/crews/:id" element={<CrewDetail />} />
               
               {/* Mad Stuff */}
               <Route path="/mad/timeline" element={<Timeline />} />
