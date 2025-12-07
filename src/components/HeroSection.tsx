@@ -1,81 +1,84 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-festival.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Festival techno"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
-      </div>
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-background noise">
+      {/* Scanlines overlay */}
+      <div className="absolute inset-0 scanlines pointer-events-none" />
 
-      {/* Animated elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: "1s" }} />
+      {/* Background text decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+        <div className="absolute top-1/4 left-0 right-0 opacity-[0.03] text-[20vw] font-mono font-bold leading-none whitespace-nowrap">
+          TECHNO_EUROPA
+        </div>
+        <div className="absolute top-1/2 left-0 right-0 opacity-[0.02] text-[15vw] font-mono leading-none whitespace-nowrap animate-marquee">
+          AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL • AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL •
+        </div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center pt-20">
-        <div className="max-w-4xl mx-auto space-y-8">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 pt-20">
+        <div className="max-w-4xl space-y-12">
+          {/* Terminal header */}
+          <div className="font-mono text-xs text-muted-foreground tracking-wider">
+            <span className="text-foreground">user@technofest</span>
+            <span className="text-muted-foreground">:</span>
+            <span className="text-foreground">~</span>
+            <span className="text-muted-foreground">$ </span>
+            <span className="animate-flicker">cat /festivales/europa/2025</span>
+            <span className="animate-blink">_</span>
+          </div>
+
+          {/* Main title */}
           <div className="space-y-4">
-            <span className="inline-block font-body text-sm uppercase tracking-[0.3em] text-primary animate-float">
-              Tu guía de festivales techno en Europa
-            </span>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black leading-tight">
-              <span className="block text-foreground">Descubre el</span>
-              <span className="block gradient-text text-glow-cyan">
-                Ritmo Europeo
-              </span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
+              <span className="block text-foreground">Festivales</span>
+              <span className="block text-foreground animate-glitch-hover">Techno Europa</span>
             </h1>
           </div>
 
-          <p className="font-body text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Explora los mejores festivales de música electrónica en Europa.
-            Desde Aquasella en Asturias hasta los eventos más underground del
-            continente.
+          {/* Description */}
+          <p className="font-mono text-sm md:text-base text-muted-foreground max-w-xl leading-relaxed tracking-wide">
+            Portal de música electrónica experimental y cultura techno.
+            Aquasella, L.E.V., y los eventos más relevantes del continente.
+            <span className="text-foreground"> [ES/EN/FR]</span>
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button variant="hero" size="xl">
-              Explorar Festivales
-              <ArrowRight className="w-5 h-5" />
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <Button variant="brutalist" size="lg">
+              Explorar festivales
+              <ArrowRight className="w-4 h-4" />
             </Button>
-            <Button variant="neon" size="xl">
-              <Play className="w-5 h-5" />
-              Ver Trailer
+            <Button variant="terminal" size="lg">
+              Aquasella 2025
             </Button>
           </div>
 
-          <div className="pt-12 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-            <div className="text-center">
-              <div className="font-display text-3xl md:text-4xl font-bold text-primary text-glow-cyan">
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-8 pt-12 border-t border-border">
+            <div>
+              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
                 150+
               </div>
-              <div className="font-body text-sm text-muted-foreground uppercase tracking-wider">
+              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
                 Festivales
               </div>
             </div>
-            <div className="text-center">
-              <div className="font-display text-3xl md:text-4xl font-bold text-secondary text-glow-magenta">
+            <div>
+              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
                 25
               </div>
-              <div className="font-body text-sm text-muted-foreground uppercase tracking-wider">
+              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
                 Países
               </div>
             </div>
-            <div className="text-center">
-              <div className="font-display text-3xl md:text-4xl font-bold text-accent text-glow-purple">
+            <div>
+              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
                 2M+
               </div>
-              <div className="font-body text-sm text-muted-foreground uppercase tracking-wider">
+              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
                 Asistentes
               </div>
             </div>
@@ -84,10 +87,8 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 rounded-full border-2 border-primary/50 flex items-start justify-center p-2">
-          <div className="w-1 h-2 bg-primary rounded-full animate-pulse" />
-        </div>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-muted-foreground">
+        <span className="animate-float-slow inline-block">[ scroll ]</span>
       </div>
     </section>
   );
