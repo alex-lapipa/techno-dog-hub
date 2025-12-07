@@ -47,13 +47,18 @@ const GearDetail = () => {
 
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Image */}
-            <div className="aspect-square relative overflow-hidden border border-border bg-card/50">
+            {/* Image - Links to official product site */}
+            <a 
+              href={gearItem.officialUrl || '#'}
+              target={gearItem.officialUrl ? '_blank' : undefined}
+              rel="noopener noreferrer"
+              className={`aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
+            >
               {gearItem.imageUrl ? (
                 <img 
                   src={gearItem.imageUrl} 
                   alt={gearItem.name}
-                  className="w-full h-full object-contain p-4"
+                  className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                     e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -67,6 +72,15 @@ const GearDetail = () => {
                 </p>
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+              {/* Official site indicator */}
+              {gearItem.officialUrl && (
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="bg-background/90 border border-border px-3 py-1 flex items-center gap-2">
+                    <ExternalLink className="w-3 h-3" />
+                    <span className="font-mono text-xs">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
+                  </div>
+                </div>
+              )}
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="flex flex-wrap gap-2">
                   {gearItem.tags.map(tag => (
@@ -79,7 +93,7 @@ const GearDetail = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </a>
 
             {/* Gear Info */}
             <div className="space-y-6">
@@ -296,43 +310,50 @@ const GearDetail = () => {
             </section>
           )}
 
-          {/* Media & Videos */}
-          <section className="mb-12 border-t border-border pt-8">
-            <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-              <Play className="w-5 h-5" />
-              {language === 'en' ? 'Media & Demos' : 'Media y Demos'}
-            </h2>
-            {gearItem.youtubeVideos && gearItem.youtubeVideos.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-4">
-                {gearItem.youtubeVideos.map((video, i) => (
-                  <a
-                    key={i}
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="border border-border p-4 hover:bg-card transition-colors group flex items-center gap-4"
-                  >
-                    <div className="w-12 h-12 bg-destructive/20 rounded flex items-center justify-center flex-shrink-0">
-                      <Play className="w-6 h-6 text-destructive" />
+          {/* Media & Videos - Embedded */}
+          {gearItem.youtubeVideos && gearItem.youtubeVideos.length > 0 && (
+            <section className="mb-12 border-t border-border pt-8">
+              <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
+                <Play className="w-5 h-5" />
+                {language === 'en' ? 'Media & Demos' : 'Media y Demos'}
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {gearItem.youtubeVideos.map((video, i) => {
+                  // Extract YouTube video ID from URL
+                  const videoId = video.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+                  
+                  return (
+                    <div key={i} className="border border-border overflow-hidden bg-card/30">
+                      {videoId ? (
+                        <div className="aspect-video">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${videoId}`}
+                            title={video.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          />
+                        </div>
+                      ) : (
+                        <a
+                          href={video.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="aspect-video bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                        >
+                          <Play className="w-12 h-12 text-muted-foreground" />
+                        </a>
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-mono text-sm mb-1">{video.title}</h3>
+                        <p className="font-mono text-xs text-muted-foreground">{video.channel}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-mono text-sm group-hover:animate-glitch">{video.title}</h3>
-                      <p className="font-mono text-xs text-muted-foreground">{video.channel}</p>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-muted-foreground ml-auto" />
-                  </a>
-                ))}
+                  );
+                })}
               </div>
-            ) : (
-              <div className="border border-border border-dashed p-8 flex items-center justify-center">
-                <p className="font-mono text-xs text-muted-foreground text-center">
-                  {language === 'en' 
-                    ? 'Video demos coming soon' 
-                    : 'Demos en video próximamente'}
-                </p>
-              </div>
-            )}
-          </section>
+            </section>
+          )}
 
         </div>
       </main>
