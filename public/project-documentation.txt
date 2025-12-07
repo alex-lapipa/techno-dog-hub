@@ -1,0 +1,752 @@
+================================================================================
+                    GLOBAL TECHNO ENCYCLOPEDIA - PROJECT DOCUMENTATION
+                              Technical & Content Overview
+================================================================================
+
+Generated: December 2024
+Version: 1.0
+
+================================================================================
+                                TABLE OF CONTENTS
+================================================================================
+
+1. PROJECT OVERVIEW
+2. TECHNOLOGY STACK
+3. PROJECT STRUCTURE
+4. DATA ARCHITECTURE
+5. BACKEND & DATABASE
+6. FEATURES & FUNCTIONALITY
+7. CONTENT CATEGORIES
+8. COMPONENT ARCHITECTURE
+9. STYLING & DESIGN SYSTEM
+10. ROUTING & NAVIGATION
+11. INTERNATIONALIZATION
+12. AUTHENTICATION
+13. AI CHAT INTEGRATION
+14. DEPLOYMENT
+
+================================================================================
+                            1. PROJECT OVERVIEW
+================================================================================
+
+This is a comprehensive Global Techno Encyclopedia web application - a curated 
+digital archive dedicated to underground techno culture worldwide. The platform 
+serves as an authoritative resource covering:
+
+- Artists & DJs from the global techno scene
+- Record Labels (iconic and emerging)
+- Venues & Clubs (legendary spaces worldwide)
+- Festivals (from Berghain to Bassiani territories)
+- Gear & Equipment (synthesizers, drum machines, effects)
+- Crews & Collectives
+- Historical Timeline of techno evolution
+- Calendar of events
+- News & Editorial content
+
+TARGET AUDIENCE:
+- Techno enthusiasts and collectors
+- DJs and producers
+- Music journalists and researchers
+- Club culture historians
+- Festival-goers and event organizers
+
+================================================================================
+                            2. TECHNOLOGY STACK
+================================================================================
+
+FRONTEND FRAMEWORK:
+- React 18.3.1 (with TypeScript)
+- Vite (build tool and dev server)
+
+STYLING:
+- Tailwind CSS (utility-first CSS)
+- Custom design system with CSS variables
+- tailwindcss-animate for animations
+
+UI COMPONENTS:
+- shadcn/ui (Radix UI primitives)
+- Lucide React (icons)
+- Custom brutalist/terminal aesthetic components
+
+STATE MANAGEMENT:
+- TanStack React Query (server state)
+- React Context (language, auth)
+
+ROUTING:
+- React Router DOM v6
+
+BACKEND:
+- Supabase (via Lovable Cloud)
+  - PostgreSQL database
+  - Edge Functions (Deno)
+  - Row Level Security (RLS)
+  - Vector embeddings for RAG
+
+AI INTEGRATION:
+- Lovable AI API for RAG chat functionality
+- Document embeddings for semantic search
+
+FORMS & VALIDATION:
+- React Hook Form
+- Zod schema validation
+
+================================================================================
+                            3. PROJECT STRUCTURE
+================================================================================
+
+/
+├── public/
+│   ├── favicon.png
+│   ├── robots.txt
+│   └── project-documentation.txt (this file)
+│
+├── src/
+│   ├── assets/
+│   │   └── techno-dog-logo.png
+│   │
+│   ├── components/
+│   │   ├── ui/                    # shadcn/ui components
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   └── ... (40+ UI primitives)
+│   │   │
+│   │   ├── Header.tsx             # Main navigation
+│   │   ├── Footer.tsx             # Site footer
+│   │   ├── HeroSection.tsx        # Homepage hero
+│   │   ├── TechnoChat.tsx         # AI chat interface
+│   │   ├── IngestButton.tsx       # Admin document ingestion
+│   │   ├── LanguageToggle.tsx     # EN/ES switcher
+│   │   ├── ScrollToTop.tsx        # Route change scroll
+│   │   ├── ScrollToTopButton.tsx  # Floating scroll button
+│   │   ├── MagazineGrid.tsx       # Editorial layout
+│   │   ├── FeaturedArticle.tsx    # Article cards
+│   │   ├── EditorialBlock.tsx     # Content blocks
+│   │   ├── HorizontalNav.tsx      # Mobile navigation
+│   │   ├── NavLink.tsx            # Navigation links
+│   │   ├── FestivalsSection.tsx   # Festival highlights
+│   │   ├── AquasellaSection.tsx   # Festival feature
+│   │   └── LEVSection.tsx         # Festival feature
+│   │
+│   ├── contexts/
+│   │   └── LanguageContext.tsx    # i18n context provider
+│   │
+│   ├── data/
+│   │   ├── artists.ts             # Artist database
+│   │   ├── labels.ts              # Label database
+│   │   ├── venues.ts              # Venue database
+│   │   ├── festivals.ts           # Festival database
+│   │   ├── gear.ts                # Equipment database
+│   │   ├── crews.ts               # Collectives database
+│   │   ├── events.ts              # Calendar events
+│   │   ├── releases.ts            # Music releases
+│   │   ├── timeline.ts            # Historical timeline
+│   │   └── technoKnowledge.ts     # RAG knowledge base
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.tsx            # Authentication hook
+│   │   ├── use-mobile.tsx         # Responsive detection
+│   │   └── use-toast.ts           # Toast notifications
+│   │
+│   ├── integrations/
+│   │   └── supabase/
+│   │       ├── client.ts          # Supabase client
+│   │       └── types.ts           # Database types
+│   │
+│   ├── lib/
+│   │   └── utils.ts               # Utility functions (cn)
+│   │
+│   ├── pages/
+│   │   ├── Index.tsx              # Homepage
+│   │   ├── Auth.tsx               # Login/Signup
+│   │   ├── Artists.tsx            # Artist directory
+│   │   ├── ArtistDetail.tsx       # Individual artist
+│   │   ├── Labels.tsx             # Label directory
+│   │   ├── Venues.tsx             # Venue directory
+│   │   ├── VenueDetail.tsx        # Individual venue
+│   │   ├── Festivals.tsx          # Festival directory
+│   │   ├── FestivalDetail.tsx     # Individual festival
+│   │   ├── Gear.tsx               # Equipment directory
+│   │   ├── GearDetail.tsx         # Individual gear
+│   │   ├── Crews.tsx              # Collectives directory
+│   │   ├── CrewDetail.tsx         # Individual crew
+│   │   ├── Calendar.tsx           # Events calendar
+│   │   ├── Releases.tsx           # Music releases
+│   │   ├── Timeline.tsx           # Historical timeline
+│   │   ├── News.tsx               # News/articles
+│   │   ├── MadStuff.tsx           # Special content
+│   │   └── NotFound.tsx           # 404 page
+│   │
+│   ├── App.tsx                    # Root component & routes
+│   ├── main.tsx                   # React entry point
+│   ├── index.css                  # Global styles & tokens
+│   └── vite-env.d.ts              # Vite type definitions
+│
+├── supabase/
+│   ├── config.toml                # Supabase configuration
+│   ├── migrations/                # Database migrations
+│   └── functions/
+│       ├── rag-chat/              # AI chat endpoint
+│       │   └── index.ts
+│       ├── generate-embedding/    # Vector embeddings
+│       │   └── index.ts
+│       └── ingest-documents/      # Document ingestion
+│           └── index.ts
+│
+├── tailwind.config.ts             # Tailwind configuration
+├── vite.config.ts                 # Vite configuration
+├── tsconfig.json                  # TypeScript config
+└── package.json                   # Dependencies
+
+================================================================================
+                            4. DATA ARCHITECTURE
+================================================================================
+
+All content data is stored as TypeScript modules in /src/data/. Each module 
+exports:
+1. A TypeScript interface defining the data structure
+2. An array of hardcoded records
+3. Utility functions for filtering/querying
+
+ARTISTS (src/data/artists.ts)
+------------------------------
+Interface: Artist
+Fields:
+  - id: string (URL slug)
+  - name: string
+  - realName?: string
+  - origin: string (city, country)
+  - active: string (year range)
+  - genres: string[]
+  - labels: string[]
+  - bio?: string
+  - aka?: string[]
+  - notableReleases?: string[]
+  - influences?: string[]
+
+Utility Functions:
+  - getArtistById(id)
+  - getArtistsByGenre(genre)
+  - getArtistsByLabel(labelId)
+
+LABELS (src/data/labels.ts)
+----------------------------
+Interface: Label
+Fields:
+  - id: string
+  - name: string
+  - founded: number
+  - city: string
+  - country: string
+  - active: boolean
+  - genres: string[]
+  - description?: string
+  - founders?: string[]
+  - notableReleases?: string[]
+  - subLabels?: string[]
+
+Utility Functions:
+  - getLabelById(id)
+  - getLabelsByCountry(country)
+  - getActiveLabels()
+
+VENUES (src/data/venues.ts)
+----------------------------
+Interface: Venue
+Fields:
+  - id: string
+  - name: string
+  - city: string
+  - country: string
+  - opened: number
+  - closed?: number
+  - active: boolean
+  - type: 'club' | 'warehouse' | 'festival-ground' | 'multi-venue'
+  - capacity?: number
+  - description?: string
+  - residents?: string[]
+  - features?: string[]
+
+Utility Functions:
+  - getVenueById(id)
+  - getVenuesByCountry(country)
+  - getVenuesByCity(city)
+  - getActiveVenues()
+
+FESTIVALS (src/data/festivals.ts)
+----------------------------------
+Interface: Festival
+Fields:
+  - id: string
+  - name: string
+  - city: string
+  - country: string
+  - founded: number
+  - active: boolean
+  - type: 'indoor' | 'outdoor' | 'hybrid'
+  - months: string[]
+  - tags: string[]
+  - description?: string
+  - stages?: string[]
+  - capacity?: number
+  - historicLineups?: object[]
+  - coords?: { lat: number, lng: number }
+
+Utility Functions:
+  - getFestivalById(id)
+  - getFestivalsByCountry(country)
+  - getActiveFestivals()
+  - getFestivalsByMonth(month)
+
+GEAR (src/data/gear.ts)
+------------------------
+Interface: GearItem
+Fields:
+  - id: string
+  - name: string
+  - manufacturer: string
+  - year: number
+  - type: 'synthesizer' | 'drum-machine' | 'sampler' | 'effect' | 'mixer' | 'other'
+  - description?: string
+  - notableUsers?: string[]
+  - features?: string[]
+
+Utility Functions:
+  - getGearById(id)
+  - getGearByType(type)
+  - getGearByManufacturer(manufacturer)
+
+CREWS (src/data/crews.ts)
+--------------------------
+Interface: Crew
+Fields:
+  - id: string
+  - name: string
+  - city: string
+  - country: string
+  - active: boolean
+  - type: 'collective' | 'sound-system' | 'party-series' | 'label-crew'
+  - founded?: number
+  - description?: string
+  - members?: string[]
+  - ideology?: string
+
+Utility Functions:
+  - getCrewById(id)
+  - getCrewsByCountry(country)
+  - getCrewsByType(type)
+  - getActiveCrews()
+
+EVENTS (src/data/events.ts)
+----------------------------
+Interface: Event
+Fields:
+  - id: string
+  - name: string
+  - venue: string
+  - city: string
+  - country: string
+  - date: string (ISO date)
+  - artists: string[]
+  - tags: string[]
+  - type: 'club-night' | 'festival' | 'showcase' | 'special'
+
+Utility Functions:
+  - getEventById(id)
+  - getEventsByMonth(month, year)
+  - getEventsByCity(city)
+  - getUpcomingEvents()
+
+RELEASES (src/data/releases.ts)
+--------------------------------
+Interface: Release
+Fields:
+  - id: string
+  - title: string
+  - artist: string
+  - label: string
+  - year: number
+  - format: 'vinyl' | 'digital' | 'cd' | 'cassette'
+  - tags: string[]
+
+Utility Functions:
+  - getReleaseById(id)
+  - getReleasesByArtist(artistId)
+  - getReleasesByLabel(labelId)
+  - getReleasesByYear(year)
+  - getReleasesByTag(tag)
+
+TIMELINE (src/data/timeline.ts)
+--------------------------------
+Historical events in techno history with year, title, and description.
+
+================================================================================
+                            5. BACKEND & DATABASE
+================================================================================
+
+SUPABASE (via Lovable Cloud)
+-----------------------------
+
+DATABASE TABLES:
+
+1. documents
+   - id: uuid (PK)
+   - title: text
+   - content: text
+   - source: text (nullable)
+   - metadata: jsonb
+   - embedding: vector (1536 dimensions)
+   - chunk_index: integer
+   - created_at: timestamp
+   - updated_at: timestamp
+   
+   Purpose: Stores document chunks for RAG (Retrieval-Augmented Generation)
+   RLS: Public read, authenticated write
+
+2. profiles
+   - id: uuid (PK)
+   - user_id: uuid (FK to auth.users)
+   - email: text
+   - created_at: timestamp
+   - updated_at: timestamp
+   
+   Purpose: User profile information
+   RLS: Users can view/update own profile
+
+3. user_roles
+   - id: uuid (PK)
+   - user_id: uuid (FK to auth.users)
+   - role: app_role enum ('admin' | 'user')
+   - created_at: timestamp
+   
+   Purpose: Role-based access control
+   RLS: Users can view own roles
+
+DATABASE FUNCTIONS:
+
+- match_documents(query_embedding, match_threshold, match_count)
+  Performs vector similarity search for RAG
+  
+- has_role(_user_id, _role)
+  Checks if user has specific role
+  
+- handle_new_user()
+  Trigger function to create profile on signup
+
+EDGE FUNCTIONS:
+
+1. rag-chat
+   - Endpoint for AI-powered chat
+   - Retrieves relevant documents via full-text search
+   - Generates responses using Lovable AI
+   - Supports streaming responses
+   
+2. generate-embedding
+   - Generates vector embeddings for text
+   - Uses Lovable AI embeddings API
+   
+3. ingest-documents
+   - Admin-only document ingestion
+   - Chunks documents and stores in database
+   - Used to populate RAG knowledge base
+
+================================================================================
+                            6. FEATURES & FUNCTIONALITY
+================================================================================
+
+CORE FEATURES:
+
+1. DIRECTORY BROWSING
+   - Grid/list views of all content types
+   - Filtering by genre, country, type, etc.
+   - Search functionality
+   - Responsive layouts
+
+2. DETAIL PAGES
+   - Rich information display
+   - Related content links
+   - Previous/Next navigation
+   - Breadcrumb navigation
+
+3. AI CHAT (TechnoChat)
+   - Floating chat button
+   - RAG-powered responses
+   - Streaming text output
+   - Context-aware answers about techno
+
+4. CALENDAR
+   - Monthly event view
+   - Upcoming events list
+   - Event filtering
+
+5. TIMELINE
+   - Historical techno events
+   - Chronological navigation
+
+6. INTERNATIONALIZATION
+   - English/Spanish toggle
+   - Context-based translations
+
+7. AUTHENTICATION
+   - Email/password signup
+   - Login/logout
+   - Protected admin features
+
+8. RESPONSIVE DESIGN
+   - Mobile-first approach
+   - Hamburger menu
+   - Touch-friendly navigation
+
+================================================================================
+                            7. CONTENT CATEGORIES
+================================================================================
+
+ARTISTS DIRECTORY:
+Curated selection of techno artists including:
+- Surgeon, Jeff Mills, Robert Hood
+- Marcel Dettmann, Ben Klock, Helena Hauff
+- Paula Temple, Rebekah, VTSS
+- 999999999, Oscar Mulero, Blawan
+(And many more across industrial, acid, hypnotic, and mental techno)
+
+LABELS DIRECTORY:
+Iconic and emerging labels:
+- Tresor, Ostgut Ton, Mord, Token
+- Arts, Semantica, PoleGroup, Perc Trax
+- Dystopian, Stroboscopic Artefacts
+(Focus on proper underground imprints)
+
+VENUES DIRECTORY:
+Legendary techno spaces:
+- Berghain (Berlin)
+- Tresor (Berlin)
+- Bassiani (Tbilisi)
+- Khidi (Tbilisi)
+- Concrete (Paris)
+- Fold (London)
+(Worldwide warehouse and club culture)
+
+FESTIVALS DIRECTORY:
+Key techno gatherings:
+- Awakenings, Dekmantel
+- Sónar, MIRA
+- Instytut, Unsound
+- LEV, Aquasella
+(European and global focus)
+
+GEAR DIRECTORY:
+Essential equipment:
+- Roland TR-808, TR-909
+- Roland TB-303
+- Sequential Prophet
+- Elektron machines
+- Modular synthesizers
+(Classic and modern production tools)
+
+================================================================================
+                            8. COMPONENT ARCHITECTURE
+================================================================================
+
+LAYOUT COMPONENTS:
+- Header: Main navigation, logo, auth button, language toggle
+- Footer: Links, copyright, terminal aesthetic
+- ScrollToTop: Automatic scroll on route change
+- ScrollToTopButton: Floating button for manual scroll
+
+PAGE COMPONENTS:
+- Index: Homepage with hero, featured sections
+- [Entity].tsx: Directory listing pages
+- [Entity]Detail.tsx: Individual entity pages
+
+SHARED COMPONENTS:
+- MagazineGrid: Editorial-style content grid
+- FeaturedArticle: Article preview cards
+- EditorialBlock: Content sections
+- HorizontalNav: Mobile category navigation
+- NavLink: Styled navigation links
+
+UI PRIMITIVES (shadcn/ui):
+- Button (with brutalist, terminal variants)
+- Card
+- Dialog
+- Sheet (mobile menu)
+- Tabs
+- Badge
+- Skeleton (loading states)
+- Toast (notifications)
+- And 35+ more Radix-based components
+
+================================================================================
+                            9. STYLING & DESIGN SYSTEM
+================================================================================
+
+AESTHETIC:
+Brutalist/Terminal aesthetic with:
+- Monospace typography accents
+- High contrast ratios
+- Raw, industrial feel
+- Minimal decorative elements
+- Grid-based layouts
+
+COLOR TOKENS (HSL format):
+--background: Dark base
+--foreground: Light text
+--primary: Accent color
+--secondary: Secondary surfaces
+--muted: Subdued elements
+--accent: Highlight color
+--destructive: Error states
+--border: Border color
+--ring: Focus rings
+
+TYPOGRAPHY:
+- Display: DM Serif Display (editorial)
+- Body: System fonts, Inter
+- Mono: JetBrains Mono (terminal effect)
+
+BUTTON VARIANTS:
+- default: Primary action
+- destructive: Danger action
+- outline: Secondary action
+- ghost: Minimal action
+- link: Text link style
+- brutalist: Bold, industrial
+- terminal: Monospace, green text
+
+ANIMATIONS:
+- accordion-down/up
+- fade-in/out
+- scale animations
+- hover transitions
+- Smooth scroll behavior
+
+================================================================================
+                            10. ROUTING & NAVIGATION
+================================================================================
+
+ROUTES:
+
+/                       Homepage
+/auth                   Login/Signup
+/news                   News/Articles
+/artists                Artist directory
+/artists/:id            Artist detail
+/labels                 Label directory
+/venues                 Venue directory
+/venues/:id             Venue detail
+/festivals              Festival directory
+/festivals/:id          Festival detail
+/gear                   Gear directory
+/gear/:id               Gear detail
+/crews                  Crews directory
+/crews/:id              Crew detail
+/calendar               Events calendar
+/releases               Music releases
+/timeline               Historical timeline
+/mad-stuff              Special content
+*                       404 Not Found
+
+NAVIGATION STRUCTURE:
+- Main nav: Horizontal desktop, hamburger mobile
+- Sub-menus: Dropdown on hover/click
+- Breadcrumbs: On detail pages
+- Prev/Next: Horizontal navigation on detail pages
+
+================================================================================
+                            11. INTERNATIONALIZATION
+================================================================================
+
+IMPLEMENTATION:
+- LanguageContext provides current language and translations
+- useLanguage hook for accessing translations
+- t() function for getting translated strings
+
+SUPPORTED LANGUAGES:
+- English (EN) - Default
+- Spanish (ES)
+
+TRANSLATION COVERAGE:
+- Navigation labels
+- Section headings
+- Button text
+- Form labels
+- Error messages
+
+================================================================================
+                            12. AUTHENTICATION
+================================================================================
+
+PROVIDER: Supabase Auth
+
+FEATURES:
+- Email/password registration
+- Email/password login
+- Session persistence
+- Protected routes (admin features)
+
+HOOKS:
+- useAuth: Returns { user, signOut, loading }
+
+PROTECTED FEATURES:
+- Document ingestion (admin only)
+- Future: User preferences, favorites
+
+================================================================================
+                            13. AI CHAT INTEGRATION
+================================================================================
+
+COMPONENT: TechnoChat
+
+FEATURES:
+- Floating chat button (bottom-right)
+- Expandable chat interface
+- Message history
+- Streaming responses
+- Loading states
+
+BACKEND:
+- rag-chat Edge Function
+- Full-text search on documents table
+- Lovable AI for response generation
+
+KNOWLEDGE BASE:
+- Ingested documents about techno culture
+- Festival information
+- Artist bios
+- Venue histories
+- Equipment guides
+
+================================================================================
+                            14. DEPLOYMENT
+================================================================================
+
+PLATFORM: Lovable (with Lovable Cloud)
+
+FRONTEND:
+- Automatic builds on commit
+- Vite production build
+- Static asset optimization
+
+BACKEND:
+- Supabase managed infrastructure
+- Edge Functions auto-deploy
+- PostgreSQL with pgvector extension
+
+DOMAINS:
+- Default: *.lovable.app subdomain
+- Custom domain: Configurable in settings
+
+ENVIRONMENT:
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_PUBLISHABLE_KEY
+- VITE_SUPABASE_PROJECT_ID
+- LOVABLE_API_KEY (Edge Functions)
+
+================================================================================
+                                END OF DOCUMENT
+================================================================================
+
+For questions or contributions, this project is maintained via Lovable.dev
+Documentation generated automatically from codebase analysis.
+
+#Techno #GlobalTechno #LovableKnowledge 🖤
