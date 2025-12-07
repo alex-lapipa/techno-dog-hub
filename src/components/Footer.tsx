@@ -5,8 +5,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
-            <div className="font-mono text-sm uppercase tracking-[0.3em] text-foreground">
-              TechnoFest_EU
+            <div className="font-mono text-sm tracking-[0.2em] text-foreground">
+              techno.dog
             </div>
             <p className="font-mono text-xs text-muted-foreground leading-relaxed max-w-md">
               Portal de festivales de música electrónica en Europa.
@@ -14,7 +14,7 @@ const Footer = () => {
               Contenido en español. Acepta entradas en ES/EN/FR.
             </p>
             <div className="font-mono text-xs text-muted-foreground">
-              © 2025 TechnoFest Europa
+              © 2025 techno.dog
             </div>
           </div>
 
@@ -64,7 +64,7 @@ const Footer = () => {
         {/* Bottom terminal */}
         <div className="mt-16 pt-8 border-t border-border">
           <div className="font-mono text-xs text-muted-foreground">
-            <span className="text-foreground">guest@technofest</span>
+            <span className="text-foreground">guest@techno.dog</span>
             <span>:</span>
             <span className="text-foreground">~</span>
             <span>$ </span>

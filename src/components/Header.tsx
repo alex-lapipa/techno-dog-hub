@@ -20,8 +20,8 @@ const Header = () => {
         <nav className="flex items-center justify-between h-14">
           {/* Logo */}
           <a href="/" className="flex items-center gap-3 group">
-            <span className="text-sm font-mono uppercase tracking-[0.3em] text-foreground group-hover:animate-glitch">
-              TechnoFest_EU
+            <span className="text-sm font-mono tracking-[0.2em] text-foreground group-hover:animate-glitch">
+              techno.dog
             </span>
           </a>
 

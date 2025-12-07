@@ -10,7 +10,7 @@ const HeroSection = () => {
       {/* Background text decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
         <div className="absolute top-1/4 left-0 right-0 opacity-[0.03] text-[20vw] font-mono font-bold leading-none whitespace-nowrap">
-          TECHNO_EUROPA
+          TECHNO.DOG
         </div>
         <div className="absolute top-1/2 left-0 right-0 opacity-[0.02] text-[15vw] font-mono leading-none whitespace-nowrap animate-marquee">
           AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL • AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL •
@@ -22,7 +22,7 @@ const HeroSection = () => {
         <div className="max-w-4xl space-y-12">
           {/* Terminal header */}
           <div className="font-mono text-xs text-muted-foreground tracking-wider">
-            <span className="text-foreground">user@technofest</span>
+            <span className="text-foreground">user@techno.dog</span>
             <span className="text-muted-foreground">:</span>
             <span className="text-foreground">~</span>
             <span className="text-muted-foreground">$ </span>
@@ -32,9 +32,9 @@ const HeroSection = () => {
 
           {/* Main title */}
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
-              <span className="block text-foreground">Festivales</span>
-              <span className="block text-foreground animate-glitch-hover">Techno Europa</span>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
+              <span className="block text-foreground">techno.dog</span>
+              <span className="block text-foreground animate-glitch-hover text-3xl md:text-5xl lg:text-6xl mt-2">Festivales Europa</span>
             </h1>
           </div>
 
