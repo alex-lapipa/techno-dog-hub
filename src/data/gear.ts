@@ -103,12 +103,7 @@ export const gear: GearItem[] = [
     relatedGear: ['behringer-td-3', 'roland-sh-101', 'roland-tr-909'],
     tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic'],
     officialUrl: 'https://www.roland.com/global/products/rc_tb-303/',
-    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tb-303_top_gal.png',
-    galleryImages: [
-      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tb-303_top_gal.png', caption: 'Top view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Roland_TB-303.jpg', caption: 'Classic silver box' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/5/58/Roland_TB-303_Panel.jpg', caption: 'Control panel detail' }
-    ],
+    galleryImages: [],
     youtubeVideos: [
       { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
       { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
@@ -255,6 +250,11 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tb-303', 'roland-juno-106', 'behringer-ms-101'],
     tags: ['analog', 'monophonic', 'bassline', 'classic', 'sequencer'],
     officialUrl: 'https://www.roland.com/global/promos/roland_classic_synths/',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Roland_SH-101.jpg',
+    galleryImages: [
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Roland_SH-101.jpg', caption: 'Classic grey SH-101' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/1/17/Roland_SH-101_red.jpg', caption: 'Red edition' }
+    ],
     youtubeVideos: [
       { title: 'Roland SH-101 History and Sound', url: 'https://www.youtube.com/watch?v=nPt6j-qFvQY', channel: 'Vintage Synth Explorer' }
     ]
@@ -525,7 +525,10 @@ export const gear: GearItem[] = [
     relatedGear: ['elektron-analog-rytm', 'elektron-digitakt', 'elektron-digitone'],
     tags: ['analog', 'polyphonic', 'sequencer', 'elektron', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-four-mkii/',
-    imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/05/A4_MKII_Front.png',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Elektron_Analog_Four.jpg',
+    galleryImages: [
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Elektron_Analog_Four.jpg', caption: 'Analog Four MKI' }
+    ],
     youtubeVideos: [
       { title: 'Analog Four MKII Introduction', url: 'https://www.youtube.com/watch?v=OoqS-BVaJ_Y', channel: 'Elektron' }
     ]
@@ -834,9 +837,14 @@ export const gear: GearItem[] = [
     relatedGear: ['novation-summit', 'asm-hydrasynth', 'sequential-prophet-rev2'],
     tags: ['hybrid', 'polyphonic', 'wavetable', 'analog-filter', 'modern'],
     officialUrl: 'https://novationmusic.com/products/peak',
-    imageUrl: 'https://cdn11.bigcommerce.com/s-itgb7ssiy1/images/stencil/1280x1280/products/125/3217/Peak_Top_Image__05618.1681814155.png',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Novation_Peak.jpg',
+    galleryImages: [
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Novation_Peak.jpg', caption: 'Top view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/9/98/Novation_Peak_%28rear%29.jpg', caption: 'Rear panel' }
+    ],
     youtubeVideos: [
-      { title: 'Novation Peak Overview', url: 'https://www.youtube.com/watch?v=m6V6Pfu5eDk', channel: 'Novation' }
+      { title: 'Novation Peak Overview', url: 'https://www.youtube.com/watch?v=m6V6Pfu5eDk', channel: 'Novation' },
+      { title: 'Peak Sound Design Deep Dive', url: 'https://www.youtube.com/watch?v=kDAzYjQCLyo', channel: 'Loopop' }
     ]
   },
   {
@@ -872,7 +880,10 @@ export const gear: GearItem[] = [
     relatedGear: ['novation-peak', 'modal-argon8', 'waldorf-iridium'],
     tags: ['digital', 'wavetable', 'polyphonic', 'modulation', 'expressive', 'modern'],
     officialUrl: 'https://www.ashunsoundmachines.com/hydrasynth-key',
-    imageUrl: 'https://www.ashunsoundmachines.com/quality_auto/Hydrasynth(2023).png',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/ASM_Hydrasynth_Desktop.jpg',
+    galleryImages: [
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/9/93/ASM_Hydrasynth_Desktop.jpg', caption: 'Hydrasynth Desktop' }
+    ],
     youtubeVideos: [
       { title: 'ASM Hydrasynth Overview and Demo', url: 'https://www.youtube.com/watch?v=op4jROJER8w', channel: 'Starsky Carr' },
       { title: 'Hydrasynth Deluxe Introduction', url: 'https://www.youtube.com/watch?v=bVwPXn7VQhY', channel: 'ASM Ashun Sound Machines' }
