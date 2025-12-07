@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight, Search, Sliders } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { gear, gearCategories, GearCategory } from "@/data/gear";
@@ -9,8 +9,26 @@ import { Input } from "@/components/ui/input";
 
 const GearPage = () => {
   const { language } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<GearCategory | "all">("all");
+  
+  // Sync category from URL
+  const categoryFromUrl = searchParams.get("category") as GearCategory | null;
+  const [selectedCategory, setSelectedCategory] = useState<GearCategory | "all">(
+    categoryFromUrl && ["synth", "drum-machine", "sampler", "sequencer", "effect", "daw", "midi-tool"].includes(categoryFromUrl)
+      ? categoryFromUrl
+      : "all"
+  );
+
+  // Update URL when category changes
+  useEffect(() => {
+    if (selectedCategory === "all") {
+      searchParams.delete("category");
+    } else {
+      searchParams.set("category", selectedCategory);
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [selectedCategory, searchParams, setSearchParams]);
 
   const filteredGear = useMemo(() => {
     return gear.filter(item => {
