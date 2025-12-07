@@ -6,11 +6,134 @@ import { getReleasesByArtist } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+// Artist images
+import jeffMillsImg from "@/assets/artists/jeff-mills.jpg";
+import robertHoodImg from "@/assets/artists/robert-hood.jpg";
+import undergroundResistanceImg from "@/assets/artists/underground-resistance.jpg";
+import surgeonImg from "@/assets/artists/surgeon.jpg";
+import helenaHauffImg from "@/assets/artists/helena-hauff.jpg";
+import marcelDettmannImg from "@/assets/artists/marcel-dettmann.jpg";
+import benKlockImg from "@/assets/artists/ben-klock.jpg";
+import regisImg from "@/assets/artists/regis.jpg";
+import rodhadImg from "@/assets/artists/rodhad.jpg";
+import nineninenineImg from "@/assets/artists/999999999.jpg";
+import menImg from "@/assets/artists/men.jpg";
+import oscarMuleroImg from "@/assets/artists/oscar-mulero.jpg";
+import djNobuImg from "@/assets/artists/dj-nobu.jpg";
+import percImg from "@/assets/artists/perc.jpg";
+import kwartzImg from "@/assets/artists/kwartz.jpg";
+import ancientMethodsImg from "@/assets/artists/ancient-methods.jpg";
+import karennImg from "@/assets/artists/karenn.jpg";
+import blawanImg from "@/assets/artists/blawan.jpg";
+import vtssImg from "@/assets/artists/vtss.jpg";
+import spfdjImg from "@/assets/artists/spfdj.jpg";
+import anethaImg from "@/assets/artists/anetha.jpg";
+import iHateModelsImg from "@/assets/artists/i-hate-models.jpg";
+import rroseImg from "@/assets/artists/rrose.jpg";
+import donatoDozzyImg from "@/assets/artists/donato-dozzy.jpg";
+import reekoImg from "@/assets/artists/reeko.jpg";
+import exiumImg from "@/assets/artists/exium.jpg";
+import eulogioImg from "@/assets/artists/eulogio.jpg";
+import daxJImg from "@/assets/artists/dax-j.jpg";
+import wataIgarashiImg from "@/assets/artists/wata-igarashi.jpg";
+import dashaRushImg from "@/assets/artists/dasha-rush.jpg";
+import planetaryAssaultSystemsImg from "@/assets/artists/planetary-assault-systems.jpg";
+import paulaTempleImg from "@/assets/artists/paula-temple.jpg";
+import rebekahImg from "@/assets/artists/rebekah.jpg";
+import manniDeeImg from "@/assets/artists/manni-dee.jpg";
+import setaocMassImg from "@/assets/artists/setaoc-mass.jpg";
+import vrilImg from "@/assets/artists/vril.jpg";
+import phaseFataleImg from "@/assets/artists/phase-fatale.jpg";
+import hectorOaksImg from "@/assets/artists/hector-oaks.jpg";
+import jamesRuskinImg from "@/assets/artists/james-ruskin.jpg";
+import dDanImg from "@/assets/artists/d-dan.jpg";
+import dimiAngelisImg from "@/assets/artists/dimi-angelis.jpg";
+import jeroenSearchImg from "@/assets/artists/jeroen-search.jpg";
+import tensalImg from "@/assets/artists/tensal.jpg";
+import kikePravdaImg from "@/assets/artists/kike-pravda.jpg";
+import psykImg from "@/assets/artists/psyk.jpg";
+import hadoneImg from "@/assets/artists/hadone.jpg";
+import nicoMorenoImg from "@/assets/artists/nico-moreno.jpg";
+import trymImg from "@/assets/artists/trym.jpg";
+import onyvaaImg from "@/assets/artists/onyvaa.jpg";
+import neelImg from "@/assets/artists/neel.jpg";
+import boston168Img from "@/assets/artists/boston-168.jpg";
+import yanCookImg from "@/assets/artists/yan-cook.jpg";
+import rikhterImg from "@/assets/artists/rikhter.jpg";
+import lewisFautziImg from "@/assets/artists/lewis-fautzi.jpg";
+import adrianaLopezImg from "@/assets/artists/adriana-lopez.jpg";
+import shdwObscureShapeImg from "@/assets/artists/shdw-obscure-shape.jpg";
+
+// Image map
+const artistImages: Record<string, string> = {
+  "jeff-mills": jeffMillsImg,
+  "robert-hood": robertHoodImg,
+  "underground-resistance": undergroundResistanceImg,
+  "surgeon": surgeonImg,
+  "helena-hauff": helenaHauffImg,
+  "marcel-dettmann": marcelDettmannImg,
+  "ben-klock": benKlockImg,
+  "regis": regisImg,
+  "rodhad": rodhadImg,
+  "999999999": nineninenineImg,
+  "men": menImg,
+  "oscar-mulero": oscarMuleroImg,
+  "dj-nobu": djNobuImg,
+  "perc": percImg,
+  "kwartz": kwartzImg,
+  "ancient-methods": ancientMethodsImg,
+  "karenn": karennImg,
+  "blawan": blawanImg,
+  "vtss": vtssImg,
+  "spfdj": spfdjImg,
+  "anetha": anethaImg,
+  "i-hate-models": iHateModelsImg,
+  "rrose": rroseImg,
+  "donato-dozzy": donatoDozzyImg,
+  "reeko": reekoImg,
+  "exium": exiumImg,
+  "eulogio": eulogioImg,
+  "dax-j": daxJImg,
+  "wata-igarashi": wataIgarashiImg,
+  "dasha-rush": dashaRushImg,
+  "planetary-assault-systems": planetaryAssaultSystemsImg,
+  "paula-temple": paulaTempleImg,
+  "rebekah": rebekahImg,
+  "manni-dee": manniDeeImg,
+  "setaoc-mass": setaocMassImg,
+  "vril": vrilImg,
+  "phase-fatale": phaseFataleImg,
+  "hector-oaks": hectorOaksImg,
+  "james-ruskin": jamesRuskinImg,
+  "d-dan": dDanImg,
+  "dimi-angelis": dimiAngelisImg,
+  "jeroen-search": jeroenSearchImg,
+  "tensal": tensalImg,
+  "kike-pravda": kikePravdaImg,
+  "psyk": psykImg,
+  "hadone": hadoneImg,
+  "nico-moreno": nicoMorenoImg,
+  "trym": trymImg,
+  "onyvaa": onyvaaImg,
+  "neel": neelImg,
+  "boston-168": boston168Img,
+  "yan-cook": yanCookImg,
+  "rikhter": rikhterImg,
+  "lewis-fautzi": lewisFautziImg,
+  "adriana-lopez": adrianaLopezImg,
+  "shdw-obscure-shape": shdwObscureShapeImg,
+};
+
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const artist = id ? getArtistById(id) : null;
   const artistReleases = id ? getReleasesByArtist(id) : [];
+
+  // Get image for artist
+  const getArtistImage = (artistId: string) => {
+    return artistImages[artistId] || artistImages["jeff-mills"]; // fallback
+  };
 
   if (!artist) {
     return (
@@ -58,9 +181,9 @@ const ArtistDetail = () => {
             {/* Artist Photo */}
             <div className="aspect-square relative overflow-hidden border border-border">
               <img 
-                src={artist.photoUrl || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800"}
+                src={getArtistImage(artist.id)}
                 alt={artist.name}
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
