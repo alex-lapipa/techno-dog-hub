@@ -77,10 +77,8 @@ const Header = () => {
       label: { en: 'Mad Stuff', es: 'Locuras' },
       path: '/mad',
       sub: [
-        { label: { en: 'Deep Cuts', es: 'Cortes Profundos' }, path: '/mad' },
         { label: { en: 'Timeline', es: 'Cronología' }, path: '/mad/timeline' },
         { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
-        { label: { en: 'Map', es: 'Mapa' }, path: '/mad/map' },
         { label: { en: 'Calendar', es: 'Calendario' }, path: '/mad/calendar' },
       ]
     },
