@@ -472,7 +472,14 @@ export const gear: GearItem[] = [
     relatedGear: ['moog-mother-32', 'moog-subharmonicon', 'elektron-analog-rytm'],
     tags: ['analog', 'semi-modular', 'moog', 'percussion', 'eurorack'],
     officialUrl: 'https://www.moogmusic.com/products/dfam',
-    imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/DFAM_Front_Product_Image.png',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/Moog_Drummer_From_Another_Mother_%28DFAM%2C_prototype%29_-_Machines_in_Music_2017_%282017-10-15_07.13_by_Kazuhisa_OTSUBO%29.jpg',
+      author: 'Kazuhisa OTSUBO',
+      license: 'CC BY 2.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by/2.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Moog_Drummer_From_Another_Mother_(DFAM,_prototype)_-_Machines_in_Music_2017_(2017-10-15_07.13_by_Kazuhisa_OTSUBO).jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'DFAM Sound Design Demo', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
     ]
@@ -556,6 +563,14 @@ export const gear: GearItem[] = [
     relatedGear: ['elektron-analog-rytm', 'elektron-digitakt', 'elektron-digitone'],
     tags: ['analog', 'polyphonic', 'sequencer', 'elektron', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-four-mkii/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Elektron_Analog_Four_-_controls.jpg',
+      author: 'Wikimedia contributor',
+      license: 'CC BY-SA 3.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Elektron_Analog_Four_-_controls.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Analog Four MKII Introduction', url: 'https://www.youtube.com/watch?v=OoqS-BVaJ_Y', channel: 'Elektron' }
     ]
@@ -598,6 +613,14 @@ export const gear: GearItem[] = [
     relatedGear: ['elektron-analog-four', 'elektron-digitakt', 'roland-tr-909'],
     tags: ['analog', 'hybrid', 'drum-machine', 'elektron', 'samples', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-rytm-mkii/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Elektron_Analog_Rytm_MKII.jpg',
+      author: 'Systemtechniker',
+      license: 'CC0 1.0 (Public Domain)',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Elektron_Analog_Rytm_MKII.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Analog Rytm MKII Introduction', url: 'https://www.youtube.com/watch?v=qYTrKDJL4m4', channel: 'Elektron' }
     ]
@@ -641,7 +664,14 @@ export const gear: GearItem[] = [
     relatedGear: ['sequential-prophet-6', 'oberheim-ob-x', 'moog-one'],
     tags: ['analog', 'polyphonic', 'classic', 'legendary', 'pads'],
     officialUrl: 'https://sequential.com/classics-reissued/prophet-5-10/',
-    imageUrl: 'https://sequential.com/wp-content/uploads/2020/08/Prophet-5-front-1920x1440.png',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Sequential_Circuits_Prophet_5.jpg',
+      author: 'CPRdave',
+      license: 'Public Domain',
+      licenseUrl: 'https://creativecommons.org/publicdomain/mark/1.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sequential_Circuits_Prophet_5.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Sequential Prophet-5 Demo', url: 'https://www.youtube.com/watch?v=33CJhKTGWn8', channel: 'Perfect Circuit' },
       { title: 'Prophet-5 2020 Reissue Sound Demo', url: 'https://www.youtube.com/watch?v=wWzb6-kfvdk', channel: 'Sequential' }
@@ -730,7 +760,14 @@ export const gear: GearItem[] = [
     relatedGear: ['sequential-prophet-5', 'roland-juno-106', 'behringer-ub-xa'],
     tags: ['analog', 'polyphonic', 'classic', 'pads', 'vintage', 'big-sound'],
     officialUrl: 'https://oberheim.com/products/ob-x8/',
-    imageUrl: 'https://oberheim.com/wp-content/uploads/2022/04/OB-X8-Top1.png',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Oberheim_OBX-a_Front.jpg',
+      author: 'Alison Cassidy',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Oberheim_OBX-a_Front.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Oberheim OB-X8 Introduction', url: 'https://www.youtube.com/watch?v=V5zL7pVvM8k', channel: 'Oberheim' },
       { title: 'OB-X8 Sound Demo', url: 'https://www.youtube.com/watch?v=YJhDwH9eCko', channel: 'Sound On Sound' }
@@ -932,7 +969,14 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tr-808', 'behringer-rd-9', 'elektron-analog-rytm'],
     tags: ['analog', 'drum-machine', 'clone', 'affordable', '808'],
     officialUrl: 'https://www.behringer.com/product.html?modelCode=0704-AAA',
-    imageUrl: 'https://mediadl.musictribe.com/media/PLM/data/images/products/P0DJL/2000Wx2000H/RD-8_P0DJL_Front_XL.png',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Behringer_RD-8_8129.jpg',
+      author: 'Ashley Pomeroy',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Behringer_RD-8_8129.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Behringer RD-8 Introduction', url: 'https://www.youtube.com/watch?v=I0m0u4C6iyA', channel: 'Behringer' }
     ]
@@ -1013,7 +1057,14 @@ export const gear: GearItem[] = [
     relatedGear: ['akai-mpc60', 'emu-sp-1200', 'elektron-octatrack'],
     tags: ['sampler', 'sequencer', 'classic', 'swing', 'hip-hop', 'mpc'],
     officialUrl: 'https://www.akaipro.com/mpc-hardware.html',
-    imageUrl: 'https://www.akaipro.com/media/catalog/product/m/p/mpc3000_1_2.jpg',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Akai_MPC3000.jpg',
+      author: 'Angie Schwendemann / Clusternote',
+      license: 'CC BY-SA 3.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Akai_MPC3000.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'MPC3000 Instructional Video', url: 'https://www.youtube.com/watch?v=pGJ3fns9O1I', channel: 'Sample Kings' },
       { title: 'MPC 3000 Classic & Limited Edition Review', url: 'https://www.youtube.com/watch?v=kSgG476YC-s', channel: 'Vintage Synth' }
