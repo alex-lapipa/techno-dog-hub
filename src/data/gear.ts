@@ -344,6 +344,12 @@ export const gear: GearItem[] = [
     tags: ['analog', 'semi-modular', 'aggressive', 'industrial', 'filters'],
     officialUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/',
     imageUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/images/main_l.jpg',
+    galleryImages: [
+      { url: 'https://www.korg.com/us/products/synthesizers/ms_20fs/images/main_l.jpg', caption: 'Front panel view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Korg_MS-20.jpg', caption: 'Classic MS-20' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Korg_MS-20_patch_panel.jpg', caption: 'Patch panel detail' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Korg_MS-20_Mini_-_2013_NAMM_Show.jpg', caption: 'MS-20 Mini at NAMM' }
+    ],
     youtubeVideos: [
       { title: 'Korg MS-20 Mini Overview', url: 'https://www.youtube.com/watch?v=7q_LxMgbKFI', channel: 'Korg' }
     ]
@@ -387,6 +393,12 @@ export const gear: GearItem[] = [
     tags: ['analog', 'semi-modular', 'moog', 'bass', 'eurorack'],
     officialUrl: 'https://www.moogmusic.com/products/mother-32',
     imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Front_Product_Image.png',
+    galleryImages: [
+      { url: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Front_Product_Image.png', caption: 'Front view' },
+      { url: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Angle_Product_Image.png', caption: 'Angle view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Moog_Mother-32.jpg', caption: 'Moog Mother-32' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Moog_Sound_Studio_-_Mother-32%2C_DFAM%2C_Subharmonicon_%282020-10-26%29.jpg', caption: 'Moog Sound Studio setup' }
+    ],
     youtubeVideos: [
       { title: 'Moog Sound Studio: Mother-32 & DFAM & Subharmonicon', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
     ]
@@ -557,6 +569,12 @@ export const gear: GearItem[] = [
     tags: ['analog', 'hybrid', 'drum-machine', 'elektron', 'samples', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-rytm-mkii/',
     imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Front.png',
+    galleryImages: [
+      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Front.png', caption: 'Front view' },
+      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Angle.png', caption: 'Angle view' },
+      { url: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Elektron_Analog_Rytm.jpg', caption: 'Analog Rytm MKI' },
+      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Back.png', caption: 'Rear panel connections' }
+    ],
     youtubeVideos: [
       { title: 'Analog Rytm MKII Introduction', url: 'https://www.youtube.com/watch?v=qYTrKDJL4m4', channel: 'Elektron' }
     ]
