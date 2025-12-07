@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, FileText, Code, Database, Layers, Palette, Globe, Shield, Bot, Rocket } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ContentSyncPanel } from "@/components/ContentSyncPanel";
 import {
   Accordion,
   AccordionContent,
@@ -48,6 +49,11 @@ const Documentation = () => {
             <FileText className="w-4 h-4" />
             Download full documentation as TXT file
           </a>
+        </div>
+
+        {/* Content Sync Panel - Admin only */}
+        <div className="mb-8">
+          <ContentSyncPanel />
         </div>
 
         {/* Accordion sections */}

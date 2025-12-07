@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_sync: {
+        Row: {
+          corrections: Json | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          last_synced_at: string | null
+          original_data: Json
+          photo_source: string | null
+          photo_url: string | null
+          status: string
+          updated_at: string
+          verified_data: Json | null
+        }
+        Insert: {
+          corrections?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          last_synced_at?: string | null
+          original_data: Json
+          photo_source?: string | null
+          photo_url?: string | null
+          status?: string
+          updated_at?: string
+          verified_data?: Json | null
+        }
+        Update: {
+          corrections?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          last_synced_at?: string | null
+          original_data?: Json
+          photo_source?: string | null
+          photo_url?: string | null
+          status?: string
+          updated_at?: string
+          verified_data?: Json | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           chunk_index: number | null

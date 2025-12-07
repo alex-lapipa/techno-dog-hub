@@ -33,3 +33,6 @@ verify_jwt = true
 
 [functions.rag-chat]
 verify_jwt = false
+
+[functions.content-sync]
+verify_jwt = false
