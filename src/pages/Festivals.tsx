@@ -1,23 +1,30 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { festivals } from "@/data/festivals";
+import { loadFestivalsSummary } from "@/data/festivals-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FestivalsPage = () => {
   const { language } = useLanguage();
 
-  const featuredFestivals = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
-  const featured = festivals.filter(f => featuredFestivals.includes(f.id));
-  const others = festivals.filter(f => !featuredFestivals.includes(f.id));
+  const { data: festivals = [], isLoading } = useQuery({
+    queryKey: ['festivals-summary'],
+    queryFn: loadFestivalsSummary,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const featuredIds = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
+  const featured = festivals.filter(f => featuredIds.includes(f.id));
+  const others = festivals.filter(f => !featuredIds.includes(f.id));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          {/* Header */}
           <div className="mb-12 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
               // {language === 'en' ? 'Global gatherings' : 'Encuentros globales'}
@@ -32,96 +39,122 @@ const FestivalsPage = () => {
             </p>
           </div>
 
-          {/* Featured festivals */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {featured.map((festival) => (
-              <Link
-                key={festival.id}
-                to={`/festivals/${festival.id}`}
-                className="group block border border-border p-6 hover:bg-card transition-colors"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
-                    {festival.type}
-                  </span>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {festival.founded}
-                  </span>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="border border-border p-6 space-y-4">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                  <Skeleton className="h-7 w-40" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-12 w-full" />
                 </div>
-                
-                <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
-                  {festival.name}
-                </h2>
-                
-                <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                  <MapPin className="w-4 h-4" />
-                  <span className="font-mono text-sm">{festival.city}, {festival.country}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                  <Calendar className="w-4 h-4" />
-                  <span className="font-mono text-xs">{festival.months.join(' / ')}</span>
-                </div>
-
-                {festival.description && (
-                  <p className="font-mono text-xs text-muted-foreground line-clamp-2 mb-4">
-                    {festival.description}
-                  </p>
-                )}
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {festival.tags.slice(0, 3).map(tag => (
-                    <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
-                      {tag}
+              ))
+            ) : (
+              featured.map((festival) => (
+                <Link
+                  key={festival.id}
+                  to={`/festivals/${festival.id}`}
+                  className="group block border border-border p-6 hover:bg-card transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
+                      {festival.type}
                     </span>
-                  ))}
-                </div>
-                
-                <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                  <span>{language === 'en' ? 'Explore' : 'Explorar'}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            ))}
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {festival.founded}
+                    </span>
+                  </div>
+                  
+                  <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
+                    {festival.name}
+                  </h2>
+                  
+                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                    <MapPin className="w-4 h-4" />
+                    <span className="font-mono text-sm">{festival.city}, {festival.country}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                    <Calendar className="w-4 h-4" />
+                    <span className="font-mono text-xs">{festival.months.join(' / ')}</span>
+                  </div>
+
+                  {festival.description && (
+                    <p className="font-mono text-xs text-muted-foreground line-clamp-2 mb-4">
+                      {festival.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {festival.tags.slice(0, 3).map(tag => (
+                      <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
+                    <span>{language === 'en' ? 'Explore' : 'Explorar'}</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
 
-          {/* All festivals list */}
           <div className="mb-12">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
               // {language === 'en' ? 'Full directory' : 'Directorio completo'}
             </div>
             <div className="border-t border-border">
-              {others.map((festival, index) => (
-                <Link
-                  key={festival.id}
-                  to={`/festivals/${festival.id}`}
-                  className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 -mx-4"
-                >
-                  <div className="flex items-center gap-6">
-                    <span className="font-mono text-xs text-muted-foreground w-8">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
-                        {festival.name}
-                      </h3>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {festival.city}, {festival.country}
-                      </span>
+              {isLoading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="border-b border-border py-4 px-4">
+                    <div className="flex items-center gap-6">
+                      <Skeleton className="h-4 w-8" />
+                      <div className="space-y-1">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-xs text-muted-foreground hidden md:block">
-                      {festival.months[0]}
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
-                  </div>
-                </Link>
-              ))}
+                ))
+              ) : (
+                others.map((festival, index) => (
+                  <Link
+                    key={festival.id}
+                    to={`/festivals/${festival.id}`}
+                    className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 -mx-4"
+                  >
+                    <div className="flex items-center gap-6">
+                      <span className="font-mono text-xs text-muted-foreground w-8">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <div>
+                        <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
+                          {festival.name}
+                        </h3>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {festival.city}, {festival.country}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-xs text-muted-foreground hidden md:block">
+                        {festival.months[0]}
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
-          {/* Deep links */}
           <div className="border border-border p-6">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
               // {language === 'en' ? 'Go deeper' : 'Profundiza'}

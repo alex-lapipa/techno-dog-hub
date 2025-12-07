@@ -1,12 +1,20 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { venues } from "@/data/venues";
+import { loadVenuesSummary } from "@/data/venues-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VenuesPage = () => {
   const { language } = useLanguage();
+
+  const { data: venues = [], isLoading } = useQuery({
+    queryKey: ['venues-summary'],
+    queryFn: loadVenuesSummary,
+    staleTime: 1000 * 60 * 10,
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -28,41 +36,54 @@ const VenuesPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {venues.map((venue) => (
-              <Link
-                key={venue.id}
-                to={`/venues/${venue.id}`}
-                className="group block border border-border p-4 sm:p-6 hover:bg-card transition-colors"
-              >
-                <div className="flex items-start justify-between mb-3 sm:mb-4">
-                  <span className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground border border-border px-1.5 sm:px-2 py-0.5 sm:py-1">
-                    {venue.type}
-                  </span>
-                  <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
-                    {venue.active}
-                  </span>
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="border border-border p-4 sm:p-6 space-y-3">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-7 w-40" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-8 w-full" />
                 </div>
-                <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
-                  {venue.name}
-                </h2>
-                <div className="flex items-center gap-2 text-muted-foreground mb-3 sm:mb-4">
-                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="font-mono text-xs sm:text-sm">{venue.city}, {venue.country}</span>
-                </div>
-                {venue.atmosphere && (
-                  <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-3 sm:mb-4">
-                    {venue.atmosphere}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground">
-                  <span>{language === 'en' ? 'View details' : 'Ver detalles'}</span>
-                  <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            ))}
+              ))
+            ) : (
+              venues.map((venue) => (
+                <Link
+                  key={venue.id}
+                  to={`/venues/${venue.id}`}
+                  className="group block border border-border p-4 sm:p-6 hover:bg-card transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3 sm:mb-4">
+                    <span className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground border border-border px-1.5 sm:px-2 py-0.5 sm:py-1">
+                      {venue.type}
+                    </span>
+                    <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+                      {venue.active}
+                    </span>
+                  </div>
+                  <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
+                    {venue.name}
+                  </h2>
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3 sm:mb-4">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="font-mono text-xs sm:text-sm">{venue.city}, {venue.country}</span>
+                  </div>
+                  {venue.atmosphere && (
+                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-3 sm:mb-4">
+                      {venue.atmosphere}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground">
+                    <span>{language === 'en' ? 'View details' : 'Ver detalles'}</span>
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
 
-          {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
             {venues.length} {language === 'en' ? 'venues in archive' : 'clubs en archivo'}
           </div>
