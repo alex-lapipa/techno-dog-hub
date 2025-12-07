@@ -91,6 +91,7 @@ const App = () => (
                 <Route path="/crews/:id" element={<CrewDetail />} />
                 
                 {/* Mad Stuff */}
+                <Route path="/mad" element={<Timeline />} />
                 <Route path="/mad/timeline" element={<Timeline />} />
                 <Route path="/mad/calendar" element={<Calendar />} />
                 
