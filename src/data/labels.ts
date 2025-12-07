@@ -14,43 +14,6 @@ export interface Label {
 
 export const labels: Label[] = [
   {
-    id: "axis",
-    name: "Axis Records",
-    city: "Detroit",
-    country: "USA",
-    founded: 1992,
-    active: true,
-    tags: ["Detroit", "minimal", "sci-fi", "essential"],
-    description: "Jeff Mills' personal imprint. A platform for his vision of techno as a cosmic, futuristic art form.",
-    founders: ["Jeff Mills"],
-    artists: ["Jeff Mills", "Robert Hood"],
-    keyReleases: ["Waveform Transmission Vol.1", "Purpose Maker Compilation"]
-  },
-  {
-    id: "underground-resistance",
-    name: "Underground Resistance",
-    city: "Detroit",
-    country: "USA",
-    founded: 1989,
-    active: true,
-    tags: ["Detroit", "militant", "anonymous", "revolutionary"],
-    description: "More than a label—a movement. Anti-corporate, pro-community. The masked revolutionaries of Detroit techno.",
-    founders: ["Mad Mike Banks", "Jeff Mills", "Robert Hood"],
-    artists: ["Mad Mike Banks", "Drexciya", "Galaxy 2 Galaxy"]
-  },
-  {
-    id: "tresor-records",
-    name: "Tresor Records",
-    city: "Berlin",
-    country: "Germany",
-    founded: 1991,
-    active: true,
-    tags: ["Detroit-Berlin", "historic", "essential", "techno"],
-    description: "The label that bridged Detroit and Berlin. Document of a transatlantic revolution.",
-    founders: ["Dimitri Hegemann"],
-    artists: ["Jeff Mills", "Juan Atkins", "Blake Baxter", "Surgeon"]
-  },
-  {
     id: "ostgut-ton",
     name: "Ostgut Ton",
     city: "Berlin",
@@ -58,8 +21,20 @@ export const labels: Label[] = [
     founded: 2005,
     active: true,
     tags: ["Berghain", "Berlin", "diverse", "quality"],
-    description: "The label arm of Berghain. Documenting the club's residents and sound.",
+    description: "The label arm of Berghain. Documenting the club's residents and sound. The Berlin standard.",
     artists: ["Ben Klock", "Marcel Dettmann", "Steffi", "Fiedel", "Len Faki"]
+  },
+  {
+    id: "token",
+    name: "Token",
+    city: "Brussels",
+    country: "Belgium",
+    founded: 2009,
+    active: true,
+    tags: ["Belgian", "driving", "quality", "essential"],
+    description: "Belgian techno institution. Quality over quantity. Every release counts.",
+    founders: ["Kr!z"],
+    artists: ["Inigo Kennedy", "Oscar Mulero", "Kr!z", "Lewis Fautzi"]
   },
   {
     id: "mord",
@@ -69,9 +44,33 @@ export const labels: Label[] = [
     founded: 2014,
     active: true,
     tags: ["industrial", "hard", "bass-heavy", "dark"],
-    description: "Hard, industrial techno. No compromises.",
+    description: "Hard, industrial techno. No compromises. Chest punch guaranteed.",
     founders: ["Bas Mooy"],
-    artists: ["Bas Mooy", "UVB", "Ansome", "Brutalismus 3000"]
+    artists: ["Bas Mooy", "UVB", "Ansome", "999999999", "Trym"]
+  },
+  {
+    id: "arts",
+    name: "Arts",
+    city: "Paris",
+    country: "France",
+    founded: 2014,
+    active: true,
+    tags: ["French", "hard", "dark", "emotional"],
+    description: "French techno at its finest. Emotional but powerful.",
+    founders: ["Emmanuel"],
+    artists: ["Dax J", "SHDW & Obscure Shape", "Hadone"]
+  },
+  {
+    id: "semantica",
+    name: "Semantica",
+    city: "Barcelona",
+    country: "Spain",
+    founded: 2006,
+    active: true,
+    tags: ["deep", "hypnotic", "atmospheric", "ambient"],
+    description: "Deep, atmospheric techno with an ambient edge.",
+    founders: ["Svreca"],
+    artists: ["Svreca", "Tensal", "Cassegrain", "Oscar Mulero"]
   },
   {
     id: "polegroup",
@@ -81,21 +80,9 @@ export const labels: Label[] = [
     founded: 2006,
     active: true,
     tags: ["Madrid", "hypnotic", "minimal", "deep"],
-    description: "Oscar Mulero's collective. Spanish techno at its finest.",
+    description: "Oscar Mulero's collective. Spanish techno at its finest. Pure warehouse sound.",
     founders: ["Oscar Mulero"],
-    artists: ["Oscar Mulero", "Exium", "Reeko", "Lewis Fautzi"]
-  },
-  {
-    id: "downwards",
-    name: "Downwards",
-    city: "Birmingham",
-    country: "UK",
-    founded: 1993,
-    active: true,
-    tags: ["Birmingham", "industrial", "dark", "essential"],
-    description: "The dark heart of Birmingham techno. Co-founded by Regis.",
-    founders: ["Regis", "Female"],
-    artists: ["Regis", "Surgeon", "Female", "Vatican Shadow"]
+    artists: ["Oscar Mulero", "Exium", "Reeko", "Lewis Fautzi", "Kwartz"]
   },
   {
     id: "perc-trax",
@@ -110,16 +97,59 @@ export const labels: Label[] = [
     artists: ["Perc", "Truss", "Ansome", "Blawan"]
   },
   {
-    id: "semantica",
-    name: "Semantica",
-    city: "Barcelona",
-    country: "Spain",
-    founded: 2006,
+    id: "clergy",
+    name: "Clergy",
+    city: "London",
+    country: "UK",
+    founded: 2013,
     active: true,
-    tags: ["deep", "hypnotic", "atmospheric", "ambient"],
-    description: "Deep, atmospheric techno with an ambient edge.",
-    founders: ["Svreca"],
-    artists: ["Svreca", "Tensal", "Cassegrain"]
+    tags: ["UK", "hypnotic", "deep", "quality"],
+    description: "UK label focused on hypnotic, deep techno.",
+    founders: ["Sigha"],
+    artists: ["Sigha", "Onyvaa"]
+  },
+  {
+    id: "hayes",
+    name: "Hayes",
+    city: "Berlin",
+    country: "Germany",
+    founded: 2018,
+    active: true,
+    tags: ["Berlin", "hypnotic", "modern", "quality"],
+    description: "Modern Berlin techno. Quality hypnotic productions."
+  },
+  {
+    id: "stroboscopic-artefacts",
+    name: "Stroboscopic Artefacts",
+    city: "Berlin",
+    country: "Germany",
+    founded: 2009,
+    active: true,
+    tags: ["experimental", "avant-garde", "Berlin", "conceptual"],
+    description: "Experimental and avant-garde electronic music. Pushing boundaries.",
+    founders: ["Lucy"],
+    artists: ["Lucy", "Perc", "Rrose"]
+  },
+  {
+    id: "dynamic-reflection",
+    name: "Dynamic Reflection",
+    city: "Rotterdam",
+    country: "Netherlands",
+    founded: 2015,
+    active: true,
+    tags: ["Dutch", "hard", "industrial", "raw"],
+    description: "Hard, industrial Dutch techno.",
+    artists: ["Stranger", "TWR72"]
+  },
+  {
+    id: "unterton",
+    name: "Unterton",
+    city: "Berlin",
+    country: "Germany",
+    founded: 2016,
+    active: true,
+    tags: ["Berlin", "hypnotic", "modern", "atmospheric"],
+    description: "Modern Berlin techno with atmospheric depth."
   },
   {
     id: "soma",
@@ -131,67 +161,41 @@ export const labels: Label[] = [
     tags: ["Scottish", "Slam", "diverse", "historic"],
     description: "Glasgow's longest-running electronic label. Home of Slam.",
     founders: ["Stuart McMillan", "Orde Meikle"],
-    artists: ["Slam", "Rebekah", "Gary Beck"]
+    artists: ["Slam", "Rebekah", "Gary Beck", "Onyvaa"]
   },
   {
-    id: "figure",
-    name: "Figure",
+    id: "mote-evolver",
+    name: "Mote-Evolver",
+    city: "London",
+    country: "UK",
+    founded: 1999,
+    active: true,
+    tags: ["UK", "Luke Slater", "hypnotic", "essential"],
+    description: "Luke Slater's imprint. Hypnotic, relentless techno.",
+    founders: ["Luke Slater"],
+    artists: ["Planetary Assault Systems", "Psyk"]
+  },
+  {
+    id: "dystopian",
+    name: "Dystopian",
     city: "Berlin",
     country: "Germany",
-    founded: 2008,
+    founded: 2012,
     active: true,
-    tags: ["driving", "loop-heavy", "Len Faki", "Berlin"],
-    description: "Len Faki's imprint. Driving, loop-focused techno.",
-    founders: ["Len Faki"],
-    artists: ["Len Faki", "Truncate", "Setaoc Mass"]
+    tags: ["Berlin", "dark", "atmospheric", "hypnotic"],
+    description: "Rødhåd's dark, atmospheric label. Berlin at its moodiest.",
+    founders: ["Rødhåd"],
+    artists: ["Rødhåd", "Alex.Do", "Vril"]
   },
   {
-    id: "arts",
-    name: "Arts",
-    city: "Paris",
-    country: "France",
-    founded: 2014,
+    id: "r-label-group",
+    name: "R Label Group",
+    city: "London",
+    country: "UK",
+    founded: 2012,
     active: true,
-    tags: ["French", "hard", "dark", "emotional"],
-    description: "French techno at its finest. Emotional but powerful.",
-    founders: ["Emmanuel"],
-    artists: ["Dax J", "I Hate Models", "Hadone"]
-  },
-  {
-    id: "northern-electronics",
-    name: "Northern Electronics",
-    city: "Stockholm",
-    country: "Sweden",
-    founded: 2013,
-    active: true,
-    tags: ["ambient", "experimental", "Scandinavian", "deep"],
-    description: "Ambient and experimental electronics from Sweden.",
-    founders: ["VARG"],
-    artists: ["VARG", "Acronym", "Posh Isolation"]
-  },
-  {
-    id: "token",
-    name: "Token",
-    city: "Brussels",
-    country: "Belgium",
-    founded: 2009,
-    active: true,
-    tags: ["Belgian", "driving", "Km Amen", "quality"],
-    description: "Belgian techno institution. Quality over quantity.",
-    founders: ["Kr!z"],
-    artists: ["Inigo Kennedy", "Oscar Mulero", "Kr!z"]
-  },
-  {
-    id: "m-plant",
-    name: "M-Plant",
-    city: "Detroit",
-    country: "USA",
-    founded: 1994,
-    active: true,
-    tags: ["minimal", "Detroit", "Robert Hood", "essential"],
-    description: "Robert Hood's label. The blueprint for minimal techno.",
-    founders: ["Robert Hood"],
-    artists: ["Robert Hood", "Floorplan"]
+    tags: ["UK", "diverse", "quality", "London"],
+    description: "London-based collective with quality-focused releases."
   }
 ];
 
