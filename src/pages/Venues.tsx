@@ -1,13 +1,23 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { loadVenuesSummary } from "@/data/venues-loader";
+import { loadVenuesSummary, loadVenueById } from "@/data/venues-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCallback } from "react";
 
 const VenuesPage = () => {
+  const queryClient = useQueryClient();
+  
+  const prefetchVenue = useCallback((id: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['venue', id],
+      queryFn: () => loadVenueById(id),
+      staleTime: 1000 * 60 * 10,
+    });
+  }, [queryClient]);
   const { language } = useLanguage();
 
   const { data: venues = [], isLoading } = useQuery({
@@ -53,6 +63,7 @@ const VenuesPage = () => {
                 <Link
                   key={venue.id}
                   to={`/venues/${venue.id}`}
+                  onMouseEnter={() => prefetchVenue(venue.id)}
                   className="group block border border-border p-4 sm:p-6 hover:bg-card transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">

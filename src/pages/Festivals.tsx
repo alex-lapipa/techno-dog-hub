@@ -1,13 +1,23 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { loadFestivalsSummary } from "@/data/festivals-loader";
+import { loadFestivalsSummary, loadFestivalById } from "@/data/festivals-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCallback } from "react";
 
 const FestivalsPage = () => {
+  const queryClient = useQueryClient();
+  
+  const prefetchFestival = useCallback((id: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['festival', id],
+      queryFn: () => loadFestivalById(id),
+      staleTime: 1000 * 60 * 10,
+    });
+  }, [queryClient]);
   const { language } = useLanguage();
 
   const { data: festivals = [], isLoading } = useQuery({
@@ -58,6 +68,7 @@ const FestivalsPage = () => {
                 <Link
                   key={festival.id}
                   to={`/festivals/${festival.id}`}
+                  onMouseEnter={() => prefetchFestival(festival.id)}
                   className="group block border border-border p-6 hover:bg-card transition-colors"
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -128,6 +139,7 @@ const FestivalsPage = () => {
                   <Link
                     key={festival.id}
                     to={`/festivals/${festival.id}`}
+                    onMouseEnter={() => prefetchFestival(festival.id)}
                     className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 -mx-4"
                   >
                     <div className="flex items-center gap-6">
