@@ -1,0 +1,151 @@
+import { Link } from "react-router-dom";
+import { ArrowRight, Calendar, MapPin } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { festivals } from "@/data/festivals";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+const FestivalsPage = () => {
+  const { language } = useLanguage();
+
+  const featuredFestivals = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
+  const featured = festivals.filter(f => featuredFestivals.includes(f.id));
+  const others = festivals.filter(f => !featuredFestivals.includes(f.id));
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main className="pt-24 lg:pt-16 pb-16">
+        <div className="container mx-auto px-4 md:px-8">
+          {/* Header */}
+          <div className="mb-12 space-y-4">
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
+              // {language === 'en' ? 'Global gatherings' : 'Encuentros globales'}
+            </div>
+            <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
+              {language === 'en' ? 'Festivals' : 'Festivales'}
+            </h1>
+            <p className="font-mono text-sm text-muted-foreground max-w-2xl">
+              {language === 'en' 
+                ? 'From Detroit to Tbilisi, Tokyo to Bogotá. The gatherings that matter.' 
+                : 'De Detroit a Tbilisi, de Tokio a Bogotá. Los encuentros que importan.'}
+            </p>
+          </div>
+
+          {/* Featured festivals */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {featured.map((festival) => (
+              <Link
+                key={festival.id}
+                to={`/festivals/${festival.id}`}
+                className="group block border border-border p-6 hover:bg-card transition-colors"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
+                    {festival.type}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {festival.founded}
+                  </span>
+                </div>
+                
+                <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
+                  {festival.name}
+                </h2>
+                
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <MapPin className="w-4 h-4" />
+                  <span className="font-mono text-sm">{festival.city}, {festival.country}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <Calendar className="w-4 h-4" />
+                  <span className="font-mono text-xs">{festival.months.join(' / ')}</span>
+                </div>
+
+                {festival.description && (
+                  <p className="font-mono text-xs text-muted-foreground line-clamp-2 mb-4">
+                    {festival.description}
+                  </p>
+                )}
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {festival.tags.slice(0, 3).map(tag => (
+                    <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                
+                <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
+                  <span>{language === 'en' ? 'Explore' : 'Explorar'}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* All festivals list */}
+          <div className="mb-12">
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
+              // {language === 'en' ? 'Full directory' : 'Directorio completo'}
+            </div>
+            <div className="border-t border-border">
+              {others.map((festival, index) => (
+                <Link
+                  key={festival.id}
+                  to={`/festivals/${festival.id}`}
+                  className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 -mx-4"
+                >
+                  <div className="flex items-center gap-6">
+                    <span className="font-mono text-xs text-muted-foreground w-8">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
+                        {festival.name}
+                      </h3>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {festival.city}, {festival.country}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-mono text-xs text-muted-foreground hidden md:block">
+                      {festival.months[0]}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Deep links */}
+          <div className="border border-border p-6">
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
+              // {language === 'en' ? 'Go deeper' : 'Profundiza'}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Link to="/venues" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → {language === 'en' ? 'Venues' : 'Clubs'}
+              </Link>
+              <Link to="/mad/calendar" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → {language === 'en' ? 'Calendar' : 'Calendario'}
+              </Link>
+              <Link to="/mad/map" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → {language === 'en' ? 'Map' : 'Mapa'}
+              </Link>
+              <Link to="/artists" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → {language === 'en' ? 'Artists' : 'Artistas'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default FestivalsPage;
