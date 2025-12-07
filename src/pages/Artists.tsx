@@ -1,13 +1,23 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { loadArtistsSummary } from "@/data/artists-loader";
+import { loadArtistsSummary, loadArtistById } from "@/data/artists-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCallback } from "react";
 
 const ArtistsPage = () => {
+  const queryClient = useQueryClient();
+  
+  const prefetchArtist = useCallback((id: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['artist', id],
+      queryFn: () => loadArtistById(id),
+      staleTime: 1000 * 60 * 10,
+    });
+  }, [queryClient]);
   const { language } = useLanguage();
 
   const { data: artists = [], isLoading } = useQuery({
@@ -53,6 +63,7 @@ const ArtistsPage = () => {
                 <Link
                   key={artist.id}
                   to={`/artists/${artist.id}`}
+                  onMouseEnter={() => prefetchArtist(artist.id)}
                   className="group block border-b border-border py-4 sm:py-6 hover:bg-card transition-colors px-2 sm:px-4 -mx-2 sm:-mx-4"
                 >
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
