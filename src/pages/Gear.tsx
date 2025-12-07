@@ -88,9 +88,18 @@ const GearPage = () => {
                 to={`/gear/${item.id}`}
                 className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
               >
-                {/* Icon placeholder instead of fake images */}
+                {/* Gear Image or Icon placeholder */}
                 <div className="aspect-[4/3] relative overflow-hidden bg-card/30 flex items-center justify-center">
-                  <Sliders className="w-12 h-12 text-muted-foreground/20" />
+                  {item.image ? (
+                    <img 
+                      src={item.image.url} 
+                      alt={item.name}
+                      className="w-full h-full object-contain p-3 sm:p-4"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Sliders className="w-12 h-12 text-muted-foreground/20" />
+                  )}
                 </div>
                 
                 <div className="p-3 sm:p-4">
