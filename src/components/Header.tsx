@@ -33,10 +33,10 @@ const Header = () => {
               L.E.V.
             </a>
             <a
-              href="#archivo"
+              href="#chat"
               className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
-              Archivo
+              Chat IA
             </a>
           </div>
 
