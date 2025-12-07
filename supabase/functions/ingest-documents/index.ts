@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 // Split text into chunks with overlap
-function chunkText(text: string, chunkSize: number = 1000, overlap: number = 200): string[] {
+function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
   const chunks: string[] = [];
   let start = 0;
   
@@ -32,11 +32,10 @@ serve(async (req) => {
       throw new Error('Documents array is required');
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!LOVABLE_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Missing required environment variables');
     }
 
@@ -58,43 +57,15 @@ serve(async (req) => {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        
-        // Generate embedding for this chunk
-        const embeddingResponse = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'text-embedding-3-small',
-            input: chunk,
-            dimensions: 768
-          }),
-        });
 
-        if (!embeddingResponse.ok) {
-          console.error(`Failed to generate embedding for chunk ${i} of "${title}"`);
-          continue;
-        }
-
-        const embeddingData = await embeddingResponse.json();
-        const embedding = embeddingData.data?.[0]?.embedding;
-
-        if (!embedding) {
-          console.error(`No embedding returned for chunk ${i} of "${title}"`);
-          continue;
-        }
-
-        // Insert into database
+        // Insert into database without embedding (will use full-text search)
         const { data, error } = await supabase
           .from('documents')
           .insert({
-            title: `${title} (${i + 1}/${chunks.length})`,
+            title: chunks.length > 1 ? `${title} (${i + 1}/${chunks.length})` : title,
             content: chunk,
             source,
             metadata: { ...metadata, original_title: title, chunk_index: i, total_chunks: chunks.length },
-            embedding: `[${embedding.join(',')}]`,
             chunk_index: i
           })
           .select('id')
@@ -104,10 +75,8 @@ serve(async (req) => {
           console.error(`Error inserting chunk ${i} of "${title}":`, error);
         } else {
           results.push({ title, chunk: i, id: data.id });
+          console.log(`Inserted chunk ${i + 1}/${chunks.length} of "${title}"`);
         }
-
-        // Small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100));
       }
     }
 
