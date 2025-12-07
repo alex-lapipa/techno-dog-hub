@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-
+import technoDogLogo from "@/assets/techno-dog-logo.png";
 const Header = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
@@ -19,7 +19,8 @@ const Header = () => {
       <div className="container mx-auto px-4 md:px-8">
         <nav className="flex items-center justify-between h-14">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-3 group">
+          <a href="/" className="flex items-center gap-2 group">
+            <img src={technoDogLogo} alt="techno.dog logo" className="w-8 h-8" />
             <span className="text-sm font-mono tracking-[0.2em] text-foreground group-hover:animate-glitch">
               techno.dog
             </span>
