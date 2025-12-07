@@ -1,7 +1,10 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroSection = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-background noise">
       {/* Scanlines overlay */}
@@ -18,7 +21,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 md:px-8 pt-20">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 pt-20 pb-24">
         <div className="max-w-4xl space-y-12">
           {/* Terminal header */}
           <div className="font-mono text-xs text-muted-foreground tracking-wider">
@@ -26,29 +29,28 @@ const HeroSection = () => {
             <span className="text-muted-foreground">:</span>
             <span className="text-foreground">~</span>
             <span className="text-muted-foreground">$ </span>
-            <span className="animate-flicker">cat /festivales/europa/2025</span>
+            <span className="animate-flicker">{t('hero.terminal')}</span>
             <span className="animate-blink">_</span>
           </div>
 
           {/* Main title */}
           <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
-              <span className="block text-foreground">techno.dog</span>
-              <span className="block text-foreground animate-glitch-hover text-3xl md:text-5xl lg:text-6xl mt-2">Festivales Europa</span>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
+              <span className="block text-foreground">{t('hero.title')}</span>
+              <span className="block text-foreground animate-glitch-hover text-3xl md:text-5xl lg:text-6xl mt-2">{t('hero.subtitle')}</span>
             </h1>
           </div>
 
           {/* Description */}
           <p className="font-mono text-sm md:text-base text-muted-foreground max-w-xl leading-relaxed tracking-wide">
-            Portal de música electrónica experimental y cultura techno.
-            Aquasella, L.E.V., y los eventos más relevantes del continente.
-            <span className="text-foreground"> [ES/EN/FR]</span>
+            {t('hero.description')}
+            <span className="text-foreground"> [EN/ES]</span>
           </p>
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button variant="brutalist" size="lg">
-              Explorar festivales
+              {t('hero.explore')}
               <ArrowRight className="w-4 h-4" />
             </Button>
             <Button variant="terminal" size="lg">
@@ -63,7 +65,7 @@ const HeroSection = () => {
                 150+
               </div>
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                Festivales
+                {t('hero.festivals')}
               </div>
             </div>
             <div>
@@ -71,7 +73,7 @@ const HeroSection = () => {
                 25
               </div>
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                Países
+                {t('hero.countries')}
               </div>
             </div>
             <div>
@@ -79,7 +81,7 @@ const HeroSection = () => {
                 2M+
               </div>
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                Asistentes
+                {t('hero.attendees')}
               </div>
             </div>
           </div>
@@ -87,8 +89,8 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-xs text-muted-foreground">
-        <span className="animate-float-slow inline-block">[ scroll ]</span>
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 font-mono text-xs text-muted-foreground">
+        <span className="animate-float-slow inline-block">{t('hero.scroll')}</span>
       </div>
     </section>
   );

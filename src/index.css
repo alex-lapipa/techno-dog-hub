@@ -233,4 +233,13 @@
     background: hsl(0 0% 100%);
     color: hsl(0 0% 0%);
   }
+
+  /* Hide scrollbar for horizontal nav */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
