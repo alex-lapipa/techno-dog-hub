@@ -2039,6 +2039,134 @@ export const artists: Artist[] = [
       "Pioneer DJM-V10"
     ],
     riderNotes: "High-powered sound system essential. Extended sets."
+  },
+
+  // GERMANY - BERLIN (Additional)
+  {
+    id: "ellen-allien",
+    name: "Ellen Allien",
+    city: "Berlin",
+    country: "Germany",
+    region: "Europe",
+    active: "1992–present",
+    tags: ["BPitch Control", "Berlin", "electro", "rave"],
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Ellen_Allien_%28MAGMA_2006%2C_Tenerife%29.jpg",
+      author: "Ventura Mendoza",
+      license: "CC BY 2.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/2.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Ellen_Allien_(MAGMA_2006,_Tenerife).jpg",
+      sourceName: "Wikimedia Commons"
+    },
+    bio: "Berlin institution. Founder of BPitch Control. One of the city's most influential figures in electronic music. Her sound bridges electro, techno, and rave culture.",
+    labels: ["BPitch Control", "Tresor"],
+    careerHighlights: [
+      "Founded BPitch Control 1999",
+      "Berlin scene pioneer",
+      "30+ years in techno",
+      "Global touring"
+    ],
+    keyReleases: [
+      { title: "Stadtkind", label: "BPitch Control", year: 2001, format: "LP" },
+      { title: "Thrills", label: "BPitch Control", year: 2005, format: "LP" },
+      { title: "Dust", label: "BPitch Control", year: 2017, format: "LP" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Korg MS-20",
+      "Elektron Analog Four",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Extended sets preferred."
+  },
+
+  // RUSSIA
+  {
+    id: "nina-kraviz",
+    name: "Nina Kraviz",
+    city: "Irkutsk",
+    country: "Russia",
+    region: "Europe",
+    active: "2008–present",
+    tags: ["трип", "acid", "hypnotic", "Russian"],
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Nina_Kraviz_-_2018_RBMA.jpg",
+      author: "Nina Kraviz",
+      license: "CC BY 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/3.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Nina_Kraviz_-_2018_RBMA.jpg",
+      sourceName: "Wikimedia Commons"
+    },
+    bio: "Siberian-born producer. Founder of трип (trip) label. Known for hypnotic, acid-tinged sets and raw productions. One of the most distinctive voices in modern techno.",
+    labels: ["трип", "Rekids"],
+    careerHighlights: [
+      "Founded трип label",
+      "Rekids artist",
+      "Global headliner",
+      "Acid techno specialist"
+    ],
+    keyReleases: [
+      { title: "Nina Kraviz", label: "Rekids", year: 2012, format: "LP" },
+      { title: "Mr Jones", label: "трип", year: 2015, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TB-303",
+      "Roland TR-909",
+      "Elektron Analog Rytm",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Extended sets preferred. Acid techno focus."
+  },
+
+  // USA - MINNEAPOLIS
+  {
+    id: "dvs1",
+    name: "DVS1",
+    realName: "Zak Khutoretsky",
+    city: "Minneapolis",
+    country: "USA",
+    region: "North America",
+    active: "1996–present",
+    tags: ["Minneapolis", "vinyl", "hypnotic", "Mistress"],
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/1/19/DVS1_FVTVR.jpg",
+      author: "Charlestpt",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:DVS1_FVTVR.jpg",
+      sourceName: "Wikimedia Commons"
+    },
+    bio: "Minneapolis techno ambassador. Founder of Mistress Recordings and Hush. Vinyl purist known for marathon sets. His sound is raw, hypnotic, and deeply rooted in techno's foundations.",
+    labels: ["Mistress", "Hush"],
+    careerHighlights: [
+      "Founded Mistress Recordings",
+      "Founded Hush label",
+      "Berghain regular",
+      "Vinyl-only specialist"
+    ],
+    keyReleases: [
+      { title: "Klockworks 14", label: "Klockworks", year: 2015, format: "12\"" },
+      { title: "Mistress 01", label: "Mistress", year: 2011, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Roland TB-303",
+      "Moog Sub 37",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Technics SL-1200MK2",
+      "Allen & Heath Xone:92"
+    ],
+    riderNotes: "Vinyl preferred. Extended marathon sets specialty."
   }
 ];
 
