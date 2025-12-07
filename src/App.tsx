@@ -20,7 +20,7 @@ import Venues from "./pages/Venues";
 import Labels from "./pages/Labels";
 import Releases from "./pages/Releases";
 import Crews from "./pages/Crews";
-import MadStuff from "./pages/MadStuff";
+
 import Timeline from "./pages/Timeline";
 import Calendar from "./pages/Calendar";
 import Gear from "./pages/Gear";
