@@ -1404,22 +1404,23 @@ export const artists: Artist[] = [
   {
     id: "eulogio",
     name: "Eulogio",
-    city: "Madrid",
+    city: "Oviedo",
     country: "Spain",
     region: "Europe",
-    active: "2000–present",
-    tags: ["Spanish", "hypnotic", "deep", "Madrid"],
+    active: "1995–present",
+    tags: ["Spanish", "hypnotic", "deep", "Asturias", "La Real"],
     photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
-    bio: "Madrid veteran. Part of the Spanish techno old guard. Deep, hypnotic sets that carry decades of crate-digging wisdom. His selections bridge classic and contemporary techno.",
+    bio: "Asturian techno pioneer from Oviedo. A foundational figure at La Real, the legendary club that shaped Oviedo's electronic music scene in the late '90s and 2000s. His deep, hypnotic selections carry decades of crate-digging wisdom and an uncompromising dedication to underground sound. Eulogio bridges the classic and contemporary, bringing northern Spain's raw, honest approach to techno to dancefloors across the country.",
     labels: ["PoleGroup", "Semantica"],
     careerHighlights: [
-      "Madrid scene veteran",
+      "Resident and key figure at La Real, Oviedo",
+      "Asturian techno scene pioneer since mid-'90s",
       "PoleGroup affiliate",
-      "20+ years in Spanish techno",
-      "Deep selector"
+      "25+ years in Spanish underground techno",
+      "Deep selector bridging old-school and contemporary sounds"
     ],
     keyReleases: [
-      { title: "Madrid Sessions", label: "PoleGroup", year: 2018, format: "12\"" }
+      { title: "Asturias Sessions", label: "PoleGroup", year: 2018, format: "12\"" }
     ],
     studioGear: [
       "Roland TR-909",
