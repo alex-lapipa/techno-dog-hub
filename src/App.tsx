@@ -25,10 +25,9 @@ const Labels = lazy(() => import("./pages/Labels"));
 const Releases = lazy(() => import("./pages/Releases"));
 const Crews = lazy(() => import("./pages/Crews"));
 const CrewDetail = lazy(() => import("./pages/CrewDetail"));
-const Timeline = lazy(() => import("./pages/Timeline"));
-const Calendar = lazy(() => import("./pages/Calendar"));
 const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
+const UserStories = lazy(() => import("./pages/UserStories"));
 const Documentation = lazy(() => import("./pages/Documentation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -61,7 +60,6 @@ const App = () => (
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<News />} />
                 <Route path="/news/features" element={<News />} />
-                <Route path="/news/interviews" element={<News />} />
                 
                 {/* Festivals */}
                 <Route path="/festivals" element={<Festivals />} />
@@ -69,7 +67,6 @@ const App = () => (
                 
                 {/* Artists */}
                 <Route path="/artists" element={<Artists />} />
-                <Route path="/artists/regions" element={<Artists />} />
                 <Route path="/artists/:id" element={<ArtistDetail />} />
                 
                 {/* Venues */}
@@ -82,8 +79,6 @@ const App = () => (
                 
                 {/* Releases */}
                 <Route path="/releases" element={<Releases />} />
-                <Route path="/releases/essential" element={<Releases />} />
-                <Route path="/releases/new" element={<Releases />} />
                 <Route path="/releases/:id" element={<Releases />} />
                 
                 {/* Crews */}
@@ -91,9 +86,8 @@ const App = () => (
                 <Route path="/crews/:id" element={<CrewDetail />} />
                 
                 {/* Mad Stuff */}
-                <Route path="/mad" element={<Timeline />} />
-                <Route path="/mad/timeline" element={<Timeline />} />
-                <Route path="/mad/calendar" element={<Calendar />} />
+                <Route path="/mad" element={<Venues />} />
+                <Route path="/mad/stories" element={<UserStories />} />
                 
                 {/* Gear */}
                 <Route path="/gear" element={<Gear />} />

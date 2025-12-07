@@ -41,7 +41,6 @@ const Header = () => {
       sub: [
         { label: { en: 'Latest', es: 'Últimas' }, path: '/news' },
         { label: { en: 'Features', es: 'Reportajes' }, path: '/news/features' },
-        { label: { en: 'Interviews', es: 'Entrevistas' }, path: '/news/interviews' },
       ]
     },
     {
@@ -60,7 +59,6 @@ const Header = () => {
       path: '/artists',
       sub: [
         { label: { en: 'Directory', es: 'Directorio' }, path: '/artists' },
-        { label: { en: 'By Region', es: 'Por Región' }, path: '/artists/regions' },
         { label: { en: 'Labels', es: 'Sellos' }, path: '/labels' },
         { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
       ]
@@ -68,11 +66,6 @@ const Header = () => {
     {
       label: { en: 'Releases', es: 'Lanzamientos' },
       path: '/releases',
-      sub: [
-        { label: { en: 'Archive', es: 'Archivo' }, path: '/releases' },
-        { label: { en: 'Essential', es: 'Esenciales' }, path: '/releases/essential' },
-        { label: { en: 'New', es: 'Nuevos' }, path: '/releases/new' },
-      ]
     },
     {
       label: { en: 'Gear', es: 'Equipo' },
@@ -88,9 +81,8 @@ const Header = () => {
       label: { en: 'Mad Stuff', es: 'Locuras' },
       path: '/mad',
       sub: [
-        { label: { en: 'Timeline', es: 'Cronología' }, path: '/mad/timeline' },
         { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
-        { label: { en: 'Calendar', es: 'Calendario' }, path: '/mad/calendar' },
+        { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
       ]
     },
   ];

@@ -38,11 +38,10 @@ const Index = () => {
   ];
 
   const quickLinks = [
-    { label: { en: 'Timeline', es: 'Cronología' }, path: '/mad/timeline' },
     { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
     { label: { en: 'Labels', es: 'Sellos' }, path: '/labels' },
     { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
-    { label: { en: 'Calendar', es: 'Calendario' }, path: '/mad/calendar' },
+    { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
   ];
 
   return (
