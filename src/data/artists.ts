@@ -103,7 +103,14 @@ export const artists: Artist[] = [
     region: "North America",
     active: "1990–present",
     tags: ["minimal", "Detroit", "stripped-down", "M-Plant"],
-    photoUrl: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800",
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Robert_Hood_Live_%40_Kennedys%2C_Dublin%2C_Ireland_2009.JPG",
+      author: "Ventolin",
+      license: "CC BY-SA 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Robert_Hood_Live_@_Kennedys,_Dublin,_Ireland_2009.JPG",
+      sourceName: "Wikimedia Commons"
+    },
     bio: "The Godfather of Minimal Techno. Original member of Underground Resistance. Creator of the Minimal Nation concept that defined an entire genre. His stripped-down approach to production influenced generations of producers worldwide.",
     labels: ["M-Plant", "Hardwax", "Tresor", "Dekmantel"],
     careerHighlights: [
@@ -1503,7 +1510,14 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "2015–present",
     tags: ["emotional", "dark", "rave", "French"],
-    photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/b/be/I_Hate_Models_Contours.png",
+      author: "Charlestpt",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:I_Hate_Models_Contours.png",
+      sourceName: "Wikimedia Commons"
+    },
     bio: "French producer. Dark emotional techno. Early work only—pre-festival era. His productions blend rave nostalgia with modern intensity.",
     labels: ["Arts", "Voitax"],
     careerHighlights: [
