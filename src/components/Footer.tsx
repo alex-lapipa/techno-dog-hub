@@ -8,13 +8,12 @@ const Footer = () => {
   const exploreLinks = [
     { label: t('nav.festivals'), path: '/festivals' },
     { label: t('footer.artists'), path: '/artists' },
-    { label: t('footer.calendar'), path: '/mad/calendar' },
     { label: t('footer.news'), path: '/news' },
-    { label: language === 'en' ? 'Timeline' : 'Cronología', path: '/mad/timeline' },
+    { label: language === 'en' ? 'Venues' : 'Clubs', path: '/venues' },
+    { label: language === 'en' ? 'User Stories' : 'Historias', path: '/mad/stories' },
   ];
 
   const resourceLinks = [
-    { label: language === 'en' ? 'Venues' : 'Clubs', path: '/venues' },
     { label: language === 'en' ? 'Labels' : 'Sellos', path: '/labels' },
     { label: language === 'en' ? 'Releases' : 'Lanzamientos', path: '/releases' },
     { label: language === 'en' ? 'Gear' : 'Equipo', path: '/gear' },
