@@ -79,10 +79,11 @@ const Header = () => {
     },
     {
       label: { en: 'Mad Stuff', es: 'Locuras' },
-      path: '/mad',
+      path: '/venues',
       sub: [
         { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
         { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
+        { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
       ]
     },
   ];

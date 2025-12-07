@@ -33,7 +33,7 @@ const Index = () => {
     {
       title: { en: 'Mad Stuff', es: 'Locuras' },
       description: { en: 'Deep cuts, history, venues, crews', es: 'Cortes profundos, historia, clubs, crews' },
-      path: '/mad'
+      path: '/venues'
     }
   ];
 
