@@ -92,7 +92,7 @@ const Header = () => {
         <nav className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={technoDogLogo} alt="techno.dog logo" className="w-28 h-28 logo-glow transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
+            <img src={technoDogLogo} alt="techno.dog logo" className="w-32 h-32 logo-glow transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
             <span className="text-sm font-mono tracking-[0.2em] text-foreground group-hover:animate-glitch">
               techno.dog
             </span>
