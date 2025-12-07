@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Building2, Sliders, Music2, Radio, Users, Disc3, Wrench, ExternalLink, Play, Images, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
+import { gearImages } from "@/assets/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -51,52 +52,71 @@ const GearDetail = () => {
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Image - Links to official product site */}
-            <a 
-              href={gearItem.officialUrl || '#'}
-              target={gearItem.officialUrl ? '_blank' : undefined}
-              rel="noopener noreferrer"
-              className={`aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
-            >
-              {gearItem.imageUrl ? (
-                <img 
-                  src={gearItem.imageUrl} 
-                  alt={gearItem.name}
-                  className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-              ) : null}
-              <div className={`text-center p-8 flex flex-col items-center justify-center h-full ${gearItem.imageUrl ? 'hidden' : ''}`}>
-                <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="font-mono text-xs text-muted-foreground">
-                  {language === 'en' ? 'Equipment visualization' : 'Visualización del equipo'}
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-              {/* Official site indicator */}
-              {gearItem.officialUrl && (
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="bg-background/90 border border-border px-3 py-1 flex items-center gap-2">
-                    <ExternalLink className="w-3 h-3" />
-                    <span className="font-mono text-xs">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
+            {(() => {
+              // Use local image if available, fallback to imageUrl
+              const localImage = gearImages[gearItem.id];
+              const imageSrc = localImage || gearItem.imageUrl;
+              
+              return (
+                <a 
+                  href={gearItem.officialUrl || '#'}
+                  target={gearItem.officialUrl ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  className={`aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
+                >
+                  {imageSrc ? (
+                    <>
+                      <img 
+                        src={imageSrc} 
+                        alt={gearItem.name}
+                        className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.classList.remove('hidden');
+                        }}
+                      />
+                      <div className="hidden text-center p-8 flex-col items-center justify-center h-full">
+                        <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {gearItem.name}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center p-8 flex flex-col items-center justify-center h-full">
+                      <Sliders className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
+                      <p className="font-mono text-xs text-muted-foreground">
+                        {gearItem.name}
+                      </p>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                  {/* Official site indicator */}
+                  {gearItem.officialUrl && (
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-background/90 border border-border px-3 py-1 flex items-center gap-2">
+                        <ExternalLink className="w-3 h-3" />
+                        <span className="font-mono text-xs">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex flex-wrap gap-2">
+                      {gearItem.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="font-mono text-xs bg-background/90 border border-border px-2 py-1"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-              <div className="absolute bottom-4 left-4 right-4">
-                <div className="flex flex-wrap gap-2">
-                  {gearItem.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="font-mono text-xs bg-background/90 border border-border px-2 py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </a>
+                </a>
+              );
+            })()}
 
             {/* Gear Info */}
             <div className="space-y-6">
