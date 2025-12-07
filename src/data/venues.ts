@@ -14,6 +14,7 @@ export interface Venue {
 }
 
 export const venues: Venue[] = [
+  // GERMANY
   {
     id: "berghain",
     name: "Berghain",
@@ -29,6 +30,34 @@ export const venues: Venue[] = [
     coords: { lat: 52.5112, lng: 13.4425 }
   },
   {
+    id: "tresor",
+    name: "Tresor",
+    city: "Berlin",
+    country: "Germany",
+    type: "club",
+    active: "1991–present",
+    capacity: 700,
+    tags: ["Detroit-Berlin axis", "historic", "vault", "underground"],
+    soundSystem: "Custom Martin Audio with emphasis on low-end",
+    atmosphere: "The original vault. The Detroit-Berlin connection that changed everything.",
+    historicLineups: ["Jeff Mills", "Juan Atkins", "Underground Resistance", "Surgeon"],
+    coords: { lat: 52.5096, lng: 13.4182 }
+  },
+  {
+    id: "about-blank",
+    name: "://about blank",
+    city: "Berlin",
+    country: "Germany",
+    type: "club",
+    active: "2010–present",
+    capacity: 600,
+    tags: ["garden", "collective", "political", "queer-friendly"],
+    atmosphere: "Collective-run space with large garden. Strong political stance. Community first.",
+    coords: { lat: 52.5067, lng: 13.4695 }
+  },
+
+  // GEORGIA
+  {
     id: "bassiani",
     name: "Bassiani",
     city: "Tbilisi",
@@ -36,24 +65,11 @@ export const venues: Venue[] = [
     type: "club",
     active: "2014–present",
     capacity: 1200,
-    tags: ["former swimming pool", "political", "movement", "techno"],
+    tags: ["former swimming pool", "political", "movement", "resistance"],
     soundSystem: "Custom d&b audiotechnik with J-series mains",
     atmosphere: "Built in a Soviet swimming pool beneath a football stadium. Symbol of Georgian youth resistance.",
-    historicLineups: ["Paula Temple", "Kobosil", "SPFDJ", "Dax J"],
+    historicLineups: ["Paula Temple", "Kobosil", "SPFDJ", "Dax J", "Hector Oaks"],
     coords: { lat: 41.7266, lng: 44.7667 }
-  },
-  {
-    id: "de-school",
-    name: "De School",
-    city: "Amsterdam",
-    country: "Netherlands",
-    type: "multi-space",
-    active: "2016–2020",
-    capacity: 700,
-    tags: ["former school", "intimate", "restaurant", "vinyl"],
-    soundSystem: "Custom system focused on clarity and warmth",
-    atmosphere: "Former technical school. Daytime café. Nighttime temple. Closed but not forgotten.",
-    historicLineups: ["Objekt", "Skee Mask", "Shackleton", "Pangaea"]
   },
   {
     id: "khidi",
@@ -67,20 +83,38 @@ export const venues: Venue[] = [
     atmosphere: "Raw industrial space. Dark. Uncompromising. The other side of Tbilisi.",
     coords: { lat: 41.7151, lng: 44.8097 }
   },
+
+  // FRANCE
   {
-    id: "tresor",
-    name: "Tresor",
-    city: "Berlin",
-    country: "Germany",
+    id: "concrete",
+    name: "Concrete",
+    city: "Paris",
+    country: "France",
     type: "club",
-    active: "1991–present",
-    capacity: 700,
-    tags: ["historic", "vault", "underground", "industrial"],
-    soundSystem: "Custom Martin Audio with emphasis on low-end",
-    atmosphere: "The original vault. The connection that changed everything.",
-    historicLineups: ["Surgeon", "Planetary Assault Systems", "Blawan"],
-    coords: { lat: 52.5096, lng: 13.4182 }
+    active: "2011–2019",
+    capacity: 400,
+    tags: ["riverside", "Funktion-One", "intimate", "daylight"],
+    soundSystem: "Funktion-One with custom configuration",
+    atmosphere: "On a barge on the Seine. Sunrise sessions with natural light. Closed but legendary.",
+    historicLineups: ["Ben Klock", "Paula Temple", "Rødhåd", "Dax J"]
   },
+
+  // NETHERLANDS
+  {
+    id: "de-school",
+    name: "De School",
+    city: "Amsterdam",
+    country: "Netherlands",
+    type: "multi-space",
+    active: "2016–2020",
+    capacity: 700,
+    tags: ["former school", "intimate", "restaurant", "vinyl"],
+    soundSystem: "Custom system focused on clarity and warmth",
+    atmosphere: "Former technical school. Daytime café. Nighttime temple. Closed but not forgotten.",
+    historicLineups: ["Objekt", "Skee Mask", "Shackleton", "Pangaea"]
+  },
+
+  // UK
   {
     id: "fold",
     name: "Fold",
@@ -95,31 +129,8 @@ export const venues: Venue[] = [
     historicLineups: ["Perc", "Blawan", "Paula Temple", "Dax J"],
     coords: { lat: 51.5391, lng: -0.0053 }
   },
-  {
-    id: "about-blank",
-    name: "://about blank",
-    city: "Berlin",
-    country: "Germany",
-    type: "club",
-    active: "2010–present",
-    capacity: 600,
-    tags: ["garden", "collective", "political", "queer-friendly"],
-    atmosphere: "Collective-run space with large garden. Strong political stance. Community first.",
-    coords: { lat: 52.5067, lng: 13.4695 }
-  },
-  {
-    id: "concrete",
-    name: "Concrete",
-    city: "Paris",
-    country: "France",
-    type: "club",
-    active: "2011–2019",
-    capacity: 400,
-    tags: ["riverside", "Funktion-One", "intimate", "daylight"],
-    soundSystem: "Funktion-One with custom configuration",
-    atmosphere: "On a barge on the Seine. Sunrise sessions with natural light. Closed but legendary.",
-    historicLineups: ["Ben Klock", "Paula Temple", "Rødhåd", "Dax J"]
-  },
+
+  // BELGIUM
   {
     id: "fuse",
     name: "Fuse",
@@ -134,56 +145,106 @@ export const venues: Venue[] = [
     historicLineups: ["Ben Klock", "Marcel Dettmann", "Trym"],
     coords: { lat: 50.8424, lng: 4.3360 }
   },
+
+  // POLAND
   {
-    id: "garage-nord",
-    name: "Garage Nord",
-    city: "Amsterdam",
-    country: "Netherlands",
-    type: "warehouse",
-    active: "2019–present",
-    capacity: 500,
-    tags: ["warehouse", "Amsterdam Noord", "raw", "intimate"],
-    atmosphere: "Raw warehouse in Amsterdam Noord. Intimate. Proper.",
-    coords: { lat: 52.3883, lng: 4.9034 }
+    id: "instytut",
+    name: "Instytut",
+    city: "Katowice",
+    country: "Poland",
+    type: "club",
+    active: "2014–present",
+    capacity: 400,
+    tags: ["Polish", "industrial heritage", "Silesia", "underground"],
+    atmosphere: "In the post-industrial heart of Silesia. Raw Polish techno.",
+    coords: { lat: 50.2649, lng: 19.0238 }
   },
+
+  // USA
   {
-    id: "blitz",
-    name: "Blitz",
-    city: "Munich",
-    country: "Germany",
+    id: "marble-bar",
+    name: "Marble Bar",
+    city: "Detroit",
+    country: "USA",
+    type: "club",
+    active: "2015–present",
+    capacity: 400,
+    tags: ["Detroit", "origin city", "intimate", "diverse"],
+    atmosphere: "In the birthplace of techno. A new generation space keeping the tradition alive.",
+    coords: { lat: 42.3314, lng: -83.0458 }
+  },
+
+  // JAPAN
+  {
+    id: "vent",
+    name: "Vent",
+    city: "Tokyo",
+    country: "Japan",
     type: "club",
     active: "2016–present",
-    capacity: 600,
-    tags: ["Munich", "Funktion-One", "marathon", "quality"],
-    soundSystem: "Funktion-One system",
-    atmosphere: "Munich's answer to the Berlin sound. Quality bookings. Marathon sessions.",
-    coords: { lat: 48.1351, lng: 11.5820 }
-  },
-  {
-    id: "eerste-communie",
-    name: "Eerste Communie",
-    city: "Amsterdam",
-    country: "Netherlands",
-    type: "club",
-    active: "2021–present",
     capacity: 300,
-    tags: ["intimate", "Dutch", "vinyl", "quality"],
-    atmosphere: "Small but perfectly formed. Focus on quality sound and bookings.",
-    coords: { lat: 52.3667, lng: 4.8945 }
+    tags: ["intimate", "quality sound", "Tokyo", "underground"],
+    soundSystem: "Custom Pioneer system with analog mixing",
+    atmosphere: "Small but perfectly formed. Focus on sound quality.",
+    historicLineups: ["DJ Nobu", "Wata Igarashi", "Donato Dozzy"],
+    coords: { lat: 35.6574, lng: 139.7053 }
   },
+
+  // COLOMBIA
   {
-    id: "corsica-studios",
-    name: "Corsica Studios",
-    city: "London",
-    country: "UK",
+    id: "video-club",
+    name: "Video Club",
+    city: "Bogotá",
+    country: "Colombia",
     type: "club",
+    active: "2019–present",
+    capacity: 350,
+    tags: ["Colombian", "underground", "intimate", "raw"],
+    atmosphere: "Bogotá's underground techno institution. Raw and uncompromising.",
+    coords: { lat: 4.6097, lng: -74.0817 }
+  },
+
+  // BRAZIL
+  {
+    id: "d-edge",
+    name: "D-Edge",
+    city: "São Paulo",
+    country: "Brazil",
+    type: "club",
+    active: "2000–present",
+    capacity: 1000,
+    tags: ["South America", "LED", "marathon", "diverse"],
+    soundSystem: "Full Void Acoustics system",
+    atmosphere: "São Paulo's techno institution. 24+ hour parties. Leading South American techno.",
+    historicLineups: ["Ben Klock", "Jeff Mills", "Oscar Mulero"],
+    coords: { lat: -23.5284, lng: -46.6665 }
+  },
+
+  // MEXICO
+  {
+    id: "mutek-mx",
+    name: "MUTEK.MX Stages",
+    city: "Mexico City",
+    country: "Mexico",
+    type: "multi-space",
     active: "2003–present",
-    capacity: 500,
-    tags: ["London", "two rooms", "intimate", "quality"],
-    soundSystem: "Custom Funktion-One",
-    atmosphere: "Two rooms under the arches. London's proper underground.",
-    historicLineups: ["Blawan", "Perc", "Helena Hauff"],
-    coords: { lat: 51.4871, lng: -0.0993 }
+    tags: ["festival", "audiovisual", "experimental", "Latin America"],
+    atmosphere: "Various venues across Mexico City. Audiovisual and experimental techno.",
+    coords: { lat: 19.4326, lng: -99.1332 }
+  },
+
+  // AUSTRALIA
+  {
+    id: "sub-club-melbourne",
+    name: "Sub Club",
+    city: "Melbourne",
+    country: "Australia",
+    type: "club",
+    active: "2015–present",
+    capacity: 400,
+    tags: ["Australian", "underground", "intimate", "quality"],
+    atmosphere: "Melbourne's underground techno space. Intimate and focused.",
+    coords: { lat: -37.8136, lng: 144.9631 }
   }
 ];
 
