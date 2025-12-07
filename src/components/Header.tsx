@@ -90,18 +90,22 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 md:px-8">
-        <nav className="flex items-center justify-between h-16">
+      <div className="container mx-auto px-4 md:px-6">
+        <nav className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <img src={technoDogLogo} alt="techno.dog logo" className="w-20 h-20 logo-glow transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:drop-shadow-[0_0_20px_hsl(var(--primary)/0.6)]" />
-            <span className="text-sm font-mono tracking-[0.2em] text-foreground group-hover:animate-glitch">
+          <Link to="/" className="flex items-center gap-3 group shrink-0">
+            <img 
+              src={technoDogLogo} 
+              alt="techno.dog logo" 
+              className="w-10 h-10 logo-glow transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:drop-shadow-[0_0_12px_hsl(var(--primary)/0.5)]" 
+            />
+            <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
               techno.dog
             </span>
           </Link>
 
           {/* Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {navItems.map((item) => (
               <div
                 key={item.path}
@@ -111,22 +115,22 @@ const Header = () => {
               >
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-1 px-3 py-2 text-xs font-mono uppercase tracking-widest transition-colors hover:animate-glitch ${
+                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors hover:animate-glitch ${
                     isActive(item.path) ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {item.label[language]}
-                  {item.sub && <ChevronDown className="w-3 h-3" />}
+                  {item.sub && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
                 </Link>
                 
                 {/* Dropdown */}
                 {item.sub && activeDropdown === item.path && (
-                  <div className="absolute top-full left-0 mt-0 py-2 bg-background border border-border min-w-[180px] z-50">
+                  <div className="absolute top-full left-0 mt-0 py-1.5 bg-background border border-border min-w-[160px] z-50 shadow-lg">
                     {item.sub.map((subItem) => (
                       <Link
                         key={subItem.path}
                         to={subItem.path}
-                        className="block px-4 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-card hover:animate-glitch transition-colors"
+                        className="block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
                       >
                         {subItem.label[language]}
                       </Link>
