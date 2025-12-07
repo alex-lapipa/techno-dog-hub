@@ -78,10 +78,8 @@ const App = () => (
               <Route path="/crews/:id" element={<Crews />} />
               
               {/* Mad Stuff */}
-              <Route path="/mad" element={<MadStuff />} />
               <Route path="/mad/timeline" element={<Timeline />} />
               <Route path="/mad/calendar" element={<Calendar />} />
-              <Route path="/mad/map" element={<MadStuff />} />
               
               {/* Gear */}
               <Route path="/gear" element={<Gear />} />
