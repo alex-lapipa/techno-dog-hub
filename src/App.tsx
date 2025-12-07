@@ -15,6 +15,7 @@ import News from "./pages/News";
 import Festivals from "./pages/Festivals";
 import FestivalDetail from "./pages/FestivalDetail";
 import Artists from "./pages/Artists";
+import ArtistDetail from "./pages/ArtistDetail";
 import Venues from "./pages/Venues";
 import Labels from "./pages/Labels";
 import Releases from "./pages/Releases";
@@ -54,7 +55,7 @@ const App = () => (
               {/* Artists */}
               <Route path="/artists" element={<Artists />} />
               <Route path="/artists/regions" element={<Artists />} />
-              <Route path="/artists/:id" element={<Artists />} />
+              <Route path="/artists/:id" element={<ArtistDetail />} />
               
               {/* Venues */}
               <Route path="/venues" element={<Venues />} />
