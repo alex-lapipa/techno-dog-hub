@@ -37,6 +37,14 @@ export interface GearItem {
   };
   relatedGear: string[];
   tags: string[];
+  // New fields for official resources
+  officialUrl?: string;
+  imageUrl?: string;
+  youtubeVideos?: {
+    title: string;
+    url: string;
+    channel: string;
+  }[];
 }
 
 export const gearCategories: Record<GearCategory, { en: string; es: string }> = {
@@ -89,7 +97,13 @@ export const gear: GearItem[] = [
       es: 'El 303 destaca creando líneas de bajo hipnóticas con su sonido "acid" característico. Técnicas clave incluyen: barridos lentos del filtro con alta resonancia, patrones de acento para variación rítmica, funciones de slide para frases legato, y apilar múltiples unidades para capas complejas.'
     },
     relatedGear: ['behringer-td-3', 'roland-sh-101', 'roland-tr-909'],
-    tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic']
+    tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic'],
+    officialUrl: 'https://www.roland.com/global/products/rc_tb-303/',
+    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tb-303_top_gal.png',
+    youtubeVideos: [
+      { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
+      { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
+    ]
   },
   {
     id: 'roland-tr-808',
@@ -129,7 +143,13 @@ export const gear: GearItem[] = [
       es: 'El bombo 808 es esencial para techno profundo y retumbante. Combinar con bombo 909 para pegada + sub. Usar los hi-hats analógicos para patrones rodantes. El cencerro y claves añaden acentos percusivos.'
     },
     relatedGear: ['roland-tr-909', 'behringer-rd-8', 'elektron-analog-rytm'],
-    tags: ['analog', 'drum-machine', 'classic', 'detroit', 'kick']
+    tags: ['analog', 'drum-machine', 'classic', 'detroit', 'kick'],
+    officialUrl: 'https://www.roland.com/global/products/rc_tr-808/',
+    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-808_top_gal.png',
+    youtubeVideos: [
+      { title: 'The Roland TR-808 In Action', url: 'https://www.youtube.com/watch?v=nEDuHsCEDfs', channel: 'Doctor Mix' },
+      { title: 'TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=Ov38brxRGks', channel: 'Roland' }
+    ]
   },
   {
     id: 'roland-tr-909',
@@ -169,7 +189,13 @@ export const gear: GearItem[] = [
       es: 'El bombo 909 es el estándar del techno—contundente con transiente definido. Usar el shuffle para sensación de swing. Combinar bombo con 808 para extensión de sub-bajos.'
     },
     relatedGear: ['roland-tr-808', 'behringer-rd-9', 'elektron-analog-rytm'],
-    tags: ['analog', 'drum-machine', 'classic', 'techno', 'kick', 'essential']
+    tags: ['analog', 'drum-machine', 'classic', 'techno', 'kick', 'essential'],
+    officialUrl: 'https://www.roland.com/global/products/rc_tr-909/',
+    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-909_top_gal.png',
+    youtubeVideos: [
+      { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' },
+      { title: 'Roland TR-909 Famous Patterns', url: 'https://www.youtube.com/watch?v=ld4n-dT-qQg', channel: 'Doctor Mix' }
+    ]
   },
   {
     id: 'roland-sh-101',
@@ -208,7 +234,11 @@ export const gear: GearItem[] = [
       es: 'El SH-101 destaca en líneas de bajo contundentes usando el sub-oscilador con la onda saw principal. Su secuenciador incorporado crea patrones hipnóticos cuando se sincroniza con cajas de ritmos.'
     },
     relatedGear: ['roland-tb-303', 'roland-juno-106', 'behringer-ms-101'],
-    tags: ['analog', 'monophonic', 'bassline', 'classic', 'sequencer']
+    tags: ['analog', 'monophonic', 'bassline', 'classic', 'sequencer'],
+    officialUrl: 'https://www.roland.com/global/promos/roland_classic_synths/',
+    youtubeVideos: [
+      { title: 'Roland SH-101 History and Sound', url: 'https://www.youtube.com/watch?v=nPt6j-qFvQY', channel: 'Vintage Synth Explorer' }
+    ]
   },
   {
     id: 'roland-juno-106',
@@ -286,7 +316,12 @@ export const gear: GearItem[] = [
       es: 'El MS-20 destaca en sonidos agresivos y estridentes para techno industrial. Los filtros duales permiten moldeo tonal complejo—el pasa-altos elimina barro mientras el pasa-bajos esculpe el tono.'
     },
     relatedGear: ['moog-mother-32', 'arturia-minibrute', 'korg-ms-20-mini'],
-    tags: ['analog', 'semi-modular', 'aggressive', 'industrial', 'filters']
+    tags: ['analog', 'semi-modular', 'aggressive', 'industrial', 'filters'],
+    officialUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/',
+    imageUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/images/main_l.jpg',
+    youtubeVideos: [
+      { title: 'Korg MS-20 Mini Overview', url: 'https://www.youtube.com/watch?v=7q_LxMgbKFI', channel: 'Korg' }
+    ]
   },
   {
     id: 'moog-mother-32',
@@ -324,7 +359,12 @@ export const gear: GearItem[] = [
       es: 'El Mother-32 es ideal para líneas de bajo gordas y potentes con la calidez del filtro ladder clásico de Moog. El secuenciador destaca en patrones hipnóticos con sus funciones de ratcheting y acento.'
     },
     relatedGear: ['moog-dfam', 'moog-subharmonicon', 'korg-ms-20'],
-    tags: ['analog', 'semi-modular', 'moog', 'bass', 'eurorack']
+    tags: ['analog', 'semi-modular', 'moog', 'bass', 'eurorack'],
+    officialUrl: 'https://www.moogmusic.com/products/mother-32',
+    imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Front_Product_Image.png',
+    youtubeVideos: [
+      { title: 'Moog Sound Studio: Mother-32 & DFAM & Subharmonicon', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
+    ]
   },
   {
     id: 'moog-dfam',
@@ -362,7 +402,12 @@ export const gear: GearItem[] = [
       es: 'El DFAM destaca creando percusión orgánica y evolutiva que escapa de la sensación cuadriculada de las cajas de ritmos tradicionales. Usar los osciladores duales afinados a diferentes tonos para sonidos complejos de bombo/tom.'
     },
     relatedGear: ['moog-mother-32', 'moog-subharmonicon', 'elektron-analog-rytm'],
-    tags: ['analog', 'semi-modular', 'moog', 'percussion', 'eurorack']
+    tags: ['analog', 'semi-modular', 'moog', 'percussion', 'eurorack'],
+    officialUrl: 'https://www.moogmusic.com/products/dfam',
+    imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/DFAM_Front_Product_Image.png',
+    youtubeVideos: [
+      { title: 'DFAM Sound Design Demo', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
+    ]
   },
   {
     id: 'moog-subharmonicon',
@@ -398,7 +443,12 @@ export const gear: GearItem[] = [
       es: 'El Subharmonicon crea patrones hipnóticos y siempre cambiantes ideales para sets de techno extendidos. Los osciladores subarmónicos generan frecuencias de bajo ricas por debajo del fundamental—perfecto para techno profundo y retumbante.'
     },
     relatedGear: ['moog-mother-32', 'moog-dfam', 'make-noise-0-coast'],
-    tags: ['analog', 'semi-modular', 'moog', 'polyrhythm', 'eurorack', 'experimental']
+    tags: ['analog', 'semi-modular', 'moog', 'polyrhythm', 'eurorack', 'experimental'],
+    officialUrl: 'https://www.moogmusic.com/products/subharmonicon',
+    imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/Subharmonicon_Front_Product_Image.png',
+    youtubeVideos: [
+      { title: 'Moog Subharmonicon Demo', url: 'https://www.youtube.com/watch?v=Zzy4ZVrfttc', channel: 'Vintage King' }
+    ]
   },
   {
     id: 'elektron-analog-four',
@@ -436,7 +486,12 @@ export const gear: GearItem[] = [
       es: 'El Analog Four es una potencia del techno. Usar parameter locks para crear barridos de filtro evolutivos y variaciones rítmicas por paso. Las salidas CV pueden controlar equipo modular o sintetizadores vintage.'
     },
     relatedGear: ['elektron-analog-rytm', 'elektron-digitakt', 'elektron-digitone'],
-    tags: ['analog', 'polyphonic', 'sequencer', 'elektron', 'parameter-locks']
+    tags: ['analog', 'polyphonic', 'sequencer', 'elektron', 'parameter-locks'],
+    officialUrl: 'https://www.elektron.se/products/analog-four-mkii/',
+    imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/05/A4_MKII_Front.png',
+    youtubeVideos: [
+      { title: 'Analog Four MKII Introduction', url: 'https://www.youtube.com/watch?v=OoqS-BVaJ_Y', channel: 'Elektron' }
+    ]
   },
   {
     id: 'elektron-analog-rytm',
@@ -474,7 +529,12 @@ export const gear: GearItem[] = [
       es: 'El Analog Rytm es el estándar moderno para programación de baterías de techno. Los motores analógicos proporcionan pegada mientras los samples añaden carácter.'
     },
     relatedGear: ['elektron-analog-four', 'elektron-digitakt', 'roland-tr-909'],
-    tags: ['analog', 'hybrid', 'drum-machine', 'elektron', 'samples', 'parameter-locks']
+    tags: ['analog', 'hybrid', 'drum-machine', 'elektron', 'samples', 'parameter-locks'],
+    officialUrl: 'https://www.elektron.se/products/analog-rytm-mkii/',
+    imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Front.png',
+    youtubeVideos: [
+      { title: 'Analog Rytm MKII Introduction', url: 'https://www.youtube.com/watch?v=qYTrKDJL4m4', channel: 'Elektron' }
+    ]
   },
   {
     id: 'sequential-prophet-5',
@@ -629,7 +689,12 @@ export const gear: GearItem[] = [
       es: 'El Digitakt es el sampler de techno moderno. Graba tus propios sonidos o importa samples. Usa parameter locks para patrones de batería evolutivos.'
     },
     relatedGear: ['elektron-digitone', 'elektron-analog-rytm', 'elektron-octatrack'],
-    tags: ['digital', 'sampler', 'elektron', 'sequencer', 'portable', 'parameter-locks']
+    tags: ['digital', 'sampler', 'elektron', 'sequencer', 'portable', 'parameter-locks'],
+    officialUrl: 'https://www.elektron.se/products/digitakt-ii/',
+    imageUrl: 'https://www.elektron.se/wp-content/uploads/2023/09/Digitakt-II_angle.png',
+    youtubeVideos: [
+      { title: 'Digitakt II Introduction', url: 'https://www.youtube.com/watch?v=sS6VzrDYlgE', channel: 'Elektron' }
+    ]
   },
   {
     id: 'elektron-digitone',
@@ -665,7 +730,12 @@ export const gear: GearItem[] = [
       es: 'El Digitone destaca en percusión metálica, pads evolutivos y bajos agresivos. La síntesis FM crea tonos tipo campana perfectos para hi-hats y platillos.'
     },
     relatedGear: ['elektron-digitakt', 'elektron-model-cycles', 'yamaha-dx7'],
-    tags: ['digital', 'fm', 'elektron', 'sequencer', 'portable', 'metallic']
+    tags: ['digital', 'fm', 'elektron', 'sequencer', 'portable', 'metallic'],
+    officialUrl: 'https://www.elektron.se/products/digitone-ii/',
+    imageUrl: 'https://www.elektron.se/wp-content/uploads/2023/09/Digitone-II_angle.png',
+    youtubeVideos: [
+      { title: 'Digitone II Introduction', url: 'https://www.youtube.com/watch?v=Wv9YHVxE7jA', channel: 'Elektron' }
+    ]
   },
   {
     id: 'novation-peak',
@@ -701,7 +771,12 @@ export const gear: GearItem[] = [
       es: 'El Peak combina flexibilidad digital con calidez analógica—ideal para techno moderno. Usa las wavetables para texturas evolutivas, luego caliéntalas con el filtro analógico.'
     },
     relatedGear: ['novation-summit', 'asm-hydrasynth', 'sequential-prophet-rev2'],
-    tags: ['hybrid', 'polyphonic', 'wavetable', 'analog-filter', 'modern']
+    tags: ['hybrid', 'polyphonic', 'wavetable', 'analog-filter', 'modern'],
+    officialUrl: 'https://novationmusic.com/products/peak',
+    imageUrl: 'https://cdn11.bigcommerce.com/s-itgb7ssiy1/images/stencil/1280x1280/products/125/3217/Peak_Top_Image__05618.1681814155.png',
+    youtubeVideos: [
+      { title: 'Novation Peak Overview', url: 'https://www.youtube.com/watch?v=m6V6Pfu5eDk', channel: 'Novation' }
+    ]
   },
   {
     id: 'asm-hydrasynth',
@@ -766,7 +841,12 @@ export const gear: GearItem[] = [
       es: 'El RD-8 proporciona sonidos 808 auténticos a precios accesibles. Usa las salidas individuales para procesamiento y mezcla detallados.'
     },
     relatedGear: ['roland-tr-808', 'behringer-rd-9', 'elektron-analog-rytm'],
-    tags: ['analog', 'drum-machine', 'clone', 'affordable', '808']
+    tags: ['analog', 'drum-machine', 'clone', 'affordable', '808'],
+    officialUrl: 'https://www.behringer.com/product.html?modelCode=0704-AAA',
+    imageUrl: 'https://mediadl.musictribe.com/media/PLM/data/images/products/P0DJL/2000Wx2000H/RD-8_P0DJL_Front_XL.png',
+    youtubeVideos: [
+      { title: 'Behringer RD-8 Introduction', url: 'https://www.youtube.com/watch?v=I0m0u4C6iyA', channel: 'Behringer' }
+    ]
   },
   {
     id: 'behringer-rd-9',
@@ -798,7 +878,12 @@ export const gear: GearItem[] = [
       es: 'El RD-9 pone los sonidos esenciales de batería de techno al alcance. El bombo captura la pegada del 909. Usa shuffle para el groove.'
     },
     relatedGear: ['roland-tr-909', 'behringer-rd-8', 'behringer-td-3'],
-    tags: ['analog', 'hybrid', 'drum-machine', 'clone', 'affordable', '909', 'techno']
+    tags: ['analog', 'hybrid', 'drum-machine', 'clone', 'affordable', '909', 'techno'],
+    officialUrl: 'https://www.behringer.com/product.html?modelCode=0704-AAB',
+    imageUrl: 'https://mediadl.musictribe.com/media/PLM/data/images/products/P0DTZ/2000Wx2000H/RD-9_P0DTZ_Front_XL.png',
+    youtubeVideos: [
+      { title: 'Behringer RD-9 Overview', url: 'https://www.youtube.com/watch?v=FqT7O0tDoEY', channel: 'Behringer' }
+    ]
   },
   // === SAMPLERS & SEQUENCERS ===
   {
@@ -1051,7 +1136,12 @@ export const gear: GearItem[] = [
       es: 'Ableton Live es el DAW predeterminado para producción de techno. Session View permite arreglos improvisados—perfecto para explorar ideas.'
     },
     relatedGear: ['bitwig-studio', 'ableton-push'],
-    tags: ['daw', 'production', 'live', 'session-view', 'industry-standard']
+    tags: ['daw', 'production', 'live', 'session-view', 'industry-standard'],
+    officialUrl: 'https://www.ableton.com/en/live/',
+    imageUrl: 'https://cdn-resources.ableton.com/resources/images/metaimages/live12.png',
+    youtubeVideos: [
+      { title: 'Live 12: Overview', url: 'https://www.youtube.com/watch?v=I7JJz7RN_GE', channel: 'Ableton' }
+    ]
   },
   {
     id: 'bitwig-studio',
@@ -1085,7 +1175,12 @@ export const gear: GearItem[] = [
       es: 'Bitwig destaca para productores de techno que quieren flexibilidad tipo modular en software. El Grid crea sintetizadores y efectos personalizados.'
     },
     relatedGear: ['ableton-live', 'fl-studio'],
-    tags: ['daw', 'production', 'modular', 'mpe', 'cv-gate', 'modern']
+    tags: ['daw', 'production', 'modular', 'mpe', 'cv-gate', 'modern'],
+    officialUrl: 'https://www.bitwig.com/',
+    imageUrl: 'https://assets.bitwig.net/media/image/bitwig-home_2311_bitwig-studio-hero/Bitwig-Home_2311_Bitwig-Studio-Hero_SM-SD.jpg',
+    youtubeVideos: [
+      { title: 'Bitwig Studio 5 Features', url: 'https://www.youtube.com/watch?v=Q-_u3EvG0ko', channel: 'Bitwig' }
+    ]
   },
   {
     id: 'logic-pro',
