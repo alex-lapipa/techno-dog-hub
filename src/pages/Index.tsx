@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import MagazineGrid from "@/components/MagazineGrid";
 import FestivalsSection from "@/components/FestivalsSection";
 import AquasellaSection from "@/components/AquasellaSection";
 import LEVSection from "@/components/LEVSection";
@@ -10,12 +11,13 @@ import HorizontalNav from "@/components/HorizontalNav";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [activeSection, setActiveSection] = useState(0);
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
   
   const sectionNames = [
     t('hero.title'),
+    language === 'en' ? 'Editorial' : 'Editorial',
     t('nav.festivals'),
     t('nav.aquasella'),
     t('nav.lev'),
@@ -54,15 +56,18 @@ const Index = () => {
           <HeroSection />
         </div>
         <div ref={el => sectionsRef.current[1] = el}>
-          <FestivalsSection />
+          <MagazineGrid />
         </div>
         <div ref={el => sectionsRef.current[2] = el}>
-          <AquasellaSection />
+          <FestivalsSection />
         </div>
         <div ref={el => sectionsRef.current[3] = el}>
-          <LEVSection />
+          <AquasellaSection />
         </div>
         <div ref={el => sectionsRef.current[4] = el}>
+          <LEVSection />
+        </div>
+        <div ref={el => sectionsRef.current[5] = el}>
           <TechnoChat />
         </div>
       </main>
