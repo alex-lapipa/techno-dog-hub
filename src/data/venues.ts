@@ -1,3 +1,12 @@
+export interface ImageAttribution {
+  url: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  sourceUrl: string;
+  sourceName: string;
+}
+
 export interface Venue {
   id: string;
   name: string;
@@ -11,6 +20,7 @@ export interface Venue {
   atmosphere?: string;
   historicLineups?: string[];
   coords?: { lat: number; lng: number };
+  image?: ImageAttribution;
 }
 
 export const venues: Venue[] = [
@@ -27,7 +37,15 @@ export const venues: Venue[] = [
     soundSystem: "Custom Funktion-One with 11 bass units",
     atmosphere: "Former power plant. Cathedral of techno. No photos. Pure sound.",
     historicLineups: ["Ben Klock", "Marcel Dettmann", "Len Faki", "Steffi", "DVS1"],
-    coords: { lat: 52.5112, lng: 13.4425 }
+    coords: { lat: 52.5112, lng: 13.4425 },
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Berlin_Berghain.jpg/800px-Berlin_Berghain.jpg",
+      author: "Arne Müseler",
+      license: "CC BY-SA 3.0 DE",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Berlin_Berghain.jpg",
+      sourceName: "Wikimedia Commons"
+    }
   },
   {
     id: "tresor",
@@ -41,7 +59,15 @@ export const venues: Venue[] = [
     soundSystem: "Custom Martin Audio with emphasis on low-end",
     atmosphere: "The original vault. The Detroit-Berlin connection that changed everything.",
     historicLineups: ["Jeff Mills", "Juan Atkins", "Underground Resistance", "Surgeon"],
-    coords: { lat: 52.5096, lng: 13.4182 }
+    coords: { lat: 52.5096, lng: 13.4182 },
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Tresor_-_Berlin.jpg/800px-Tresor_-_Berlin.jpg",
+      author: "MichaelBrossmann",
+      license: "Public Domain",
+      licenseUrl: "https://en.wikipedia.org/wiki/Public_domain",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Tresor_-_Berlin.jpg",
+      sourceName: "Wikimedia Commons"
+    }
   },
   {
     id: "about-blank",
@@ -53,7 +79,15 @@ export const venues: Venue[] = [
     capacity: 600,
     tags: ["garden", "collective", "political", "queer-friendly"],
     atmosphere: "Collective-run space with large garden. Strong political stance. Community first.",
-    coords: { lat: 52.5067, lng: 13.4695 }
+    coords: { lat: 52.5067, lng: 13.4695 },
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Techno-Club_About_Blank_Markgrafendamm_Berlin.jpg/800px-Techno-Club_About_Blank_Markgrafendamm_Berlin.jpg",
+      author: "Singlespeedfahrer",
+      license: "CC0 1.0",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Techno-Club_About_Blank_Markgrafendamm_Berlin.jpg",
+      sourceName: "Wikimedia Commons"
+    }
   },
 
   // GEORGIA
@@ -69,7 +103,15 @@ export const venues: Venue[] = [
     soundSystem: "Custom d&b audiotechnik with J-series mains",
     atmosphere: "Built in a Soviet swimming pool beneath a football stadium. Symbol of Georgian youth resistance.",
     historicLineups: ["Paula Temple", "Kobosil", "SPFDJ", "Dax J", "Hector Oaks"],
-    coords: { lat: 41.7266, lng: 44.7667 }
+    coords: { lat: 41.7266, lng: 44.7667 },
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Tbilisi_Boris_Paichadze_Dinamo_Arena_1.jpg/800px-Tbilisi_Boris_Paichadze_Dinamo_Arena_1.jpg",
+      author: "DJMX",
+      license: "CC BY-SA 3.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Tbilisi_Boris_Paichadze_Dinamo_Arena_1.jpg",
+      sourceName: "Wikimedia Commons"
+    }
   },
   {
     id: "khidi",
@@ -111,7 +153,15 @@ export const venues: Venue[] = [
     tags: ["former school", "intimate", "restaurant", "vinyl"],
     soundSystem: "Custom system focused on clarity and warmth",
     atmosphere: "Former technical school. Daytime café. Nighttime temple. Closed but not forgotten.",
-    historicLineups: ["Objekt", "Skee Mask", "Shackleton", "Pangaea"]
+    historicLineups: ["Objekt", "Skee Mask", "Shackleton", "Pangaea"],
+    image: {
+      url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/De_School_Dancefloor.jpg/960px-De_School_Dancefloor.jpg",
+      author: "Martijn Savenije",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:De_School_Dancefloor.jpg",
+      sourceName: "Wikimedia Commons"
+    }
   },
 
   // UK

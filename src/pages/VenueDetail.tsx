@@ -61,27 +61,59 @@ const VenueDetail = () => {
           {/* Hero Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
             {/* Venue Visual */}
-            <div className="aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/50 flex items-center justify-center">
-              <div className="text-center p-6">
-                <Building2 className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 text-muted-foreground/50" />
-                <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2">{venue.name}</h2>
-                <p className="font-mono text-xs text-muted-foreground">{venue.city}, {venue.country}</p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-              
-              {/* Tags */}
-              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {venue.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+            <div className="aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/50">
+              {venue.image ? (
+                <>
+                  <img 
+                    src={venue.image.url} 
+                    alt={`${venue.name} - ${venue.city}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                  
+                  {/* Attribution */}
+                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 space-y-2">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {venue.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="font-mono text-[9px] text-muted-foreground/80 bg-background/80 px-2 py-1 inline-block">
+                      Photo: <a href={venue.image.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{venue.image.author}</a> / <a href={venue.image.licenseUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{venue.image.license}</a>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <Building2 className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 text-muted-foreground/50" />
+                      <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2">{venue.name}</h2>
+                      <p className="font-mono text-xs text-muted-foreground">{venue.city}, {venue.country}</p>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                  
+                  {/* Tags */}
+                  <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {venue.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Venue Info */}
