@@ -37,13 +37,9 @@ export interface GearItem {
   };
   relatedGear: string[];
   tags: string[];
-  // New fields for official resources
+  // Resources
   officialUrl?: string;
   imageUrl?: string;
-  galleryImages?: {
-    url: string;
-    caption?: string;
-  }[];
   youtubeVideos?: {
     title: string;
     url: string;
@@ -103,7 +99,6 @@ export const gear: GearItem[] = [
     relatedGear: ['behringer-td-3', 'roland-sh-101', 'roland-tr-909'],
     tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic'],
     officialUrl: 'https://www.roland.com/global/products/rc_tb-303/',
-    galleryImages: [],
     youtubeVideos: [
       { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
       { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
@@ -149,12 +144,6 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tr-909', 'behringer-rd-8', 'elektron-analog-rytm'],
     tags: ['analog', 'drum-machine', 'classic', 'detroit', 'kick'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-808/',
-    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-808_top_gal.png',
-    galleryImages: [
-      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tr-808_top_gal.png', caption: 'Top view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Roland_TR-808_drum_machine.jpg', caption: 'Classic 808 front panel' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Roland_TR-808_%26_909.jpg', caption: 'TR-808 with TR-909' }
-    ],
     youtubeVideos: [
       { title: 'The Roland TR-808 In Action', url: 'https://www.youtube.com/watch?v=nEDuHsCEDfs', channel: 'Doctor Mix' },
       { title: 'TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=Ov38brxRGks', channel: 'Roland' }
@@ -200,12 +189,6 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tr-808', 'behringer-rd-9', 'elektron-analog-rytm'],
     tags: ['analog', 'drum-machine', 'classic', 'techno', 'kick', 'essential'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-909/',
-    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_tr-909_top_gal.png',
-    galleryImages: [
-      { url: 'https://static.roland.com/assets/images/products/gallery/rc_tr-909_top_gal.png', caption: 'Top view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Roland_TR-909.jpg', caption: 'Classic 909 front panel' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Roland_TR-909_%28large%29.jpg', caption: 'Detailed view' }
-    ],
     youtubeVideos: [
       { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' },
       { title: 'Roland TR-909 Famous Patterns', url: 'https://www.youtube.com/watch?v=ld4n-dT-qQg', channel: 'Doctor Mix' }
@@ -250,11 +233,6 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tb-303', 'roland-juno-106', 'behringer-ms-101'],
     tags: ['analog', 'monophonic', 'bassline', 'classic', 'sequencer'],
     officialUrl: 'https://www.roland.com/global/promos/roland_classic_synths/',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Roland_SH-101.jpg',
-    galleryImages: [
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Roland_SH-101.jpg', caption: 'Classic grey SH-101' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/1/17/Roland_SH-101_red.jpg', caption: 'Red edition' }
-    ],
     youtubeVideos: [
       { title: 'Roland SH-101 History and Sound', url: 'https://www.youtube.com/watch?v=nPt6j-qFvQY', channel: 'Vintage Synth Explorer' }
     ]
@@ -343,13 +321,6 @@ export const gear: GearItem[] = [
     relatedGear: ['moog-mother-32', 'arturia-minibrute', 'korg-ms-20-mini'],
     tags: ['analog', 'semi-modular', 'aggressive', 'industrial', 'filters'],
     officialUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/',
-    imageUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/images/main_l.jpg',
-    galleryImages: [
-      { url: 'https://www.korg.com/us/products/synthesizers/ms_20fs/images/main_l.jpg', caption: 'Front panel view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Korg_MS-20.jpg', caption: 'Classic MS-20' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Korg_MS-20_patch_panel.jpg', caption: 'Patch panel detail' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/0/0d/Korg_MS-20_Mini_-_2013_NAMM_Show.jpg', caption: 'MS-20 Mini at NAMM' }
-    ],
     youtubeVideos: [
       { title: 'Korg MS-20 Mini Overview', url: 'https://www.youtube.com/watch?v=7q_LxMgbKFI', channel: 'Korg' }
     ]
@@ -392,13 +363,6 @@ export const gear: GearItem[] = [
     relatedGear: ['moog-dfam', 'moog-subharmonicon', 'korg-ms-20'],
     tags: ['analog', 'semi-modular', 'moog', 'bass', 'eurorack'],
     officialUrl: 'https://www.moogmusic.com/products/mother-32',
-    imageUrl: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Front_Product_Image.png',
-    galleryImages: [
-      { url: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Front_Product_Image.png', caption: 'Front view' },
-      { url: 'https://www.moogmusic.com/sites/default/files/2022-12/Mother-32_Angle_Product_Image.png', caption: 'Angle view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Moog_Mother-32.jpg', caption: 'Moog Mother-32' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Moog_Sound_Studio_-_Mother-32%2C_DFAM%2C_Subharmonicon_%282020-10-26%29.jpg', caption: 'Moog Sound Studio setup' }
-    ],
     youtubeVideos: [
       { title: 'Moog Sound Studio: Mother-32 & DFAM & Subharmonicon', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
     ]
@@ -525,10 +489,6 @@ export const gear: GearItem[] = [
     relatedGear: ['elektron-analog-rytm', 'elektron-digitakt', 'elektron-digitone'],
     tags: ['analog', 'polyphonic', 'sequencer', 'elektron', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-four-mkii/',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Elektron_Analog_Four.jpg',
-    galleryImages: [
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Elektron_Analog_Four.jpg', caption: 'Analog Four MKI' }
-    ],
     youtubeVideos: [
       { title: 'Analog Four MKII Introduction', url: 'https://www.youtube.com/watch?v=OoqS-BVaJ_Y', channel: 'Elektron' }
     ]
@@ -571,13 +531,6 @@ export const gear: GearItem[] = [
     relatedGear: ['elektron-analog-four', 'elektron-digitakt', 'roland-tr-909'],
     tags: ['analog', 'hybrid', 'drum-machine', 'elektron', 'samples', 'parameter-locks'],
     officialUrl: 'https://www.elektron.se/products/analog-rytm-mkii/',
-    imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Front.png',
-    galleryImages: [
-      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Front.png', caption: 'Front view' },
-      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Angle.png', caption: 'Angle view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Elektron_Analog_Rytm.jpg', caption: 'Analog Rytm MKI' },
-      { url: 'https://www.elektron.se/wp-content/uploads/2017/05/AR_MKII_Back.png', caption: 'Rear panel connections' }
-    ],
     youtubeVideos: [
       { title: 'Analog Rytm MKII Introduction', url: 'https://www.youtube.com/watch?v=qYTrKDJL4m4', channel: 'Elektron' }
     ]
@@ -837,11 +790,6 @@ export const gear: GearItem[] = [
     relatedGear: ['novation-summit', 'asm-hydrasynth', 'sequential-prophet-rev2'],
     tags: ['hybrid', 'polyphonic', 'wavetable', 'analog-filter', 'modern'],
     officialUrl: 'https://novationmusic.com/products/peak',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Novation_Peak.jpg',
-    galleryImages: [
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Novation_Peak.jpg', caption: 'Top view' },
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/9/98/Novation_Peak_%28rear%29.jpg', caption: 'Rear panel' }
-    ],
     youtubeVideos: [
       { title: 'Novation Peak Overview', url: 'https://www.youtube.com/watch?v=m6V6Pfu5eDk', channel: 'Novation' },
       { title: 'Peak Sound Design Deep Dive', url: 'https://www.youtube.com/watch?v=kDAzYjQCLyo', channel: 'Loopop' }
@@ -880,10 +828,6 @@ export const gear: GearItem[] = [
     relatedGear: ['novation-peak', 'modal-argon8', 'waldorf-iridium'],
     tags: ['digital', 'wavetable', 'polyphonic', 'modulation', 'expressive', 'modern'],
     officialUrl: 'https://www.ashunsoundmachines.com/hydrasynth-key',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/ASM_Hydrasynth_Desktop.jpg',
-    galleryImages: [
-      { url: 'https://upload.wikimedia.org/wikipedia/commons/9/93/ASM_Hydrasynth_Desktop.jpg', caption: 'Hydrasynth Desktop' }
-    ],
     youtubeVideos: [
       { title: 'ASM Hydrasynth Overview and Demo', url: 'https://www.youtube.com/watch?v=op4jROJER8w', channel: 'Starsky Carr' },
       { title: 'Hydrasynth Deluxe Introduction', url: 'https://www.youtube.com/watch?v=bVwPXn7VQhY', channel: 'ASM Ashun Sound Machines' }
