@@ -64,6 +64,16 @@ const Header = () => {
       ]
     },
     {
+      label: { en: 'Gear', es: 'Equipo' },
+      path: '/gear',
+      sub: [
+        { label: { en: 'All Gear', es: 'Todo' }, path: '/gear' },
+        { label: { en: 'Synthesizers', es: 'Sintetizadores' }, path: '/gear?category=synth' },
+        { label: { en: 'Drum Machines', es: 'Cajas de Ritmos' }, path: '/gear?category=drum-machine' },
+        { label: { en: 'Samplers', es: 'Samplers' }, path: '/gear?category=sampler' },
+      ]
+    },
+    {
       label: { en: 'Mad Stuff', es: 'Locuras' },
       path: '/mad',
       sub: [
