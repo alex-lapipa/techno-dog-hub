@@ -400,6 +400,20 @@ const ArtistDetail = () => {
             )}
           </section>
 
+          {/* Image Disclaimer */}
+          <section className="mb-12 border-t border-border pt-8">
+            <div className="bg-card/30 border border-border p-4">
+              <p className="font-mono text-xs text-muted-foreground leading-relaxed">
+                <span className="text-foreground uppercase tracking-wider">
+                  {language === 'en' ? 'Image Disclaimer' : 'Aviso sobre imágenes'}:
+                </span>{' '}
+                {language === 'en' 
+                  ? 'The images displayed on artist pages are artistic representations generated for editorial purposes. They are not photographs of the actual artists. We are committed to accurate representation and do not use placeholder or stock photography.'
+                  : 'Las imágenes mostradas en las páginas de artistas son representaciones artísticas generadas con fines editoriales. No son fotografías de los artistas reales. Nos comprometemos con una representación precisa y no utilizamos fotografías de archivo o genéricas.'}
+              </p>
+            </div>
+          </section>
+
           {/* Related Artists */}
           {relatedArtists.length > 0 && (
             <section className="border-t border-border pt-8">
