@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getArtistById, artists } from "@/data/artists";
 import { getReleasesByArtist } from "@/data/releases";
@@ -10,6 +10,11 @@ const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const artist = id ? getArtistById(id) : null;
+
+  // Find prev/next artists for navigation
+  const currentIndex = artists.findIndex(a => a.id === id);
+  const prevArtist = currentIndex > 0 ? artists[currentIndex - 1] : null;
+  const nextArtist = currentIndex < artists.length - 1 ? artists[currentIndex + 1] : null;
 
   if (!artist) {
     return (
@@ -43,14 +48,58 @@ const ArtistDetail = () => {
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          {/* Breadcrumb */}
-          <Link 
-            to="/artists" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-8 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {language === 'en' ? 'Back to Artists' : 'Volver a Artistas'}
-          </Link>
+          {/* Navigation Row */}
+          <div className="flex items-center justify-between mb-8">
+            {/* Back Link */}
+            <Link 
+              to="/artists" 
+              className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              {language === 'en' ? 'Back to Artists' : 'Volver a Artistas'}
+            </Link>
+
+            {/* Prev/Next Navigation */}
+            <div className="flex items-center gap-2">
+              {prevArtist ? (
+                <Link
+                  to={`/artists/${prevArtist.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={prevArtist.name}
+                >
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {prevArtist.name}
+                  </span>
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              )}
+
+              <span className="font-mono text-xs text-muted-foreground px-2">
+                {currentIndex + 1}/{artists.length}
+              </span>
+
+              {nextArtist ? (
+                <Link
+                  to={`/artists/${nextArtist.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={nextArtist.name}
+                >
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {nextArtist.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
