@@ -18,12 +18,16 @@ serve(async (req) => {
       throw new Error('Query is required');
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!LOVABLE_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error('Missing required environment variables');
+    if (!GROQ_API_KEY) {
+      throw new Error('GROQ_API_KEY is not configured');
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Missing required Supabase environment variables');
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -93,39 +97,44 @@ indica que no tienes esa información específica pero ofrece lo que sepas del t
 CONTEXTO DE CONOCIMIENTO:
 ${context || 'No hay documentos en la base de conocimiento. Responde basándote en tu conocimiento general sobre techno y festivales europeos.'}`;
 
-    // Generate response with AI
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    console.log('Calling Groq API with model: llama-3.1-70b-versatile');
+
+    // Generate response with Groq AI
+    const aiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'llama-3.1-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }
         ],
-        stream: stream
+        stream: stream,
+        temperature: 0.7,
+        max_tokens: 1024
       }),
     });
 
     if (!aiResponse.ok) {
+      const errText = await aiResponse.text();
+      console.error('Groq API error:', aiResponse.status, errText);
+      
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: 'Payment required. Please add credits.' }), {
-          status: 402,
+      if (aiResponse.status === 401) {
+        return new Response(JSON.stringify({ error: 'Invalid API key. Please check your Groq API key.' }), {
+          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      const errText = await aiResponse.text();
-      console.error('AI error:', errText);
-      throw new Error('AI request failed');
+      throw new Error(`Groq API request failed: ${errText}`);
     }
 
     if (stream) {
