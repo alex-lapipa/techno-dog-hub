@@ -2,7 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getGearById, getRelatedGear, gearCategories } from "@/data/gear";
-import { gearImages } from "@/assets/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -31,8 +30,6 @@ const GearDetail = () => {
   }
 
   const relatedItems = getRelatedGear(gearItem.relatedGear);
-  const localImage = gearImages[gearItem.id];
-  const imageSrc = localImage || gearItem.imageUrl;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -50,37 +47,22 @@ const GearDetail = () => {
 
           {/* Hero Section - Responsive Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
-            {/* Main Image */}
+            {/* Gear Placeholder - No fake images */}
             <a 
               href={gearItem.officialUrl || '#'}
               target={gearItem.officialUrl ? '_blank' : undefined}
               rel="noopener noreferrer"
-              className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/50 group ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/30 group flex items-center justify-center ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
             >
-              {imageSrc ? (
-                <>
-                  <img 
-                    src={imageSrc} 
-                    alt={gearItem.name}
-                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-300 group-hover:scale-105"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.classList.remove('hidden');
-                    }}
-                  />
-                  <div className="hidden text-center p-6 flex-col items-center justify-center h-full">
-                    <Sliders className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground/50" />
-                    <p className="font-mono text-xs text-muted-foreground">{gearItem.name}</p>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center p-6 flex flex-col items-center justify-center h-full">
-                  <Sliders className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground/50" />
-                  <p className="font-mono text-xs text-muted-foreground">{gearItem.name}</p>
-                </div>
-              )}
+              <div className="text-center p-8">
+                <Sliders className="w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-6 text-muted-foreground/30" />
+                <h2 className="font-mono text-lg sm:text-xl uppercase tracking-tight mb-2 text-muted-foreground">
+                  {gearItem.name}
+                </h2>
+                <p className="font-mono text-xs text-muted-foreground/70">
+                  {gearItem.manufacturer} • {gearItem.releaseYear}
+                </p>
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
               
               {/* Official site indicator */}
