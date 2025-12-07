@@ -1,17 +1,23 @@
+import { useLanguage } from "@/contexts/LanguageContext";
+import technoDogLogo from "@/assets/techno-dog-logo.png";
+
 const Footer = () => {
+  const { t } = useLanguage();
+  
   return (
-    <footer className="bg-background border-t border-border py-16">
+    <footer className="bg-background border-t border-border py-16 pb-24">
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
-            <div className="font-mono text-sm tracking-[0.2em] text-foreground">
-              techno.dog
+            <div className="flex items-center gap-2">
+              <img src={technoDogLogo} alt="techno.dog" className="w-8 h-8" />
+              <div className="font-mono text-sm tracking-[0.2em] text-foreground">
+                techno.dog
+              </div>
             </div>
             <p className="font-mono text-xs text-muted-foreground leading-relaxed max-w-md">
-              Portal de festivales de música electrónica en Europa.
-              Información sobre eventos, artistas y cultura techno.
-              Contenido en español. Acepta entradas en ES/EN/FR.
+              {t('footer.description')}
             </p>
             <div className="font-mono text-xs text-muted-foreground">
               © 2025 techno.dog
@@ -21,10 +27,10 @@ const Footer = () => {
           {/* Links */}
           <div className="space-y-4">
             <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              // Explorar
+              {t('footer.explore')}
             </div>
             <ul className="space-y-2">
-              {["Festivales", "Artistas", "Calendario", "Noticias", "Archivo"].map(
+              {[t('nav.festivals'), t('footer.artists'), t('footer.calendar'), t('footer.news'), t('footer.archive')].map(
                 (link) => (
                   <li key={link}>
                     <a
@@ -42,7 +48,7 @@ const Footer = () => {
           {/* Social */}
           <div className="space-y-4">
             <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              // Redes
+              {t('footer.social')}
             </div>
             <ul className="space-y-2">
               {["Instagram", "Twitter/X", "Telegram", "Soundcloud"].map(

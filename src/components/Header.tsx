@@ -1,10 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "./LanguageToggle";
 import technoDogLogo from "@/assets/techno-dog-logo.png";
+
 const Header = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleAuthClick = async () => {
     if (user) {
@@ -26,39 +30,40 @@ const Header = () => {
             </span>
           </a>
 
-          {/* Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Navigation - Hidden on mobile since we have bottom nav */}
+          <div className="hidden lg:flex items-center gap-8">
             <a
               href="#festivales"
               className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
-              Festivales
+              {t('nav.festivals')}
             </a>
             <a
               href="#aquasella"
               className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
-              Aquasella
+              {t('nav.aquasella')}
             </a>
             <a
               href="#lev"
               className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
-              L.E.V.
+              {t('nav.lev')}
             </a>
             <a
               href="#chat"
               className="text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
             >
-              Chat IA
+              {t('nav.chat')}
             </a>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            <LanguageToggle />
             {!loading && (
               <Button variant="brutalist" size="sm" onClick={handleAuthClick}>
-                {user ? 'Salir' : 'Entrar'}
+                {user ? t('nav.logout') : t('nav.login')}
               </Button>
             )}
           </div>
