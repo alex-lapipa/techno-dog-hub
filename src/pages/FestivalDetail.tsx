@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Calendar, MapPin, ExternalLink } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { festivals, getFestivalById } from "@/data/festivals";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,11 @@ const FestivalDetail = () => {
   const { id } = useParams();
   const { language } = useLanguage();
   const festival = getFestivalById(id || '');
+
+  // Find prev/next festivals for navigation
+  const currentIndex = festivals.findIndex(f => f.id === id);
+  const prevFestival = currentIndex > 0 ? festivals[currentIndex - 1] : null;
+  const nextFestival = currentIndex < festivals.length - 1 ? festivals[currentIndex + 1] : null;
 
   if (!festival) {
     return (
@@ -43,14 +48,58 @@ const FestivalDetail = () => {
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          {/* Breadcrumb */}
-          <Link 
-            to="/festivals" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground mb-8 hover:animate-glitch"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {language === 'en' ? 'All Festivals' : 'Todos los Festivales'}
-          </Link>
+          {/* Navigation Row */}
+          <div className="flex items-center justify-between mb-8">
+            {/* Back Link */}
+            <Link 
+              to="/festivals" 
+              className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              {language === 'en' ? 'All Festivals' : 'Todos los Festivales'}
+            </Link>
+
+            {/* Prev/Next Navigation */}
+            <div className="flex items-center gap-2">
+              {prevFestival ? (
+                <Link
+                  to={`/festivals/${prevFestival.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={prevFestival.name}
+                >
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {prevFestival.name}
+                  </span>
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              )}
+
+              <span className="font-mono text-xs text-muted-foreground px-2">
+                {currentIndex + 1}/{festivals.length}
+              </span>
+
+              {nextFestival ? (
+                <Link
+                  to={`/festivals/${nextFestival.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={nextFestival.name}
+                >
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {nextFestival.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Content */}

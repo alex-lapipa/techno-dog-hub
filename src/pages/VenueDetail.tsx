@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getVenueById, venues } from "@/data/venues";
 import Header from "@/components/Header";
@@ -9,6 +9,11 @@ const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const venue = id ? getVenueById(id) : null;
+
+  // Find prev/next venues for navigation
+  const currentIndex = venues.findIndex(v => v.id === id);
+  const prevVenue = currentIndex > 0 ? venues[currentIndex - 1] : null;
+  const nextVenue = currentIndex < venues.length - 1 ? venues[currentIndex + 1] : null;
 
   const typeLabels: Record<string, { en: string; es: string }> = {
     'club': { en: 'Club', es: 'Club' },
@@ -49,14 +54,58 @@ const VenueDetail = () => {
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <Link 
-            to="/venues" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-6 sm:mb-8 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {language === 'en' ? 'Back to Venues' : 'Volver a Clubs'}
-          </Link>
+          {/* Navigation Row */}
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            {/* Back Link */}
+            <Link 
+              to="/venues" 
+              className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              {language === 'en' ? 'Back to Venues' : 'Volver a Clubs'}
+            </Link>
+
+            {/* Prev/Next Navigation */}
+            <div className="flex items-center gap-2">
+              {prevVenue ? (
+                <Link
+                  to={`/venues/${prevVenue.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={prevVenue.name}
+                >
+                  <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {prevVenue.name}
+                  </span>
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronLeft className="w-4 h-4" />
+                </div>
+              )}
+
+              <span className="font-mono text-xs text-muted-foreground px-2">
+                {currentIndex + 1}/{venues.length}
+              </span>
+
+              {nextVenue ? (
+                <Link
+                  to={`/venues/${nextVenue.id}`}
+                  className="flex items-center gap-2 px-3 py-2 border border-border hover:bg-card transition-colors group"
+                  title={nextVenue.name}
+                >
+                  <span className="font-mono text-xs uppercase tracking-wider hidden sm:inline max-w-[100px] truncate">
+                    {nextVenue.name}
+                  </span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              ) : (
+                <div className="px-3 py-2 border border-border/30 text-muted-foreground/30 cursor-not-allowed">
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Hero Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
