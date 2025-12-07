@@ -67,14 +67,6 @@ const ArtistsPage = () => {
             {artists.length} {language === 'en' ? 'artists in archive' : 'artistas en archivo'}
           </div>
 
-          {/* Image Disclaimer */}
-          <div className="mt-12 pt-6 border-t border-border/50">
-            <p className="font-mono text-[10px] text-muted-foreground/70 leading-relaxed max-w-2xl">
-              {language === 'en' 
-                ? '* Artist page images are artistic representations generated for editorial purposes, not photographs of the actual artists.'
-                : '* Las imágenes en las páginas de artistas son representaciones artísticas generadas con fines editoriales, no fotografías de los artistas reales.'}
-            </p>
-          </div>
         </div>
       </main>
       <Footer />

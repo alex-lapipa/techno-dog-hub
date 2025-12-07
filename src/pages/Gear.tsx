@@ -1,9 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, Sliders } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { gear, gearCategories, GearCategory } from "@/data/gear";
-import { gearImages } from "@/assets/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
@@ -83,67 +82,53 @@ const GearPage = () => {
 
           {/* Gear Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {filteredGear.map((item) => {
-              const localImage = gearImages[item.id];
-              const imageSrc = localImage || item.imageUrl;
-              
-              return (
-                <Link
-                  key={item.id}
-                  to={`/gear/${item.id}`}
-                  className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
-                >
-                  {/* Image thumbnail */}
-                  {imageSrc && (
-                    <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
-                      <img 
-                        src={imageSrc} 
-                        alt={item.name}
-                        className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+            {filteredGear.map((item) => (
+              <Link
+                key={item.id}
+                to={`/gear/${item.id}`}
+                className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
+              >
+                {/* Icon placeholder instead of fake images */}
+                <div className="aspect-[4/3] relative overflow-hidden bg-card/30 flex items-center justify-center">
+                  <Sliders className="w-12 h-12 text-muted-foreground/20" />
+                </div>
+                
+                <div className="p-3 sm:p-4">
+                  <div className="flex justify-between items-start mb-2 sm:mb-3">
+                    <div className="flex-1 min-w-0">
+                      <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
+                        {gearCategories[item.category][language]}
+                      </span>
+                      <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate">
+                        {item.name}
+                      </h2>
                     </div>
-                  )}
-                  
-                  <div className="p-3 sm:p-4">
-                    <div className="flex justify-between items-start mb-2 sm:mb-3">
-                      <div className="flex-1 min-w-0">
-                        <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
-                          {gearCategories[item.category][language]}
-                        </span>
-                        <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate">
-                          {item.name}
-                        </h2>
-                      </div>
-                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 flex-shrink-0" />
-                    </div>
-                    
-                    <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
-                      <span>{item.manufacturer}</span>
-                      <span className="text-border">|</span>
-                      <span>{item.releaseYear}</span>
-                    </div>
-
-                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
-                      {item.shortDescription[language]}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {item.tags.slice(0, 3).map(tag => (
-                        <span 
-                          key={tag} 
-                          className="font-mono text-[9px] sm:text-[10px] text-muted-foreground border border-border/50 px-1 sm:px-1.5 py-0.5"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 flex-shrink-0" />
                   </div>
-                </Link>
-              );
-            })}
+                    
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
+                    <span>{item.manufacturer}</span>
+                    <span className="text-border">|</span>
+                    <span>{item.releaseYear}</span>
+                  </div>
+
+                  <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
+                    {item.shortDescription[language]}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1">
+                    {item.tags.slice(0, 3).map(tag => (
+                      <span 
+                        key={tag} 
+                        className="font-mono text-[9px] sm:text-[10px] text-muted-foreground border border-border/50 px-1 sm:px-1.5 py-0.5"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
 
           {/* Count */}
