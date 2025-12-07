@@ -1365,6 +1365,68 @@ export const artists: Artist[] = [
     ],
     riderNotes: "Extended sets preferred."
   },
+  {
+    id: "eulogio",
+    name: "Eulogio",
+    city: "Madrid",
+    country: "Spain",
+    region: "Europe",
+    active: "2000–present",
+    tags: ["Spanish", "hypnotic", "deep", "Madrid"],
+    photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+    bio: "Madrid veteran. Part of the Spanish techno old guard. Deep, hypnotic sets that carry decades of crate-digging wisdom. His selections bridge classic and contemporary techno.",
+    labels: ["PoleGroup", "Semantica"],
+    careerHighlights: [
+      "Madrid scene veteran",
+      "PoleGroup affiliate",
+      "20+ years in Spanish techno",
+      "Deep selector"
+    ],
+    keyReleases: [
+      { title: "Madrid Sessions", label: "PoleGroup", year: 2018, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Korg MS-20",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Allen & Heath Xone:92"
+    ],
+    riderNotes: "Extended sets preferred. Analog mixer."
+  },
+  {
+    id: "men",
+    name: "M.E.N",
+    city: "Barcelona",
+    country: "Spain",
+    region: "Europe",
+    active: "2010–present",
+    tags: ["Spanish", "Barcelona", "Moog", "hypnotic", "deep"],
+    photoUrl: "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=800",
+    bio: "Barcelona-based. Resident at Moog Barcelona—the city's legendary basement club. His sets are deep, hypnotic, and perfectly tailored for intimate spaces. A key figure in the Catalan techno scene.",
+    labels: ["Moog Barcelona"],
+    careerHighlights: [
+      "Moog Barcelona resident",
+      "Barcelona scene leader",
+      "Intimate club specialist",
+      "Catalan techno ambassador"
+    ],
+    keyReleases: [
+      { title: "Basement Sessions", label: "Moog Barcelona", year: 2019, format: "12\"" }
+    ],
+    studioGear: [
+      "Elektron Digitakt",
+      "Roland TR-8S",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-2000NXS2",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Standard Pioneer setup. Intimate venues preferred."
+  },
 
   // FRANCE
   {
