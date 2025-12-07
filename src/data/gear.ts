@@ -1,5 +1,15 @@
 export type GearCategory = 'synth' | 'drum-machine' | 'sampler' | 'sequencer' | 'effect' | 'daw' | 'midi-tool';
 
+// Image attribution for Creative Commons / public domain images
+export interface ImageAttribution {
+  url: string;           // Direct image URL
+  author: string;        // Photographer/creator name
+  license: string;       // License type (CC BY-SA, Public Domain, etc.)
+  licenseUrl: string;    // Link to license
+  sourceUrl: string;     // Link to original source page
+  sourceName: string;    // e.g. "Wikimedia Commons"
+}
+
 export interface GearItem {
   id: string;
   name: string;
@@ -40,6 +50,8 @@ export interface GearItem {
   // Resources
   officialUrl?: string;
   imageUrl?: string;
+  // Image with proper attribution for Creative Commons images
+  image?: ImageAttribution;
   youtubeVideos?: {
     title: string;
     url: string;
@@ -99,6 +111,14 @@ export const gear: GearItem[] = [
     relatedGear: ['behringer-td-3', 'roland-sh-101', 'roland-tr-909'],
     tags: ['acid', 'analog', 'bassline', 'classic', 'monophonic'],
     officialUrl: 'https://www.roland.com/global/products/rc_tb-303/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/0/01/TB303_Front_View.jpg',
+      author: 'Steve Sims',
+      license: 'Public Domain',
+      licenseUrl: 'https://creativecommons.org/publicdomain/mark/1.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:TB303_Front_View.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
       { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
@@ -144,6 +164,14 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tr-909', 'behringer-rd-8', 'elektron-analog-rytm'],
     tags: ['analog', 'drum-machine', 'classic', 'detroit', 'kick'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-808/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/b/be/Roland_TR-808_drum_machine.jpg',
+      author: 'Eriq (Dutch Wikipedia)',
+      license: 'CC BY-SA 3.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Roland_TR-808_drum_machine.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'The Roland TR-808 In Action', url: 'https://www.youtube.com/watch?v=nEDuHsCEDfs', channel: 'Doctor Mix' },
       { title: 'TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=Ov38brxRGks', channel: 'Roland' }
@@ -189,6 +217,14 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tr-808', 'behringer-rd-9', 'elektron-analog-rytm'],
     tags: ['analog', 'drum-machine', 'classic', 'techno', 'kick', 'essential'],
     officialUrl: 'https://www.roland.com/global/products/rc_tr-909/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Roland_TR-909.jpg',
+      author: 'Wikimedia contributor',
+      license: 'CC BY-SA 2.5',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.5/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Roland_TR-909.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' },
       { title: 'Roland TR-909 Famous Patterns', url: 'https://www.youtube.com/watch?v=ld4n-dT-qQg', channel: 'Doctor Mix' }
@@ -233,6 +269,14 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-tb-303', 'roland-juno-106', 'behringer-ms-101'],
     tags: ['analog', 'monophonic', 'bassline', 'classic', 'sequencer'],
     officialUrl: 'https://www.roland.com/global/promos/roland_classic_synths/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Roland_SH-101.jpg',
+      author: 'Wikimedia contributor',
+      license: 'CC BY-SA 3.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Roland_SH-101.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Roland SH-101 History and Sound', url: 'https://www.youtube.com/watch?v=nPt6j-qFvQY', channel: 'Vintage Synth Explorer' }
     ]
@@ -276,7 +320,14 @@ export const gear: GearItem[] = [
     relatedGear: ['roland-sh-101', 'korg-polysix', 'behringer-deepmind'],
     tags: ['analog', 'polyphonic', 'pads', 'classic', 'chorus'],
     officialUrl: 'https://www.roland.com/global/products/rc_juno-106/',
-    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_juno-106_top_gal.png',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/7/78/Roland-Juno-106.jpg',
+      author: 'Iainf',
+      license: 'Public Domain',
+      licenseUrl: 'https://creativecommons.org/publicdomain/mark/1.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Roland-Juno-106.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Roland Cloud JUNO-106 Demo & Review', url: 'https://www.youtube.com/watch?v=xdh3hu3SMVU', channel: 'Roland' },
       { title: 'Roland Icon Series: The JUNO-106', url: 'https://www.youtube.com/watch?v=nf4Y-8R0T9M', channel: 'Roland' }
@@ -321,6 +372,14 @@ export const gear: GearItem[] = [
     relatedGear: ['moog-mother-32', 'arturia-minibrute', 'korg-ms-20-mini'],
     tags: ['analog', 'semi-modular', 'aggressive', 'industrial', 'filters'],
     officialUrl: 'https://www.korg.com/us/products/synthesizers/ms_20fs/',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Korg_Synthesizer_MS-20.jpg',
+      author: 'Wikimedia contributor',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Korg_Synthesizer_MS-20.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Korg MS-20 Mini Overview', url: 'https://www.youtube.com/watch?v=7q_LxMgbKFI', channel: 'Korg' }
     ]
@@ -363,6 +422,14 @@ export const gear: GearItem[] = [
     relatedGear: ['moog-dfam', 'moog-subharmonicon', 'korg-ms-20'],
     tags: ['analog', 'semi-modular', 'moog', 'bass', 'eurorack'],
     officialUrl: 'https://www.moogmusic.com/products/mother-32',
+    image: {
+      url: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Moog_Mother-32_synthesizer.jpg',
+      author: 'Wikimedia contributor',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Moog_Mother-32_synthesizer.jpg',
+      sourceName: 'Wikimedia Commons'
+    },
     youtubeVideos: [
       { title: 'Moog Sound Studio: Mother-32 & DFAM & Subharmonicon', url: 'https://www.youtube.com/watch?v=nZVGJkXVNB0', channel: 'Moog Music' }
     ]

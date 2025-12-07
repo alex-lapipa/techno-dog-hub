@@ -47,48 +47,88 @@ const GearDetail = () => {
 
           {/* Hero Section - Responsive Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
-            {/* Gear Placeholder - No fake images */}
-            <a 
-              href={gearItem.officialUrl || '#'}
-              target={gearItem.officialUrl ? '_blank' : undefined}
-              rel="noopener noreferrer"
-              className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/30 group flex items-center justify-center ${gearItem.officialUrl ? 'cursor-pointer' : 'cursor-default'}`}
-            >
-              <div className="text-center p-8">
-                <Sliders className="w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-6 text-muted-foreground/30" />
-                <h2 className="font-mono text-lg sm:text-xl uppercase tracking-tight mb-2 text-muted-foreground">
-                  {gearItem.name}
-                </h2>
-                <p className="font-mono text-xs text-muted-foreground/70">
-                  {gearItem.manufacturer} • {gearItem.releaseYear}
-                </p>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-              
-              {/* Official site indicator */}
-              {gearItem.officialUrl && (
-                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="bg-background/90 border border-border px-2 sm:px-3 py-1 flex items-center gap-2">
-                    <ExternalLink className="w-3 h-3" />
-                    <span className="font-mono text-[10px] sm:text-xs hidden sm:inline">{language === 'en' ? 'View Official' : 'Ver Oficial'}</span>
+            {/* Gear Image with Attribution or Placeholder */}
+            <div className="relative">
+              <a 
+                href={gearItem.image?.sourceUrl || gearItem.officialUrl || '#'}
+                target={gearItem.image?.sourceUrl || gearItem.officialUrl ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/30 group flex items-center justify-center block ${(gearItem.image?.sourceUrl || gearItem.officialUrl) ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                {gearItem.image ? (
+                  <>
+                    <img 
+                      src={gearItem.image.url} 
+                      alt={gearItem.name}
+                      className="w-full h-full object-contain p-4 sm:p-6"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
+                  </>
+                ) : (
+                  <div className="text-center p-8">
+                    <Sliders className="w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-6 text-muted-foreground/30" />
+                    <h2 className="font-mono text-lg sm:text-xl uppercase tracking-tight mb-2 text-muted-foreground">
+                      {gearItem.name}
+                    </h2>
+                    <p className="font-mono text-xs text-muted-foreground/70">
+                      {gearItem.manufacturer} • {gearItem.releaseYear}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Source indicator */}
+                {(gearItem.image?.sourceUrl || gearItem.officialUrl) && (
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-background/90 border border-border px-2 sm:px-3 py-1 flex items-center gap-2">
+                      <ExternalLink className="w-3 h-3" />
+                      <span className="font-mono text-[10px] sm:text-xs hidden sm:inline">
+                        {gearItem.image ? gearItem.image.sourceName : (language === 'en' ? 'View Official' : 'Ver Oficial')}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Tags */}
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {gearItem.tags.slice(0, 5).map(tag => (
+                      <span
+                        key={tag}
+                        className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              )}
+              </a>
               
-              {/* Tags */}
-              <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {gearItem.tags.slice(0, 5).map(tag => (
-                    <span
-                      key={tag}
-                      className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              {/* Image Attribution */}
+              {gearItem.image && (
+                <div className="mt-2 font-mono text-[9px] sm:text-[10px] text-muted-foreground/70 leading-relaxed">
+                  <span>{language === 'en' ? 'Photo' : 'Foto'}: </span>
+                  <a 
+                    href={gearItem.image.sourceUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground underline"
+                  >
+                    {gearItem.image.author}
+                  </a>
+                  <span> / </span>
+                  <a 
+                    href={gearItem.image.licenseUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground underline"
+                  >
+                    {gearItem.image.license}
+                  </a>
+                  <span> via {gearItem.image.sourceName}</span>
                 </div>
-              </div>
-            </a>
+              )}
+            </div>
 
             {/* Gear Info */}
             <div className="space-y-4 sm:space-y-6">
