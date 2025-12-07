@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { loadArtistsSummary, loadArtistById } from "@/data/artists-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 const ArtistsPage = () => {
   const queryClient = useQueryClient();
+  const parentRef = useRef<HTMLDivElement>(null);
   
   const prefetchArtist = useCallback((id: string) => {
     queryClient.prefetchQuery({
@@ -18,12 +20,20 @@ const ArtistsPage = () => {
       staleTime: 1000 * 60 * 10,
     });
   }, [queryClient]);
+  
   const { language } = useLanguage();
 
   const { data: artists = [], isLoading } = useQuery({
     queryKey: ['artists-summary'],
     queryFn: loadArtistsSummary,
-    staleTime: 1000 * 60 * 10, // Cache for 10 minutes
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const rowVirtualizer = useVirtualizer({
+    count: artists.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 80,
+    overscan: 5,
   });
 
   return (
@@ -59,40 +69,61 @@ const ArtistsPage = () => {
                 </div>
               ))
             ) : (
-              artists.map((artist, index) => (
-                <Link
-                  key={artist.id}
-                  to={`/artists/${artist.id}`}
-                  onMouseEnter={() => prefetchArtist(artist.id)}
-                  className="group block border-b border-border py-4 sm:py-6 hover:bg-card transition-colors px-2 sm:px-4 -mx-2 sm:-mx-4"
+              <div
+                ref={parentRef}
+                className="h-[70vh] overflow-auto"
+              >
+                <div
+                  style={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                    width: '100%',
+                    position: 'relative',
+                  }}
                 >
-                  <div className="flex items-start justify-between gap-3 sm:gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline gap-2 sm:gap-4 mb-1 sm:mb-2">
-                        <span className="font-mono text-[10px] sm:text-xs text-muted-foreground w-6 sm:w-8 flex-shrink-0">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <h2 className="font-mono text-base sm:text-xl md:text-2xl uppercase tracking-wide group-hover:animate-glitch truncate">
-                          {artist.name}
-                        </h2>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 pl-8 sm:pl-12">
-                        <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
-                          {artist.city}, {artist.country}
-                        </span>
-                        <div className="hidden sm:flex gap-2">
-                          {artist.tags.slice(0, 3).map(tag => (
-                            <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
-                              {tag}
-                            </span>
-                          ))}
+                  {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                    const artist = artists[virtualRow.index];
+                    return (
+                      <Link
+                        key={artist.id}
+                        to={`/artists/${artist.id}`}
+                        onMouseEnter={() => prefetchArtist(artist.id)}
+                        data-index={virtualRow.index}
+                        ref={rowVirtualizer.measureElement}
+                        className="group absolute left-0 right-0 border-b border-border py-4 sm:py-6 hover:bg-card transition-colors px-2 sm:px-4"
+                        style={{
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-3 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-baseline gap-2 sm:gap-4 mb-1 sm:mb-2">
+                              <span className="font-mono text-[10px] sm:text-xs text-muted-foreground w-6 sm:w-8 flex-shrink-0">
+                                {String(virtualRow.index + 1).padStart(2, "0")}
+                              </span>
+                              <h2 className="font-mono text-base sm:text-xl md:text-2xl uppercase tracking-wide group-hover:animate-glitch truncate">
+                                {artist.name}
+                              </h2>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-4 pl-8 sm:pl-12">
+                              <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+                                {artist.city}, {artist.country}
+                              </span>
+                              <div className="hidden sm:flex gap-2">
+                                {artist.tags.slice(0, 3).map(tag => (
+                                  <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 sm:mt-2 flex-shrink-0" />
                         </div>
-                      </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 sm:mt-2 flex-shrink-0" />
-                  </div>
-                </Link>
-              ))
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
 
