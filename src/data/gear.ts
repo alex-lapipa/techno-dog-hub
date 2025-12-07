@@ -277,7 +277,13 @@ export const gear: GearItem[] = [
       es: 'El Juno-106 es ideal para pads cálidos y acordes en techno. El chorus incorporado añade amplitud y movimiento—usar Modo I para estéreo sutil, Modo II para sonido exuberante completo.'
     },
     relatedGear: ['roland-sh-101', 'korg-polysix', 'behringer-deepmind'],
-    tags: ['analog', 'polyphonic', 'pads', 'classic', 'chorus']
+    tags: ['analog', 'polyphonic', 'pads', 'classic', 'chorus'],
+    officialUrl: 'https://www.roland.com/global/products/rc_juno-106/',
+    imageUrl: 'https://static.roland.com/assets/images/products/gallery/rc_juno-106_top_gal.png',
+    youtubeVideos: [
+      { title: 'Roland Cloud JUNO-106 Demo & Review', url: 'https://www.youtube.com/watch?v=xdh3hu3SMVU', channel: 'Roland' },
+      { title: 'Roland Icon Series: The JUNO-106', url: 'https://www.youtube.com/watch?v=nf4Y-8R0T9M', channel: 'Roland' }
+    ]
   },
   {
     id: 'korg-ms-20',
@@ -570,10 +576,16 @@ export const gear: GearItem[] = [
     ],
     technoApplications: {
       en: 'While more associated with prog and synth-pop, the Prophet-5 creates lush pads and warm stabs for deeper techno. The poly-mod section allows complex, evolving tones. Use the unison mode for massive leads. The 2022 reissue offers vintage Rev 3 and Rev 4 filter options plus modern connectivity. Alternative: Sequential Prophet-6 for similar sound with modern features.',
-      es: 'Aunque más asociado con prog y synth-pop, el Prophet-5 crea pads exuberantes y stabs cálidos para techno más profundo. La sección poly-mod permite tonos complejos y evolutivos.'
+      es: 'Aunque más asociado con prog y synth-pop, el Prophet-5 crea pads exuberantes y stabs cálidos para techno más profundo.'
     },
-    relatedGear: ['sequential-prophet-6', 'oberheim-ob-xa', 'roland-juno-106'],
-    tags: ['analog', 'polyphonic', 'classic', 'pads', 'vintage']
+    relatedGear: ['sequential-prophet-6', 'oberheim-ob-x', 'moog-one'],
+    tags: ['analog', 'polyphonic', 'classic', 'legendary', 'pads'],
+    officialUrl: 'https://sequential.com/classics-reissued/prophet-5-10/',
+    imageUrl: 'https://sequential.com/wp-content/uploads/2020/08/Prophet-5-front-1920x1440.png',
+    youtubeVideos: [
+      { title: 'Sequential Prophet-5 Demo', url: 'https://www.youtube.com/watch?v=33CJhKTGWn8', channel: 'Perfect Circuit' },
+      { title: 'Prophet-5 2020 Reissue Sound Demo', url: 'https://www.youtube.com/watch?v=wWzb6-kfvdk', channel: 'Sequential' }
+    ]
   },
   {
     id: 'arp-2600',
@@ -611,7 +623,13 @@ export const gear: GearItem[] = [
       es: 'El ARP 2600 destaca en texturas de techno experimental, leads estridentes y diseño de sonido complejo. El sample & hold crea patrones de modulación aleatorios.'
     },
     relatedGear: ['korg-ms-20', 'behringer-2600', 'moog-mother-32'],
-    tags: ['analog', 'semi-modular', 'classic', 'experimental', 'sound-design']
+    tags: ['analog', 'semi-modular', 'classic', 'experimental', 'sound-design'],
+    officialUrl: 'https://www.korg.com/us/products/synthesizers/arp2600_fs/',
+    imageUrl: 'https://www.korg.com/us/products/synthesizers/arp2600_fs/images/main_l.jpg',
+    youtubeVideos: [
+      { title: 'ARP 2600 FS Full Demo', url: 'https://www.youtube.com/watch?v=4IxhTzPVWNk', channel: 'Korg' },
+      { title: 'ARP 2600 Sound Design', url: 'https://www.youtube.com/watch?v=WMc9jGJAHmE', channel: 'Perfect Circuit' }
+    ]
   },
   {
     id: 'oberheim-ob-xa',
@@ -650,7 +668,13 @@ export const gear: GearItem[] = [
       es: 'El OB-Xa crea pads masivos y desafinados y stabs potentes para momentos épicos de techno. La modulación cruzada entre osciladores añade armónicos complejos.'
     },
     relatedGear: ['sequential-prophet-5', 'roland-juno-106', 'behringer-ub-xa'],
-    tags: ['analog', 'polyphonic', 'classic', 'pads', 'vintage', 'big-sound']
+    tags: ['analog', 'polyphonic', 'classic', 'pads', 'vintage', 'big-sound'],
+    officialUrl: 'https://oberheim.com/products/ob-x8/',
+    imageUrl: 'https://oberheim.com/wp-content/uploads/2022/04/OB-X8-Top1.png',
+    youtubeVideos: [
+      { title: 'Oberheim OB-X8 Introduction', url: 'https://www.youtube.com/watch?v=V5zL7pVvM8k', channel: 'Oberheim' },
+      { title: 'OB-X8 Sound Demo', url: 'https://www.youtube.com/watch?v=YJhDwH9eCko', channel: 'Sound On Sound' }
+    ]
   },
   // === MODERN / HYBRID ===
   {
@@ -809,7 +833,13 @@ export const gear: GearItem[] = [
       es: 'El Hydrasynth crea texturas complejas y evolutivas para techno moderno. Usa wavemorphing para timbres que cambian lentamente.'
     },
     relatedGear: ['novation-peak', 'modal-argon8', 'waldorf-iridium'],
-    tags: ['digital', 'wavetable', 'polyphonic', 'modulation', 'expressive', 'modern']
+    tags: ['digital', 'wavetable', 'polyphonic', 'modulation', 'expressive', 'modern'],
+    officialUrl: 'https://www.ashunsoundmachines.com/hydrasynth-key',
+    imageUrl: 'https://www.ashunsoundmachines.com/quality_auto/Hydrasynth(2023).png',
+    youtubeVideos: [
+      { title: 'ASM Hydrasynth Overview and Demo', url: 'https://www.youtube.com/watch?v=op4jROJER8w', channel: 'Starsky Carr' },
+      { title: 'Hydrasynth Deluxe Introduction', url: 'https://www.youtube.com/watch?v=bVwPXn7VQhY', channel: 'ASM Ashun Sound Machines' }
+    ]
   },
   {
     id: 'behringer-rd-8',
@@ -922,7 +952,13 @@ export const gear: GearItem[] = [
       es: 'El swing del MPC3000 es legendario—incluso en contextos de techno, añade sensación humana. Úsalo para samplear vinilo, construir kits de batería y secuenciar sintetizadores externos vía MIDI.'
     },
     relatedGear: ['akai-mpc60', 'emu-sp-1200', 'elektron-octatrack'],
-    tags: ['sampler', 'sequencer', 'classic', 'swing', 'hip-hop', 'mpc']
+    tags: ['sampler', 'sequencer', 'classic', 'swing', 'hip-hop', 'mpc'],
+    officialUrl: 'https://www.akaipro.com/mpc-hardware.html',
+    imageUrl: 'https://www.akaipro.com/media/catalog/product/m/p/mpc3000_1_2.jpg',
+    youtubeVideos: [
+      { title: 'MPC3000 Instructional Video', url: 'https://www.youtube.com/watch?v=pGJ3fns9O1I', channel: 'Sample Kings' },
+      { title: 'MPC 3000 Classic & Limited Edition Review', url: 'https://www.youtube.com/watch?v=kSgG476YC-s', channel: 'Vintage Synth' }
+    ]
   },
   {
     id: 'emu-sp-1200',
@@ -960,7 +996,13 @@ export const gear: GearItem[] = [
       es: 'El SP-1200 añade grit y carácter a las baterías de techno. El sampling de 12 bits y los filtros SSM crean calidez que los samplers digitales no pueden replicar.'
     },
     relatedGear: ['akai-mpc3000', 'akai-mpc60', 'elektron-digitakt'],
-    tags: ['sampler', 'classic', '12-bit', 'gritty', 'hip-hop', 'vintage']
+    tags: ['sampler', 'classic', '12-bit', 'gritty', 'hip-hop', 'vintage'],
+    officialUrl: 'https://www.rossum-electro.com/products/sp-1200/',
+    imageUrl: 'https://www.rossum-electro.com/wp-content/uploads/2021/11/SP-1200-Front-Panel-scaled.jpg',
+    youtubeVideos: [
+      { title: 'The Sound of SP-1200 Rossum', url: 'https://www.youtube.com/watch?v=a_fs4Pe7MU8', channel: 'Cookin Soul' },
+      { title: 'SP-1200 Tutorial for both E-mu & Rossum', url: 'https://www.youtube.com/watch?v=fJllMiVqL3U', channel: 'Rossum Electro-Music' }
+    ]
   },
   {
     id: 'elektron-octatrack',
@@ -997,7 +1039,13 @@ export const gear: GearItem[] = [
       es: 'El Octatrack es la herramienta definitiva de actuación de techno en vivo. Usa escenas para transiciones dramáticas vía crossfader. Samplea entradas de audio en vivo y manipula en tiempo real.'
     },
     relatedGear: ['elektron-digitakt', 'elektron-analog-rytm', 'akai-mpc-live'],
-    tags: ['sampler', 'elektron', 'live', 'performance', 'timestretch', 'advanced']
+    tags: ['sampler', 'elektron', 'live', 'performance', 'timestretch', 'advanced'],
+    officialUrl: 'https://www.elektron.se/explore/octatrack-mkii',
+    imageUrl: 'https://www.elektron.se/wp-content/uploads/2017/09/OT_MKII_Front.png',
+    youtubeVideos: [
+      { title: 'Octatrack MKII Introduction', url: 'https://www.youtube.com/watch?v=sQwf1mVWxEs', channel: 'Elektron' },
+      { title: 'Octatrack MKII Deep Dive', url: 'https://www.youtube.com/watch?v=2oS2p_qh8d8', channel: 'Elektron' }
+    ]
   },
   {
     id: 'polyend-tracker',
@@ -1030,7 +1078,13 @@ export const gear: GearItem[] = [
       es: 'El Tracker ofrece un flujo de trabajo único para producción de techno. Los efectos por paso permiten patrones complejos y glitchy.'
     },
     relatedGear: ['elektron-digitakt', 'dirtywave-m8', 'elektron-model-samples'],
-    tags: ['sampler', 'tracker', 'sequencer', 'portable', 'granular', 'unique']
+    tags: ['sampler', 'tracker', 'sequencer', 'portable', 'granular', 'unique'],
+    officialUrl: 'https://polyend.com/tracker/',
+    imageUrl: 'https://polyend.com/wp-content/uploads/2020/05/Tracker-hero-1.png',
+    youtubeVideos: [
+      { title: 'Polyend Tracker Overview', url: 'https://www.youtube.com/watch?v=VWq7v4hv4Qg', channel: 'Polyend' },
+      { title: 'Polyend Tracker Mini Introduction', url: 'https://www.youtube.com/watch?v=RnYT-c9lNHc', channel: 'Polyend' }
+    ]
   },
   {
     id: 'squarp-pyramid',
@@ -1063,7 +1117,13 @@ export const gear: GearItem[] = [
       es: 'El Pyramid es el centro de mando para setups de techno hardware. Usa pistas polirrítmicas para crear patrones evolutivos e hipnóticos.'
     },
     relatedGear: ['sequentix-cirklon', 'elektron-analog-four', 'squarp-hapax'],
-    tags: ['sequencer', 'midi', 'polyrhythm', 'hardware', 'cv-gate']
+    tags: ['sequencer', 'midi', 'polyrhythm', 'hardware', 'cv-gate'],
+    officialUrl: 'https://squarp.net/pyramid/',
+    imageUrl: 'https://squarp.net/wp-content/uploads/2023/10/pyramid-hero.png',
+    youtubeVideos: [
+      { title: 'Squarp Pyramid Overview', url: 'https://www.youtube.com/watch?v=8MqdJRHbMFc', channel: 'Squarp Instruments' },
+      { title: 'Pyramid MIDI Effects Demo', url: 'https://www.youtube.com/watch?v=IXHGPp_2OGQ', channel: 'Squarp Instruments' }
+    ]
   },
   {
     id: 'sequentix-cirklon',
@@ -1098,7 +1158,13 @@ export const gear: GearItem[] = [
       es: 'El Cirklon es el estándar de oro para secuenciación de techno hardware. Las definiciones de instrumentos adaptan la interfaz a cada sintetizador.'
     },
     relatedGear: ['squarp-pyramid', 'elektron-analog-four', 'squarp-hapax'],
-    tags: ['sequencer', 'midi', 'cv-gate', 'professional', 'live', 'legendary']
+    tags: ['sequencer', 'midi', 'cv-gate', 'professional', 'live', 'legendary'],
+    officialUrl: 'https://www.sequentix.com/products/cirklon2-sequencer',
+    imageUrl: 'https://www.sequentix.com/cdn/shop/files/ck2.jpg',
+    youtubeVideos: [
+      { title: 'Cirklon Tutorial - Getting Started', url: 'https://www.youtube.com/watch?v=AC8FMrzn7Is', channel: 'Sequentix' },
+      { title: 'Classic House on Hardware with Cirklon', url: 'https://www.youtube.com/watch?v=qJQHvfQ8w7w', channel: 'Starsky Carr' }
+    ]
   },
   // === DAWs ===
   {
@@ -1214,7 +1280,13 @@ export const gear: GearItem[] = [
       es: 'Logic Pro ofrece producción de techno completa a un precio accesible. Alchemy proporciona síntesis wavetable profunda.'
     },
     relatedGear: ['ableton-live', 'bitwig-studio'],
-    tags: ['daw', 'production', 'mac', 'comprehensive', 'value']
+    tags: ['daw', 'production', 'mac', 'comprehensive', 'value'],
+    officialUrl: 'https://www.apple.com/logic-pro/',
+    imageUrl: 'https://www.apple.com/v/logic-pro/m/images/meta/og__bth9rq4qlkya_image.png',
+    youtubeVideos: [
+      { title: 'Logic Pro 11 Overview', url: 'https://www.youtube.com/watch?v=yyOTBNoC7KM', channel: 'Echo Sound Works' },
+      { title: 'Logic Pro for Beginners', url: 'https://www.youtube.com/watch?v=EYBvLaV1E_M', channel: 'Apple' }
+    ]
   },
 ];
 
