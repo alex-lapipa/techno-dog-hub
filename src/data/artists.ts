@@ -43,7 +43,7 @@ export const artists: Artist[] = [
     region: "North America",
     active: "1985–present",
     tags: ["Detroit", "minimal", "sci-fi", "TR-909", "three-deck"],
-    photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+    // No photoUrl - requires licensed image
     bio: "The Wizard. Co-founder of Underground Resistance. Pioneer of minimal techno and the three-deck technique. His work transcends dance music into cinematic and orchestral territories. Mills has performed with symphony orchestras worldwide and continues to push the boundaries of what techno can be.",
     labels: ["Axis", "Underground Resistance", "Purpose Maker", "Tomorrow"],
     careerHighlights: [
@@ -128,7 +128,7 @@ export const artists: Artist[] = [
     region: "North America",
     active: "1989–present",
     tags: ["Detroit", "militant", "anonymous", "revolutionary"],
-    photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+    // No photoUrl - UR maintains anonymity
     bio: "More than artists—a movement. The masked revolutionaries of Detroit techno. Anti-corporate, pro-community. Their sonic warfare approach created a template for artistic resistance through electronic music.",
     labels: ["Underground Resistance"],
     careerHighlights: [
@@ -171,7 +171,7 @@ export const artists: Artist[] = [
     region: "North America",
     active: "2011–present",
     tags: ["experimental", "optical", "Eaux", "cerebral", "modular"],
-    photoUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800",
+    // No photoUrl - requires licensed image
     bio: "Exploring techno's outer reaches through optical illusions and experimental sound design. Rrose's approach to production and performance is deeply cerebral, creating immersive sonic experiences that challenge perception.",
     labels: ["Eaux", "Sandwell District", "Stroboscopic Artefacts"],
     careerHighlights: [
@@ -212,7 +212,7 @@ export const artists: Artist[] = [
     region: "North America",
     active: "2014–present",
     tags: ["NYC", "hypnotic", "Bossa Nova Civic Club", "deep"],
-    photoUrl: "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=800",
+    // No photoUrl - requires licensed image
     bio: "NYC-based selector. Deep, hypnotic selections that bridge the New York underground with global techno. Resident at Bossa Nova Civic Club. Co-founder of The Bunker New York.",
     labels: ["The Bunker New York"],
     careerHighlights: [
@@ -250,7 +250,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "2011–present",
     tags: ["Spanish", "dark", "hypnotic", "industrial", "PoleGroup"],
-    photoUrl: "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=800",
+    // No photoUrl - requires licensed image
     bio: "Real name Mario Campos. Born in Madrid 1989, now Berlin-based. Member of PoleGroup. His dark, hypnotic industrial techno drew attention from leading names in the scene. Released split EP with Exium in 2013.",
     labels: ["PoleGroup", "Planet Rhythm", "Mord"],
     careerHighlights: [
@@ -292,7 +292,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "1994–present",
     tags: ["industrial", "Birmingham sound", "hardware", "modular"],
-    photoUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
+    // No photoUrl - requires licensed image
     bio: "One of the most influential figures in British techno. Co-founder of Counterbalance and Dynamic Tension. Raw, visceral sound and extended live sets. His modular synthesizer performances are legendary.",
     labels: ["Tresor", "Dynamic Tension", "Counterbalance", "Blueprint"],
     collaborators: ["Regis", "Lady Starlight", "British Murder Boys"],
@@ -338,7 +338,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "1991–present",
     tags: ["industrial", "Birmingham", "Sandwell District", "dark"],
-    photoUrl: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=800",
+    // No photoUrl - requires licensed image
     bio: "Co-founder of Downwards Records. Half of British Murder Boys. A key architect of the Birmingham sound and industrial techno movement. His productions are raw, uncompromising, and deeply influential.",
     labels: ["Downwards", "Blackest Ever Black", "Sandwell District"],
     collaborators: ["Surgeon", "Female", "British Murder Boys"],
@@ -375,7 +375,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "1998–present",
     tags: ["industrial", "noise", "Decon/Recon", "raw", "live"],
-    photoUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800",
+    // No photoUrl - requires licensed image
     bio: "Deconstructed approach to techno. Her Decon/Recon parties are legendary. Raw power meets precision engineering in both her DJ sets and live performances.",
     labels: ["R&S", "Noise Manifesto"],
     careerHighlights: [
@@ -415,7 +415,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "2011–present",
     tags: ["Birmingham", "driving", "Elements", "raw"],
-    photoUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+    // No photoUrl - requires licensed image
     bio: "Founder of Elements series. Powerful voice for equality in the scene. Her DJ sets are renowned for their power and precision.",
     labels: ["CLR", "Soma", "Sleaze"],
     careerHighlights: [
@@ -450,7 +450,7 @@ export const artists: Artist[] = [
     region: "Europe",
     active: "1994–present",
     tags: ["Blueprint", "UK", "deep", "hypnotic"],
-    photoUrl: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=800",
+    // No photoUrl - requires licensed image
     bio: "Founder of Blueprint Records. Defining the UK techno sound for three decades. His productions are deep, hypnotic, and meticulously crafted.",
     labels: ["Blueprint", "Tresor"],
     careerHighlights: [
