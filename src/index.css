@@ -239,6 +239,11 @@
     color: hsl(0 0% 0%);
   }
 
+  /* Neon text glow */
+  .text-shadow-neon {
+    text-shadow: 0 0 8px hsl(var(--primary) / 0.6), 0 0 16px hsl(var(--primary) / 0.4), 0 0 24px hsl(var(--primary) / 0.2);
+  }
+
   /* Hide scrollbar for horizontal nav */
   .scrollbar-hide {
     -ms-overflow-style: none;
