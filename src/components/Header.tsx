@@ -89,6 +89,13 @@ const Header = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+  const isSubItemActive = (path: string) => {
+    if (path.includes('?')) {
+      const [basePath, query] = path.split('?');
+      return location.pathname === basePath && location.search.includes(query);
+    }
+    return location.pathname === path;
+  };
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
@@ -134,7 +141,11 @@ const Header = () => {
                       <Link
                         key={subItem.path}
                         to={subItem.path}
-                        className="block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-card transition-colors"
+                        className={`block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                          isSubItemActive(subItem.path) 
+                            ? 'text-foreground bg-card border-l-2 border-primary' 
+                            : 'text-muted-foreground hover:text-foreground hover:bg-card'
+                        }`}
                       >
                         {subItem.label[language]}
                       </Link>
@@ -185,7 +196,11 @@ const Header = () => {
                                 key={subItem.path}
                                 to={subItem.path}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="block px-6 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                                className={`block px-6 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
+                                  isSubItemActive(subItem.path)
+                                    ? 'text-foreground border-l-2 border-primary ml-[-2px]'
+                                    : 'text-muted-foreground hover:text-foreground'
+                                }`}
                               >
                                 {subItem.label[language]}
                               </Link>
