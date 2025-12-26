@@ -42,3 +42,6 @@ verify_jwt = false
 
 [functions.youtube-search]
 verify_jwt = false
+
+[functions.cleanup-youtube-cache]
+verify_jwt = false
