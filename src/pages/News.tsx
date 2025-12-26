@@ -82,8 +82,22 @@ const NewsPage = () => {
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
               {language === 'en' ? 'News' : 'Noticias'}
             </h1>
+            <div className="flex gap-4">
+              <Link 
+                to="/news/archive" 
+                className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                → {language === 'en' ? 'Browse Archive' : 'Ver Archivo'}
+              </Link>
+            </div>
             {user && (
               <div className="flex gap-4 mt-4">
+                <Link 
+                  to="/news/archive" 
+                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  → {language === 'en' ? 'Archive' : 'Archivo'}
+                </Link>
                 <Link 
                   to="/news/drafts" 
                   className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
