@@ -37,7 +37,29 @@ const Footer = () => {
               {t('footer.description')}
             </p>
             <p className="font-mono text-xs text-muted-foreground">
-              © 2025 techno.dog
+              © 2025 Techno.Dog
+            </p>
+            <p className="font-mono text-xs text-muted-foreground">
+              Techno.Dog ringleader{' '}
+              <a 
+                href="https://alexlawton.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-foreground hover:underline"
+              >
+                Alex Lawton
+              </a>
+            </p>
+            <p className="font-mono text-xs text-muted-foreground">
+              part of{' '}
+              <a 
+                href="https://lapipa.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-foreground hover:underline"
+              >
+                La PiPa
+              </a>
             </p>
           </div>
 
