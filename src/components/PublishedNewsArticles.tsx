@@ -83,7 +83,7 @@ const PublishedNewsArticles = () => {
       {/* Section Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-          // {language === 'en' ? 'Agent-generated stories' : 'Historias generadas por agente'}
+          // {language === 'en' ? 'Community-Agent generated stories' : 'Historias generadas por comunidad-agente'}
         </div>
       </div>
 
