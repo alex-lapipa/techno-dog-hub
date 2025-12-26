@@ -40,7 +40,58 @@ const Index = () => {
     }
   };
 
-  const combinedSchema = [organizationSchema, websiteSchema];
+  const faqItems = [
+    {
+      question: { en: 'What is techno.dog?', es: '¿Qué es techno.dog?' },
+      answer: { 
+        en: 'techno.dog is a comprehensive global techno culture archive featuring artists, festivals, venues, labels, crews, and gear from Detroit to Tbilisi, Tokyo to Bogotá.', 
+        es: 'techno.dog es un archivo completo de cultura techno global con artistas, festivales, clubs, sellos, crews y equipo de Detroit a Tbilisi, de Tokio a Bogotá.' 
+      }
+    },
+    {
+      question: { en: 'What artists are featured on techno.dog?', es: '¿Qué artistas aparecen en techno.dog?' },
+      answer: { 
+        en: 'We feature legendary and contemporary techno artists including Jeff Mills, Underground Resistance, Surgeon, Helena Hauff, Paula Temple, Ben Klock, Marcel Dettmann, and many more from the global underground scene.', 
+        es: 'Presentamos artistas de techno legendarios y contemporáneos incluyendo Jeff Mills, Underground Resistance, Surgeon, Helena Hauff, Paula Temple, Ben Klock, Marcel Dettmann y muchos más de la escena underground global.' 
+      }
+    },
+    {
+      question: { en: 'Which techno festivals are covered?', es: '¿Qué festivales de techno están cubiertos?' },
+      answer: { 
+        en: 'We cover major techno festivals worldwide including Awakenings, Dekmantel, Movement Detroit, Time Warp, Neopop, Sónar, MELT, and underground gatherings across Europe, Americas, and Asia.', 
+        es: 'Cubrimos los principales festivales de techno del mundo incluyendo Awakenings, Dekmantel, Movement Detroit, Time Warp, Neopop, Sónar, MELT y encuentros underground en Europa, América y Asia.' 
+      }
+    },
+    {
+      question: { en: 'What venues and clubs are in the archive?', es: '¿Qué clubs y locales están en el archivo?' },
+      answer: { 
+        en: 'Our archive includes iconic techno venues like Berghain, Tresor, Bassiani, Khidi, Concrete, De School, Fold, and legendary spots from Detroit to Melbourne.', 
+        es: 'Nuestro archivo incluye locales icónicos de techno como Berghain, Tresor, Bassiani, Khidi, Concrete, De School, Fold y lugares legendarios de Detroit a Melbourne.' 
+      }
+    },
+    {
+      question: { en: 'Is techno.dog available in Spanish?', es: '¿techno.dog está disponible en español?' },
+      answer: { 
+        en: 'Yes, techno.dog is fully bilingual with complete English and Spanish language support across all pages and content.', 
+        es: 'Sí, techno.dog es completamente bilingüe con soporte completo en inglés y español en todas las páginas y contenido.' 
+      }
+    }
+  ];
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(item => ({
+      "@type": "Question",
+      "name": item.question[language],
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer[language]
+      }
+    }))
+  };
+
+  const combinedSchema = [organizationSchema, websiteSchema, faqSchema];
 
   const featuredSections = [
     {
@@ -217,6 +268,28 @@ const Index = () => {
 {`░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 ░░  DETROIT → BERLIN → TBILISI → TOKYO → BOGOTÁ → SÃO PAULO → MEXICO CITY → MELBOURNE  ░░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="border-b border-border">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight mb-8">
+              {language === 'en' ? 'Frequently Asked Questions' : 'Preguntas Frecuentes'}
+            </h2>
+            <div className="grid gap-6 max-w-3xl">
+              {faqItems.map((item, index) => (
+                <details key={index} className="group border border-border">
+                  <summary className="font-mono text-sm md:text-base uppercase tracking-wide p-4 cursor-pointer hover:bg-card transition-colors list-none flex justify-between items-center">
+                    <span>{item.question[language]}</span>
+                    <span className="text-muted-foreground group-open:rotate-45 transition-transform">+</span>
+                  </summary>
+                  <div className="font-mono text-sm text-muted-foreground p-4 pt-0 leading-relaxed">
+                    {item.answer[language]}
+                  </div>
+                </details>
+              ))}
             </div>
           </div>
         </section>
