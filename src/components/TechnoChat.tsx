@@ -1,9 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Badge } from '@/components/ui/badge';
 
+// Create URL-friendly slug from artist name
+const createArtistSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+};
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -217,12 +225,13 @@ const TechnoChat = () => {
                 <p className="font-mono text-xs text-muted-foreground mb-2">// Artistas referenciados:</p>
                 <div className="flex flex-wrap gap-2">
                   {referencedArtists.map((artist, idx) => (
-                    <div 
+                    <Link 
                       key={idx}
-                      className="border border-border bg-muted/30 px-3 py-2 hover:border-primary transition-colors"
+                      to={`/artists/${createArtistSlug(artist.name)}`}
+                      className="border border-border bg-muted/30 px-3 py-2 hover:border-primary hover:bg-muted/50 transition-colors cursor-pointer group"
                     >
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-sm font-bold text-foreground">
+                        <span className="font-mono text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                           {artist.name}
                         </span>
                         <Badge variant="outline" className="text-xs font-mono">
@@ -241,7 +250,7 @@ const TechnoChat = () => {
                           </Badge>
                         ))}
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
