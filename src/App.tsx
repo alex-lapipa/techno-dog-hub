@@ -35,6 +35,7 @@ const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const SubmissionsAdmin = lazy(() => import("./pages/SubmissionsAdmin"));
 const NewsDrafts = lazy(() => import("./pages/NewsDrafts"));
 const NewsArticleDetail = lazy(() => import("./pages/NewsArticleDetail"));
+const NewsArchive = lazy(() => import("./pages/NewsArchive"));
 const DJArtistsAdmin = lazy(() => import("./pages/DJArtistsAdmin"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
@@ -73,6 +74,7 @@ const App = () => (
                   <Route path="/news/drafts" element={<NewsDrafts />} />
                   <Route path="/news/article/:id" element={<NewsArticleDetail />} />
                   <Route path="/news/:id" element={<NewsArticleDetail />} />
+                  <Route path="/news/archive" element={<NewsArchive />} />
                   <Route path="/news/features" element={<News />} />
                   
                   {/* Admin */}
