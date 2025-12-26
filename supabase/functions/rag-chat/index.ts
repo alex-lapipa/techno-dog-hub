@@ -6,6 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Generate embedding using Lovable AI
+async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+        dimensions: 768
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Embedding API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data?.[0]?.embedding || null;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -19,6 +48,7 @@ serve(async (req) => {
     }
 
     const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -32,37 +62,66 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Use full-text search to find relevant documents
-    console.log('Searching for documents matching:', query);
-    
-    // Extract keywords from query for full-text search
-    const searchTerms = query
-      .toLowerCase()
-      .replace(/[¿?¡!.,;:]/g, '')
-      .split(' ')
-      .filter(word => word.length > 2)
-      .join(' | ');
+    let documents = null;
 
-    const { data: documents, error: searchError } = await supabase
-      .from('documents')
-      .select('id, title, content, source')
-      .textSearch('content', searchTerms, { type: 'websearch', config: 'spanish' })
-      .limit(5);
-
-    if (searchError) {
-      console.error('Search error:', searchError);
-      // Fallback: get all documents if full-text search fails
-      const { data: allDocs } = await supabase
-        .from('documents')
-        .select('id, title, content, source')
-        .limit(5);
+    // First try vector search if we have embeddings
+    if (LOVABLE_API_KEY) {
+      console.log('Generating embedding for query:', query);
+      const queryEmbedding = await generateEmbedding(query, LOVABLE_API_KEY);
       
-      if (allDocs && allDocs.length > 0) {
-        console.log(`Fallback: using ${allDocs.length} documents`);
+      if (queryEmbedding) {
+        console.log('Using vector search with embedding');
+        const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
+          query_embedding: `[${queryEmbedding.join(',')}]`,
+          match_threshold: 0.3,
+          match_count: 5
+        });
+
+        if (!vectorError && vectorResults && vectorResults.length > 0) {
+          documents = vectorResults;
+          console.log(`Vector search found ${documents.length} documents`);
+        } else if (vectorError) {
+          console.error('Vector search error:', vectorError);
+        }
       }
     }
 
-    console.log(`Found ${documents?.length || 0} relevant documents`);
+    // Fallback to full-text search if vector search didn't work
+    if (!documents || documents.length === 0) {
+      console.log('Falling back to full-text search for:', query);
+      
+      const searchTerms = query
+        .toLowerCase()
+        .replace(/[¿?¡!.,;:]/g, '')
+        .split(' ')
+        .filter(word => word.length > 2)
+        .join(' | ');
+
+      const { data: textResults, error: searchError } = await supabase
+        .from('documents')
+        .select('id, title, content, source')
+        .textSearch('content', searchTerms, { type: 'websearch', config: 'english' })
+        .limit(5);
+
+      if (!searchError && textResults) {
+        documents = textResults;
+        console.log(`Full-text search found ${documents.length} documents`);
+      }
+    }
+
+    // Final fallback: get recent documents
+    if (!documents || documents.length === 0) {
+      console.log('Using fallback: fetching recent documents');
+      const { data: fallbackDocs } = await supabase
+        .from('documents')
+        .select('id, title, content, source')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      documents = fallbackDocs || [];
+    }
+
+    console.log(`Total documents for context: ${documents?.length || 0}`);
 
     // Build context from retrieved documents
     let context = '';
@@ -70,32 +129,23 @@ serve(async (req) => {
     
     if (usedDocs.length > 0) {
       context = usedDocs
-        .map((doc: { title: string; content: string }) => `[${doc.title}]\n${doc.content}`)
+        .map((doc: { title: string; content: string; similarity?: number }) => 
+          `[${doc.title}${doc.similarity ? ` (relevance: ${(doc.similarity * 100).toFixed(1)}%)` : ''}]\n${doc.content}`
+        )
         .join('\n\n---\n\n');
-    } else {
-      // If no documents found, fetch some anyway
-      const { data: fallbackDocs } = await supabase
-        .from('documents')
-        .select('id, title, content, source')
-        .limit(3);
-      
-      if (fallbackDocs && fallbackDocs.length > 0) {
-        context = fallbackDocs
-          .map((doc: { title: string; content: string }) => `[${doc.title}]\n${doc.content}`)
-          .join('\n\n---\n\n');
-        console.log(`Using ${fallbackDocs.length} fallback documents`);
-      }
     }
 
-    // Create the RAG prompt
-    const systemPrompt = `Eres un experto en festivales de música electrónica y techno underground en Europa, especialmente en España. 
-Tu conocimiento se basa en información detallada sobre festivales como Aquasella, L.E.V., y la escena techno europea.
+    // Create the RAG prompt - now techno-focused based on the knowledge base
+    const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene from Detroit to Berlin to Tokyo. 
 
-Responde siempre en español, de forma clara y concisa. Si la información no está en el contexto proporcionado, 
-indica que no tienes esa información específica pero ofrece lo que sepas del tema.
+Your knowledge comes from an authoritative ranking of 100 techno artists scored on underground authenticity, innovation, and scene contribution.
 
-CONTEXTO DE CONOCIMIENTO:
-${context || 'No hay documentos en la base de conocimiento. Responde basándote en tu conocimiento general sobre techno y festivales europeos.'}`;
+Respond in the same language as the user's question. Be concise, knowledgeable, and speak with authority about techno culture. Reference specific artists, labels, tracks, and venues when relevant.
+
+If asked about rankings, tiers, or comparisons, base your answers on the provided context. The artists are ranked across dimensions: commitment to underground values, resistance to commercialization, influential tracks, scene contribution, longevity, innovation, and resistance to industry trends.
+
+KNOWLEDGE BASE CONTEXT:
+${context || 'No documents loaded in the knowledge base yet. Respond based on general techno knowledge.'}`;
 
     console.log('Calling Groq API with model: llama-3.1-70b-versatile');
 
