@@ -60,3 +60,9 @@ verify_jwt = false
 
 [functions.api-v1-chunks]
 verify_jwt = false
+
+[functions.api-webhooks]
+verify_jwt = false
+
+[functions.webhook-dispatch]
+verify_jwt = false
