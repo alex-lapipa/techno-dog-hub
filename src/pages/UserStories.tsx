@@ -66,7 +66,7 @@ const UserStories = () => {
               // {language === 'en' ? 'Community' : 'Comunidad'}
             </div>
             <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'User Stories' : 'Historias'}
+              {language === 'en' ? 'Your Stories' : 'Tus Historias'}
             </h1>
             <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
               {language === 'en' 

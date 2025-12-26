@@ -109,9 +109,9 @@ const App = () => (
                   <Route path="/crews" element={<Crews />} />
                   <Route path="/crews/:id" element={<CrewDetail />} />
                   
-                  {/* Mad Stuff */}
-                  <Route path="/mad" element={<Venues />} />
-                  <Route path="/mad/stories" element={<UserStories />} />
+                  {/* User Stories (under News) */}
+                  <Route path="/news/your-stories" element={<UserStories />} />
+                  <Route path="/mad/stories" element={<UserStories />} /> {/* Legacy redirect */}
                   
                   {/* Gear */}
                   <Route path="/gear" element={<Gear />} />
