@@ -80,9 +80,12 @@ const Header = () => {
       path: '/technopedia',
       sub: [
         { label: { en: 'About', es: 'Acerca de' }, path: '/technopedia' },
-        { label: { en: 'Developer API', es: 'API' }, path: '/developer' },
         { label: { en: 'Submit', es: 'Enviar' }, path: '/submit' },
       ]
+    },
+    {
+      label: { en: 'Developer API', es: 'API' },
+      path: '/developer',
     },
   ];
 
