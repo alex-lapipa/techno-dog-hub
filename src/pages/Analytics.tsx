@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -63,7 +63,7 @@ interface EventStats {
 const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
 
 const Analytics = () => {
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [eventStats, setEventStats] = useState<EventStats[]>([]);

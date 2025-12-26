@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/hooks/useAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -45,7 +45,7 @@ interface Submission {
 
 const SubmissionsAdmin = () => {
   const { language } = useLanguage();
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, loading: authLoading } = useAdminAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -91,7 +91,6 @@ const SubmissionsAdmin = () => {
           status,
           admin_notes: notes,
           reviewed_at: new Date().toISOString(),
-          reviewed_by: user?.id,
         })
         .eq("id", id);
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DJArtistSearch from '@/components/DJArtistSearch';
@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { Upload, Search, Database, Loader2 } from 'lucide-react';
 
 const DJArtistsAdmin = () => {
-  const { user } = useAuth();
+  const { isAdmin, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
   const [jsonInput, setJsonInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -76,9 +76,34 @@ const DJArtistsAdmin = () => {
     }
   };
 
-  if (!user) {
-    navigate('/auth');
-    return null;
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <main className="pt-24 lg:pt-16">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <div className="max-w-md mx-auto text-center">
+              <h1 className="font-mono text-2xl uppercase tracking-tight mb-4">Access Denied</h1>
+              <p className="font-mono text-sm text-muted-foreground">
+                You need admin privileges to access this page.
+              </p>
+              <Button variant="outline" className="mt-4" onClick={() => navigate('/admin')}>
+                Go to Admin Login
+              </Button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
