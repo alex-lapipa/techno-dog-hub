@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import LanguageToggle from "./LanguageToggle";
-import technoDogIcon from "@/assets/techno-dog-icon.jpg";
+import hexagonLogo from "@/assets/hexagon-logo-green.png";
 import { useState, useEffect } from "react";
 import { ChevronDown, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -110,9 +110,9 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group shrink-0">
             <img 
-              src={technoDogIcon} 
+              src={hexagonLogo} 
               alt="techno.dog logo" 
-              className="w-12 h-12 rounded-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-[0_0_8px_hsl(var(--primary)/0.3)] group-hover:animate-neon-pulse"
+              className="w-10 h-10 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(142_100%_50%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(142_100%_50%/0.8)]"
             />
             <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
               techno.dog
