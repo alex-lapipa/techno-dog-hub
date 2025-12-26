@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X, Eye, Clock, CheckCircle, XCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -52,7 +52,7 @@ const SubmissionsAdmin = () => {
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
+  const [actionType, setActionType] = useState<"approve" | "reject" | "duplicate" | null>(null);
 
   // Fetch submissions
   const { data: submissions, isLoading } = useQuery({
@@ -99,9 +99,10 @@ const SubmissionsAdmin = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-submissions"] });
+      const actionLabels = { approve: "approved", reject: "rejected", duplicate: "marked as duplicate" };
       toast({
         title: "Submission updated",
-        description: `Submission has been ${actionType === "approve" ? "approved" : "rejected"}.`,
+        description: `Submission has been ${actionLabels[actionType as keyof typeof actionLabels] || "updated"}.`,
       });
       setSelectedSubmission(null);
       setAdminNotes("");
@@ -117,7 +118,7 @@ const SubmissionsAdmin = () => {
     },
   });
 
-  const handleAction = (submission: Submission, action: "approve" | "reject") => {
+  const handleAction = (submission: Submission, action: "approve" | "reject" | "duplicate") => {
     setSelectedSubmission(submission);
     setActionType(action);
     setAdminNotes(submission.admin_notes || "");
@@ -125,9 +126,10 @@ const SubmissionsAdmin = () => {
 
   const confirmAction = () => {
     if (!selectedSubmission || !actionType) return;
+    const statusMap = { approve: "approved", reject: "rejected", duplicate: "duplicate" };
     updateMutation.mutate({
       id: selectedSubmission.id,
-      status: actionType === "approve" ? "approved" : "rejected",
+      status: statusMap[actionType],
       notes: adminNotes,
     });
   };
@@ -343,6 +345,15 @@ const SubmissionsAdmin = () => {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => handleAction(submission, "duplicate")}
+                            className="font-mono text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            Duplicate
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => handleAction(submission, "reject")}
                             className="font-mono text-xs text-destructive hover:text-destructive"
                           >
@@ -367,11 +378,13 @@ const SubmissionsAdmin = () => {
         <DialogContent className="font-mono">
           <DialogHeader>
             <DialogTitle className="font-mono uppercase tracking-tight">
-              {actionType === "approve" ? "Approve Submission" : "Reject Submission"}
+              {actionType === "approve" ? "Approve Submission" : actionType === "duplicate" ? "Mark as Duplicate" : "Reject Submission"}
             </DialogTitle>
             <DialogDescription className="font-mono text-xs">
               {actionType === "approve"
                 ? "This submission will be marked as approved."
+                : actionType === "duplicate"
+                ? "This submission already exists in the archive or has been submitted before."
                 : "This submission will be marked as rejected."}
             </DialogDescription>
           </DialogHeader>
@@ -414,17 +427,19 @@ const SubmissionsAdmin = () => {
             <Button
               onClick={confirmAction}
               disabled={updateMutation.isPending}
-              variant={actionType === "approve" ? "default" : "destructive"}
+              variant={actionType === "approve" ? "default" : actionType === "duplicate" ? "secondary" : "destructive"}
               className="font-mono text-xs"
             >
               {updateMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-1 animate-spin" />
               ) : actionType === "approve" ? (
                 <Check className="w-4 h-4 mr-1" />
+              ) : actionType === "duplicate" ? (
+                <Copy className="w-4 h-4 mr-1" />
               ) : (
                 <X className="w-4 h-4 mr-1" />
               )}
-              {actionType === "approve" ? "Approve" : "Reject"}
+              {actionType === "approve" ? "Approve" : actionType === "duplicate" ? "Mark Duplicate" : "Reject"}
             </Button>
           </DialogFooter>
         </DialogContent>
