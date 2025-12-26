@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy } from "lucide-react";
+import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy, Edit, Eye, FileText, Image, Music, ExternalLink, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -30,12 +32,14 @@ import {
 interface Submission {
   id: string;
   user_id: string | null;
-  submission_type: string;
-  name: string;
+  submission_type: string | null;
+  name: string | null;
+  email: string | null;
   description: string | null;
   location: string | null;
   website_url: string | null;
   additional_info: string | null;
+  file_urls: string[] | null;
   status: string;
   admin_notes: string | null;
   created_at: string;
@@ -52,7 +56,17 @@ const SubmissionsAdmin = () => {
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
-  const [actionType, setActionType] = useState<"approve" | "reject" | "duplicate" | null>(null);
+  const [actionType, setActionType] = useState<"approve" | "reject" | "duplicate" | "edit" | "view" | null>(null);
+  
+  // Edit form state
+  const [editForm, setEditForm] = useState({
+    name: "",
+    submission_type: "",
+    description: "",
+    location: "",
+    website_url: "",
+    additional_info: "",
+  });
 
   // Fetch submissions
   const { data: submissions, isLoading } = useQuery({
@@ -74,8 +88,8 @@ const SubmissionsAdmin = () => {
     enabled: isAdmin,
   });
 
-  // Update submission mutation
-  const updateMutation = useMutation({
+  // Update submission status mutation
+  const updateStatusMutation = useMutation({
     mutationFn: async ({
       id,
       status,
@@ -103,9 +117,7 @@ const SubmissionsAdmin = () => {
         title: "Submission updated",
         description: `Submission has been ${actionLabels[actionType as keyof typeof actionLabels] || "updated"}.`,
       });
-      setSelectedSubmission(null);
-      setAdminNotes("");
-      setActionType(null);
+      closeDialog();
     },
     onError: (error) => {
       console.error("Update error:", error);
@@ -117,19 +129,94 @@ const SubmissionsAdmin = () => {
     },
   });
 
-  const handleAction = (submission: Submission, action: "approve" | "reject" | "duplicate") => {
+  // Edit submission mutation
+  const editMutation = useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Submission>;
+    }) => {
+      const { error } = await supabase
+        .from("community_submissions")
+        .update(updates)
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-submissions"] });
+      toast({
+        title: "Submission edited",
+        description: "Changes have been saved.",
+      });
+      closeDialog();
+    },
+    onError: (error) => {
+      console.error("Edit error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save changes.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const closeDialog = () => {
+    setSelectedSubmission(null);
+    setAdminNotes("");
+    setActionType(null);
+    setEditForm({
+      name: "",
+      submission_type: "",
+      description: "",
+      location: "",
+      website_url: "",
+      additional_info: "",
+    });
+  };
+
+  const handleAction = (submission: Submission, action: "approve" | "reject" | "duplicate" | "edit" | "view") => {
     setSelectedSubmission(submission);
     setActionType(action);
     setAdminNotes(submission.admin_notes || "");
+    
+    if (action === "edit") {
+      setEditForm({
+        name: submission.name || "",
+        submission_type: submission.submission_type || "",
+        description: submission.description || "",
+        location: submission.location || "",
+        website_url: submission.website_url || "",
+        additional_info: submission.additional_info || "",
+      });
+    }
   };
 
-  const confirmAction = () => {
+  const confirmStatusAction = () => {
     if (!selectedSubmission || !actionType) return;
     const statusMap = { approve: "approved", reject: "rejected", duplicate: "duplicate" };
-    updateMutation.mutate({
+    updateStatusMutation.mutate({
       id: selectedSubmission.id,
-      status: statusMap[actionType],
+      status: statusMap[actionType as keyof typeof statusMap],
       notes: adminNotes,
+    });
+  };
+
+  const confirmEdit = () => {
+    if (!selectedSubmission) return;
+    editMutation.mutate({
+      id: selectedSubmission.id,
+      updates: {
+        name: editForm.name || null,
+        submission_type: editForm.submission_type || null,
+        description: editForm.description || null,
+        location: editForm.location || null,
+        website_url: editForm.website_url || null,
+        additional_info: editForm.additional_info || null,
+        admin_notes: adminNotes || null,
+      },
     });
   };
 
@@ -141,6 +228,17 @@ const SubmissionsAdmin = () => {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const getFileIcon = (url: string) => {
+    const ext = url.split('.').pop()?.toLowerCase() || '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return Image;
+    if (['mp3', 'wav', 'ogg', 'm4a', 'flac'].includes(ext)) return Music;
+    return FileText;
+  };
+
+  const getFileName = (url: string) => {
+    return url.split('/').pop() || 'file';
   };
 
   const getStatusBadge = (status: string) => {
@@ -159,16 +257,19 @@ const SubmissionsAdmin = () => {
     );
   };
 
-  const getTypeBadge = (type: string) => {
-    const colors = {
+  const getTypeBadge = (type: string | null) => {
+    if (!type) return null;
+    const colors: Record<string, string> = {
       artist: "bg-purple-500/20 text-purple-400 border-purple-500/30",
       venue: "bg-blue-500/20 text-blue-400 border-blue-500/30",
       festival: "bg-green-500/20 text-green-400 border-green-500/30",
       label: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+      crew: "bg-pink-500/20 text-pink-400 border-pink-500/30",
+      release: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
       other: "bg-gray-500/20 text-gray-400 border-gray-500/30",
     };
     return (
-      <Badge variant="outline" className={`font-mono text-[10px] uppercase ${colors[type as keyof typeof colors] || colors.other}`}>
+      <Badge variant="outline" className={`font-mono text-[10px] uppercase ${colors[type] || colors.other}`}>
         {type}
       </Badge>
     );
@@ -195,6 +296,11 @@ const SubmissionsAdmin = () => {
               <p className="font-mono text-sm text-muted-foreground">
                 You need admin privileges to access this page.
               </p>
+              <Link to="/admin">
+                <Button variant="outline" className="mt-4 font-mono text-xs">
+                  Go to Admin Login
+                </Button>
+              </Link>
             </div>
           </div>
         </main>
@@ -219,12 +325,16 @@ const SubmissionsAdmin = () => {
           <div className="container mx-auto px-4 md:px-8 py-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
-                  // Admin
-                </div>
+                <Link to="/admin" className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground mb-4 transition-colors">
+                  <ArrowLeft className="w-3 h-3" />
+                  Back to Admin
+                </Link>
                 <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight">
                   Community Submissions
                 </h1>
+                <p className="font-mono text-xs text-muted-foreground mt-2">
+                  {submissions?.length || 0} submissions found
+                </p>
               </div>
 
               {/* Filter */}
@@ -273,11 +383,22 @@ const SubmissionsAdmin = () => {
                         <div className="flex flex-wrap items-center gap-2">
                           {getTypeBadge(submission.submission_type)}
                           {getStatusBadge(submission.status)}
+                          {submission.file_urls && submission.file_urls.length > 0 && (
+                            <Badge variant="outline" className="font-mono text-[10px]">
+                              {submission.file_urls.length} file(s)
+                            </Badge>
+                          )}
                         </div>
 
                         <h3 className="font-mono text-lg uppercase tracking-tight">
-                          {submission.name}
+                          {submission.name || "Unnamed Submission"}
                         </h3>
+
+                        {submission.email && (
+                          <p className="font-mono text-xs text-muted-foreground">
+                            ✉️ {submission.email}
+                          </p>
+                        )}
 
                         {submission.location && (
                           <p className="font-mono text-xs text-muted-foreground">
@@ -296,21 +417,11 @@ const SubmissionsAdmin = () => {
                             href={submission.website_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-mono text-xs text-primary hover:underline inline-block"
+                            className="font-mono text-xs text-primary hover:underline inline-flex items-center gap-1"
                           >
                             {submission.website_url}
+                            <ExternalLink className="w-3 h-3" />
                           </a>
-                        )}
-
-                        {submission.additional_info && (
-                          <details className="mt-2">
-                            <summary className="font-mono text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                              Additional info
-                            </summary>
-                            <p className="font-mono text-xs text-muted-foreground mt-2 pl-4 border-l border-border">
-                              {submission.additional_info}
-                            </p>
-                          </details>
                         )}
 
                         {submission.admin_notes && (
@@ -330,37 +441,48 @@ const SubmissionsAdmin = () => {
                       </div>
 
                       {/* Actions */}
-                      {submission.status === "pending" && (
-                        <div className="flex gap-2 lg:flex-col">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleAction(submission, "approve")}
-                            className="font-mono text-xs"
-                          >
-                            <Check className="w-4 h-4 mr-1" />
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleAction(submission, "duplicate")}
-                            className="font-mono text-xs text-muted-foreground hover:text-foreground"
-                          >
-                            <Copy className="w-4 h-4 mr-1" />
-                            Duplicate
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleAction(submission, "reject")}
-                            className="font-mono text-xs text-destructive hover:text-destructive"
-                          >
-                            <X className="w-4 h-4 mr-1" />
-                            Reject
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex gap-2 lg:flex-col">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAction(submission, "view")}
+                          className="font-mono text-xs"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAction(submission, "edit")}
+                          className="font-mono text-xs"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        {submission.status === "pending" && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleAction(submission, "approve")}
+                              className="font-mono text-xs text-green-500 hover:text-green-400"
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleAction(submission, "reject")}
+                              className="font-mono text-xs text-destructive hover:text-destructive"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -372,8 +494,226 @@ const SubmissionsAdmin = () => {
 
       <Footer />
 
-      {/* Confirm Dialog */}
-      <Dialog open={!!selectedSubmission} onOpenChange={() => setSelectedSubmission(null)}>
+      {/* View Dialog */}
+      <Dialog open={actionType === "view" && !!selectedSubmission} onOpenChange={() => closeDialog()}>
+        <DialogContent className="font-mono max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-mono uppercase tracking-tight">
+              Submission Details
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedSubmission && (
+            <div className="space-y-6">
+              {/* Status & Type */}
+              <div className="flex flex-wrap gap-2">
+                {getTypeBadge(selectedSubmission.submission_type)}
+                {getStatusBadge(selectedSubmission.status)}
+              </div>
+
+              {/* Basic Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Name</label>
+                  <p className="font-mono text-sm">{selectedSubmission.name || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Email</label>
+                  <p className="font-mono text-sm">{selectedSubmission.email || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Location</label>
+                  <p className="font-mono text-sm">{selectedSubmission.location || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Website</label>
+                  {selectedSubmission.website_url ? (
+                    <a href={selectedSubmission.website_url} target="_blank" rel="noopener noreferrer" className="font-mono text-sm text-primary hover:underline block truncate">
+                      {selectedSubmission.website_url}
+                    </a>
+                  ) : (
+                    <p className="font-mono text-sm">—</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              {selectedSubmission.description && (
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Description</label>
+                  <p className="font-mono text-sm whitespace-pre-wrap">{selectedSubmission.description}</p>
+                </div>
+              )}
+
+              {/* Additional Info */}
+              {selectedSubmission.additional_info && (
+                <div className="space-y-1">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Additional Info</label>
+                  <p className="font-mono text-sm whitespace-pre-wrap">{selectedSubmission.additional_info}</p>
+                </div>
+              )}
+
+              {/* Files */}
+              {selectedSubmission.file_urls && selectedSubmission.file_urls.length > 0 && (
+                <div className="space-y-2">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Uploaded Files</label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {selectedSubmission.file_urls.map((url, index) => {
+                      const FileIcon = getFileIcon(url);
+                      return (
+                        <a
+                          key={index}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-3 border border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <FileIcon className="w-5 h-5 text-muted-foreground" />
+                          <span className="font-mono text-xs flex-1 truncate">{getFileName(url)}</span>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Notes */}
+              {selectedSubmission.admin_notes && (
+                <div className="space-y-1 p-4 bg-muted/50 border border-border">
+                  <label className="font-mono text-[10px] uppercase text-muted-foreground">Admin Notes</label>
+                  <p className="font-mono text-sm">{selectedSubmission.admin_notes}</p>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="text-[10px] font-mono text-muted-foreground border-t border-border pt-4">
+                <p>Submitted: {formatDate(selectedSubmission.created_at)}</p>
+                {selectedSubmission.reviewed_at && (
+                  <p>Reviewed: {formatDate(selectedSubmission.reviewed_at)}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialog} className="font-mono text-xs">
+              Close
+            </Button>
+            <Button onClick={() => { setActionType("edit"); }} className="font-mono text-xs">
+              <Edit className="w-4 h-4 mr-1" />
+              Edit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={actionType === "edit" && !!selectedSubmission} onOpenChange={() => closeDialog()}>
+        <DialogContent className="font-mono max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-mono uppercase tracking-tight">
+              Edit Submission
+            </DialogTitle>
+            <DialogDescription className="font-mono text-xs">
+              Update the submission details below.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedSubmission && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="font-mono text-xs uppercase text-muted-foreground">Name</label>
+                  <Input
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="font-mono text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-mono text-xs uppercase text-muted-foreground">Type</label>
+                  <Select value={editForm.submission_type} onValueChange={(v) => setEditForm({ ...editForm, submission_type: v })}>
+                    <SelectTrigger className="font-mono text-sm">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="artist">Artist</SelectItem>
+                      <SelectItem value="venue">Venue</SelectItem>
+                      <SelectItem value="festival">Festival</SelectItem>
+                      <SelectItem value="label">Label</SelectItem>
+                      <SelectItem value="crew">Crew</SelectItem>
+                      <SelectItem value="release">Release</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs uppercase text-muted-foreground">Location</label>
+                <Input
+                  value={editForm.location}
+                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  className="font-mono text-sm"
+                  placeholder="City, Country"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs uppercase text-muted-foreground">Website URL</label>
+                <Input
+                  value={editForm.website_url}
+                  onChange={(e) => setEditForm({ ...editForm, website_url: e.target.value })}
+                  className="font-mono text-sm"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs uppercase text-muted-foreground">Description</label>
+                <Textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="font-mono text-sm min-h-[100px]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-mono text-xs uppercase text-muted-foreground">Additional Info</label>
+                <Textarea
+                  value={editForm.additional_info}
+                  onChange={(e) => setEditForm({ ...editForm, additional_info: e.target.value })}
+                  className="font-mono text-sm min-h-[80px]"
+                />
+              </div>
+
+              <div className="space-y-2 border-t border-border pt-4">
+                <label className="font-mono text-xs uppercase text-muted-foreground">Admin Notes</label>
+                <Textarea
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  placeholder="Internal notes..."
+                  className="font-mono text-sm min-h-[60px]"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialog} className="font-mono text-xs">
+              Cancel
+            </Button>
+            <Button onClick={confirmEdit} disabled={editMutation.isPending} className="font-mono text-xs">
+              {editMutation.isPending ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Check className="w-4 h-4 mr-1" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Approve/Reject/Duplicate Dialog */}
+      <Dialog open={(actionType === "approve" || actionType === "reject" || actionType === "duplicate") && !!selectedSubmission} onOpenChange={() => closeDialog()}>
         <DialogContent className="font-mono">
           <DialogHeader>
             <DialogTitle className="font-mono uppercase tracking-tight">
@@ -392,7 +732,7 @@ const SubmissionsAdmin = () => {
             <div className="space-y-4">
               <div className="p-4 bg-muted/50 border border-border">
                 <p className="font-mono text-sm">
-                  <strong>{selectedSubmission.submission_type}:</strong> {selectedSubmission.name}
+                  <strong>{selectedSubmission.submission_type || "Submission"}:</strong> {selectedSubmission.name || "Unnamed"}
                 </p>
                 {selectedSubmission.location && (
                   <p className="font-mono text-xs text-muted-foreground mt-1">
@@ -418,18 +758,18 @@ const SubmissionsAdmin = () => {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setSelectedSubmission(null)}
+              onClick={closeDialog}
               className="font-mono text-xs"
             >
               Cancel
             </Button>
             <Button
-              onClick={confirmAction}
-              disabled={updateMutation.isPending}
+              onClick={confirmStatusAction}
+              disabled={updateStatusMutation.isPending}
               variant={actionType === "approve" ? "default" : actionType === "duplicate" ? "secondary" : "destructive"}
               className="font-mono text-xs"
             >
-              {updateMutation.isPending ? (
+              {updateStatusMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-1 animate-spin" />
               ) : actionType === "approve" ? (
                 <Check className="w-4 h-4 mr-1" />
