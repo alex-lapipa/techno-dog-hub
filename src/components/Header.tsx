@@ -48,6 +48,10 @@ const Header = () => {
       path: '/festivals',
     },
     {
+      label: { en: 'Venues', es: 'Clubs' },
+      path: '/venues',
+    },
+    {
       label: { en: 'Artists', es: 'Artistas' },
       path: '/artists',
       sub: [
@@ -69,7 +73,6 @@ const Header = () => {
       path: '/technopedia',
       sub: [
         { label: { en: 'About', es: 'Acerca de' }, path: '/technopedia' },
-        { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
         { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
         { label: { en: 'Developer API', es: 'API' }, path: '/developer' },
         { label: { en: 'Submit', es: 'Enviar' }, path: '/submit' },
