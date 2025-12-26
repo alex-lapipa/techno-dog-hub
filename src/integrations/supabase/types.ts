@@ -89,6 +89,7 @@ export type Database = {
           rate_limit_per_minute: number
           status: string
           total_requests: number
+          usage_notification_sent_at: string | null
           user_id: string
         }
         Insert: {
@@ -102,6 +103,7 @@ export type Database = {
           rate_limit_per_minute?: number
           status?: string
           total_requests?: number
+          usage_notification_sent_at?: string | null
           user_id: string
         }
         Update: {
@@ -115,6 +117,7 @@ export type Database = {
           rate_limit_per_minute?: number
           status?: string
           total_requests?: number
+          usage_notification_sent_at?: string | null
           user_id?: string
         }
         Relationships: []
