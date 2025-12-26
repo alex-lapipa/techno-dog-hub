@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
     'chat.subtitle': 'Ask about festivals',
     
     // Footer
-    'footer.description': 'Your monthly portal for electronic music festivals in Europe. Information on events, artists, and techno culture.',
+    'footer.description': 'A daily, open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream. Curated by Alex Lawton and Antaine Reilly.',
     'footer.explore': '// Explore',
     'footer.social': '// Social',
     'footer.artists': 'Artists',
@@ -93,7 +93,7 @@ const translations: Record<Language, Record<string, string>> = {
     'chat.subtitle': 'Pregunta sobre festivales',
     
     // Footer
-    'footer.description': 'Tu portal mensual de festivales de música electrónica en Europa. Información sobre eventos, artistas y cultura techno.',
+    'footer.description': 'Una plataforma abierta y base de datos dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream. Curado por Alex Lawton y Antaine Reilly.',
     'footer.explore': '// Explorar',
     'footer.social': '// Redes',
     'footer.artists': 'Artistas',
