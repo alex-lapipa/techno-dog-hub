@@ -295,6 +295,176 @@ export type Database = {
         }
         Relationships: []
       }
+      td_article_entities: {
+        Row: {
+          article_id: string
+          entity_id: string
+        }
+        Insert: {
+          article_id: string
+          entity_id: string
+        }
+        Update: {
+          article_id?: string
+          entity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "td_article_entities_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "td_news_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "td_article_entities_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "td_knowledge_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      td_knowledge_entities: {
+        Row: {
+          aliases: string[] | null
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          source_urls: string[] | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          aliases?: string[] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          source_urls?: string[] | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          aliases?: string[] | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          source_urls?: string[] | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      td_news_agent_runs: {
+        Row: {
+          candidates: Json | null
+          chosen_story: Json | null
+          created_at: string
+          error_log: string | null
+          final_article_id: string | null
+          id: string
+          rejected: Json | null
+          run_date: string
+          sources_checked: Json | null
+          status: string
+        }
+        Insert: {
+          candidates?: Json | null
+          chosen_story?: Json | null
+          created_at?: string
+          error_log?: string | null
+          final_article_id?: string | null
+          id?: string
+          rejected?: Json | null
+          run_date?: string
+          sources_checked?: Json | null
+          status?: string
+        }
+        Update: {
+          candidates?: Json | null
+          chosen_story?: Json | null
+          created_at?: string
+          error_log?: string | null
+          final_article_id?: string | null
+          id?: string
+          rejected?: Json | null
+          run_date?: string
+          sources_checked?: Json | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_final_article"
+            columns: ["final_article_id"]
+            isOneToOne: false
+            referencedRelation: "td_news_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      td_news_articles: {
+        Row: {
+          author_pseudonym: string
+          body_markdown: string
+          city_tags: string[] | null
+          confidence_score: number | null
+          created_at: string
+          entity_tags: string[] | null
+          genre_tags: string[] | null
+          id: string
+          published_at: string | null
+          source_snapshots: Json | null
+          source_urls: string[] | null
+          status: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_pseudonym: string
+          body_markdown: string
+          city_tags?: string[] | null
+          confidence_score?: number | null
+          created_at?: string
+          entity_tags?: string[] | null
+          genre_tags?: string[] | null
+          id?: string
+          published_at?: string | null
+          source_snapshots?: Json | null
+          source_urls?: string[] | null
+          status?: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_pseudonym?: string
+          body_markdown?: string
+          city_tags?: string[] | null
+          confidence_score?: number | null
+          created_at?: string
+          entity_tags?: string[] | null
+          genre_tags?: string[] | null
+          id?: string
+          published_at?: string | null
+          source_snapshots?: Json | null
+          source_urls?: string[] | null
+          status?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
