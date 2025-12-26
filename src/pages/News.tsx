@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PublishedNewsArticles from "@/components/PublishedNewsArticles";
 
 const newsItems = [
   {
@@ -63,6 +65,7 @@ const newsItems = [
 
 const NewsPage = () => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const featured = newsItems.filter(n => n.featured);
   const regular = newsItems.filter(n => !n.featured);
 
@@ -79,6 +82,27 @@ const NewsPage = () => {
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
               {language === 'en' ? 'News' : 'Noticias'}
             </h1>
+            {user && (
+              <div className="flex gap-4 mt-4">
+                <Link 
+                  to="/news/drafts" 
+                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  → {language === 'en' ? 'View Drafts' : 'Ver Borradores'}
+                </Link>
+                <Link 
+                  to="/admin/news-agent" 
+                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  → {language === 'en' ? 'News Agent' : 'Agente de Noticias'}
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Agent-generated articles */}
+          <div className="mb-16">
+            <PublishedNewsArticles />
           </div>
 
           {/* Featured */}

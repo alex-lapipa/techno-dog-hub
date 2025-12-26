@@ -31,6 +31,9 @@ const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
 const UserStories = lazy(() => import("./pages/UserStories"));
 const Documentation = lazy(() => import("./pages/Documentation"));
+const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
+const NewsDrafts = lazy(() => import("./pages/NewsDrafts"));
+const NewsArticleDetail = lazy(() => import("./pages/NewsArticleDetail"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -64,8 +67,13 @@ const App = () => (
                   
                   {/* News */}
                   <Route path="/news" element={<News />} />
-                  <Route path="/news/:id" element={<News />} />
+                  <Route path="/news/drafts" element={<NewsDrafts />} />
+                  <Route path="/news/article/:id" element={<NewsArticleDetail />} />
+                  <Route path="/news/:id" element={<NewsArticleDetail />} />
                   <Route path="/news/features" element={<News />} />
+                  
+                  {/* Admin */}
+                  <Route path="/admin/news-agent" element={<NewsAgentAdmin />} />
                   
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
