@@ -35,6 +35,34 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
   }
 }
 
+// Format artist data for context
+function formatArtistContext(artist: {
+  rank: number;
+  artist_name: string;
+  real_name: string | null;
+  nationality: string | null;
+  years_active: string | null;
+  subgenres: string[] | null;
+  labels: string[] | null;
+  top_tracks: string[] | null;
+  known_for: string | null;
+  similarity: number;
+}): string {
+  const parts = [
+    `**#${artist.rank} ${artist.artist_name}**`,
+    artist.real_name ? `Real name: ${artist.real_name}` : null,
+    artist.nationality ? `Nationality: ${artist.nationality}` : null,
+    artist.years_active ? `Active: ${artist.years_active}` : null,
+    artist.subgenres?.length ? `Genres: ${artist.subgenres.join(', ')}` : null,
+    artist.labels?.length ? `Labels: ${artist.labels.join(', ')}` : null,
+    artist.top_tracks?.length ? `Key tracks: ${artist.top_tracks.join(', ')}` : null,
+    artist.known_for ? `Known for: ${artist.known_for}` : null,
+    `Relevance: ${(artist.similarity * 100).toFixed(1)}%`
+  ].filter(Boolean);
+  
+  return parts.join('\n');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -62,31 +90,62 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    let documents = null;
+    let documents: Array<{ title: string; content: string; source?: string; similarity?: number }> | null = null;
+    let artists: Array<{
+      rank: number;
+      artist_name: string;
+      real_name: string | null;
+      nationality: string | null;
+      years_active: string | null;
+      subgenres: string[] | null;
+      labels: string[] | null;
+      top_tracks: string[] | null;
+      known_for: string | null;
+      similarity: number;
+    }> | null = null;
 
-    // First try vector search if we have embeddings
+    // Generate embedding for vector searches
+    let queryEmbedding: number[] | null = null;
     if (LOVABLE_API_KEY) {
       console.log('Generating embedding for query:', query);
-      const queryEmbedding = await generateEmbedding(query, LOVABLE_API_KEY);
-      
-      if (queryEmbedding) {
-        console.log('Using vector search with embedding');
-        const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
-          query_embedding: `[${queryEmbedding.join(',')}]`,
-          match_threshold: 0.3,
-          match_count: 5
-        });
+      queryEmbedding = await generateEmbedding(query, LOVABLE_API_KEY);
+    }
 
-        if (!vectorError && vectorResults && vectorResults.length > 0) {
-          documents = vectorResults;
-          console.log(`Vector search found ${documents.length} documents`);
-        } else if (vectorError) {
-          console.error('Vector search error:', vectorError);
-        }
+    // Search DJ artists using vector similarity
+    if (queryEmbedding) {
+      console.log('Searching DJ artists with vector similarity');
+      const { data: artistResults, error: artistError } = await supabase.rpc('search_dj_artists', {
+        query_embedding: `[${queryEmbedding.join(',')}]`,
+        similarity_threshold: 0.3,
+        match_count: 5
+      });
+
+      if (!artistError && artistResults && artistResults.length > 0) {
+        artists = artistResults;
+        console.log(`Found ${artistResults.length} matching artists`);
+      } else if (artistError) {
+        console.error('Artist search error:', artistError);
       }
     }
 
-    // Fallback to full-text search if vector search didn't work
+    // Search documents using vector similarity
+    if (queryEmbedding) {
+      console.log('Using vector search for documents');
+      const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
+        query_embedding: `[${queryEmbedding.join(',')}]`,
+        match_threshold: 0.3,
+        match_count: 5
+      });
+
+      if (!vectorError && vectorResults && vectorResults.length > 0) {
+        documents = vectorResults;
+        console.log(`Vector search found ${vectorResults.length} documents`);
+      } else if (vectorError) {
+        console.error('Vector search error:', vectorError);
+      }
+    }
+
+    // Fallback to full-text search for documents if vector search didn't work
     if (!documents || documents.length === 0) {
       console.log('Falling back to full-text search for:', query);
       
@@ -121,31 +180,48 @@ serve(async (req) => {
       documents = fallbackDocs || [];
     }
 
-    console.log(`Total documents for context: ${documents?.length || 0}`);
+    console.log(`Total documents for context: ${documents?.length || 0}, artists: ${artists?.length || 0}`);
+
+    // Build context from retrieved artists
+    let artistContext = '';
+    if (artists && artists.length > 0) {
+      artistContext = '## DJ ARTISTS DATABASE:\n\n' + artists.map(formatArtistContext).join('\n\n---\n\n');
+    }
 
     // Build context from retrieved documents
-    let context = '';
+    let documentContext = '';
     const usedDocs = documents || [];
     
     if (usedDocs.length > 0) {
-      context = usedDocs
-        .map((doc: { title: string; content: string; similarity?: number }) => 
+      documentContext = '## KNOWLEDGE BASE DOCUMENTS:\n\n' + usedDocs
+        .map((doc) => 
           `[${doc.title}${doc.similarity ? ` (relevance: ${(doc.similarity * 100).toFixed(1)}%)` : ''}]\n${doc.content}`
         )
         .join('\n\n---\n\n');
     }
 
-    // Create the RAG prompt - now techno-focused based on the knowledge base
+    // Combine contexts
+    const combinedContext = [artistContext, documentContext].filter(Boolean).join('\n\n');
+
+    // Create the RAG prompt - techno-focused based on the knowledge base
     const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene from Detroit to Berlin to Tokyo. 
 
-Your knowledge comes from an authoritative ranking of 100 techno artists scored on underground authenticity, innovation, and scene contribution.
+Your knowledge comes from an authoritative ranking of 100 techno artists scored on underground authenticity, innovation, and scene contribution, plus a curated knowledge base of techno culture.
+
+When answering about artists, use the DJ ARTISTS DATABASE information which includes:
+- Rankings (1-100, lower is more influential/authentic)
+- Real names, nationalities, years active
+- Subgenres they represent
+- Labels they've released on
+- Key tracks
+- What they're known for
 
 Respond in the same language as the user's question. Be concise, knowledgeable, and speak with authority about techno culture. Reference specific artists, labels, tracks, and venues when relevant.
 
 If asked about rankings, tiers, or comparisons, base your answers on the provided context. The artists are ranked across dimensions: commitment to underground values, resistance to commercialization, influential tracks, scene contribution, longevity, innovation, and resistance to industry trends.
 
-KNOWLEDGE BASE CONTEXT:
-${context || 'No documents loaded in the knowledge base yet. Respond based on general techno knowledge.'}`;
+CONTEXT:
+${combinedContext || 'No relevant data found. Respond based on general techno knowledge.'}`;
 
     console.log('Calling Groq API with model: llama-3.1-70b-versatile');
 
@@ -195,7 +271,8 @@ ${context || 'No documents loaded in the knowledge base yet. Respond based on ge
       const data = await aiResponse.json();
       return new Response(JSON.stringify({
         answer: data.choices?.[0]?.message?.content,
-        sources: usedDocs.map((d: { title: string; source: string }) => ({ title: d.title, source: d.source }))
+        sources: usedDocs.map((d) => ({ title: d.title, source: d.source })),
+        artists: artists?.map(a => ({ name: a.artist_name, rank: a.rank })) || []
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
