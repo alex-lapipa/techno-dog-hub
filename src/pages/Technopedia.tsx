@@ -4,7 +4,8 @@ import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
-import { Database, Users, Heart, Code, Globe, BookOpen, Handshake, Gift } from "lucide-react";
+import FlexibleSubmissionForm from "@/components/FlexibleSubmissionForm";
+import { Database, Users, Heart, Globe, BookOpen, Github, Handshake, Gift, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const TechnopediaPage = () => {
@@ -15,8 +16,20 @@ const TechnopediaPage = () => {
     en: {
       title: "Technopedia",
       subtitle: "The Open Techno Knowledge Base",
-      intro: "A collaborative, community-driven encyclopedia preserving and sharing the culture, history, and knowledge of global techno music. Free, open, and built by the community.",
+      intro: "An open-source, community-led data collaboration project dedicated to preserving and sharing the culture, history, and knowledge of global techno music. Free, transparent, and built together.",
       
+      mission: {
+        title: "Our Mission",
+        text: "Techno culture has always been about community, collaboration, and sharing knowledge freely. Technopedia embodies these values by creating a permanent, open archive that belongs to everyone. No corporations, no gatekeepers — just the global techno community documenting its own history.",
+        points: [
+          "Open source code and open data — everything is transparent",
+          "Community-owned — every contribution is credited and valued",
+          "Non-commercial — no ads, no data harvesting, no hidden agendas",
+          "Decentralized knowledge — from Detroit to Tbilisi, Tokyo to Bogotá",
+          "Preservation first — documenting stories before they're lost to time"
+        ]
+      },
+
       sections: [
         {
           icon: Database,
@@ -32,19 +45,18 @@ const TechnopediaPage = () => {
         {
           icon: Globe,
           title: "Open & Free",
-          description: "All data is publicly accessible and free to use. We believe techno knowledge belongs to everyone. No paywalls, no gatekeeping. Just pure, unadulterated information for the community, by the community.",
+          description: "All data is publicly accessible and free to use. We believe techno knowledge belongs to everyone. No paywalls, no gatekeeping. Pure, unadulterated information for the community, by the community.",
         },
         {
-          icon: Code,
-          title: "Public Data Access",
-          description: "Need techno data for your project? Our public data feed lets you access artist information, festival dates, venue details, and more. Perfect for building apps, research, or creative projects that celebrate techno culture.",
-          cta: { label: "View Developer Docs", path: "/developer" }
+          icon: Github,
+          title: "Open Source",
+          description: "Technopedia is built on open principles. Our data is freely accessible via our public API, and our methodologies are transparent. We welcome developers, researchers, and enthusiasts to use, extend, and improve upon our work.",
+          cta: { label: "Developer API", path: "/developer" }
         },
         {
           icon: Users,
           title: "Community Built",
           description: "Every piece of information comes from people who live and breathe techno. DJs, producers, promoters, ravers, and enthusiasts contribute their knowledge to keep this archive accurate and alive.",
-          cta: { label: "Submit Information", path: "/submit" }
         },
         {
           icon: BookOpen,
@@ -58,18 +70,17 @@ const TechnopediaPage = () => {
         }
       ],
 
-      collaborate: {
-        title: "Collaborate With Us",
-        description: "Whether you're a DJ with stories to tell, a promoter with event history, a producer with technical knowledge, or simply a fan with a good memory — we want to hear from you.",
-        items: [
-          "Contribute artist information and biographies",
-          "Add festival and venue data",
-          "Correct inaccuracies in existing entries",
-          "Share photos and historical documentation",
+      contribute: {
+        title: "Contribute to the Archive",
+        description: "Your knowledge matters. Whether you have photos from a legendary party, stories from the early scene, corrections to existing entries, or information about artists and venues we've missed — we want to hear from you.",
+        examples: [
+          "Share photos, flyers, and recordings from events",
+          "Document local scenes and underground venues",
+          "Correct or expand existing artist biographies",
+          "Add information about labels and releases",
           "Translate content to reach more communities",
-          "Help develop new features and tools"
-        ],
-        cta: "Get Involved"
+          "Share personal stories and historical context"
+        ]
       },
 
       sponsor: {
@@ -82,13 +93,25 @@ const TechnopediaPage = () => {
     es: {
       title: "Technopedia",
       subtitle: "La Base de Conocimiento Techno Abierta",
-      intro: "Una enciclopedia colaborativa impulsada por la comunidad que preserva y comparte la cultura, historia y conocimiento de la música techno global. Gratuita, abierta y construida por la comunidad.",
+      intro: "Un proyecto de colaboración de datos de código abierto, liderado por la comunidad, dedicado a preservar y compartir la cultura, historia y conocimiento de la música techno global. Gratuito, transparente y construido juntos.",
       
+      mission: {
+        title: "Nuestra Misión",
+        text: "La cultura techno siempre ha sido sobre comunidad, colaboración y compartir conocimiento libremente. Technopedia encarna estos valores creando un archivo permanente y abierto que pertenece a todos. Sin corporaciones, sin guardianes — solo la comunidad techno global documentando su propia historia.",
+        points: [
+          "Código abierto y datos abiertos — todo es transparente",
+          "Propiedad comunitaria — cada contribución es acreditada y valorada",
+          "No comercial — sin anuncios, sin recolección de datos, sin agendas ocultas",
+          "Conocimiento descentralizado — de Detroit a Tbilisi, de Tokio a Bogotá",
+          "Preservación primero — documentando historias antes de que se pierdan"
+        ]
+      },
+
       sections: [
         {
           icon: Database,
           title: "El Archivo",
-          description: "Una colección en constante crecimiento de artistas, sellos, festivales, clubs y equipos que dieron forma a la cultura techno. Desde los originadores de Detroit hasta los últimos residentes de Berlín, desde fiestas olvidadas en almacenes hasta clubs legendarios.",
+          description: "Una colección en constante crecimiento de artistas, sellos, festivales, clubs y equipos que dieron forma a la cultura techno. Desde los originadores de Detroit hasta los últimos residentes de Berlín.",
           stats: [
             { label: "Artistas", value: "130+" },
             { label: "Festivales", value: "150+" },
@@ -99,49 +122,47 @@ const TechnopediaPage = () => {
         {
           icon: Globe,
           title: "Abierto y Gratuito",
-          description: "Todos los datos son públicamente accesibles y de uso gratuito. Creemos que el conocimiento techno pertenece a todos. Sin muros de pago, sin exclusividad. Solo información pura para la comunidad, por la comunidad.",
+          description: "Todos los datos son públicamente accesibles y de uso gratuito. Creemos que el conocimiento techno pertenece a todos. Sin muros de pago, sin exclusividad.",
         },
         {
-          icon: Code,
-          title: "Acceso Público a Datos",
-          description: "¿Necesitas datos techno para tu proyecto? Nuestro feed de datos público te permite acceder a información de artistas, fechas de festivales, detalles de clubs y más. Perfecto para crear apps, investigación o proyectos creativos que celebren la cultura techno.",
-          cta: { label: "Ver Documentación", path: "/developer" }
+          icon: Github,
+          title: "Código Abierto",
+          description: "Technopedia está construido sobre principios abiertos. Nuestros datos son accesibles libremente a través de nuestra API pública, y nuestras metodologías son transparentes.",
+          cta: { label: "API para Desarrolladores", path: "/developer" }
         },
         {
           icon: Users,
           title: "Construido por la Comunidad",
-          description: "Cada pieza de información viene de personas que viven y respiran techno. DJs, productores, promotores, ravers y entusiastas contribuyen su conocimiento para mantener este archivo preciso y vivo.",
-          cta: { label: "Enviar Información", path: "/submit" }
+          description: "Cada pieza de información viene de personas que viven y respiran techno. DJs, productores, promotores y entusiastas contribuyen su conocimiento.",
         },
         {
           icon: BookOpen,
           title: "Conservación del Conocimiento",
-          description: "La historia del techno a menudo se transmite de boca en boca y memorias que se desvanecen. Estamos creando un registro permanente — documentando las historias, los sonidos y las personas antes de que se pierdan en el tiempo.",
+          description: "La historia del techno a menudo se transmite de boca en boca y memorias que se desvanecen. Estamos creando un registro permanente.",
         },
         {
           icon: Heart,
           title: "No Comercial",
-          description: "Esto no es un negocio. No hay anuncios, no hay recolección de datos, no hay agendas ocultas. Solo un proyecto de pasión de personas que creen que la cultura techno merece ser preservada y compartida libremente.",
+          description: "Esto no es un negocio. No hay anuncios, no hay recolección de datos, no hay agendas ocultas. Solo un proyecto de pasión.",
         }
       ],
 
-      collaborate: {
-        title: "Colabora Con Nosotros",
-        description: "Ya seas un DJ con historias que contar, un promotor con historial de eventos, un productor con conocimiento técnico, o simplemente un fan con buena memoria — queremos escucharte.",
-        items: [
-          "Contribuye información y biografías de artistas",
-          "Añade datos de festivales y clubs",
-          "Corrige inexactitudes en entradas existentes",
-          "Comparte fotos y documentación histórica",
+      contribute: {
+        title: "Contribuye al Archivo",
+        description: "Tu conocimiento importa. Ya sea que tengas fotos de una fiesta legendaria, historias de la escena temprana, correcciones a entradas existentes, o información sobre artistas y clubs — queremos escucharte.",
+        examples: [
+          "Comparte fotos, flyers y grabaciones de eventos",
+          "Documenta escenas locales y clubs underground",
+          "Corrige o expande biografías de artistas existentes",
+          "Añade información sobre sellos y lanzamientos",
           "Traduce contenido para llegar a más comunidades",
-          "Ayuda a desarrollar nuevas funciones y herramientas"
-        ],
-        cta: "Participa"
+          "Comparte historias personales y contexto histórico"
+        ]
       },
 
       sponsor: {
         title: "Apoya el Proyecto",
-        description: "Mantener esta plataforma requiere tiempo, recursos y dedicación. Damos la bienvenida al apoyo de individuos y marcas que genuinamente se preocupan por la cultura techno — no para influir en el contenido, sino para mantener este proyecto gratuito y sostenible para todos.",
+        description: "Mantener esta plataforma requiere tiempo, recursos y dedicación. Damos la bienvenida al apoyo de individuos y marcas que genuinamente se preocupan por la cultura techno.",
         note: "Solo aceptamos apoyo de personas y marcas auténticamente conectadas con la cultura techno. Sin patrocinadores mainstream, sin compromisos.",
         cta: "Contáctanos"
       }
@@ -173,7 +194,7 @@ const TechnopediaPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Hero */}
-          <div className="max-w-4xl mb-16 sm:mb-24">
+          <div className="max-w-4xl mb-16 sm:mb-20">
             <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
               // {language === 'en' ? 'Open Knowledge' : 'Conocimiento Abierto'}
             </div>
@@ -188,8 +209,31 @@ const TechnopediaPage = () => {
             </p>
           </div>
 
+          {/* Mission Statement */}
+          <div className="border border-logo-green/30 bg-logo-green/5 p-6 sm:p-10 mb-12 sm:mb-16">
+            <div className="flex items-start gap-4 mb-6">
+              <Sparkles className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
+              <div>
+                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-4">
+                  {t.mission.title}
+                </h2>
+                <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-6">
+                  {t.mission.text}
+                </p>
+                <ul className="space-y-2">
+                  {t.mission.points.map((point, i) => (
+                    <li key={i} className="font-mono text-xs text-foreground flex items-start gap-2">
+                      <span className="text-logo-green mt-0.5">◆</span>
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Main Sections */}
-          <div className="grid gap-8 sm:gap-12 mb-16 sm:mb-24">
+          <div className="grid gap-8 sm:gap-10 mb-16 sm:mb-20">
             {t.sections.map((section, index) => (
               <div 
                 key={index}
@@ -233,40 +277,38 @@ const TechnopediaPage = () => {
             ))}
           </div>
 
-          {/* Collaborate Section */}
-          <div className="border border-logo-green/30 bg-card p-6 sm:p-10 mb-8 sm:mb-12">
-            <div className="flex items-start gap-4 mb-6">
-              <Handshake className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
-              <div>
-                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2">
-                  {t.collaborate.title}
-                </h2>
-                <p className="font-mono text-sm text-muted-foreground">
-                  {t.collaborate.description}
-                </p>
+          {/* Contribute Section with Form */}
+          <div id="contribute" className="border border-logo-green/30 bg-card mb-12 sm:mb-16">
+            <div className="p-6 sm:p-10 border-b border-border">
+              <div className="flex items-start gap-4 mb-6">
+                <Handshake className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
+                <div>
+                  <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2">
+                    {t.contribute.title}
+                  </h2>
+                  <p className="font-mono text-sm text-muted-foreground">
+                    {t.contribute.description}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid sm:grid-cols-2 gap-3 pl-12">
+                {t.contribute.examples.map((item, i) => (
+                  <div key={i} className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                    <span className="text-logo-green">→</span>
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
             
-            <ul className="grid sm:grid-cols-2 gap-3 mb-8 pl-12">
-              {t.collaborate.items.map((item, i) => (
-                <li key={i} className="font-mono text-xs text-muted-foreground flex items-start gap-2">
-                  <span className="text-logo-green">→</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            
-            <div className="pl-12">
-              <Link to="/submit">
-                <Button variant="brutalist" className="hover:bg-logo-green hover:text-background">
-                  {t.collaborate.cta}
-                </Button>
-              </Link>
+            <div className="p-6 sm:p-10">
+              <FlexibleSubmissionForm />
             </div>
           </div>
 
           {/* Sponsor Section */}
-          <div className="border border-border p-6 sm:p-10">
+          <div className="border border-border p-6 sm:p-10 mb-12">
             <div className="flex items-start gap-4 mb-6">
               <Gift className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
               <div>
@@ -292,7 +334,7 @@ const TechnopediaPage = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="mt-16 pt-8 border-t border-border">
+          <div className="pt-8 border-t border-border">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-6">
               // {language === 'en' ? 'Explore the Archive' : 'Explora el Archivo'}
             </div>
