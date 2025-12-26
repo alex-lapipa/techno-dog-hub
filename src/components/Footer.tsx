@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import technoDogLogo from "@/assets/techno-dog-logo.png";
+import HexagonLogo from "./HexagonLogo";
 
 const Footer = () => {
   const { t, language } = useLanguage();
@@ -28,7 +28,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
             <Link to="/" className="flex items-center gap-2 group" aria-label="techno.dog home">
-              <img src={technoDogLogo} alt="techno.dog logo" className="w-8 h-8" />
+              <HexagonLogo className="w-8 h-8 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
               <span className="font-mono text-sm tracking-[0.2em] text-foreground group-hover:animate-glitch">
                 techno.dog
               </span>
