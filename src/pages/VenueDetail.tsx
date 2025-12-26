@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getVenueById, venues } from "@/data/venues";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +55,14 @@ const VenueDetail = () => {
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Breadcrumb Navigation */}
+          <DetailBreadcrumb 
+            items={[
+              { label: language === 'en' ? 'Venues' : 'Clubs', href: '/venues' },
+              { label: venue.name }
+            ]} 
+          />
+
           {/* Navigation Row */}
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             {/* Back Link */}
