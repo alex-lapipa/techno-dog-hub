@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,6 +12,47 @@ const FestivalDetail = () => {
   const { id } = useParams();
   const { language } = useLanguage();
   const festival = getFestivalById(id || '');
+
+  // Add JSON-LD structured data for Event
+  useEffect(() => {
+    if (!festival) return;
+
+    const eventSchema = {
+      "@context": "https://schema.org",
+      "@type": "MusicFestival",
+      "name": festival.name,
+      "description": festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}`,
+      "url": `https://technodog.lovable.app/festivals/${festival.id}`,
+      "location": {
+        "@type": "Place",
+        "name": festival.city,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": festival.city,
+          "addressCountry": festival.country
+        }
+      },
+      "organizer": {
+        "@type": "Organization",
+        "name": festival.name
+      },
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      ...(festival.founded && { "foundingDate": festival.founded.toString() }),
+      ...(festival.capacity && { "maximumAttendeeCapacity": festival.capacity }),
+      "keywords": festival.tags.join(", ")
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-schema', 'event');
+    script.textContent = JSON.stringify(eventSchema);
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [festival]);
 
   // Find prev/next festivals for navigation
   const currentIndex = festivals.findIndex(f => f.id === id);

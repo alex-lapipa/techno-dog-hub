@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -7,10 +8,63 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LazyImage from "@/components/LazyImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
+
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const artist = id ? getArtistById(id) : null;
+
+  // Add JSON-LD structured data for Person/MusicGroup
+  useEffect(() => {
+    if (!artist) return;
+
+    const personSchema = {
+      "@context": "https://schema.org",
+      "@type": "MusicGroup",
+      "name": artist.name,
+      ...(artist.realName && { "alternateName": artist.realName }),
+      "description": artist.bio,
+      "url": `https://technodog.lovable.app/artists/${artist.id}`,
+      ...(artist.image && { "image": artist.image.url }),
+      "genre": ["Techno", ...artist.tags],
+      "foundingLocation": {
+        "@type": "Place",
+        "name": `${artist.city}, ${artist.country}`,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": artist.city,
+          "addressCountry": artist.country
+        }
+      },
+      ...(artist.labels && artist.labels.length > 0 && {
+        "affiliation": artist.labels.map(label => ({
+          "@type": "Organization",
+          "name": label
+        }))
+      }),
+      ...(artist.keyReleases && artist.keyReleases.length > 0 && {
+        "album": artist.keyReleases.map(release => ({
+          "@type": "MusicAlbum",
+          "name": release.title,
+          "datePublished": release.year.toString(),
+          "recordLabel": {
+            "@type": "Organization",
+            "name": release.label
+          }
+        }))
+      })
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-schema', 'person');
+    script.textContent = JSON.stringify(personSchema);
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [artist]);
 
   // Find prev/next artists for navigation
   const currentIndex = artists.findIndex(a => a.id === id);
