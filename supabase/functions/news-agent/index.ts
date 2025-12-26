@@ -336,31 +336,30 @@ serve(async (req) => {
     const allCandidates: any[] = [];
     const sourcesChecked: any[] = [];
 
-    // Search each tier
-    for (const [tierName, tierData] of Object.entries(SOURCE_TIERS)) {
-      for (const source of tierData.sources) {
-        try {
-          console.log(`Searching ${source.name}...`);
-          const searchResult = await searchWithFirecrawl(source.name, firecrawlKey);
-          
-          sourcesChecked.push({ name: source.name, tier: tierName, resultsCount: searchResult?.data?.length || 0 });
-          
-          if (searchResult?.data) {
-            for (const item of searchResult.data) {
-              allCandidates.push({
-                title: item.title || 'Untitled',
-                url: item.url,
-                excerpt: item.description || item.markdown?.substring(0, 500) || '',
-                source: source.name,
-                tier: tierName,
-                tierWeight: tierData.weight,
-                content: item.markdown?.substring(0, 15000) || '',
-              });
-            }
+    // Search only Tier 1 sources to stay within timeout limits
+    const tier1 = SOURCE_TIERS.tier1;
+    for (const source of tier1.sources.slice(0, 2)) { // Limit to 2 sources
+      try {
+        console.log(`Searching ${source.name}...`);
+        const searchResult = await searchWithFirecrawl(source.name, firecrawlKey);
+        
+        sourcesChecked.push({ name: source.name, tier: 'tier1', resultsCount: searchResult?.data?.length || 0 });
+        
+        if (searchResult?.data) {
+          for (const item of searchResult.data.slice(0, 5)) { // Limit to 5 per source
+            allCandidates.push({
+              title: item.title || 'Untitled',
+              url: item.url,
+              excerpt: item.description || item.markdown?.substring(0, 500) || '',
+              source: source.name,
+              tier: 'tier1',
+              tierWeight: tier1.weight,
+              content: item.markdown?.substring(0, 10000) || '',
+            });
           }
-        } catch (err) {
-          console.error(`Error searching ${source.name}:`, err);
         }
+      } catch (err) {
+        console.error(`Error searching ${source.name}:`, err);
       }
     }
 
