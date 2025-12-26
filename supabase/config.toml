@@ -75,3 +75,9 @@ verify_jwt = false
 
 [functions.news-agent]
 verify_jwt = false
+
+[functions.upload-dj-artists]
+verify_jwt = false
+
+[functions.search-dj-artists]
+verify_jwt = false
