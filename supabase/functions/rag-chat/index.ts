@@ -264,7 +264,40 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
     }
 
     if (stream) {
-      return new Response(aiResponse.body, {
+      // Create a new stream that prepends artist metadata
+      const artistMeta = artists?.map(a => ({
+        name: a.artist_name,
+        rank: a.rank,
+        nationality: a.nationality,
+        subgenres: a.subgenres,
+        labels: a.labels
+      })) || [];
+      
+      const metaEvent = `data: ${JSON.stringify({ type: 'metadata', artists: artistMeta })}\n\n`;
+      const metaEncoder = new TextEncoder();
+      const metaBytes = metaEncoder.encode(metaEvent);
+      
+      // Combine metadata with AI response stream
+      const combinedStream = new ReadableStream({
+        async start(controller) {
+          // Send metadata first
+          controller.enqueue(metaBytes);
+          
+          // Then pipe the AI response
+          const reader = aiResponse.body!.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+          } finally {
+            controller.close();
+          }
+        }
+      });
+      
+      return new Response(combinedStream, {
         headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
       });
     } else {

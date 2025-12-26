@@ -2,16 +2,26 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { Badge } from '@/components/ui/badge';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
+interface ArtistMeta {
+  name: string;
+  rank: number;
+  nationality: string | null;
+  subgenres: string[] | null;
+  labels: string[] | null;
+}
+
 const TechnoChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [referencedArtists, setReferencedArtists] = useState<ArtistMeta[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { trackEvent, trackSearch, trackError } = useAnalytics();
@@ -32,8 +42,8 @@ const TechnoChat = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setReferencedArtists([]);
     
-    // Track chat query
     trackSearch(userQuery, 0);
 
     let assistantContent = '';
@@ -77,7 +87,6 @@ const TechnoChat = () => {
       const decoder = new TextDecoder();
       let buffer = '';
 
-      // Add empty assistant message
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       while (true) {
@@ -100,6 +109,13 @@ const TechnoChat = () => {
 
           try {
             const parsed = JSON.parse(jsonStr);
+            
+            // Check for metadata event (artists)
+            if (parsed.type === 'metadata' && parsed.artists) {
+              setReferencedArtists(parsed.artists);
+              continue;
+            }
+            
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
@@ -126,7 +142,6 @@ const TechnoChat = () => {
       }
     } finally {
       setIsLoading(false);
-      // Track successful response
       if (assistantContent) {
         trackEvent({ eventType: 'chat', eventName: 'chat_response', metadata: { responseLength: assistantContent.length } });
       }
@@ -160,7 +175,7 @@ const TechnoChat = () => {
               <span className="text-primary">&gt;</span> CONSULTA LA BASE DE CONOCIMIENTO
             </h2>
             <p className="text-muted-foreground font-mono text-sm mb-6">
-              Pregunta sobre Aquasella, L.E.V., la escena techno europea o cualquier festival underground.
+              Pregunta sobre artistas, sellos, festivales o cualquier tema de la escena techno underground.
             </p>
 
             {/* Chat Messages */}
@@ -169,8 +184,9 @@ const TechnoChat = () => {
                 <div className="text-center text-muted-foreground font-mono text-sm py-8">
                   <p>// Escribe tu pregunta para empezar</p>
                   <p className="mt-2 text-xs">Ejemplos:</p>
-                  <p className="text-xs">"¿Cuándo se fundó Aquasella?"</p>
-                  <p className="text-xs">"¿Qué es el movimiento freetekno?"</p>
+                  <p className="text-xs">"¿Quién es Jeff Mills?"</p>
+                  <p className="text-xs">"¿Qué artistas lanzaron en Tresor?"</p>
+                  <p className="text-xs">"Háblame del techno de Detroit"</p>
                 </div>
               )}
               
@@ -194,6 +210,42 @@ const TechnoChat = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
+
+            {/* Referenced Artists Cards */}
+            {referencedArtists.length > 0 && (
+              <div className="mb-4">
+                <p className="font-mono text-xs text-muted-foreground mb-2">// Artistas referenciados:</p>
+                <div className="flex flex-wrap gap-2">
+                  {referencedArtists.map((artist, idx) => (
+                    <div 
+                      key={idx}
+                      className="border border-border bg-muted/30 px-3 py-2 hover:border-primary transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-sm font-bold text-foreground">
+                          {artist.name}
+                        </span>
+                        <Badge variant="outline" className="text-xs font-mono">
+                          #{artist.rank}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {artist.nationality && (
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {artist.nationality}
+                          </span>
+                        )}
+                        {artist.subgenres?.slice(0, 2).map((genre, i) => (
+                          <Badge key={i} variant="secondary" className="text-[10px] font-mono">
+                            {genre}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Input */}
             <div className="flex gap-2">
