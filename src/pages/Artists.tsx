@@ -35,7 +35,7 @@ const ArtistsPage = () => {
   const rowVirtualizer = useVirtualizer({
     count: artists.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 80,
+    estimateSize: () => 100,
     overscan: 5,
   });
 
@@ -125,9 +125,25 @@ const ArtistsPage = () => {
                           transform: `translateY(${virtualRow.start}px)`,
                         }}
                       >
-                        <div className="flex items-start justify-between gap-3 sm:gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          {/* Artist Photo */}
+                          <div className="w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 bg-muted border border-border overflow-hidden">
+                            {artist.photoUrl ? (
+                              <img 
+                                src={artist.photoUrl} 
+                                alt={artist.name}
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center font-mono text-lg text-muted-foreground/50">
+                                {artist.name.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                          
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline gap-2 sm:gap-4 mb-1 sm:mb-2">
+                            <div className="flex items-baseline gap-2 sm:gap-4 mb-1">
                               <span className="font-mono text-[10px] sm:text-xs text-muted-foreground w-6 sm:w-8 flex-shrink-0">
                                 {artist.rank ? `#${artist.rank}` : String(virtualRow.index + 1).padStart(2, "0")}
                               </span>
@@ -158,12 +174,13 @@ const ArtistsPage = () => {
                               </div>
                             </div>
                             {artist.knownFor && (
-                              <p className="hidden md:block font-mono text-[10px] text-muted-foreground/70 mt-2 pl-8 sm:pl-12 line-clamp-1 max-w-3xl">
+                              <p className="hidden md:block font-mono text-[10px] text-muted-foreground/70 mt-1 pl-8 sm:pl-12 line-clamp-1 max-w-3xl">
                                 {artist.knownFor}
                               </p>
                             )}
                           </div>
-                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-logo-green group-hover:translate-x-1 transition-all mt-1 sm:mt-2 flex-shrink-0" />
+                          
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-logo-green group-hover:translate-x-1 transition-all flex-shrink-0" />
                         </div>
                       </Link>
                     );

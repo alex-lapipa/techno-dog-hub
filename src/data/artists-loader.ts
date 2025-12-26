@@ -17,6 +17,8 @@ export interface ArtistSummary {
   rank?: number;
   realName?: string;
   labels?: string[];
+  photoUrl?: string;
+  photoSource?: string;
 }
 
 interface DJArtist {
@@ -153,16 +155,36 @@ export const loadArtistById = async (id: string) => {
   return legacyArtist;
 };
 
-// Load all summaries (merges legacy + RAG data)
+// Load all summaries (merges legacy + RAG data + photos from content_sync)
 export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
   const { artists: legacyArtists } = await import('./artists-legacy');
   
-  // Fetch all RAG artists
-  const { data: ragArtists } = await supabase
-    .from('dj_artists')
-    .select('id, artist_name, real_name, nationality, years_active, subgenres, labels, known_for, top_tracks, rank')
-    .order('rank', { ascending: true })
-    .limit(200);
+  // Fetch all RAG artists and photos in parallel
+  const [ragResult, photosResult] = await Promise.all([
+    supabase
+      .from('dj_artists')
+      .select('id, artist_name, real_name, nationality, years_active, subgenres, labels, known_for, top_tracks, rank')
+      .order('rank', { ascending: true })
+      .limit(200),
+    supabase
+      .from('content_sync')
+      .select('entity_id, photo_url, photo_source')
+      .eq('entity_type', 'artist')
+      .not('photo_url', 'is', null)
+  ]);
+  
+  const ragArtists = ragResult.data;
+  const photoData = photosResult.data;
+  
+  // Create photo lookup map
+  const photoMap = new Map<string, { url: string; source: string }>();
+  if (photoData) {
+    for (const p of photoData) {
+      if (p.photo_url) {
+        photoMap.set(p.entity_id, { url: p.photo_url, source: p.photo_source || 'Unknown' });
+      }
+    }
+  }
   
   // Create a map of legacy artists for quick lookup
   const legacyMap = new Map(legacyArtists.map(a => [normalizeForMatch(a.name), a]));
@@ -191,6 +213,8 @@ export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
       
       if (foundLegacy) {
         usedLegacyIds.add(foundLegacy.id);
+        const photo = photoMap.get(foundLegacy.id);
+        const legacyPhoto = foundLegacy.image?.url;
         mergedArtists.push({
           id: foundLegacy.id,
           name: foundLegacy.name,
@@ -204,11 +228,15 @@ export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
           rank: ra.rank,
           realName: ra.real_name || foundLegacy.realName,
           labels: ra.labels || foundLegacy.labels,
+          photoUrl: photo?.url || legacyPhoto,
+          photoSource: photo?.source || foundLegacy.image?.sourceName,
         });
       } else {
         // New artist from RAG only
+        const artistSlug = createSlug(ra.artist_name);
+        const photo = photoMap.get(artistSlug);
         mergedArtists.push({
-          id: createSlug(ra.artist_name),
+          id: artistSlug,
           name: ra.artist_name,
           ...location,
           tags: ra.subgenres || [],
@@ -218,6 +246,8 @@ export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
           rank: ra.rank,
           realName: ra.real_name || undefined,
           labels: ra.labels || undefined,
+          photoUrl: photo?.url,
+          photoSource: photo?.source,
         });
       }
     }
@@ -226,6 +256,7 @@ export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
   // Add remaining legacy artists that weren't matched
   for (const legacy of legacyArtists) {
     if (!usedLegacyIds.has(legacy.id)) {
+      const photo = photoMap.get(legacy.id);
       mergedArtists.push({
         id: legacy.id,
         name: legacy.name,
@@ -235,6 +266,8 @@ export const loadArtistsSummary = async (): Promise<ArtistSummary[]> => {
         tags: legacy.tags,
         realName: legacy.realName,
         labels: legacy.labels,
+        photoUrl: photo?.url || legacy.image?.url,
+        photoSource: photo?.source || legacy.image?.sourceName,
       });
     }
   }
