@@ -1,21 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import LanguageToggle from "./LanguageToggle";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, Shield } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
-  const { user, signOut, loading } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
-  const { trackClick, trackNavigation } = useAnalytics();
+  const { trackNavigation } = useAnalytics();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -27,16 +23,6 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleAuthClick = async () => {
-    if (user) {
-      trackClick('logout_button');
-      await signOut();
-    } else {
-      trackClick('login_button');
-      navigate('/auth');
-    }
-  };
 
   const navItems = [
     {
@@ -160,11 +146,12 @@ const Header = () => {
           {/* Actions */}
           <div className="flex items-center gap-4">
             <LanguageToggle />
-            {!loading && (
-              <Button variant="brutalist" size="sm" onClick={handleAuthClick} className="hidden sm:flex hover:animate-glitch">
-                {user ? (language === 'en' ? 'Logout' : 'Salir') : (language === 'en' ? 'Login' : 'Entrar')}
+            <Link to="/admin">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
+                <Shield className="w-3.5 h-3.5 mr-1.5" />
+                Admin
               </Button>
-            )}
+            </Link>
             
             {/* Mobile hamburger */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -212,11 +199,12 @@ const Header = () => {
                     ))}
                   </nav>
                   <div className="p-4 border-t border-border">
-                    {!loading && (
-                      <Button variant="brutalist" size="sm" onClick={() => { handleAuthClick(); setMobileMenuOpen(false); }} className="w-full">
-                        {user ? (language === 'en' ? 'Logout' : 'Salir') : (language === 'en' ? 'Login' : 'Entrar')}
+                    <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="brutalist" size="sm" className="w-full font-mono text-xs uppercase tracking-wider">
+                        <Shield className="w-3.5 h-3.5 mr-1.5" />
+                        Admin
                       </Button>
-                    )}
+                    </Link>
                   </div>
                 </div>
               </SheetContent>

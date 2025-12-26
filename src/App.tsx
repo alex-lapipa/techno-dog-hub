@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AdminAuthProvider } from "@/hooks/useAdminAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
@@ -16,7 +16,7 @@ import ParticleBackground from "@/components/ParticleBackground";
 import Index from "./pages/Index";
 
 // Lazy load - secondary pages
-const Auth = lazy(() => import("./pages/Auth"));
+const Admin = lazy(() => import("./pages/Admin"));
 const News = lazy(() => import("./pages/News"));
 const Festivals = lazy(() => import("./pages/Festivals"));
 const FestivalDetail = lazy(() => import("./pages/FestivalDetail"));
@@ -57,7 +57,7 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <AuthProvider>
+        <AdminAuthProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -70,7 +70,8 @@ const App = () => (
                 <Routes>
                   {/* Main */}
                   <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/auth" element={<Navigate to="/admin" replace />} />
                   
                   {/* News */}
                   <Route path="/news" element={<News />} />
@@ -134,7 +135,7 @@ const App = () => (
               </Suspense>
             </BrowserRouter>
           </TooltipProvider>
-        </AuthProvider>
+        </AdminAuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
   </HelmetProvider>
