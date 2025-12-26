@@ -166,14 +166,16 @@ export type Database = {
           admin_notes: string | null
           created_at: string
           description: string | null
+          email: string | null
+          file_urls: string[] | null
           id: string
           location: string | null
-          name: string
+          name: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           social_links: Json | null
           status: string
-          submission_type: string
+          submission_type: string | null
           updated_at: string
           user_id: string | null
           website_url: string | null
@@ -183,14 +185,16 @@ export type Database = {
           admin_notes?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
+          file_urls?: string[] | null
           id?: string
           location?: string | null
-          name: string
+          name?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           social_links?: Json | null
           status?: string
-          submission_type: string
+          submission_type?: string | null
           updated_at?: string
           user_id?: string | null
           website_url?: string | null
@@ -200,14 +204,16 @@ export type Database = {
           admin_notes?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
+          file_urls?: string[] | null
           id?: string
           location?: string | null
-          name?: string
+          name?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           social_links?: Json | null
           status?: string
-          submission_type?: string
+          submission_type?: string | null
           updated_at?: string
           user_id?: string | null
           website_url?: string | null
