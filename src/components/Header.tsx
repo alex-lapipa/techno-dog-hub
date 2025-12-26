@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import LanguageToggle from "./LanguageToggle";
 import technoDogIcon from "@/assets/techno-dog-icon.jpg";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
@@ -14,6 +15,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
+  const { trackClick, trackNavigation } = useAnalytics();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -28,8 +30,10 @@ const Header = () => {
 
   const handleAuthClick = async () => {
     if (user) {
+      trackClick('logout_button');
       await signOut();
     } else {
+      trackClick('login_button');
       navigate('/auth');
     }
   };
@@ -126,6 +130,7 @@ const Header = () => {
               >
                 <Link
                   to={item.path}
+                  onClick={() => trackNavigation(location.pathname, item.path)}
                   className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-shadow-neon ${
                     isActive(item.path) ? 'text-foreground text-shadow-neon' : 'text-muted-foreground hover:text-foreground'
                   }`}
@@ -141,6 +146,7 @@ const Header = () => {
                       <Link
                         key={subItem.path}
                         to={subItem.path}
+                        onClick={() => trackNavigation(location.pathname, subItem.path)}
                         className={`block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
                           isSubItemActive(subItem.path) 
                             ? 'text-foreground bg-card border-l-2 border-primary' 
