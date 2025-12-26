@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,6 +11,48 @@ const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
   const venue = id ? getVenueById(id) : null;
+
+  // Add JSON-LD structured data for Place
+  useEffect(() => {
+    if (!venue) return;
+
+    const placeSchema = {
+      "@context": "https://schema.org",
+      "@type": "MusicVenue",
+      "name": venue.name,
+      "description": venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}`,
+      "url": `https://technodog.lovable.app/venues/${venue.id}`,
+      ...(venue.image && { "image": venue.image.url }),
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": venue.city,
+        "addressCountry": venue.country
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "addressCountry": venue.country
+      },
+      ...(venue.capacity && { "maximumAttendeeCapacity": typeof venue.capacity === 'number' ? venue.capacity : parseInt(String(venue.capacity).replace(/\D/g, '')) }),
+      "keywords": venue.tags.join(", "),
+      ...(venue.soundSystem && {
+        "amenityFeature": {
+          "@type": "LocationFeatureSpecification",
+          "name": "Sound System",
+          "value": venue.soundSystem
+        }
+      })
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-schema', 'place');
+    script.textContent = JSON.stringify(placeSchema);
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
+  }, [venue]);
 
   // Find prev/next venues for navigation
   const currentIndex = venues.findIndex(v => v.id === id);
