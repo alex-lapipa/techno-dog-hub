@@ -27,7 +27,9 @@ import {
   Clock,
   Zap,
   RefreshCw,
+  Bell,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface UsageData {
   endpoint: string;
