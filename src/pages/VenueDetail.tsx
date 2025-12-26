@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getVenueById, venues } from "@/data/venues";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
 const VenueDetail = () => {
@@ -12,47 +12,28 @@ const VenueDetail = () => {
   const { language } = useLanguage();
   const venue = id ? getVenueById(id) : null;
 
-  // Add JSON-LD structured data for Place
-  useEffect(() => {
-    if (!venue) return;
-
-    const placeSchema = {
-      "@context": "https://schema.org",
-      "@type": "MusicVenue",
-      "name": venue.name,
-      "description": venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}`,
-      "url": `https://technodog.lovable.app/venues/${venue.id}`,
-      ...(venue.image && { "image": venue.image.url }),
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": venue.city,
-        "addressCountry": venue.country
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "addressCountry": venue.country
-      },
-      ...(venue.capacity && { "maximumAttendeeCapacity": typeof venue.capacity === 'number' ? venue.capacity : parseInt(String(venue.capacity).replace(/\D/g, '')) }),
-      "keywords": venue.tags.join(", "),
-      ...(venue.soundSystem && {
-        "amenityFeature": {
-          "@type": "LocationFeatureSpecification",
-          "name": "Sound System",
-          "value": venue.soundSystem
-        }
-      })
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-schema', 'place');
-    script.textContent = JSON.stringify(placeSchema);
-    document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
-  }, [venue]);
+  const placeSchema = venue ? {
+    "@context": "https://schema.org",
+    "@type": "MusicVenue",
+    "name": venue.name,
+    "description": venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}`,
+    "url": `https://techno.dog/venues/${venue.id}`,
+    ...(venue.image && { "image": venue.image.url }),
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": venue.city,
+      "addressCountry": venue.country
+    },
+    ...(venue.capacity && { "maximumAttendeeCapacity": typeof venue.capacity === 'number' ? venue.capacity : parseInt(String(venue.capacity).replace(/\D/g, '')) }),
+    "keywords": venue.tags.join(", "),
+    ...(venue.soundSystem && {
+      "amenityFeature": {
+        "@type": "LocationFeatureSpecification",
+        "name": "Sound System",
+        "value": venue.soundSystem
+      }
+    })
+  } : null;
 
   // Find prev/next venues for navigation
   const currentIndex = venues.findIndex(v => v.id === id);
@@ -67,9 +48,19 @@ const VenueDetail = () => {
   };
 
   if (!venue) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {venue && (
+        <PageSEO
+          title={`${venue.name} - Techno Venue in ${venue.city}`}
+          description={venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}.`}
+          path={`/venues/${venue.id}`}
+          image={venue.image?.url}
+          locale={language}
+          structuredData={placeSchema}
+        />
+      )}
+      <Header />
         <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <p className="font-mono text-muted-foreground">

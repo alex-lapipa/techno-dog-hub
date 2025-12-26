@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
 const GearDetail = () => {
@@ -37,8 +38,31 @@ const GearDetail = () => {
 
   const relatedItems = getRelatedGear(gearItem.relatedGear);
 
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": gearItem.name,
+    "description": gearItem.shortDescription[language],
+    "url": `https://techno.dog/gear/${gearItem.id}`,
+    ...(gearItem.image && { "image": gearItem.image.url }),
+    "manufacturer": {
+      "@type": "Organization",
+      "name": gearItem.manufacturer
+    },
+    "category": gearCategories[gearItem.category][language],
+    "keywords": gearItem.tags.join(", ")
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={`${gearItem.name} - ${gearItem.manufacturer} ${gearCategories[gearItem.category][language]}`}
+        description={gearItem.shortDescription[language]}
+        path={`/gear/${gearItem.id}`}
+        image={gearItem.image?.url}
+        locale={language}
+        structuredData={productSchema}
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

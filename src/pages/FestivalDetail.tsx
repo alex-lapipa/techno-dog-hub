@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -6,6 +5,7 @@ import { festivals, getFestivalById } from "@/data/festivals";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
 const FestivalDetail = () => {
@@ -13,46 +13,31 @@ const FestivalDetail = () => {
   const { language } = useLanguage();
   const festival = getFestivalById(id || '');
 
-  // Add JSON-LD structured data for Event
-  useEffect(() => {
-    if (!festival) return;
-
-    const eventSchema = {
-      "@context": "https://schema.org",
-      "@type": "MusicFestival",
-      "name": festival.name,
-      "description": festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}`,
-      "url": `https://technodog.lovable.app/festivals/${festival.id}`,
-      "location": {
-        "@type": "Place",
-        "name": festival.city,
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": festival.city,
-          "addressCountry": festival.country
-        }
-      },
-      "organizer": {
-        "@type": "Organization",
-        "name": festival.name
-      },
-      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-      "eventStatus": "https://schema.org/EventScheduled",
-      ...(festival.founded && { "foundingDate": festival.founded.toString() }),
-      ...(festival.capacity && { "maximumAttendeeCapacity": festival.capacity }),
-      "keywords": festival.tags.join(", ")
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-schema', 'event');
-    script.textContent = JSON.stringify(eventSchema);
-    document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
-  }, [festival]);
+  const eventSchema = festival ? {
+    "@context": "https://schema.org",
+    "@type": "MusicFestival",
+    "name": festival.name,
+    "description": festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}`,
+    "url": `https://techno.dog/festivals/${festival.id}`,
+    "location": {
+      "@type": "Place",
+      "name": festival.city,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": festival.city,
+        "addressCountry": festival.country
+      }
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": festival.name
+    },
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    ...(festival.founded && { "foundingDate": festival.founded.toString() }),
+    ...(festival.capacity && { "maximumAttendeeCapacity": festival.capacity }),
+    "keywords": festival.tags.join(", ")
+  } : null;
 
   // Find prev/next festivals for navigation
   const currentIndex = festivals.findIndex(f => f.id === id);
@@ -60,9 +45,18 @@ const FestivalDetail = () => {
   const nextFestival = currentIndex < festivals.length - 1 ? festivals[currentIndex + 1] : null;
 
   if (!festival) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {festival && (
+        <PageSEO
+          title={`${festival.name} - Techno Festival in ${festival.city}`}
+          description={festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}. Established ${festival.founded}.`}
+          path={`/festivals/${festival.id}`}
+          locale={language}
+          structuredData={eventSchema}
+        />
+      )}
+      <Header />
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-4 md:px-8 text-center">
             <h1 className="font-mono text-4xl uppercase tracking-tight mb-4">404</h1>

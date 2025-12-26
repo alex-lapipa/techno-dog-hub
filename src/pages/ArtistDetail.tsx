@@ -6,6 +6,7 @@ import { getArtistById, artists } from "@/data/artists";
 import { getReleasesByArtist } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import LazyImage from "@/components/LazyImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
@@ -14,57 +15,42 @@ const ArtistDetail = () => {
   const { language } = useLanguage();
   const artist = id ? getArtistById(id) : null;
 
-  // Add JSON-LD structured data for Person/MusicGroup
-  useEffect(() => {
-    if (!artist) return;
-
-    const personSchema = {
-      "@context": "https://schema.org",
-      "@type": "MusicGroup",
-      "name": artist.name,
-      ...(artist.realName && { "alternateName": artist.realName }),
-      "description": artist.bio,
-      "url": `https://technodog.lovable.app/artists/${artist.id}`,
-      ...(artist.image && { "image": artist.image.url }),
-      "genre": ["Techno", ...artist.tags],
-      "foundingLocation": {
-        "@type": "Place",
-        "name": `${artist.city}, ${artist.country}`,
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": artist.city,
-          "addressCountry": artist.country
-        }
-      },
-      ...(artist.labels && artist.labels.length > 0 && {
-        "affiliation": artist.labels.map(label => ({
+  const personSchema = artist ? {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": artist.name,
+    ...(artist.realName && { "alternateName": artist.realName }),
+    "description": artist.bio,
+    "url": `https://techno.dog/artists/${artist.id}`,
+    ...(artist.image && { "image": artist.image.url }),
+    "genre": ["Techno", ...artist.tags],
+    "foundingLocation": {
+      "@type": "Place",
+      "name": `${artist.city}, ${artist.country}`,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": artist.city,
+        "addressCountry": artist.country
+      }
+    },
+    ...(artist.labels && artist.labels.length > 0 && {
+      "affiliation": artist.labels.map(label => ({
+        "@type": "Organization",
+        "name": label
+      }))
+    }),
+    ...(artist.keyReleases && artist.keyReleases.length > 0 && {
+      "album": artist.keyReleases.map(release => ({
+        "@type": "MusicAlbum",
+        "name": release.title,
+        "datePublished": release.year.toString(),
+        "recordLabel": {
           "@type": "Organization",
-          "name": label
-        }))
-      }),
-      ...(artist.keyReleases && artist.keyReleases.length > 0 && {
-        "album": artist.keyReleases.map(release => ({
-          "@type": "MusicAlbum",
-          "name": release.title,
-          "datePublished": release.year.toString(),
-          "recordLabel": {
-            "@type": "Organization",
-            "name": release.label
-          }
-        }))
-      })
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-schema', 'person');
-    script.textContent = JSON.stringify(personSchema);
-    document.head.appendChild(script);
-
-    return () => {
-      script.remove();
-    };
-  }, [artist]);
+          "name": release.label
+        }
+      }))
+    })
+  } : null;
 
   // Find prev/next artists for navigation
   const currentIndex = artists.findIndex(a => a.id === id);
@@ -100,9 +86,18 @@ const ArtistDetail = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={`${artist.name} - Techno Artist`}
+        description={artist.bio.slice(0, 155) + '...'}
+        path={`/artists/${artist.id}`}
+        image={artist.image?.url}
+        type="profile"
+        locale={language}
+        structuredData={personSchema}
+      />
       <Header />
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
+        <article className="container mx-auto px-4 md:px-8">
           {/* Breadcrumb Navigation */}
           <DetailBreadcrumb 
             items={[
@@ -487,7 +482,7 @@ const ArtistDetail = () => {
               </Link>
             </div>
           </section>
-        </div>
+        </article>
       </main>
       <Footer />
     </div>
