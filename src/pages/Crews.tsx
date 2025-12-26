@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { crews } from "@/data/crews";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 
 const CrewsPage = () => {
   const { language } = useLanguage();
@@ -15,8 +16,36 @@ const CrewsPage = () => {
     'rave crew': { en: 'Rave Crew', es: 'Crew de Rave' }
   };
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Crews & Collectives" : "Crews y Colectivos de Techno",
+    "description": language === 'en' 
+      ? "Sound systems, collectives and movements building the techno scene"
+      : "Sound systems, colectivos y movimientos que construyen la escena techno",
+    "numberOfItems": crews.length,
+    "itemListElement": crews.map((crew, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Organization",
+        "name": crew.name,
+        "url": `https://techno.dog/crews/${crew.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Crews & Collectives' : 'Crews y Colectivos de Techno'}
+        description={language === 'en' 
+          ? 'The sound systems, collectives, and movements that build the techno scene worldwide.'
+          : 'Los sound systems, colectivos y movimientos que construyen la escena techno mundial.'}
+        path="/crews"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">

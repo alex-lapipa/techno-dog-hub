@@ -6,6 +6,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { gear, gearCategories, GearCategory } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 
 const GearPage = () => {
@@ -47,8 +48,37 @@ const GearPage = () => {
 
   const categories: (GearCategory | "all")[] = ["all", "synth", "drum-machine", "sampler", "sequencer", "effect", "daw", "midi-tool"];
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Gear & Equipment" : "Equipo de Techno",
+    "description": language === 'en' 
+      ? "Synthesizers, drum machines, samplers and tools that shaped techno"
+      : "Sintetizadores, cajas de ritmos, samplers y herramientas que dieron forma al techno",
+    "numberOfItems": gear.length,
+    "itemListElement": gear.slice(0, 20).map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": item.name,
+        "manufacturer": { "@type": "Organization", "name": item.manufacturer },
+        "url": `https://techno.dog/gear/${item.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Gear & Equipment' : 'Equipo de Techno'}
+        description={language === 'en' 
+          ? 'The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses.'
+          : 'Los sintetizadores, cajas de ritmos, samplers y herramientas que dieron forma al techno. De los sótanos de Detroit a los almacenes de Berlín.'}
+        path="/gear"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { loadVenuesSummary, loadVenueById } from "@/data/venues-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCallback, useRef } from "react";
 
@@ -39,8 +40,41 @@ const VenuesPage = () => {
     overscan: 3,
   });
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Venues & Clubs" : "Clubs y Espacios de Techno",
+    "description": language === 'en' 
+      ? "Directory of techno clubs, warehouses and spaces worldwide"
+      : "Directorio de clubs, almacenes y espacios de techno en el mundo",
+    "numberOfItems": venues.length,
+    "itemListElement": venues.slice(0, 20).map((venue, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "MusicVenue",
+        "name": venue.name,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": venue.city,
+          "addressCountry": venue.country
+        },
+        "url": `https://techno.dog/venues/${venue.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Venues & Clubs' : 'Clubs y Espacios de Techno'}
+        description={language === 'en' 
+          ? 'The clubs, warehouses, and spaces where techno lives. From Berghain to Bassiani, Tresor to Khidi.'
+          : 'Los clubs, almacenes y espacios donde vive el techno. De Berghain a Bassiani, de Tresor a Khidi.'}
+        path="/venues"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

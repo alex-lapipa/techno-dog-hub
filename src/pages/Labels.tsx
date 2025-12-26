@@ -4,12 +4,41 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { labels } from "@/data/labels";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 
 const LabelsPage = () => {
   const { language } = useLanguage();
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Record Labels" : "Sellos Discográficos de Techno",
+    "description": language === 'en' 
+      ? "Underground techno record labels defining the sound"
+      : "Sellos discográficos de techno underground que definen el sonido",
+    "numberOfItems": labels.length,
+    "itemListElement": labels.map((label, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Organization",
+        "name": label.name,
+        "url": `https://techno.dog/labels/${label.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Record Labels' : 'Sellos Discográficos de Techno'}
+        description={language === 'en' 
+          ? 'The imprints that define the underground. Quality over quantity. Essential techno labels worldwide.'
+          : 'Los sellos que definen el underground. Calidad sobre cantidad. Sellos esenciales de techno en el mundo.'}
+        path="/labels"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">
