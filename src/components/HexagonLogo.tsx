@@ -1,0 +1,47 @@
+const HexagonLogo = ({ className = "" }: { className?: string }) => (
+  <svg
+    viewBox="0 0 100 100"
+    className={className}
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Outer hexagon */}
+    <polygon
+      points="50,2 93,27 93,73 50,98 7,73 7,27"
+      stroke="hsl(100, 100%, 60%)"
+      strokeWidth="4"
+      fill="none"
+    />
+    {/* Inner cube structure - top */}
+    <polygon
+      points="50,27 72,40 50,53 28,40"
+      stroke="hsl(100, 100%, 60%)"
+      strokeWidth="3"
+      fill="none"
+    />
+    {/* Inner cube structure - bottom left */}
+    <polygon
+      points="28,40 50,53 50,78 28,65"
+      stroke="hsl(100, 100%, 60%)"
+      strokeWidth="3"
+      fill="none"
+    />
+    {/* Inner cube structure - bottom right */}
+    <polygon
+      points="72,40 50,53 50,78 72,65"
+      stroke="hsl(100, 100%, 60%)"
+      strokeWidth="3"
+      fill="none"
+    />
+    {/* Top connecting lines */}
+    <line x1="50" y1="2" x2="50" y2="27" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    <line x1="7" y1="27" x2="28" y2="40" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    <line x1="93" y1="27" x2="72" y2="40" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    {/* Bottom connecting lines */}
+    <line x1="50" y1="78" x2="50" y2="98" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    <line x1="7" y1="73" x2="28" y2="65" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    <line x1="93" y1="73" x2="72" y2="65" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+  </svg>
+);
+
+export default HexagonLogo;
