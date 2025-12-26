@@ -1,71 +1,46 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TechnoChat from "@/components/TechnoChat";
+import PageSEO from "@/components/PageSEO";
 
 const Index = () => {
   const { language } = useLanguage();
   useScrollDepth({ pageName: 'index' });
 
-  // Add JSON-LD structured data
-  useEffect(() => {
-    const organizationSchema = {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "techno.dog",
-      "url": "https://technodog.lovable.app",
-      "logo": "https://technodog.lovable.app/og-image.png",
-      "description": language === 'en' 
-        ? "Global techno culture archive - artists, festivals, venues, labels, and history from Detroit to Tbilisi"
-        : "Archivo de cultura techno global - artistas, festivales, clubs, sellos e historia de Detroit a Tbilisi",
-      "sameAs": [],
-      "foundingDate": "2024",
-      "knowsAbout": ["Techno Music", "Electronic Music", "DJ Culture", "Music Festivals", "Record Labels"]
-    };
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "techno.dog",
+    "url": "https://techno.dog",
+    "logo": "https://techno.dog/og-image.png",
+    "description": language === 'en' 
+      ? "Global techno culture archive - artists, festivals, venues, labels, and history from Detroit to Tbilisi"
+      : "Archivo de cultura techno global - artistas, festivales, clubs, sellos e historia de Detroit a Tbilisi",
+    "foundingDate": "2024",
+    "knowsAbout": ["Techno Music", "Electronic Music", "DJ Culture", "Music Festivals", "Record Labels"]
+  };
 
-    const websiteSchema = {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "techno.dog",
-      "url": "https://technodog.lovable.app",
-      "description": language === 'en'
-        ? "Discover the best techno festivals, artists, venues, and labels worldwide"
-        : "Descubre los mejores festivales, artistas, clubs y sellos de techno del mundo",
-      "inLanguage": ["en", "es"],
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://technodog.lovable.app/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    };
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "techno.dog",
+    "url": "https://techno.dog",
+    "description": language === 'en'
+      ? "Discover the best techno festivals, artists, venues, and labels worldwide"
+      : "Descubre los mejores festivales, artistas, clubs y sellos de techno del mundo",
+    "inLanguage": ["en", "es"],
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://techno.dog/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
 
-    // Remove existing scripts if any
-    const existingScripts = document.querySelectorAll('script[data-schema]');
-    existingScripts.forEach(script => script.remove());
-
-    // Add Organization schema
-    const orgScript = document.createElement('script');
-    orgScript.type = 'application/ld+json';
-    orgScript.setAttribute('data-schema', 'organization');
-    orgScript.textContent = JSON.stringify(organizationSchema);
-    document.head.appendChild(orgScript);
-
-    // Add WebSite schema
-    const siteScript = document.createElement('script');
-    siteScript.type = 'application/ld+json';
-    siteScript.setAttribute('data-schema', 'website');
-    siteScript.textContent = JSON.stringify(websiteSchema);
-    document.head.appendChild(siteScript);
-
-    return () => {
-      orgScript.remove();
-      siteScript.remove();
-    };
-  }, [language]);
+  const combinedSchema = [organizationSchema, websiteSchema];
 
   const featuredSections = [
     {
@@ -106,6 +81,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Global Techno Culture Archive' : 'Archivo Global de Cultura Techno'}
+        description={language === 'en' 
+          ? 'Discover the global techno archive. Artists, festivals, venues, labels, and history from Detroit to Tbilisi, Tokyo to Bogotá.'
+          : 'Descubre el archivo global de techno. Artistas, festivales, clubs, sellos e historia de Detroit a Tbilisi, Tokyo a Bogotá.'}
+        path="/"
+        locale={language}
+        structuredData={combinedSchema}
+      />
       <Header />
       
       <main className="pt-24 lg:pt-16">

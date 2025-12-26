@@ -5,111 +5,102 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
                             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
-    <loc>https://technodog.lovable.app/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/"/>
+    <loc>https://techno.dog/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/news</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/news?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/news?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/news"/>
+    <loc>https://techno.dog/news</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/news"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/news"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/news"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/festivals</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/festivals?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/festivals?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/festivals"/>
+    <loc>https://techno.dog/festivals</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/festivals"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/festivals"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/festivals"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/artists</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/artists?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/artists?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/artists"/>
+    <loc>https://techno.dog/artists</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/artists"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/artists"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/artists"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/releases</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/releases?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/releases?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/releases"/>
+    <loc>https://techno.dog/releases</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/releases"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/releases"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/releases"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/venues</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/venues?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/venues?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/venues"/>
+    <loc>https://techno.dog/venues</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/venues"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/venues"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/venues"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/labels</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/labels?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/labels?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/labels"/>
+    <loc>https://techno.dog/labels</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/labels"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/labels"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/labels"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/crews</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/crews?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/crews?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/crews"/>
+    <loc>https://techno.dog/crews</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/crews"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/crews"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/crews"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/gear</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/gear?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/gear?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/gear"/>
+    <loc>https://techno.dog/gear</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/gear"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/gear"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/gear"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/mad/stories</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/mad/stories?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/mad/stories?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/mad/stories"/>
+    <loc>https://techno.dog/mad/stories</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/mad/stories"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/mad/stories"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/mad/stories"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://technodog.lovable.app/docs</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/docs?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/docs?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/docs"/>
+    <loc>https://techno.dog/docs</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://techno.dog/docs"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://techno.dog/es/docs"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://techno.dog/docs"/>
     <lastmod>2025-12-26T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://technodog.lovable.app/auth</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://technodog.lovable.app/auth?lang=en"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://technodog.lovable.app/auth?lang=es"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://technodog.lovable.app/auth"/>
-    <lastmod>2025-12-26T00:00:00+00:00</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
   </url>
 </urlset>
