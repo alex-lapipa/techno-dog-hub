@@ -37,12 +37,17 @@ const HeroSection = () => {
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
               <span className="block text-foreground">{t('hero.title')}</span>
-              <span className="block text-foreground animate-glitch-hover text-3xl md:text-5xl lg:text-6xl mt-2">{t('hero.subtitle')}</span>
+              <span className="block text-foreground animate-glitch-hover text-2xl md:text-4xl lg:text-5xl mt-2">{t('hero.subtitle')}</span>
             </h1>
           </div>
 
+          {/* Mission tagline */}
+          <p className="font-mono text-sm md:text-lg text-foreground/90 max-w-2xl leading-relaxed border-l-2 border-primary pl-4">
+            {t('hero.tagline')}
+          </p>
+
           {/* Description */}
-          <p className="font-mono text-sm md:text-base text-muted-foreground max-w-xl leading-relaxed tracking-wide">
+          <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-xl leading-relaxed tracking-wide">
             {t('hero.description')}
             <span className="text-foreground"> [EN/ES]</span>
           </p>
