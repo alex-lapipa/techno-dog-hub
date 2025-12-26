@@ -160,6 +160,60 @@ export type Database = {
           },
         ]
       }
+      community_submissions: {
+        Row: {
+          additional_info: string | null
+          admin_notes: string | null
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          social_links: Json | null
+          status: string
+          submission_type: string
+          updated_at: string
+          user_id: string | null
+          website_url: string | null
+        }
+        Insert: {
+          additional_info?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social_links?: Json | null
+          status?: string
+          submission_type: string
+          updated_at?: string
+          user_id?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          additional_info?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social_links?: Json | null
+          status?: string
+          submission_type?: string
+          updated_at?: string
+          user_id?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       content_sync: {
         Row: {
           corrections: Json | null

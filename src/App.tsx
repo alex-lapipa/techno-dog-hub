@@ -37,6 +37,7 @@ const NewsArticleDetail = lazy(() => import("./pages/NewsArticleDetail"));
 const DJArtistsAdmin = lazy(() => import("./pages/DJArtistsAdmin"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
+const Submit = lazy(() => import("./pages/Submit"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -117,6 +118,9 @@ const App = () => (
                   
                   {/* Developer API */}
                   <Route path="/developer" element={<Developer />} />
+                  
+                  {/* Community */}
+                  <Route path="/submit" element={<Submit />} />
                   
                   {/* Catch all */}
                   <Route path="*" element={<NotFound />} />
