@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers, Webhook, RefreshCw, CheckCircle, XCircle, Pause, Play } from 'lucide-react';
+import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers, Webhook, RefreshCw, CheckCircle, XCircle, Pause, Play, BarChart3 } from 'lucide-react';
+import ApiUsageAnalytics from '@/components/ApiUsageAnalytics';
 import {
   Dialog,
   DialogContent,
@@ -307,8 +308,12 @@ export default function Developer() {
         </div>
 
         <Tabs defaultValue="keys" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+          <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
             <TabsTrigger value="keys">API Keys</TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-1">
+              <BarChart3 className="h-3 w-3" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
             <TabsTrigger value="docs">Docs</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
@@ -422,6 +427,11 @@ export default function Developer() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-8">
+            <ApiUsageAnalytics />
           </TabsContent>
 
           {/* Webhooks Tab */}
