@@ -54,6 +54,9 @@ export default {
           cyan: "hsl(var(--glitch-1))",
           magenta: "hsl(var(--glitch-2))",
         },
+        logo: {
+          green: "hsl(var(--logo-green))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
