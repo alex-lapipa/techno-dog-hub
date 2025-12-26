@@ -13,12 +13,45 @@ const FestivalDetail = () => {
   const { language } = useLanguage();
   const festival = getFestivalById(id || '');
 
+  // Helper to generate date range for next occurrence
+  const getNextEventDates = (months: string[]) => {
+    const monthMap: { [key: string]: number } = {
+      'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
+      'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11
+    };
+    
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // Get first month of festival
+    const firstMonth = months[0];
+    const monthIndex = monthMap[firstMonth] ?? 6; // Default to July
+    
+    // If festival month has passed, use next year
+    const year = monthIndex < currentMonth ? currentYear + 1 : currentYear;
+    
+    // Assume 3-day festival starting on a Friday
+    const startDate = new Date(year, monthIndex, 15); // Mid-month approximation
+    const endDate = new Date(year, monthIndex, 17);
+    
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0]
+    };
+  };
+
+  const eventDates = festival ? getNextEventDates(festival.months) : null;
+
   const eventSchema = festival ? {
     "@context": "https://schema.org",
     "@type": "MusicFestival",
     "name": festival.name,
     "description": festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}`,
     "url": `https://techno.dog/festivals/${festival.id}`,
+    "image": "https://techno.dog/og-image.png",
+    "startDate": eventDates?.startDate,
+    "endDate": eventDates?.endDate,
     "location": {
       "@type": "Place",
       "name": festival.city,
@@ -30,13 +63,27 @@ const FestivalDetail = () => {
     },
     "organizer": {
       "@type": "Organization",
-      "name": festival.name
+      "name": festival.name,
+      "url": `https://techno.dog/festivals/${festival.id}`
+    },
+    "performer": festival.historicLineups?.slice(0, 10).map(artist => ({
+      "@type": "MusicGroup",
+      "name": artist
+    })) || [],
+    "offers": {
+      "@type": "Offer",
+      "url": `https://techno.dog/festivals/${festival.id}`,
+      "price": "0",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "validFrom": eventDates?.startDate
     },
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
     "eventStatus": "https://schema.org/EventScheduled",
     ...(festival.founded && { "foundingDate": festival.founded.toString() }),
     ...(festival.capacity && { "maximumAttendeeCapacity": festival.capacity }),
-    "keywords": festival.tags.join(", ")
+    "keywords": festival.tags.join(", "),
+    "inLanguage": ["en", "es"]
   } : null;
 
   // Find prev/next festivals for navigation
@@ -45,18 +92,9 @@ const FestivalDetail = () => {
   const nextFestival = currentIndex < festivals.length - 1 ? festivals[currentIndex + 1] : null;
 
   if (!festival) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {festival && (
-        <PageSEO
-          title={`${festival.name} - Techno Festival in ${festival.city}`}
-          description={festival.description || `${festival.name} - ${festival.type} festival in ${festival.city}, ${festival.country}. Established ${festival.founded}.`}
-          path={`/festivals/${festival.id}`}
-          locale={language}
-          structuredData={eventSchema}
-        />
-      )}
-      <Header />
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-4 md:px-8 text-center">
             <h1 className="font-mono text-4xl uppercase tracking-tight mb-4">404</h1>
@@ -82,6 +120,13 @@ const FestivalDetail = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={`${festival.name} - Techno Festival in ${festival.city}, ${festival.country}`}
+        description={festival.description || `${festival.name} is a ${festival.type} techno festival in ${festival.city}, ${festival.country}. Established ${festival.founded}. Capacity: ${festival.capacity?.toLocaleString() || 'TBA'}.`}
+        path={`/festivals/${festival.id}`}
+        locale={language}
+        structuredData={eventSchema}
+      />
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
