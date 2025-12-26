@@ -301,9 +301,15 @@ export default function Developer() {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">TECHNO.DOG Developer API</h1>
-          <p className="text-muted-foreground mt-2">
-            AI-ready knowledge access. No ads. No scraping. No bullshit.
+          <div className="text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2 font-mono">
+            // Developer API
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight font-mono uppercase">TECHNO.DOG API</h1>
+          <p className="text-muted-foreground mt-2 font-mono text-sm">
+            Access the Global Techno Knowledge Hub. AI-ready data on artists, venues, festivals, labels, and more.
+          </p>
+          <p className="text-muted-foreground/70 mt-1 font-mono text-xs">
+            Open platform. No ads. No scraping. No bullshit. Strictly non-mainstream.
           </p>
         </div>
 
