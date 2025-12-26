@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
-import { loadArtistsSummary, loadArtistById } from "@/data/artists-loader";
+import { loadArtistsSummary, loadArtistById, type ArtistSummary } from "@/data/artists-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -129,26 +129,41 @@ const ArtistsPage = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-baseline gap-2 sm:gap-4 mb-1 sm:mb-2">
                               <span className="font-mono text-[10px] sm:text-xs text-muted-foreground w-6 sm:w-8 flex-shrink-0">
-                                {String(virtualRow.index + 1).padStart(2, "0")}
+                                {artist.rank ? `#${artist.rank}` : String(virtualRow.index + 1).padStart(2, "0")}
                               </span>
-                              <h2 className="font-mono text-base sm:text-xl md:text-2xl uppercase tracking-wide group-hover:animate-glitch truncate">
+                              <h2 className="font-mono text-base sm:text-xl md:text-2xl uppercase tracking-wide group-hover:text-logo-green transition-colors truncate">
                                 {artist.name}
                               </h2>
+                              {artist.realName && (
+                                <span className="hidden md:inline font-mono text-xs text-muted-foreground">
+                                  ({artist.realName})
+                                </span>
+                              )}
                             </div>
                             <div className="flex flex-wrap items-center gap-2 sm:gap-4 pl-8 sm:pl-12">
                               <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
                                 {artist.city}, {artist.country}
                               </span>
+                              {artist.labels && artist.labels.length > 0 && (
+                                <span className="hidden lg:inline font-mono text-[10px] text-muted-foreground">
+                                  {artist.labels.slice(0, 2).join(' / ')}
+                                </span>
+                              )}
                               <div className="hidden sm:flex gap-2">
-                                {artist.tags.slice(0, 3).map(tag => (
+                                {(artist.subgenres || artist.tags).slice(0, 3).map(tag => (
                                   <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
                                     {tag}
                                   </span>
                                 ))}
                               </div>
                             </div>
+                            {artist.knownFor && (
+                              <p className="hidden md:block font-mono text-[10px] text-muted-foreground/70 mt-2 pl-8 sm:pl-12 line-clamp-1 max-w-3xl">
+                                {artist.knownFor}
+                              </p>
+                            )}
                           </div>
-                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 sm:mt-2 flex-shrink-0" />
+                          <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-logo-green group-hover:translate-x-1 transition-all mt-1 sm:mt-2 flex-shrink-0" />
                         </div>
                       </Link>
                     );
