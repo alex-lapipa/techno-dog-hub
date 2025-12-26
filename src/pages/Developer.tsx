@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers } from 'lucide-react';
+import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers, Webhook, RefreshCw, CheckCircle, XCircle, Pause, Play } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -40,17 +41,46 @@ interface ApiKey {
   total_requests: number;
 }
 
+interface WebhookData {
+  id: string;
+  name: string;
+  url: string;
+  events: string[];
+  status: string;
+  failure_count: number;
+  last_triggered_at: string | null;
+  last_success_at: string | null;
+  created_at: string;
+}
+
 const BASE_URL = 'https://bshyeweljerupobpmmes.supabase.co/functions/v1';
+const AVAILABLE_EVENTS = [
+  { id: 'content.updated', label: 'Content Updated', description: 'When existing content is modified' },
+  { id: 'content.created', label: 'Content Created', description: 'When new content is added' },
+  { id: 'content.deleted', label: 'Content Deleted', description: 'When content is removed' },
+];
 
 export default function Developer() {
   const { user, loading: authLoading } = useAuth();
   const [keys, setKeys] = useState<ApiKey[]>([]);
+  const [webhooks, setWebhooks] = useState<WebhookData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [webhooksLoading, setWebhooksLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [creatingWebhook, setCreatingWebhook] = useState(false);
   const [newKeyName, setNewKeyName] = useState('Default API Key');
   const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showKey, setShowKey] = useState(false);
+  
+  // Webhook form state
+  const [showWebhookDialog, setShowWebhookDialog] = useState(false);
+  const [webhookName, setWebhookName] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [webhookEvents, setWebhookEvents] = useState<string[]>(['content.updated']);
+  const [newWebhookSecret, setNewWebhookSecret] = useState<string | null>(null);
+  const [showWebhookSecretDialog, setShowWebhookSecretDialog] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
 
   const fetchKeys = async () => {
     if (!user) return;
@@ -73,9 +103,27 @@ export default function Developer() {
     }
   };
 
+  const fetchWebhooks = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await supabase.functions.invoke('api-webhooks', {
+        method: 'GET',
+      });
+
+      if (response.error) throw response.error;
+      setWebhooks(response.data.webhooks || []);
+    } catch (error) {
+      console.error('Error fetching webhooks:', error);
+    } finally {
+      setWebhooksLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchKeys();
+      fetchWebhooks();
     }
   }, [user]);
 
@@ -118,6 +166,75 @@ export default function Developer() {
     }
   };
 
+  const createWebhook = async () => {
+    if (!webhookUrl) {
+      toast.error('URL is required');
+      return;
+    }
+
+    setCreatingWebhook(true);
+    try {
+      const response = await supabase.functions.invoke('api-webhooks', {
+        method: 'POST',
+        body: { 
+          name: webhookName || 'My Webhook',
+          url: webhookUrl,
+          events: webhookEvents
+        },
+      });
+
+      if (response.error) throw response.error;
+
+      setNewWebhookSecret(response.data.secret);
+      setShowWebhookDialog(false);
+      setShowWebhookSecretDialog(true);
+      setWebhookName('');
+      setWebhookUrl('');
+      setWebhookEvents(['content.updated']);
+      await fetchWebhooks();
+      toast.success('Webhook created successfully');
+    } catch (error) {
+      console.error('Error creating webhook:', error);
+      toast.error('Failed to create webhook');
+    } finally {
+      setCreatingWebhook(false);
+    }
+  };
+
+  const toggleWebhookStatus = async (webhook: WebhookData) => {
+    try {
+      const newStatus = webhook.status === 'active' ? 'paused' : 'active';
+      const { error } = await supabase.functions.invoke(`api-webhooks?id=${webhook.id}`, {
+        method: 'PATCH',
+        body: { status: newStatus },
+      });
+
+      if (error) throw error;
+
+      await fetchWebhooks();
+      toast.success(`Webhook ${newStatus === 'active' ? 'activated' : 'paused'}`);
+    } catch (error) {
+      console.error('Error updating webhook:', error);
+      toast.error('Failed to update webhook');
+    }
+  };
+
+  const deleteWebhook = async (webhookId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke(`api-webhooks?id=${webhookId}`, {
+        method: 'DELETE',
+      });
+
+      if (error) throw error;
+
+      await fetchWebhooks();
+      toast.success('Webhook deleted');
+    } catch (error) {
+      console.error('Error deleting webhook:', error);
+      toast.error('Failed to delete webhook');
+    }
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
@@ -135,6 +252,14 @@ export default function Developer() {
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat().format(num);
+  };
+
+  const toggleEvent = (eventId: string) => {
+    setWebhookEvents(prev => 
+      prev.includes(eventId) 
+        ? prev.filter(e => e !== eventId)
+        : [...prev, eventId]
+    );
   };
 
   if (authLoading) {
@@ -182,15 +307,15 @@ export default function Developer() {
         </div>
 
         <Tabs defaultValue="keys" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
             <TabsTrigger value="keys">API Keys</TabsTrigger>
-            <TabsTrigger value="docs">Documentation</TabsTrigger>
+            <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+            <TabsTrigger value="docs">Docs</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
           </TabsList>
 
           {/* API Keys Tab */}
           <TabsContent value="keys" className="space-y-8">
-            {/* Rate Limits Overview */}
             {activeKey && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
@@ -223,13 +348,10 @@ export default function Developer() {
               </div>
             )}
 
-            {/* Create New Key */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Create API Key</CardTitle>
-                <CardDescription>
-                  Generate a new API key. Only one active key per user.
-                </CardDescription>
+                <CardDescription>Only one active key per user.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4 items-end">
@@ -245,13 +367,12 @@ export default function Developer() {
                   </div>
                   <Button onClick={createKey} disabled={creating}>
                     <Plus className="h-4 w-4 mr-2" />
-                    {creating ? 'Creating...' : 'Create Key'}
+                    {creating ? 'Creating...' : 'Create'}
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* API Keys List */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Your API Keys</CardTitle>
@@ -260,9 +381,7 @@ export default function Developer() {
                 {loading ? (
                   <div className="text-center py-8 text-muted-foreground">Loading...</div>
                 ) : keys.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No API keys yet. Create one to get started.
-                  </div>
+                  <div className="text-center py-8 text-muted-foreground">No API keys yet.</div>
                 ) : (
                   <div className="space-y-4">
                     {keys.map((key) => (
@@ -270,9 +389,7 @@ export default function Developer() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium">{key.name}</span>
-                            <Badge variant={key.status === 'active' ? 'default' : 'secondary'}>
-                              {key.status}
-                            </Badge>
+                            <Badge variant={key.status === 'active' ? 'default' : 'secondary'}>{key.status}</Badge>
                           </div>
                           <div className="text-sm text-muted-foreground font-mono">{key.prefix}...</div>
                           <div className="text-xs text-muted-foreground mt-1">
@@ -284,16 +401,13 @@ export default function Developer() {
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="destructive" size="sm">
-                                <Trash2 className="h-4 w-4 mr-1" />
-                                Revoke
+                                <Trash2 className="h-4 w-4 mr-1" />Revoke
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will immediately revoke the key. Applications using this key will stop working.
-                                </AlertDialogDescription>
+                                <AlertDialogDescription>Applications using this key will stop working.</AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -310,9 +424,164 @@ export default function Developer() {
             </Card>
           </TabsContent>
 
+          {/* Webhooks Tab */}
+          <TabsContent value="webhooks" className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Webhook className="h-5 w-5" />
+                  Webhooks
+                </CardTitle>
+                <CardDescription>
+                  Receive real-time notifications when content is updated.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setShowWebhookDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Webhook
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Your Webhooks</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {webhooksLoading ? (
+                  <div className="text-center py-8 text-muted-foreground">Loading...</div>
+                ) : webhooks.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">No webhooks configured.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {webhooks.map((webhook) => (
+                      <div key={webhook.id} className="p-4 border rounded-lg bg-card">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium">{webhook.name}</span>
+                              <Badge variant={
+                                webhook.status === 'active' ? 'default' : 
+                                webhook.status === 'failed' ? 'destructive' : 'secondary'
+                              }>
+                                {webhook.status === 'active' && <CheckCircle className="h-3 w-3 mr-1" />}
+                                {webhook.status === 'failed' && <XCircle className="h-3 w-3 mr-1" />}
+                                {webhook.status === 'paused' && <Pause className="h-3 w-3 mr-1" />}
+                                {webhook.status}
+                              </Badge>
+                              {webhook.failure_count > 0 && webhook.status !== 'failed' && (
+                                <Badge variant="outline" className="text-amber-600">
+                                  {webhook.failure_count} failures
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground font-mono truncate max-w-md">
+                              {webhook.url}
+                            </div>
+                            <div className="flex gap-2 mt-2">
+                              {webhook.events.map(event => (
+                                <Badge key={event} variant="outline" className="text-xs">
+                                  {event}
+                                </Badge>
+                              ))}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-2">
+                              Created: {formatDate(webhook.created_at)}
+                              {webhook.last_success_at && ` • Last success: ${formatDate(webhook.last_success_at)}`}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleWebhookStatus(webhook)}
+                            >
+                              {webhook.status === 'active' ? (
+                                <><Pause className="h-4 w-4 mr-1" />Pause</>
+                              ) : (
+                                <><Play className="h-4 w-4 mr-1" />Activate</>
+                              )}
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Webhook?</AlertDialogTitle>
+                                  <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteWebhook(webhook.id)}>Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Webhook Documentation */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Webhook Payload</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Each webhook delivery includes an HMAC-SHA256 signature for verification.
+                </p>
+                <div className="bg-muted p-4 rounded-lg font-mono text-xs overflow-x-auto">
+                  <pre>{`Headers:
+X-Webhook-Signature: t=1234567890,v1=abc123...
+X-Webhook-ID: evt_01J8F...
+Content-Type: application/json
+
+Body:
+{
+  "id": "evt_01J8F...",
+  "type": "content.updated",
+  "created": "2025-01-01T12:00:00Z",
+  "data": {
+    "entity_type": "artist",
+    "entity_id": "jeff-mills",
+    "title": "Jeff Mills",
+    "changes": ["bio", "photo"]
+  }
+}`}</pre>
+                </div>
+                <div className="text-sm space-y-2">
+                  <p className="font-medium">Signature Verification:</p>
+                  <div className="bg-muted p-4 rounded-lg font-mono text-xs overflow-x-auto">
+                    <pre>{`// Extract timestamp and signature
+const [t, v1] = signature.split(',').map(p => p.split('=')[1]);
+
+// Compute expected signature
+const payload = t + '.' + JSON.stringify(body);
+const expected = crypto
+  .createHmac('sha256', webhookSecret)
+  .update(payload)
+  .digest('hex');
+
+// Compare signatures
+if (expected === v1) {
+  // Valid signature
+}`}</pre>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Documentation Tab */}
           <TabsContent value="docs" className="space-y-8">
-            {/* Authentication */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -321,107 +590,66 @@ export default function Developer() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
-                  All API requests require an API key in the Authorization header.
-                </p>
+                <p className="text-muted-foreground">All API requests require an API key.</p>
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm">
                   Authorization: Bearer YOUR_API_KEY
                 </div>
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  🔐 Keys are shown once at creation time. Store them securely.
-                </p>
               </CardContent>
             </Card>
 
-            {/* Endpoints */}
             <Card>
               <CardHeader>
                 <CardTitle>Core Endpoints</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Ping */}
                 <div className="border-b pb-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">GET</Badge>
                     <code className="text-sm font-mono">/api-v1-ping</code>
                   </div>
-                  <p className="text-sm text-muted-foreground">Test your API key connection.</p>
+                  <p className="text-sm text-muted-foreground">Test your API key.</p>
                 </div>
 
-                {/* Search */}
                 <div className="border-b pb-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">GET</Badge>
-                    <code className="text-sm font-mono">/api-v1-search</code>
+                    <code className="text-sm font-mono">/api-v1-search?q=...</code>
                     <Search className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">Search across the knowledge base.</p>
-                  <div className="text-sm space-y-2">
-                    <p className="font-medium">Query Parameters:</p>
-                    <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                      <li><code>q</code> — Search query (required)</li>
-                      <li><code>limit</code> — Max results (default: 10, max: 50)</li>
-                      <li><code>tags</code> — Comma-separated tag filters</li>
-                      <li><code>types</code> — Document types (article, gear, artist, release)</li>
-                      <li><code>cursor</code> — Pagination cursor</li>
-                      <li><code>updated_after</code> — ISO datetime filter</li>
-                    </ul>
-                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">Search the knowledge base.</p>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                    <li><code>q</code> — Search query (required)</li>
+                    <li><code>limit</code> — Max results (default: 10, max: 50)</li>
+                    <li><code>tags</code> — Comma-separated filters</li>
+                    <li><code>types</code> — article, gear, artist, release</li>
+                  </ul>
                 </div>
 
-                {/* Docs */}
                 <div className="border-b pb-6">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">GET</Badge>
-                    <code className="text-sm font-mono">/api-v1-docs?docId=&#123;docId&#125;</code>
+                    <code className="text-sm font-mono">/api-v1-docs?docId=...</code>
                     <FileText className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">Retrieve canonical document content.</p>
-                  <div className="bg-muted/50 p-3 rounded text-xs">
-                    <p className="font-medium mb-1">AI / RAG Notes:</p>
-                    <ul className="list-disc list-inside text-muted-foreground">
-                      <li>Use <code>content.text</code> for embeddings</li>
-                      <li>IDs are stable across updates</li>
-                    </ul>
-                  </div>
+                  <p className="text-sm text-muted-foreground">Retrieve document content.</p>
                 </div>
 
-                {/* Chunks */}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">GET</Badge>
-                    <code className="text-sm font-mono">/api-v1-chunks?docId=&#123;docId&#125;</code>
+                    <code className="text-sm font-mono">/api-v1-chunks?docId=...</code>
                     <Layers className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">Returns document content split into chunks for RAG ingestion.</p>
-                  <div className="text-sm space-y-2">
-                    <p className="font-medium">Query Parameters:</p>
-                    <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                      <li><code>docId</code> — Document ID (required)</li>
-                      <li><code>chunkSize</code> — Target chunk size (default: 500, max: 2000)</li>
-                      <li><code>cursor</code> — Pagination cursor</li>
-                    </ul>
-                  </div>
+                  <p className="text-sm text-muted-foreground">RAG-optimized chunks.</p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Error Handling */}
             <Card>
               <CardHeader>
-                <CardTitle>Error Handling</CardTitle>
+                <CardTitle>Error Codes</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-sm">All errors return structured JSON:</p>
-                <div className="bg-muted p-4 rounded-lg font-mono text-xs overflow-x-auto">
-                  <pre>{`{
-  "error": {
-    "code": "unauthorized",
-    "message": "Missing or invalid API key.",
-    "requestId": "req_01J8F..."
-  }
-}`}</pre>
-                </div>
+              <CardContent>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><Badge variant="outline">401</Badge> Unauthorized</div>
                   <div><Badge variant="outline">404</Badge> Not found</div>
@@ -430,37 +658,13 @@ export default function Developer() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Rate Limits */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Rate Limits</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="font-medium">Per Minute</p>
-                    <p className="text-muted-foreground">60 requests</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Per Day</p>
-                    <p className="text-muted-foreground">10,000 requests</p>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Rate limit headers included in all responses: <code className="bg-muted px-1 rounded">X-RateLimit-Limit</code>, <code className="bg-muted px-1 rounded">X-RateLimit-Remaining</code>, <code className="bg-muted px-1 rounded">X-RateLimit-Reset</code>
-                </p>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Examples Tab */}
           <TabsContent value="examples" className="space-y-8">
-            {/* Quick Start */}
             <Card>
               <CardHeader>
                 <CardTitle>Quick Start</CardTitle>
-                <CardDescription>Test your key with a simple ping</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
@@ -473,125 +677,28 @@ export default function Developer() {
               </CardContent>
             </Card>
 
-            {/* Search Example */}
             <Card>
               <CardHeader>
-                <CardTitle>Search Knowledge</CardTitle>
+                <CardTitle>Search Example</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
                   <pre>{`curl "${BASE_URL}/api-v1-search?q=roland+acid&limit=5" \\
   -H "Authorization: Bearer YOUR_API_KEY"`}</pre>
                 </div>
-                <p className="text-sm font-medium">Response:</p>
-                <div className="bg-muted/50 p-4 rounded-lg font-mono text-xs overflow-x-auto">
-                  <pre>{`{
-  "query": "roland acid",
-  "results": [
-    {
-      "docId": "gear_tb303",
-      "title": "Roland TB-303",
-      "snippet": "The TB-303 defined acid techno...",
-      "type": "gear",
-      "tags": ["acid", "roland", "synth"],
-      "score": 0.92,
-      "updatedAt": "2024-12-01T10:12:00Z",
-      "url": "https://techno.dog/gear/tb-303"
-    }
-  ],
-  "nextCursor": null
-}`}</pre>
-                </div>
               </CardContent>
             </Card>
 
-            {/* Document Example */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Retrieve Document</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                  <pre>{`curl "${BASE_URL}/api-v1-docs?docId=gear_tb303" \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}</pre>
-                </div>
-                <p className="text-sm font-medium">Response:</p>
-                <div className="bg-muted/50 p-4 rounded-lg font-mono text-xs overflow-x-auto">
-                  <pre>{`{
-  "doc": {
-    "docId": "gear_tb303",
-    "type": "gear",
-    "title": "Roland TB-303",
-    "tags": ["acid", "synth"],
-    "updatedAt": "2024-12-01T10:12:00Z",
-    "content": {
-      "text": "The Roland TB-303 is a monophonic bass synthesizer..."
-    },
-    "metadata": {
-      "source_url": "https://techno.dog/gear/tb-303",
-      "license": "TECHNO.DOG Knowledge License"
-    }
-  }
-}`}</pre>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Chunks Example */}
-            <Card>
-              <CardHeader>
-                <CardTitle>RAG-Optimized Chunks</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                  <pre>{`curl "${BASE_URL}/api-v1-chunks?docId=gear_tb303" \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}</pre>
-                </div>
-                <p className="text-sm font-medium">Response:</p>
-                <div className="bg-muted/50 p-4 rounded-lg font-mono text-xs overflow-x-auto">
-                  <pre>{`{
-  "docId": "gear_tb303",
-  "chunks": [
-    {
-      "chunkId": "gear_tb303_001",
-      "index": 0,
-      "text": "The TB-303 was released in 1982..."
-    }
-  ],
-  "nextCursor": null
-}`}</pre>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Usage Guidelines */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Usage Guidelines</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
-                  <li>Cache results when possible</li>
-                  <li>Do not scrape HTML pages — use the API</li>
-                  <li>Respect rate limits</li>
-                  <li>Do not redistribute raw content without permission</li>
-                  <li>Use stable IDs for deduplication</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Designed for AI */}
             <Card className="border-primary/20 bg-primary/5">
               <CardHeader>
                 <CardTitle>Designed for AI</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">This API is intentionally built for:</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>• RAG pipelines</div>
                   <div>• AI copilots</div>
                   <div>• Research agents</div>
-                  <div>• Knowledge graph builders</div>
+                  <div>• Knowledge graphs</div>
                 </div>
                 <p className="text-sm mt-4 font-medium">Clean text. Stable IDs. No markup chaos.</p>
               </CardContent>
@@ -599,7 +706,7 @@ export default function Developer() {
           </TabsContent>
         </Tabs>
 
-        {/* New Key Dialog */}
+        {/* New API Key Dialog */}
         <Dialog open={showNewKeyDialog} onOpenChange={setShowNewKeyDialog}>
           <DialogContent>
             <DialogHeader>
@@ -607,18 +714,11 @@ export default function Developer() {
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
                 Your New API Key
               </DialogTitle>
-              <DialogDescription>
-                Copy this key now. It will not be shown again.
-              </DialogDescription>
+              <DialogDescription>Copy this key now. It will not be shown again.</DialogDescription>
             </DialogHeader>
             <div className="mt-4">
               <div className="relative">
-                <Input
-                  value={newApiKey || ''}
-                  readOnly
-                  type={showKey ? 'text' : 'password'}
-                  className="font-mono pr-20"
-                />
+                <Input value={newApiKey || ''} readOnly type={showKey ? 'text' : 'password'} className="font-mono pr-20" />
                 <div className="absolute right-1 top-1 flex gap-1">
                   <Button size="sm" variant="ghost" onClick={() => setShowKey(!showKey)}>
                     {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -628,18 +728,100 @@ export default function Developer() {
                   </Button>
                 </div>
               </div>
+              <p className="text-sm text-amber-600 dark:text-amber-400 mt-3">Store securely.</p>
+            </div>
+            <div className="flex justify-end mt-4">
+              <Button onClick={() => { setShowNewKeyDialog(false); setNewApiKey(null); setShowKey(false); }}>Done</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Webhook Dialog */}
+        <Dialog open={showWebhookDialog} onOpenChange={setShowWebhookDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Webhook</DialogTitle>
+              <DialogDescription>Receive notifications when content changes.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="webhookName">Name</Label>
+                <Input
+                  id="webhookName"
+                  value={webhookName}
+                  onChange={(e) => setWebhookName(e.target.value)}
+                  placeholder="My Webhook"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="webhookUrl">Endpoint URL</Label>
+                <Input
+                  id="webhookUrl"
+                  value={webhookUrl}
+                  onChange={(e) => setWebhookUrl(e.target.value)}
+                  placeholder="https://example.com/webhook"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="mb-3 block">Events</Label>
+                <div className="space-y-3">
+                  {AVAILABLE_EVENTS.map((event) => (
+                    <div key={event.id} className="flex items-start gap-3">
+                      <Checkbox
+                        id={event.id}
+                        checked={webhookEvents.includes(event.id)}
+                        onCheckedChange={() => toggleEvent(event.id)}
+                      />
+                      <div className="grid gap-1 leading-none">
+                        <label htmlFor={event.id} className="text-sm font-medium cursor-pointer">
+                          {event.label}
+                        </label>
+                        <p className="text-xs text-muted-foreground">{event.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={() => setShowWebhookDialog(false)}>Cancel</Button>
+              <Button onClick={createWebhook} disabled={creatingWebhook || !webhookUrl}>
+                {creatingWebhook ? 'Creating...' : 'Create Webhook'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Webhook Secret Dialog */}
+        <Dialog open={showWebhookSecretDialog} onOpenChange={setShowWebhookSecretDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                Webhook Signing Secret
+              </DialogTitle>
+              <DialogDescription>Save this secret to verify webhook signatures.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <div className="relative">
+                <Input value={newWebhookSecret || ''} readOnly type={showSecret ? 'text' : 'password'} className="font-mono pr-20" />
+                <div className="absolute right-1 top-1 flex gap-1">
+                  <Button size="sm" variant="ghost" onClick={() => setShowSecret(!showSecret)}>
+                    {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => copyToClipboard(newWebhookSecret || '')}>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
               <p className="text-sm text-amber-600 dark:text-amber-400 mt-3">
-                Store this key securely. You won't be able to see it again.
+                This secret will not be shown again. Use it to verify webhook signatures.
               </p>
             </div>
             <div className="flex justify-end mt-4">
-              <Button onClick={() => {
-                setShowNewKeyDialog(false);
-                setNewApiKey(null);
-                setShowKey(false);
-              }}>
-                Done
-              </Button>
+              <Button onClick={() => { setShowWebhookSecretDialog(false); setNewWebhookSecret(null); setShowSecret(false); }}>Done</Button>
             </div>
           </DialogContent>
         </Dialog>
