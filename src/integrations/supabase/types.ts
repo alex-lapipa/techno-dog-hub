@@ -85,7 +85,10 @@ export type Database = {
           last_used_at: string | null
           name: string
           prefix: string
+          rate_limit_per_day: number
+          rate_limit_per_minute: number
           status: string
+          total_requests: number
           user_id: string
         }
         Insert: {
@@ -95,7 +98,10 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           prefix: string
+          rate_limit_per_day?: number
+          rate_limit_per_minute?: number
           status?: string
+          total_requests?: number
           user_id: string
         }
         Update: {
@@ -105,10 +111,51 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           prefix?: string
+          rate_limit_per_day?: number
+          rate_limit_per_minute?: number
           status?: string
+          total_requests?: number
           user_id?: string
         }
         Relationships: []
+      }
+      api_usage: {
+        Row: {
+          api_key_id: string
+          created_at: string
+          endpoint: string
+          id: string
+          request_count: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          api_key_id: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          request_count?: number
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          api_key_id?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          request_count?: number
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       content_sync: {
         Row: {
@@ -265,6 +312,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_api_key_id: string
+          p_endpoint: string
+          p_limit_per_minute?: number
+          p_user_id: string
+        }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          limit_remaining: number
+          reset_at: string
+        }[]
+      }
+      cleanup_old_api_usage: { Args: never; Returns: number }
+      get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
       // List user's API keys (without the actual key values)
       const { data: keys, error: listError } = await supabase
         .from('api_keys')
-        .select('id, name, prefix, status, created_at, last_used_at')
+        .select('id, name, prefix, status, created_at, last_used_at, rate_limit_per_minute, rate_limit_per_day, total_requests')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
