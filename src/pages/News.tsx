@@ -75,43 +75,81 @@ const NewsPage = () => {
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          {/* Header */}
-          <div className="mb-12 space-y-4">
-            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-              // {language === 'en' ? 'Latest transmissions' : 'Últimas transmisiones'}
-            </div>
-            <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'News' : 'Noticias'}
-            </h1>
-            <div className="flex gap-4">
-              <Link 
-                to="/news/archive" 
-                className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                → {language === 'en' ? 'Browse Archive' : 'Ver Archivo'}
-              </Link>
-            </div>
-            {user && (
-              <div className="flex gap-4 mt-4">
+          {/* Hero with Featured Article */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            {/* Left: Header */}
+            <div className="space-y-4">
+              <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
+                // {language === 'en' ? 'Latest transmissions' : 'Últimas transmisiones'}
+              </div>
+              <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
+                {language === 'en' ? 'News' : 'Noticias'}
+              </h1>
+              <p className="font-mono text-sm text-muted-foreground max-w-md">
+                {language === 'en' 
+                  ? 'Curated stories from the global underground. No hype, just substance.' 
+                  : 'Historias curadas del underground global. Sin hype, solo sustancia.'}
+              </p>
+              <div className="flex gap-4 pt-4">
                 <Link 
                   to="/news/archive" 
                   className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  → {language === 'en' ? 'Archive' : 'Archivo'}
-                </Link>
-                <Link 
-                  to="/news/drafts" 
-                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  → {language === 'en' ? 'View Drafts' : 'Ver Borradores'}
-                </Link>
-                <Link 
-                  to="/admin/news-agent" 
-                  className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  → {language === 'en' ? 'News Agent' : 'Agente de Noticias'}
+                  → {language === 'en' ? 'Browse Archive' : 'Ver Archivo'}
                 </Link>
               </div>
+              {user && (
+                <div className="flex gap-4 mt-4">
+                  <Link 
+                    to="/news/archive" 
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    → {language === 'en' ? 'Archive' : 'Archivo'}
+                  </Link>
+                  <Link 
+                    to="/news/drafts" 
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    → {language === 'en' ? 'View Drafts' : 'Ver Borradores'}
+                  </Link>
+                  <Link 
+                    to="/admin/news-agent" 
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    → {language === 'en' ? 'News Agent' : 'Agente de Noticias'}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Featured Article */}
+            {featured[0] && (
+              <Link
+                to={`/news/${featured[0].id}`}
+                className="group block border border-border p-6 md:p-8 hover:bg-card transition-colors bg-card/30"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-mono text-xs uppercase tracking-[0.3em] text-primary border border-primary px-2 py-1">
+                    {language === 'en' ? 'Featured' : 'Destacado'}
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {featured[0].readTime}
+                  </span>
+                </div>
+                <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
+                  {featured[0].category[language]}
+                </span>
+                <h2 className="font-mono text-xl md:text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
+                  {featured[0].title[language]}
+                </h2>
+                <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-4">
+                  {featured[0].excerpt[language]}
+                </p>
+                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground">
+                  <span>{language === 'en' ? 'Read Now' : 'Leer Ahora'}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
             )}
           </div>
 
@@ -123,9 +161,9 @@ const NewsPage = () => {
             <PublishedNewsArticles />
           </div>
 
-          {/* Featured */}
+          {/* Featured (excluding hero featured) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-            {featured.map((item) => (
+            {featured.slice(1).map((item) => (
               <Link
                 key={item.id}
                 to={`/news/${item.id}`}
