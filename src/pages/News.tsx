@@ -114,7 +114,7 @@ const NewsPage = () => {
             )}
           </div>
 
-          {/* Agent-generated articles */}
+          {/* Community-Agent generated articles */}
           <div className="mb-16">
             <PublishedNewsArticles />
           </div>
