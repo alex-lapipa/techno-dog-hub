@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { ContentSyncPanel } from '@/components/ContentSyncPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,8 +13,14 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers, Webhook, RefreshCw, CheckCircle, XCircle, Pause, Play, BarChart3 } from 'lucide-react';
+import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap, Search, FileText, Layers, Webhook, RefreshCw, CheckCircle, XCircle, Pause, Play, BarChart3, Globe, Code, Database, Palette, Shield, Bot, Rocket, ChevronLeft } from 'lucide-react';
 import ApiUsageAnalytics from '@/components/ApiUsageAnalytics';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import {
   Dialog,
   DialogContent,
@@ -271,25 +281,225 @@ export default function Developer() {
     );
   }
 
+  // Platform documentation content (shown to all users)
+  const PlatformDocs = () => (
+    <div className="space-y-6">
+      {/* Download link */}
+      <div className="p-4 border border-border bg-card rounded-lg">
+        <a 
+          href="/project-documentation.txt" 
+          download 
+          className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:underline"
+        >
+          <FileText className="w-4 h-4" />
+          Download full documentation as TXT file
+        </a>
+      </div>
+
+      {/* Content Sync Panel - Admin only */}
+      <ContentSyncPanel />
+
+      <Accordion type="multiple" className="space-y-4">
+        {/* Project Overview */}
+        <AccordionItem value="overview" className="border border-border rounded-lg px-6 bg-card">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-3">
+              <Globe className="w-5 h-5 text-primary" />
+              <span className="font-mono text-lg">Project Overview</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="font-mono text-sm text-muted-foreground space-y-4 pb-6">
+            <p>
+              The <strong className="text-foreground">Global Techno Encyclopedia</strong> is a comprehensive digital archive 
+              dedicated to underground techno culture worldwide.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Target Audience</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Techno enthusiasts and collectors</li>
+                  <li>DJs and producers</li>
+                  <li>Music journalists and researchers</li>
+                  <li>Festival-goers and event organizers</li>
+                </ul>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Core Philosophy</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Accept only real techno: driving, hypnotic, raw</li>
+                  <li>No EDM, hardstyle, or commercial schlag</li>
+                  <li>From Detroit to Tbilisi, Tokyo to Bogotá</li>
+                </ul>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Technology Stack */}
+        <AccordionItem value="tech-stack" className="border border-border rounded-lg px-6 bg-card">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-3">
+              <Code className="w-5 h-5 text-primary" />
+              <span className="font-mono text-lg">Technology Stack</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="font-mono text-sm text-muted-foreground space-y-4 pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Frontend</h4>
+                <ul className="space-y-1">
+                  <li>• React 18.3.1 + TypeScript</li>
+                  <li>• Vite (build tool)</li>
+                  <li>• React Router DOM v6</li>
+                  <li>• TanStack React Query</li>
+                </ul>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Styling</h4>
+                <ul className="space-y-1">
+                  <li>• Tailwind CSS</li>
+                  <li>• shadcn/ui components</li>
+                  <li>• Lucide React icons</li>
+                </ul>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Backend</h4>
+                <ul className="space-y-1">
+                  <li>• Lovable Cloud</li>
+                  <li>• PostgreSQL + pgvector</li>
+                  <li>• Edge Functions (Deno)</li>
+                </ul>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Data Architecture */}
+        <AccordionItem value="data" className="border border-border rounded-lg px-6 bg-card">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-3">
+              <Database className="w-5 h-5 text-primary" />
+              <span className="font-mono text-lg">Data Architecture</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="font-mono text-sm text-muted-foreground space-y-4 pb-6">
+            <p>
+              All content data is stored as TypeScript modules in <code className="text-foreground bg-muted px-1 rounded">/src/data/</code>.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">artists.ts</h4>
+                <p className="text-xs">Artist profiles with origin, genres, labels, bio</p>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">labels.ts</h4>
+                <p className="text-xs">Record labels with founding year, city, genres</p>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">venues.ts</h4>
+                <p className="text-xs">Clubs and spaces with capacity, residents</p>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">festivals.ts</h4>
+                <p className="text-xs">Festivals with stages, capacity, lineups</p>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* AI Chat Integration */}
+        <AccordionItem value="ai" className="border border-border rounded-lg px-6 bg-card">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-3">
+              <Bot className="w-5 h-5 text-primary" />
+              <span className="font-mono text-lg">AI Chat Integration</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="font-mono text-sm text-muted-foreground space-y-4 pb-6">
+            <p>
+              The <strong className="text-foreground">TechnoChat</strong> component provides AI-powered 
+              responses using Retrieval-Augmented Generation (RAG).
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Features</h4>
+                <ul className="list-disc list-inside space-y-1 text-xs">
+                  <li>Floating chat button</li>
+                  <li>Message history</li>
+                  <li>Streaming responses</li>
+                </ul>
+              </div>
+              <div className="p-4 border border-border rounded bg-background">
+                <h4 className="text-foreground font-bold mb-2">Knowledge Base</h4>
+                <ul className="list-disc list-inside space-y-1 text-xs">
+                  <li>Festival information</li>
+                  <li>Artist bios</li>
+                  <li>Venue histories</li>
+                </ul>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              Developer Access
-            </CardTitle>
-            <CardDescription>
-              Sign in to manage your API keys and access the techno.dog API.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => window.location.href = '/auth'} className="w-full">
-              Sign In
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 md:px-8 py-12 max-w-5xl">
+          {/* Breadcrumb */}
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground font-mono text-sm mb-8 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2 font-mono">
+              // Developers
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight font-mono uppercase">TECHNO.DOG DEVELOPERS</h1>
+            <p className="text-muted-foreground mt-2 font-mono text-sm">
+              Platform documentation and API access for the Global Techno Knowledge Hub.
+            </p>
+          </div>
+
+          <Tabs defaultValue="platform" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[300px]">
+              <TabsTrigger value="platform">Platform</TabsTrigger>
+              <TabsTrigger value="api">API Access</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="platform" className="space-y-8">
+              <PlatformDocs />
+            </TabsContent>
+
+            <TabsContent value="api" className="space-y-8">
+              <Card className="max-w-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Key className="h-5 w-5" />
+                    Developer API Access
+                  </CardTitle>
+                  <CardDescription>
+                    Sign in to manage your API keys and access the techno.dog API.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => window.location.href = '/auth'} className="w-full">
+                    Sign In
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -298,32 +508,45 @@ export default function Developer() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <Header />
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Breadcrumb */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground font-mono text-sm mb-8 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back to Home
+        </Link>
+
         {/* Header */}
         <div className="mb-8">
           <div className="text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2 font-mono">
-            // Developer API
+            // Developers
           </div>
-          <h1 className="text-3xl font-bold tracking-tight font-mono uppercase">TECHNO.DOG API</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-mono uppercase">TECHNO.DOG DEVELOPERS</h1>
           <p className="text-muted-foreground mt-2 font-mono text-sm">
-            Access the Global Techno Knowledge Hub. AI-ready data on artists, venues, festivals, labels, and more.
-          </p>
-          <p className="text-muted-foreground/70 mt-1 font-mono text-xs">
-            Open platform. No ads. No scraping. No bullshit. Strictly non-mainstream.
+            Platform documentation and API access. AI-ready data on artists, venues, festivals, labels, and more.
           </p>
         </div>
 
-        <Tabs defaultValue="keys" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
+        <Tabs defaultValue="platform" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-6 lg:w-[700px]">
+            <TabsTrigger value="platform">Platform</TabsTrigger>
             <TabsTrigger value="keys">API Keys</TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-1">
               <BarChart3 className="h-3 w-3" />
               Analytics
             </TabsTrigger>
             <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
-            <TabsTrigger value="docs">Docs</TabsTrigger>
+            <TabsTrigger value="docs">API Docs</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
           </TabsList>
+
+          {/* Platform Tab */}
+          <TabsContent value="platform" className="space-y-8">
+            <PlatformDocs />
+          </TabsContent>
 
           {/* API Keys Tab */}
           <TabsContent value="keys" className="space-y-8">
@@ -841,7 +1064,8 @@ if (expected === v1) {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

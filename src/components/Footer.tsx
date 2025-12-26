@@ -18,7 +18,7 @@ const Footer = () => {
     { label: language === 'en' ? 'Releases' : 'Lanzamientos', path: '/releases' },
     { label: language === 'en' ? 'Gear' : 'Equipo', path: '/gear' },
     { label: language === 'en' ? 'Submit' : 'Enviar', path: '/submit' },
-    { label: 'Documentation', path: '/docs' },
+    { label: language === 'en' ? 'Developers' : 'Desarrolladores', path: '/developer' },
   ];
   
   return (
