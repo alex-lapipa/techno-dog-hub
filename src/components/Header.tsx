@@ -42,6 +42,10 @@ const Header = () => {
     {
       label: { en: 'News', es: 'Noticias' },
       path: '/news',
+      sub: [
+        { label: { en: 'Latest', es: 'Últimas' }, path: '/news' },
+        { label: { en: 'Your Stories', es: 'Tus Historias' }, path: '/news/your-stories' },
+      ]
     },
     {
       label: { en: 'Festivals', es: 'Festivales' },
@@ -73,7 +77,6 @@ const Header = () => {
       path: '/technopedia',
       sub: [
         { label: { en: 'About', es: 'Acerca de' }, path: '/technopedia' },
-        { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
         { label: { en: 'Developer API', es: 'API' }, path: '/developer' },
         { label: { en: 'Submit', es: 'Enviar' }, path: '/submit' },
       ]
