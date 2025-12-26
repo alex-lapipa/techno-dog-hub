@@ -5,6 +5,7 @@ import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TechnoChat from "@/components/TechnoChat";
+import DailySpotlight from "@/components/DailySpotlight";
 import PageSEO from "@/components/PageSEO";
 
 const Index = () => {
@@ -204,7 +205,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Quick links */}
+        {/* Daily Spotlight */}
+        <DailySpotlight />
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
