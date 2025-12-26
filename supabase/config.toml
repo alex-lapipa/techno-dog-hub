@@ -81,3 +81,6 @@ verify_jwt = false
 
 [functions.search-dj-artists]
 verify_jwt = false
+
+[functions.batch-upload-artists]
+verify_jwt = false
