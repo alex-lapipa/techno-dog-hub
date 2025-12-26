@@ -7,8 +7,11 @@ const HreflangTags = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  const enUrl = `${BASE_URL}${currentPath}`;
-  const esUrl = `${BASE_URL}/es${currentPath}`;
+  // Normalize path (remove trailing slash except for root)
+  const normalizedPath = currentPath === '/' ? '' : currentPath.replace(/\/$/, '');
+  
+  const enUrl = `${BASE_URL}${normalizedPath || '/'}`;
+  const esUrl = `${BASE_URL}/es${normalizedPath}`;
 
   return (
     <Helmet>
