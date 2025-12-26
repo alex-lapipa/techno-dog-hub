@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublishedNewsArticles from "@/components/PublishedNewsArticles";
+import TrendingTopics from "@/components/TrendingTopics";
 
 const newsItems = [
   {
@@ -113,6 +114,9 @@ const NewsPage = () => {
               </div>
             )}
           </div>
+
+          {/* Trending Topics */}
+          <TrendingTopics />
 
           {/* Community-Agent generated articles */}
           <div className="mb-16">

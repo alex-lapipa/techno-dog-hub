@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowUpRight, Filter, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -25,6 +25,7 @@ interface NewsArticle {
 
 const NewsArchive = () => {
   const { language } = useLanguage();
+  const [searchParams] = useSearchParams();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [allCityTags, setAllCityTags] = useState<string[]>([]);
@@ -32,6 +33,21 @@ const NewsArchive = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Initialize filters from URL params
+  useEffect(() => {
+    const cityParam = searchParams.get('city');
+    const genreParam = searchParams.get('genre');
+    
+    if (cityParam) {
+      setSelectedCities([cityParam]);
+      setShowFilters(true);
+    }
+    if (genreParam) {
+      setSelectedGenres([genreParam]);
+      setShowFilters(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchArticles();
