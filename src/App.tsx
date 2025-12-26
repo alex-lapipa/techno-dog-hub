@@ -29,6 +29,7 @@ const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
 const UserStories = lazy(() => import("./pages/UserStories"));
 const Documentation = lazy(() => import("./pages/Documentation"));
+const Analytics = lazy(() => import("./pages/Analytics"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -95,6 +96,9 @@ const App = () => (
                 
                 {/* Documentation */}
                 <Route path="/docs" element={<Documentation />} />
+                
+                {/* Analytics (Admin only) */}
+                <Route path="/analytics" element={<Analytics />} />
                 
                 {/* Catch all */}
                 <Route path="*" element={<NotFound />} />
