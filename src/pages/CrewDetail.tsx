@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getCrewById, crews } from "@/data/crews";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 
 const CrewDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,8 +45,33 @@ const CrewDetail = () => {
     )
     .slice(0, 4);
 
+  const crewSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": crew.name,
+    "description": crew.description || `${crew.name} - ${crew.type} from ${crew.city}, ${crew.country}`,
+    "url": `https://techno.dog/crews/${crew.id}`,
+    "location": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": crew.city,
+        "addressCountry": crew.country
+      }
+    },
+    ...(crew.founded && { "foundingDate": crew.founded.toString() }),
+    "keywords": crew.tags.join(", ")
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={`${crew.name} - Techno ${typeLabels[crew.type]?.[language] || crew.type}`}
+        description={crew.description || `${crew.name} - ${crew.type} from ${crew.city}, ${crew.country}.`}
+        path={`/crews/${crew.id}`}
+        locale={language}
+        structuredData={crewSchema}
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
