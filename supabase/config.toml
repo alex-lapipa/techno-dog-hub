@@ -45,3 +45,9 @@ verify_jwt = false
 
 [functions.cleanup-youtube-cache]
 verify_jwt = false
+
+[functions.api-keys]
+verify_jwt = false
+
+[functions.api-v1-ping]
+verify_jwt = false
