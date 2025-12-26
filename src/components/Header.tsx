@@ -42,10 +42,6 @@ const Header = () => {
     {
       label: { en: 'News', es: 'Noticias' },
       path: '/news',
-      sub: [
-        { label: { en: 'Latest', es: 'Últimas' }, path: '/news' },
-        { label: { en: 'Features', es: 'Reportajes' }, path: '/news/features' },
-      ]
     },
     {
       label: { en: 'Festivals', es: 'Festivales' },
@@ -74,12 +70,6 @@ const Header = () => {
     {
       label: { en: 'Gear', es: 'Equipo' },
       path: '/gear',
-      sub: [
-        { label: { en: 'All Gear', es: 'Todo' }, path: '/gear' },
-        { label: { en: 'Synthesizers', es: 'Sintetizadores' }, path: '/gear?category=synth' },
-        { label: { en: 'Drum Machines', es: 'Cajas de Ritmos' }, path: '/gear?category=drum-machine' },
-        { label: { en: 'Samplers', es: 'Samplers' }, path: '/gear?category=sampler' },
-      ]
     },
     {
       label: { en: 'Technopedia', es: 'Technopedia' },
