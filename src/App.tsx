@@ -41,6 +41,7 @@ const DJArtistsAdmin = lazy(() => import("./pages/DJArtistsAdmin"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
 const Submit = lazy(() => import("./pages/Submit"));
+const Technopedia = lazy(() => import("./pages/Technopedia"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -125,6 +126,7 @@ const App = () => (
                   
                   {/* Community */}
                   <Route path="/submit" element={<Submit />} />
+                  <Route path="/technopedia" element={<Technopedia />} />
                   
                   {/* Catch all */}
                   <Route path="*" element={<NotFound />} />
