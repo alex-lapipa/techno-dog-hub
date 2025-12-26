@@ -256,6 +256,28 @@ const TechnoChat = () => {
               </div>
             )}
 
+            {/* Quick Query Suggestions */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {[
+                "¿Quién es Jeff Mills?",
+                "Top Detroit techno artists",
+                "¿Qué artistas lanzaron en Tresor?",
+                "Industrial techno pioneers",
+                "¿Quién hizo The Bells?"
+              ].map((suggestion, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setInput(suggestion)}
+                  disabled={isLoading}
+                  className="text-xs font-mono px-3 py-1.5 border border-border bg-muted/20 
+                           hover:border-primary hover:text-primary transition-colors
+                           disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
             {/* Input */}
             <div className="flex gap-2">
               <input
