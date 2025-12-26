@@ -20,6 +20,35 @@ function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200
   return chunks;
 }
 
+// Generate embedding using Lovable AI
+async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+        dimensions: 768
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Embedding API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data?.[0]?.embedding || null;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -28,6 +57,7 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Missing required environment variables');
@@ -77,13 +107,14 @@ serve(async (req) => {
 
     console.log('Admin verified:', user.email);
 
-    const { documents } = await req.json();
+    const { documents, generateEmbeddings = true } = await req.json();
     
     if (!documents || !Array.isArray(documents)) {
       throw new Error('Documents array is required');
     }
 
     const results = [];
+    let embeddingsGenerated = 0;
 
     for (const doc of documents) {
       const { title, content, source, metadata = {} } = doc;
@@ -99,14 +130,27 @@ serve(async (req) => {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
+        
+        // Generate embedding if API key is available
+        let embedding = null;
+        if (generateEmbeddings && LOVABLE_API_KEY) {
+          embedding = await generateEmbedding(chunk, LOVABLE_API_KEY);
+          if (embedding) {
+            embeddingsGenerated++;
+          }
+        }
 
-        // Insert into database without embedding (will use full-text search)
+        // Format embedding for pgvector
+        const embeddingStr = embedding ? `[${embedding.join(',')}]` : null;
+
+        // Insert into database
         const { data, error } = await supabaseAdmin
           .from('documents')
           .insert({
             title: chunks.length > 1 ? `${title} (${i + 1}/${chunks.length})` : title,
             content: chunk,
             source,
+            embedding: embeddingStr,
             metadata: { ...metadata, original_title: title, chunk_index: i, total_chunks: chunks.length },
             chunk_index: i
           })
@@ -116,17 +160,18 @@ serve(async (req) => {
         if (error) {
           console.error(`Error inserting chunk ${i} of "${title}":`, error);
         } else {
-          results.push({ title, chunk: i, id: data.id });
-          console.log(`Inserted chunk ${i + 1}/${chunks.length} of "${title}"`);
+          results.push({ title, chunk: i, id: data.id, hasEmbedding: !!embedding });
+          console.log(`Inserted chunk ${i + 1}/${chunks.length} of "${title}" (embedding: ${!!embedding})`);
         }
       }
     }
 
-    console.log(`Ingested ${results.length} document chunks`);
+    console.log(`Ingested ${results.length} document chunks, ${embeddingsGenerated} with embeddings`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       ingested: results.length,
+      embeddingsGenerated,
       results 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
