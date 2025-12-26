@@ -36,7 +36,9 @@ const HeroSection = () => {
           {/* Main title */}
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
-              <span className="block text-foreground">{t('hero.title')}</span>
+              <span className="block text-foreground">
+                techno<span className="text-logo-green">.</span>dog
+              </span>
               <span className="block text-foreground animate-glitch-hover text-2xl md:text-4xl lg:text-5xl mt-2">{t('hero.subtitle')}</span>
             </h1>
           </div>
