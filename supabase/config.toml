@@ -72,3 +72,6 @@ verify_jwt = false
 
 [functions.analytics-insights]
 verify_jwt = false
+
+[functions.news-agent]
+verify_jwt = false
