@@ -18,6 +18,7 @@ const Footer = () => {
     { label: language === 'en' ? 'Releases' : 'Lanzamientos', path: '/releases' },
     { label: language === 'en' ? 'Gear' : 'Equipo', path: '/gear' },
     { label: 'Documentation', path: '/docs' },
+    { label: 'Sitemap', path: '/sitemap.xml', external: true },
   ];
   
   return (
@@ -67,12 +68,23 @@ const Footer = () => {
             <ul className="space-y-2">
               {resourceLinks.map((link) => (
                 <li key={link.path}>
-                  <Link
-                    to={link.path}
-                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
+                  {'external' in link && link.external ? (
+                    <a
+                      href={link.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
