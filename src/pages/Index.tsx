@@ -150,17 +150,25 @@ const Index = () => {
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
             <div className="max-w-4xl">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
-                // {language === 'en' ? 'Techno culture archive' : 'Archivo de cultura techno'}
+                // {language === 'en' ? 'Global Techno Knowledge Hub' : 'Centro Global de Conocimiento Techno'}
               </div>
               <h1 className="font-mono text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight mb-6">
                 <span className="hover:animate-glitch inline-block">techno</span>
                 <span className="text-muted-foreground">.</span>
                 <span className="hover:animate-glitch inline-block">dog</span>
               </h1>
-              <p className="font-mono text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl mb-8">
+              
+              {/* Mission Statement */}
+              <p className="font-mono text-sm md:text-base text-foreground/90 leading-relaxed max-w-2xl mb-6 border-l-2 border-primary pl-4">
                 {language === 'en' 
-                  ? 'From Detroit to Tbilisi, Tokyo to Bogotá. The artists, the venues, the labels, the history. Go deep.' 
-                  : 'De Detroit a Tbilisi, de Tokio a Bogotá. Los artistas, los clubs, los sellos, la historia. Profundiza.'}
+                  ? 'A daily, open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.' 
+                  : 'Una plataforma abierta y diaria dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream.'}
+              </p>
+              
+              <p className="font-mono text-sm text-muted-foreground leading-relaxed max-w-2xl mb-8">
+                {language === 'en' 
+                  ? 'The collaborative digital magazine and encyclopedia. From Detroit to Tbilisi, Tokyo to Bogotá.' 
+                  : 'La revista digital colaborativa y enciclopedia. De Detroit a Tbilisi, de Tokio a Bogotá.'}
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link 
@@ -169,6 +177,12 @@ const Index = () => {
                 >
                   {language === 'en' ? 'Enter' : 'Entrar'}
                   <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link 
+                  to="/submit" 
+                  className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-border px-6 py-3 hover:border-foreground transition-colors"
+                >
+                  {language === 'en' ? 'Contribute' : 'Contribuir'}
                 </Link>
               </div>
             </div>
