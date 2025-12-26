@@ -7,6 +7,7 @@ import { useScrollDepth } from "@/hooks/useScrollDepth";
 import { loadArtistsSummary, loadArtistById } from "@/data/artists-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCallback, useRef } from "react";
 
@@ -38,8 +39,36 @@ const ArtistsPage = () => {
     overscan: 5,
   });
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Artists" : "Artistas de Techno",
+    "description": language === 'en' 
+      ? "Directory of techno DJs, producers and live performers"
+      : "Directorio de DJs, productores e intérpretes de techno",
+    "numberOfItems": artists.length,
+    "itemListElement": artists.slice(0, 30).map((artist, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "MusicGroup",
+        "name": artist.name,
+        "url": `https://techno.dog/artists/${artist.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Artists Directory' : 'Directorio de Artistas de Techno'}
+        description={language === 'en' 
+          ? 'The producers, DJs, and live performers shaping techno culture. From Detroit pioneers to Berlin residents.'
+          : 'Los productores, DJs e intérpretes que dan forma a la cultura techno. De los pioneros de Detroit a los residentes de Berlín.'}
+        path="/artists"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

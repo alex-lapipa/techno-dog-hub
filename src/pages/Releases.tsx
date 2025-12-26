@@ -4,12 +4,42 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { releases } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 
 const ReleasesPage = () => {
   const { language } = useLanguage();
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Releases" : "Lanzamientos de Techno",
+    "description": language === 'en' 
+      ? "Essential techno records, vinyl and digital releases"
+      : "Discos esenciales de techno, lanzamientos en vinilo y digital",
+    "numberOfItems": releases.length,
+    "itemListElement": releases.slice(0, 20).map((release, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "MusicAlbum",
+        "name": release.title,
+        "byArtist": { "@type": "MusicGroup", "name": release.artist },
+        "url": `https://techno.dog/releases/${release.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Releases Archive' : 'Archivo de Lanzamientos de Techno'}
+        description={language === 'en' 
+          ? 'The records that shaped the sound. Essential techno vinyl and digital releases from the underground.'
+          : 'Los discos que definieron el sonido. Lanzamientos esenciales de techno en vinilo y digital del underground.'}
+        path="/releases"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">

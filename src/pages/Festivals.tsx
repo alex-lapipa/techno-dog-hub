@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { loadFestivalsSummary, loadFestivalById } from "@/data/festivals-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCallback, useRef } from "react";
 
@@ -40,8 +41,45 @@ const FestivalsPage = () => {
     overscan: 5,
   });
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": language === 'en' ? "Techno Festivals" : "Festivales de Techno",
+    "description": language === 'en' 
+      ? "Directory of techno music festivals worldwide"
+      : "Directorio de festivales de música techno en el mundo",
+    "numberOfItems": festivals.length,
+    "itemListElement": festivals.slice(0, 20).map((festival, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "MusicEvent",
+        "name": festival.name,
+        "location": {
+          "@type": "Place",
+          "name": festival.city,
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": festival.city,
+            "addressCountry": festival.country
+          }
+        },
+        "url": `https://techno.dog/festivals/${festival.id}`
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={language === 'en' ? 'Techno Festivals Worldwide' : 'Festivales de Techno en el Mundo'}
+        description={language === 'en' 
+          ? 'Discover techno festivals from Detroit to Tbilisi, Tokyo to Bogotá. Comprehensive guide to the global gatherings that matter.'
+          : 'Descubre festivales de techno de Detroit a Tbilisi, Tokyo a Bogotá. Guía completa de los encuentros globales que importan.'}
+        path="/festivals"
+        locale={language}
+        structuredData={itemListSchema}
+      />
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
