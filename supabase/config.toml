@@ -51,3 +51,12 @@ verify_jwt = false
 
 [functions.api-v1-ping]
 verify_jwt = false
+
+[functions.api-v1-search]
+verify_jwt = false
+
+[functions.api-v1-docs]
+verify_jwt = false
+
+[functions.api-v1-chunks]
+verify_jwt = false
