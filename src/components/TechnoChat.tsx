@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,6 +14,7 @@ const TechnoChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { trackEvent, trackSearch, trackError } = useAnalytics();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,10 +27,14 @@ const TechnoChat = () => {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    const userQuery = input.trim();
+    const userMessage: Message = { role: 'user', content: userQuery };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    
+    // Track chat query
+    trackSearch(userQuery, 0);
 
     let assistantContent = '';
 
@@ -114,11 +120,16 @@ const TechnoChat = () => {
       }
     } catch (error) {
       console.error('Chat error:', error);
+      trackError(error instanceof Error ? error.message : 'Chat error');
       if (!assistantContent) {
         setMessages(prev => prev.filter(m => m.content !== ''));
       }
     } finally {
       setIsLoading(false);
+      // Track successful response
+      if (assistantContent) {
+        trackEvent({ eventType: 'chat', eventName: 'chat_response', metadata: { responseLength: assistantContent.length } });
+      }
     }
   };
 
