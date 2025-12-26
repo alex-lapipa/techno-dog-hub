@@ -8,6 +8,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
+import HreflangTags from "@/components/HreflangTags";
+import { HelmetProvider } from 'react-helmet-async';
 
 // Eager load - critical path
 import Index from "./pages/Index";
@@ -42,73 +44,76 @@ const PageLoader = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <ScrollToTopButton />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Main */}
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* News */}
-                <Route path="/news" element={<News />} />
-                <Route path="/news/:id" element={<News />} />
-                <Route path="/news/features" element={<News />} />
-                
-                {/* Festivals */}
-                <Route path="/festivals" element={<Festivals />} />
-                <Route path="/festivals/:id" element={<FestivalDetail />} />
-                
-                {/* Artists */}
-                <Route path="/artists" element={<Artists />} />
-                <Route path="/artists/:id" element={<ArtistDetail />} />
-                
-                {/* Venues */}
-                <Route path="/venues" element={<Venues />} />
-                <Route path="/venues/:id" element={<VenueDetail />} />
-                
-                {/* Labels */}
-                <Route path="/labels" element={<Labels />} />
-                <Route path="/labels/:id" element={<Labels />} />
-                
-                {/* Releases */}
-                <Route path="/releases" element={<Releases />} />
-                <Route path="/releases/:id" element={<Releases />} />
-                
-                {/* Crews */}
-                <Route path="/crews" element={<Crews />} />
-                <Route path="/crews/:id" element={<CrewDetail />} />
-                
-                {/* Mad Stuff */}
-                <Route path="/mad" element={<Venues />} />
-                <Route path="/mad/stories" element={<UserStories />} />
-                
-                {/* Gear */}
-                <Route path="/gear" element={<Gear />} />
-                <Route path="/gear/:id" element={<GearDetail />} />
-                
-                {/* Documentation */}
-                <Route path="/docs" element={<Documentation />} />
-                
-                {/* Analytics (Admin only) */}
-                <Route path="/analytics" element={<Analytics />} />
-                
-                {/* Catch all */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <ScrollToTopButton />
+              <HreflangTags />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Main */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* News */}
+                  <Route path="/news" element={<News />} />
+                  <Route path="/news/:id" element={<News />} />
+                  <Route path="/news/features" element={<News />} />
+                  
+                  {/* Festivals */}
+                  <Route path="/festivals" element={<Festivals />} />
+                  <Route path="/festivals/:id" element={<FestivalDetail />} />
+                  
+                  {/* Artists */}
+                  <Route path="/artists" element={<Artists />} />
+                  <Route path="/artists/:id" element={<ArtistDetail />} />
+                  
+                  {/* Venues */}
+                  <Route path="/venues" element={<Venues />} />
+                  <Route path="/venues/:id" element={<VenueDetail />} />
+                  
+                  {/* Labels */}
+                  <Route path="/labels" element={<Labels />} />
+                  <Route path="/labels/:id" element={<Labels />} />
+                  
+                  {/* Releases */}
+                  <Route path="/releases" element={<Releases />} />
+                  <Route path="/releases/:id" element={<Releases />} />
+                  
+                  {/* Crews */}
+                  <Route path="/crews" element={<Crews />} />
+                  <Route path="/crews/:id" element={<CrewDetail />} />
+                  
+                  {/* Mad Stuff */}
+                  <Route path="/mad" element={<Venues />} />
+                  <Route path="/mad/stories" element={<UserStories />} />
+                  
+                  {/* Gear */}
+                  <Route path="/gear" element={<Gear />} />
+                  <Route path="/gear/:id" element={<GearDetail />} />
+                  
+                  {/* Documentation */}
+                  <Route path="/docs" element={<Documentation />} />
+                  
+                  {/* Analytics (Admin only) */}
+                  <Route path="/analytics" element={<Analytics />} />
+                  
+                  {/* Catch all */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
