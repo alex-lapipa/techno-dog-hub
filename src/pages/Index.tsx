@@ -2,12 +2,14 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TechnoChat from "@/components/TechnoChat";
 
 const Index = () => {
   const { language } = useLanguage();
+  useScrollDepth({ pageName: 'index' });
 
   // Add JSON-LD structured data
   useEffect(() => {

@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useScrollDepth } from "@/hooks/useScrollDepth";
 import { loadArtistsSummary, loadArtistById } from "@/data/artists-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,6 +13,7 @@ import { useCallback, useRef } from "react";
 const ArtistsPage = () => {
   const queryClient = useQueryClient();
   const parentRef = useRef<HTMLDivElement>(null);
+  useScrollDepth({ pageName: 'artists' });
   
   const prefetchArtist = useCallback((id: string) => {
     queryClient.prefetchQuery({
