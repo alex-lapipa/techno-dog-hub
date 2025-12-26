@@ -1,14 +1,13 @@
-import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getArtistById, artists } from "@/data/artists";
-import { getReleasesByArtist } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import LazyImage from "@/components/LazyImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
+import YouTubeVideos from "@/components/YouTubeVideos";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -340,6 +339,9 @@ const ArtistDetail = () => {
               </div>
             </section>
           )}
+
+          {/* YouTube DJ Sets & Performances */}
+          <YouTubeVideos artistName={artist.name} />
 
           {/* Gear & Rider */}
           <section className="mb-12 border-t border-border pt-8">

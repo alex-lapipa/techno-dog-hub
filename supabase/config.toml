@@ -39,3 +39,6 @@ verify_jwt = false
 
 [functions.scheduled-content-sync]
 verify_jwt = false
+
+[functions.youtube-search]
+verify_jwt = false
