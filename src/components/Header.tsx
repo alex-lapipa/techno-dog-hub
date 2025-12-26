@@ -46,13 +46,6 @@ const Header = () => {
     {
       label: { en: 'Festivals', es: 'Festivales' },
       path: '/festivals',
-      sub: [
-        { label: { en: 'All Festivals', es: 'Todos' }, path: '/festivals' },
-        { label: { en: 'Aquasella', es: 'Aquasella' }, path: '/festivals/aquasella' },
-        { label: { en: 'L.E.V.', es: 'L.E.V.' }, path: '/festivals/lev' },
-        { label: { en: 'Atonal', es: 'Atonal' }, path: '/festivals/atonal' },
-        { label: { en: 'Dekmantel', es: 'Dekmantel' }, path: '/festivals/dekmantel' },
-      ]
     },
     {
       label: { en: 'Artists', es: 'Artistas' },

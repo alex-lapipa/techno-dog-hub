@@ -8,7 +8,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCallback, useRef } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useCallback, useRef, useMemo, useState } from "react";
 
 const FestivalsPage = () => {
   const queryClient = useQueryClient();
@@ -24,15 +25,29 @@ const FestivalsPage = () => {
   
   const { language } = useLanguage();
 
+  const [selectedCountry, setSelectedCountry] = useState<string>('all');
+
   const { data: festivals = [], isLoading } = useQuery({
     queryKey: ['festivals-summary'],
     queryFn: loadFestivalsSummary,
     staleTime: 1000 * 60 * 10,
   });
 
+  // Get unique countries sorted alphabetically
+  const countries = useMemo(() => {
+    const uniqueCountries = [...new Set(festivals.map(f => f.country))].sort();
+    return uniqueCountries;
+  }, [festivals]);
+
+  // Filter festivals by selected country
+  const filteredFestivals = useMemo(() => {
+    if (selectedCountry === 'all') return festivals;
+    return festivals.filter(f => f.country === selectedCountry);
+  }, [festivals, selectedCountry]);
+
   const featuredIds = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
-  const featured = festivals.filter(f => featuredIds.includes(f.id));
-  const others = festivals.filter(f => !featuredIds.includes(f.id));
+  const featured = filteredFestivals.filter(f => featuredIds.includes(f.id));
+  const others = filteredFestivals.filter(f => !featuredIds.includes(f.id));
 
   const rowVirtualizer = useVirtualizer({
     count: others.length,
@@ -83,7 +98,7 @@ const FestivalsPage = () => {
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="mb-12 space-y-4">
+          <div className="mb-8 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
               // {language === 'en' ? 'Global gatherings' : 'Encuentros globales'}
             </div>
@@ -96,6 +111,36 @@ const FestivalsPage = () => {
                 : 'De Detroit a Tbilisi, de Tokio a Bogotá. Los encuentros que importan.'}
             </p>
           </div>
+
+          {/* Country Tabs */}
+          <Tabs value={selectedCountry} onValueChange={setSelectedCountry} className="mb-10">
+            <TabsList className="h-auto flex flex-wrap gap-2 bg-transparent p-0 justify-start">
+              <TabsTrigger 
+                value="all" 
+                className="font-mono text-xs uppercase tracking-wider border border-border px-4 py-2 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground hover:bg-card transition-colors"
+              >
+                {language === 'en' ? 'All' : 'Todos'}
+                <span className="ml-2 text-muted-foreground data-[state=active]:text-background/70">
+                  ({festivals.length})
+                </span>
+              </TabsTrigger>
+              {countries.map(country => {
+                const count = festivals.filter(f => f.country === country).length;
+                return (
+                  <TabsTrigger 
+                    key={country}
+                    value={country}
+                    className="font-mono text-xs uppercase tracking-wider border border-border px-4 py-2 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground hover:bg-card transition-colors"
+                  >
+                    {country}
+                    <span className="ml-2 text-muted-foreground data-[state=active]:text-background/70">
+                      ({count})
+                    </span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+          </Tabs>
 
           {/* Featured festivals - not virtualized as it's a small fixed set */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
