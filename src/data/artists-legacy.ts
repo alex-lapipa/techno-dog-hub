@@ -37,6 +37,12 @@ export interface Artist {
   liveSetup?: string[];
   djSetup?: string[];
   riderNotes?: string;
+  // RAG enriched fields
+  knownFor?: string;
+  topTracks?: string[];
+  subgenres?: string[];
+  rank?: number;
+  nationality?: string;
 }
 
 export const artists: Artist[] = [
