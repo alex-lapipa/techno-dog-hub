@@ -205,6 +205,57 @@ export type Database = {
         }
         Relationships: []
       }
+      dj_artists: {
+        Row: {
+          artist_name: string
+          born: string | null
+          created_at: string | null
+          died: string | null
+          embedding: string | null
+          id: number
+          known_for: string | null
+          labels: string[] | null
+          nationality: string | null
+          rank: number
+          real_name: string | null
+          subgenres: string[] | null
+          top_tracks: string[] | null
+          years_active: string | null
+        }
+        Insert: {
+          artist_name: string
+          born?: string | null
+          created_at?: string | null
+          died?: string | null
+          embedding?: string | null
+          id?: number
+          known_for?: string | null
+          labels?: string[] | null
+          nationality?: string | null
+          rank: number
+          real_name?: string | null
+          subgenres?: string[] | null
+          top_tracks?: string[] | null
+          years_active?: string | null
+        }
+        Update: {
+          artist_name?: string
+          born?: string | null
+          created_at?: string | null
+          died?: string | null
+          embedding?: string | null
+          id?: number
+          known_for?: string | null
+          labels?: string[] | null
+          nationality?: string | null
+          rank?: number
+          real_name?: string | null
+          subgenres?: string[] | null
+          top_tracks?: string[] | null
+          years_active?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           chunk_index: number | null
@@ -646,6 +697,26 @@ export type Database = {
           similarity: number
           source: string
           title: string
+        }[]
+      }
+      search_dj_artists: {
+        Args: {
+          match_count?: number
+          query_embedding: string
+          similarity_threshold?: number
+        }
+        Returns: {
+          artist_name: string
+          id: number
+          known_for: string
+          labels: string[]
+          nationality: string
+          rank: number
+          real_name: string
+          similarity: number
+          subgenres: string[]
+          top_tracks: string[]
+          years_active: string
         }[]
       }
     }

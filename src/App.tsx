@@ -34,6 +34,7 @@ const Documentation = lazy(() => import("./pages/Documentation"));
 const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const NewsDrafts = lazy(() => import("./pages/NewsDrafts"));
 const NewsArticleDetail = lazy(() => import("./pages/NewsArticleDetail"));
+const DJArtistsAdmin = lazy(() => import("./pages/DJArtistsAdmin"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -74,6 +75,7 @@ const App = () => (
                   
                   {/* Admin */}
                   <Route path="/admin/news-agent" element={<NewsAgentAdmin />} />
+                  <Route path="/admin/dj-artists" element={<DJArtistsAdmin />} />
                   
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
