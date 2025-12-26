@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight, Search, Sliders } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { gear, gearCategories, GearCategory } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 
 const GearPage = () => {
   const { language } = useLanguage();
+  const { trackClick, trackSearch } = useAnalytics();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -74,6 +76,11 @@ const GearPage = () => {
                 placeholder={language === 'en' ? 'Search gear...' : 'Buscar equipo...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onBlur={() => {
+                  if (searchQuery.trim()) {
+                    trackSearch(searchQuery, filteredGear.length);
+                  }
+                }}
                 className="pl-10 font-mono text-xs sm:text-sm bg-transparent border-border"
               />
             </div>
@@ -82,7 +89,10 @@ const GearPage = () => {
               {categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    trackClick(`gear_filter_${cat}`);
+                  }}
                   className={`font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 border transition-colors ${
                     selectedCategory === cat
                       ? 'bg-foreground text-background border-foreground'

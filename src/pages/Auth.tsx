@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -17,10 +18,12 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { user, signIn, signUp } = useAuth();
+  const { trackClick, trackEvent, trackError } = useAnalytics();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleGoogleSignIn = async () => {
+    trackClick('google_oauth_button');
     setIsGoogleLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -30,6 +33,7 @@ const Auth = () => {
         },
       });
       if (error) {
+        trackError(error.message || 'Google OAuth failed');
         toast({
           title: 'Error',
           description: error.message || 'No se pudo conectar con Google',
@@ -37,6 +41,7 @@ const Auth = () => {
         });
       }
     } catch (err) {
+      trackError('Google OAuth unexpected error');
       toast({
         title: 'Error',
         description: 'Ocurrió un error inesperado',
@@ -56,15 +61,20 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const authType = isLogin ? 'login' : 'signup';
+    trackEvent({ eventType: 'auth', eventName: `${authType}_form_submit`, metadata: {} });
+    
     // Validate inputs
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
+      trackError(`${authType}_validation_error: email`);
       toast({ title: 'Error', description: emailResult.error.errors[0].message, variant: 'destructive' });
       return;
     }
     
     const passwordResult = passwordSchema.safeParse(password);
     if (!passwordResult.success) {
+      trackError(`${authType}_validation_error: password`);
       toast({ title: 'Error', description: passwordResult.error.errors[0].message, variant: 'destructive' });
       return;
     }
@@ -75,24 +85,28 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
+          trackError(`login_failed: ${error.message}`);
           if (error.message.includes('Invalid login credentials')) {
             toast({ title: 'Error', description: 'Credenciales inválidas', variant: 'destructive' });
           } else {
             toast({ title: 'Error', description: error.message, variant: 'destructive' });
           }
         } else {
+          trackEvent({ eventType: 'auth', eventName: 'login_success', metadata: {} });
           toast({ title: 'Bienvenido', description: 'Has iniciado sesión correctamente' });
           navigate('/');
         }
       } else {
         const { error } = await signUp(email, password);
         if (error) {
+          trackError(`signup_failed: ${error.message}`);
           if (error.message.includes('already registered')) {
             toast({ title: 'Error', description: 'Este email ya está registrado', variant: 'destructive' });
           } else {
             toast({ title: 'Error', description: error.message, variant: 'destructive' });
           }
         } else {
+          trackEvent({ eventType: 'auth', eventName: 'signup_success', metadata: {} });
           toast({ title: 'Cuenta creada', description: 'Tu cuenta ha sido creada. Puedes iniciar sesión.' });
           setIsLogin(true);
         }

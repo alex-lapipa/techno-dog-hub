@@ -1,4 +1,5 @@
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HorizontalNavProps {
@@ -9,15 +10,22 @@ interface HorizontalNavProps {
 
 const HorizontalNav = ({ activeSection, onSectionChange, sections }: HorizontalNavProps) => {
   const { t } = useLanguage();
+  const { trackNavigation } = useAnalytics();
   
   const handlePrev = () => {
     if (activeSection > 0) {
+      const fromSection = sections[activeSection];
+      const toSection = sections[activeSection - 1];
+      trackNavigation(fromSection, toSection);
       onSectionChange(activeSection - 1);
     }
   };
 
   const handleNext = () => {
     if (activeSection < sections.length - 1) {
+      const fromSection = sections[activeSection];
+      const toSection = sections[activeSection + 1];
+      trackNavigation(fromSection, toSection);
       onSectionChange(activeSection + 1);
     }
   };
@@ -40,7 +48,12 @@ const HorizontalNav = ({ activeSection, onSectionChange, sections }: HorizontalN
             {sections.map((section, index) => (
               <button
                 key={section}
-                onClick={() => onSectionChange(index)}
+                onClick={() => {
+                  if (index !== activeSection) {
+                    trackNavigation(sections[activeSection], section);
+                  }
+                  onSectionChange(index);
+                }}
                 className={`px-4 py-2 font-mono text-xs uppercase tracking-widest whitespace-nowrap transition-all ${
                   activeSection === index
                     ? 'text-foreground bg-foreground/10 border border-foreground/30'
