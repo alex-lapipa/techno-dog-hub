@@ -56,8 +56,8 @@ const HorizontalNav = ({ activeSection, onSectionChange, sections }: HorizontalN
                 }}
                 className={`px-4 py-2 font-mono text-xs uppercase tracking-widest whitespace-nowrap transition-all ${
                   activeSection === index
-                    ? 'text-foreground bg-foreground/10 border border-foreground/30'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-logo-green bg-logo-green/10 border border-logo-green/30 drop-shadow-[0_0_6px_hsl(var(--logo-green)/0.4)]'
+                    : 'text-muted-foreground hover:text-logo-green'
                 }`}
               >
                 {section}
@@ -78,7 +78,7 @@ const HorizontalNav = ({ activeSection, onSectionChange, sections }: HorizontalN
         {/* Progress Bar */}
         <div className="h-px bg-border">
           <div
-            className="h-full bg-foreground transition-all duration-300"
+            className="h-full bg-logo-green transition-all duration-300"
             style={{ width: `${((activeSection + 1) / sections.length) * 100}%` }}
           />
         </div>

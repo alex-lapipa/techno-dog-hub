@@ -127,8 +127,8 @@ const Header = () => {
                 <Link
                   to={item.path}
                   onClick={() => trackNavigation(location.pathname, item.path)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-shadow-neon ${
-                    isActive(item.path) ? 'text-foreground text-shadow-neon' : 'text-muted-foreground hover:text-foreground'
+                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
+                    isActive(item.path) ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' : 'text-muted-foreground hover:text-logo-green'
                   }`}
                 >
                   {item.label[language]}
@@ -145,8 +145,8 @@ const Header = () => {
                         onClick={() => trackNavigation(location.pathname, subItem.path)}
                         className={`block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
                           isSubItemActive(subItem.path) 
-                            ? 'text-foreground bg-card border-l-2 border-primary' 
-                            : 'text-muted-foreground hover:text-foreground hover:bg-card'
+                            ? 'text-logo-green bg-card border-l-2 border-logo-green' 
+                            : 'text-muted-foreground hover:text-logo-green hover:bg-card'
                         }`}
                       >
                         {subItem.label[language]}
@@ -186,7 +186,7 @@ const Header = () => {
                           to={item.path}
                           onClick={() => setMobileMenuOpen(false)}
                           className={`block px-4 py-3 text-sm font-mono uppercase tracking-wider transition-colors hover:bg-card ${
-                            isActive(item.path) ? 'text-foreground bg-card' : 'text-muted-foreground'
+                            isActive(item.path) ? 'text-logo-green bg-card' : 'text-muted-foreground'
                           }`}
                         >
                           {item.label[language]}
@@ -200,8 +200,8 @@ const Header = () => {
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={`block px-6 py-2 text-xs font-mono uppercase tracking-wider transition-colors ${
                                   isSubItemActive(subItem.path)
-                                    ? 'text-foreground border-l-2 border-primary ml-[-2px]'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                    ? 'text-logo-green border-l-2 border-logo-green ml-[-2px]'
+                                    : 'text-muted-foreground hover:text-logo-green'
                                 }`}
                               >
                                 {subItem.label[language]}
