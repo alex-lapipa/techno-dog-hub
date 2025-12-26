@@ -84,3 +84,6 @@ verify_jwt = false
 
 [functions.batch-upload-artists]
 verify_jwt = false
+
+[functions.write-article]
+verify_jwt = false
