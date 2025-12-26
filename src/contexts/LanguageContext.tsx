@@ -21,8 +21,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Hero
     'hero.terminal': 'cat /festivals/europe/2025',
     'hero.title': 'techno.dog',
-    'hero.subtitle': 'European Festivals',
-    'hero.description': 'Your monthly portal for experimental electronic music and techno culture. Aquasella, L.E.V., and the most relevant events across the continent.',
+    'hero.subtitle': 'Global Techno Knowledge Hub',
+    'hero.tagline': 'A daily, open platform dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.',
+    'hero.description': 'The collaborative digital magazine and database for the global techno community.',
     'hero.explore': 'Explore festivals',
     'hero.festivals': 'Festivals',
     'hero.countries': 'Countries',
@@ -66,8 +67,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Hero
     'hero.terminal': 'cat /festivales/europa/2025',
     'hero.title': 'techno.dog',
-    'hero.subtitle': 'Festivales Europa',
-    'hero.description': 'Tu portal mensual de música electrónica experimental y cultura techno. Aquasella, L.E.V., y los eventos más relevantes del continente.',
+    'hero.subtitle': 'Centro Global de Conocimiento Techno',
+    'hero.tagline': 'Una plataforma abierta y diaria dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream.',
+    'hero.description': 'La revista digital colaborativa y base de datos para la comunidad techno global.',
     'hero.explore': 'Explorar festivales',
     'hero.festivals': 'Festivales',
     'hero.countries': 'Países',
