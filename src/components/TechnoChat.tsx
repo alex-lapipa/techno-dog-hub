@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Badge } from '@/components/ui/badge';
+import { RotateCcw } from 'lucide-react';
 
 // Create URL-friendly slug from artist name
 const createArtistSlug = (name: string): string => {
@@ -163,6 +164,12 @@ const TechnoChat = () => {
     }
   };
 
+  const clearChat = () => {
+    setMessages([]);
+    setReferencedArtists([]);
+    setInput('');
+  };
+
   return (
     <section id="chat" className="py-20 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
@@ -173,9 +180,20 @@ const TechnoChat = () => {
               <div className="w-2 h-2 rounded-full bg-yellow-500" />
               <div className="w-2 h-2 rounded-full bg-green-500" />
             </div>
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="font-mono text-xs text-muted-foreground flex-1">
               techno_knowledge_base.exe
             </span>
+            {messages.length > 0 && (
+              <button
+                onClick={clearChat}
+                disabled={isLoading}
+                className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors disabled:opacity-50 flex items-center gap-1"
+                title="Limpiar chat"
+              >
+                <RotateCcw className="w-3 h-3" />
+                CLEAR
+              </button>
+            )}
           </div>
           
           <div className="p-6">
