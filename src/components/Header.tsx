@@ -86,6 +86,7 @@ const Header = () => {
     {
       label: { en: 'Developer API', es: 'API' },
       path: '/developer',
+      highlight: true,
     },
   ];
 
@@ -124,10 +125,15 @@ const Header = () => {
                 <Link
                   to={item.path}
                   onClick={() => trackNavigation(location.pathname, item.path)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
-                    isActive(item.path) ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' : 'text-muted-foreground hover:text-logo-green'
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
+                    item.highlight 
+                      ? 'text-logo-green border border-logo-green/50 bg-logo-green/10 rounded-sm hover:bg-logo-green/20 hover:border-logo-green' 
+                      : isActive(item.path) 
+                        ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
+                        : 'text-muted-foreground hover:text-logo-green'
                   }`}
                 >
+                  {item.highlight && <span className="w-1.5 h-1.5 rounded-full bg-logo-green animate-pulse" />}
                   {item.label[language]}
                   {item.sub && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
                 </Link>
