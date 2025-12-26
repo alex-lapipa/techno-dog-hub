@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Copy, Key, Plus, Trash2, Eye, EyeOff, AlertTriangle, Activity, Zap } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,9 @@ interface ApiKey {
   status: string;
   created_at: string;
   last_used_at: string | null;
+  rate_limit_per_minute: number;
+  rate_limit_per_day: number;
+  total_requests: number;
 }
 
 export default function Developer() {
@@ -98,13 +102,6 @@ export default function Developer() {
 
   const revokeKey = async (keyId: string) => {
     try {
-      const response = await supabase.functions.invoke('api-keys', {
-        method: 'DELETE',
-        body: {},
-        headers: {},
-      });
-
-      // Use query params for delete
       const { error } = await supabase.functions.invoke(`api-keys?id=${keyId}`, {
         method: 'DELETE',
       });
@@ -132,6 +129,10 @@ export default function Developer() {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat().format(num);
   };
 
   if (authLoading) {
@@ -165,6 +166,8 @@ export default function Developer() {
     );
   }
 
+  const activeKey = keys.find(k => k.status === 'active');
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -174,6 +177,42 @@ export default function Developer() {
             Manage your API keys to access techno.dog programmatically.
           </p>
         </div>
+
+        {/* Rate Limits Overview */}
+        {activeKey && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <Zap className="h-4 w-4" />
+                  Rate Limit (per minute)
+                </div>
+                <div className="text-2xl font-bold">{activeKey.rate_limit_per_minute}</div>
+                <p className="text-xs text-muted-foreground mt-1">requests/min</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <Activity className="h-4 w-4" />
+                  Daily Limit
+                </div>
+                <div className="text-2xl font-bold">{formatNumber(activeKey.rate_limit_per_day)}</div>
+                <p className="text-xs text-muted-foreground mt-1">requests/day</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                  <Key className="h-4 w-4" />
+                  Total Requests
+                </div>
+                <div className="text-2xl font-bold">{formatNumber(activeKey.total_requests)}</div>
+                <p className="text-xs text-muted-foreground mt-1">all time</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Create New Key */}
         <Card className="mb-8">
@@ -239,6 +278,11 @@ export default function Developer() {
                         Created: {formatDate(key.created_at)}
                         {key.last_used_at && ` • Last used: ${formatDate(key.last_used_at)}`}
                       </div>
+                      {key.status === 'active' && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {formatNumber(key.total_requests)} total requests • {key.rate_limit_per_minute}/min limit
+                        </div>
+                      )}
                     </div>
                     {key.status === 'active' && (
                       <AlertDialog>
@@ -271,6 +315,37 @@ export default function Developer() {
           </CardContent>
         </Card>
 
+        {/* Rate Limits Info */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="text-lg">Rate Limits</CardTitle>
+            <CardDescription>
+              API rate limits protect the service from abuse.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Per Minute</span>
+                  <span className="text-muted-foreground">60 requests</span>
+                </div>
+                <Progress value={0} className="h-2" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Per Day</span>
+                  <span className="text-muted-foreground">10,000 requests</span>
+                </div>
+                <Progress value={0} className="h-2" />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Rate limit headers are included in API responses: <code className="bg-muted px-1 rounded">X-RateLimit-Limit</code>, <code className="bg-muted px-1 rounded">X-RateLimit-Remaining</code>, <code className="bg-muted px-1 rounded">X-RateLimit-Reset</code>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* API Usage Example */}
         <Card className="mt-8">
           <CardHeader>
@@ -288,6 +363,20 @@ export default function Developer() {
             <p className="text-sm text-muted-foreground mt-4">
               Replace <code className="bg-muted px-1 rounded">YOUR_API_KEY</code> with your actual API key.
             </p>
+            <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium mb-2">Example Response:</p>
+              <pre className="text-xs text-muted-foreground overflow-x-auto">{`{
+  "ok": true,
+  "project": "techno.dog",
+  "timestamp": "2025-12-26T19:00:00Z",
+  "version": "v1",
+  "rateLimit": {
+    "limit": 60,
+    "remaining": 59,
+    "resetAt": "2025-12-26T19:01:00Z"
+  }
+}`}</pre>
+            </div>
           </CardContent>
         </Card>
 

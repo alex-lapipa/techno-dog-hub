@@ -18,13 +18,22 @@ interface KeyRecord {
   id: string;
   user_id: string;
   status: string;
+  rate_limit_per_minute: number;
+  rate_limit_per_day: number;
+}
+
+interface RateLimitResult {
+  allowed: boolean;
+  current_count: number;
+  limit_remaining: number;
+  reset_at: string;
 }
 
 // Validate API key and return user info
 async function validateApiKey(
   apiKey: string, 
   supabase: SupabaseClient
-): Promise<{ valid: boolean; userId?: string; keyId?: string; error?: string }> {
+): Promise<{ valid: boolean; userId?: string; keyId?: string; rateLimit?: number; error?: string }> {
   if (!apiKey || !apiKey.startsWith('td_live_')) {
     return { valid: false, error: 'Invalid API key format' };
   }
@@ -33,7 +42,7 @@ async function validateApiKey(
 
   const { data, error } = await supabase
     .from('api_keys')
-    .select('id, user_id, status')
+    .select('id, user_id, status, rate_limit_per_minute, rate_limit_per_day')
     .eq('key_hash', keyHash)
     .eq('status', 'active')
     .single();
@@ -50,7 +59,45 @@ async function validateApiKey(
     .update({ last_used_at: new Date().toISOString() })
     .eq('id', keyRecord.id);
 
-  return { valid: true, userId: keyRecord.user_id, keyId: keyRecord.id };
+  return { 
+    valid: true, 
+    userId: keyRecord.user_id, 
+    keyId: keyRecord.id,
+    rateLimit: keyRecord.rate_limit_per_minute 
+  };
+}
+
+// Check rate limit using database function
+async function checkRateLimit(
+  supabase: SupabaseClient,
+  keyId: string,
+  userId: string,
+  endpoint: string,
+  limitPerMinute: number
+): Promise<{ allowed: boolean; remaining: number; resetAt: string }> {
+  const { data, error } = await supabase.rpc('check_rate_limit', {
+    p_api_key_id: keyId,
+    p_user_id: userId,
+    p_endpoint: endpoint,
+    p_limit_per_minute: limitPerMinute
+  });
+
+  if (error) {
+    console.error('Rate limit check error:', error);
+    // Allow request on error but log it
+    return { allowed: true, remaining: 0, resetAt: new Date().toISOString() };
+  }
+
+  const result = data?.[0] as RateLimitResult | undefined;
+  if (!result) {
+    return { allowed: true, remaining: 0, resetAt: new Date().toISOString() };
+  }
+
+  return {
+    allowed: result.allowed,
+    remaining: result.limit_remaining,
+    resetAt: result.reset_at
+  };
 }
 
 Deno.serve(async (req) => {
@@ -85,16 +132,51 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`API ping from user: ${validation.userId}`);
+    // Check rate limit
+    const rateLimit = await checkRateLimit(
+      supabase,
+      validation.keyId!,
+      validation.userId!,
+      '/api/v1/ping',
+      validation.rateLimit || 60
+    );
+
+    // Add rate limit headers
+    const rateLimitHeaders = {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+      'X-RateLimit-Limit': String(validation.rateLimit || 60),
+      'X-RateLimit-Remaining': String(rateLimit.remaining),
+      'X-RateLimit-Reset': rateLimit.resetAt,
+    };
+
+    if (!rateLimit.allowed) {
+      console.log(`Rate limit exceeded for user: ${validation.userId}`);
+      return new Response(
+        JSON.stringify({ 
+          ok: false, 
+          error: 'Rate limit exceeded. Please try again later.',
+          retryAfter: rateLimit.resetAt
+        }),
+        { status: 429, headers: rateLimitHeaders }
+      );
+    }
+
+    console.log(`API ping from user: ${validation.userId}, remaining: ${rateLimit.remaining}`);
 
     return new Response(
       JSON.stringify({
         ok: true,
         project: 'techno.dog',
         timestamp: new Date().toISOString(),
-        version: 'v1'
+        version: 'v1',
+        rateLimit: {
+          limit: validation.rateLimit || 60,
+          remaining: rateLimit.remaining,
+          resetAt: rateLimit.resetAt
+        }
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: rateLimitHeaders }
     );
 
   } catch (error) {
