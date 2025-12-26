@@ -58,11 +58,14 @@ const Header = () => {
     {
       label: { en: 'Artists', es: 'Artistas' },
       path: '/artists',
-      sub: [
-        { label: { en: 'Directory', es: 'Directorio' }, path: '/artists' },
-        { label: { en: 'Labels', es: 'Sellos' }, path: '/labels' },
-        { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
-      ]
+    },
+    {
+      label: { en: 'Labels', es: 'Sellos' },
+      path: '/labels',
+    },
+    {
+      label: { en: 'Crews', es: 'Crews' },
+      path: '/crews',
     },
     {
       label: { en: 'Releases', es: 'Lanzamientos' },
