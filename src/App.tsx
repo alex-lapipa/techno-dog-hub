@@ -30,7 +30,7 @@ const CrewDetail = lazy(() => import("./pages/CrewDetail"));
 const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
 const UserStories = lazy(() => import("./pages/UserStories"));
-const Documentation = lazy(() => import("./pages/Documentation"));
+
 const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const SubmissionsAdmin = lazy(() => import("./pages/SubmissionsAdmin"));
 const NewsDrafts = lazy(() => import("./pages/NewsDrafts"));
@@ -114,14 +114,12 @@ const App = () => (
                   <Route path="/gear" element={<Gear />} />
                   <Route path="/gear/:id" element={<GearDetail />} />
                   
-                  {/* Documentation */}
-                  <Route path="/docs" element={<Documentation />} />
+                  {/* Developers (merged docs + API) */}
+                  <Route path="/developer" element={<Developer />} />
+                  <Route path="/docs" element={<Developer />} />
                   
                   {/* Analytics (Admin only) */}
                   <Route path="/analytics" element={<Analytics />} />
-                  
-                  {/* Developer API */}
-                  <Route path="/developer" element={<Developer />} />
                   
                   {/* Community */}
                   <Route path="/submit" element={<Submit />} />
