@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -101,12 +101,19 @@ const AdminDashboard = () => {
 
   const adminTools = [
     {
+      title: "AI Control Center",
+      description: "Claude + GPT orchestration: Review → Implement → Validate",
+      icon: Bot,
+      path: "/admin/control-center",
+      count: null,
+      highlight: true,
+    },
+    {
       title: "User & Role Management",
       description: "Manage users, grant/revoke admin roles",
       icon: Crown,
       path: "/admin/users",
       count: null,
-      highlight: true,
     },
     {
       title: "Media Engine",

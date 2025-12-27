@@ -47,6 +47,7 @@ const MediaAdmin = lazy(() => import("./pages/MediaAdmin"));
 const AdminAudit = lazy(() => import("./pages/AdminAudit"));
 const MediaEngine = lazy(() => import("./pages/MediaEngine"));
 const UserRoleManagement = lazy(() => import("./pages/UserRoleManagement"));
+const AdminControlCenter = lazy(() => import("./pages/AdminControlCenter"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -102,6 +103,7 @@ const App = () => (
                   <Route path="/admin/audit" element={<AdminAudit />} />
                   <Route path="/admin/media-engine" element={<MediaEngine />} />
                   <Route path="/admin/users" element={<UserRoleManagement />} />
+                  <Route path="/admin/control-center" element={<AdminControlCenter />} />
                   
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
