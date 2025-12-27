@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import eulogioFullLogo from "@/assets/eulogio-full-logo.jpg";
+import eulogioIcon from "@/assets/eulogio-e-icon.jpg";
 
 const Store = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -241,11 +241,11 @@ const Store = () => {
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNDUsMTU4LDExLDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
                 <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-10 p-6 md:p-10">
                   {/* Logo */}
-                  <div className="shrink-0">
+                  <div className="shrink-0 bg-[#333] p-3 md:p-4">
                     <img 
-                      src={eulogioFullLogo}
+                      src={eulogioIcon}
                       alt="Eulogio" 
-                      className="h-16 md:h-24 w-auto object-contain"
+                      className="h-12 md:h-16 w-auto object-contain"
                     />
                   </div>
                   
