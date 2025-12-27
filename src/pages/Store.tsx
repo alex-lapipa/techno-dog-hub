@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CartDrawer, CartButton } from "@/components/store/CartDrawer";
+import { GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { fetchProducts, fetchCollections, ShopifyProductEdge, ShopifyCollection } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 
@@ -39,6 +40,9 @@ const Store = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* SVG Filter for glitch effect - render once */}
+      <GlitchSVGFilter />
+      
       <PageSEO
         title="Store | techno.dog"
         description="Objects for people who live inside sound. Official techno.dog merchandise."
