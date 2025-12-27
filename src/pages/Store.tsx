@@ -22,7 +22,8 @@ const Store = () => {
 
   const handleNotifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!notifyEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail)) {
+    const emailToSubmit = notifyEmail.toLowerCase().trim();
+    if (!emailToSubmit || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToSubmit)) {
       toast.error("Please enter a valid email address");
       return;
     }
@@ -31,7 +32,7 @@ const Store = () => {
     try {
       const { error } = await supabase
         .from("launch_notifications")
-        .insert({ email: notifyEmail.toLowerCase().trim() });
+        .insert({ email: emailToSubmit });
 
       if (error) {
         if (error.code === "23505") {
@@ -41,7 +42,16 @@ const Store = () => {
           throw error;
         }
       } else {
-        toast.success("You're on the list! We'll notify you when we launch.");
+        // Send confirmation email
+        supabase.functions.invoke("launch-notification-email", {
+          body: { email: emailToSubmit },
+        }).then(({ error: emailError }) => {
+          if (emailError) {
+            console.error("Failed to send confirmation email:", emailError);
+          }
+        });
+
+        toast.success("You're on the list! Check your inbox for confirmation.");
         setIsSubscribed(true);
       }
     } catch (error) {

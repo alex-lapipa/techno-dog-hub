@@ -135,3 +135,6 @@ verify_jwt = false
 
 [functions.activity-log]
 verify_jwt = false
+
+[functions.launch-notification-email]
+verify_jwt = false
