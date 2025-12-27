@@ -4,13 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -63,7 +61,6 @@ const submissionSchema = z.object({
 type SubmissionFormData = z.infer<typeof submissionSchema>;
 
 const CommunitySubmissionForm = () => {
-  const { language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,11 +79,11 @@ const CommunitySubmissionForm = () => {
   });
 
   const typeLabels = {
-    artist: { en: "Artist / DJ", es: "Artista / DJ" },
-    venue: { en: "Venue / Club", es: "Club / Local" },
-    festival: { en: "Festival", es: "Festival" },
-    label: { en: "Record Label", es: "Sello Discográfico" },
-    other: { en: "Other", es: "Otro" },
+    artist: "Artist / DJ",
+    venue: "Venue / Club",
+    festival: "Festival",
+    label: "Record Label",
+    other: "Other",
   };
 
   const onSubmit = async (data: SubmissionFormData) => {
@@ -108,11 +105,8 @@ const CommunitySubmissionForm = () => {
       setIsSuccess(true);
       form.reset();
       toast({
-        title: language === "en" ? "Submission received" : "Sugerencia recibida",
-        description:
-          language === "en"
-            ? "Thank you for contributing to the techno knowledge base!"
-            : "¡Gracias por contribuir a la base de conocimiento techno!",
+        title: "Submission received",
+        description: "Thank you for contributing to the techno knowledge base!",
       });
 
       // Reset success state after 5 seconds
@@ -120,11 +114,8 @@ const CommunitySubmissionForm = () => {
     } catch (error) {
       console.error("Submission error:", error);
       toast({
-        title: language === "en" ? "Submission failed" : "Error al enviar",
-        description:
-          language === "en"
-            ? "Please try again later."
-            : "Por favor, inténtalo más tarde.",
+        title: "Submission failed",
+        description: "Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -137,19 +128,17 @@ const CommunitySubmissionForm = () => {
       <div className="border border-primary bg-card p-8 text-center">
         <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
         <h3 className="font-mono text-xl uppercase tracking-tight mb-2">
-          {language === "en" ? "Submission Received" : "Sugerencia Recibida"}
+          Submission Received
         </h3>
         <p className="font-mono text-sm text-muted-foreground mb-4">
-          {language === "en"
-            ? "Our team will review your suggestion. Thank you for contributing!"
-            : "Nuestro equipo revisará tu sugerencia. ¡Gracias por contribuir!"}
+          Our team will review your suggestion. Thank you for contributing!
         </p>
         <Button
           variant="outline"
           onClick={() => setIsSuccess(false)}
           className="font-mono text-xs uppercase"
         >
-          {language === "en" ? "Submit another" : "Enviar otra"}
+          Submit another
         </Button>
       </div>
     );
@@ -159,7 +148,7 @@ const CommunitySubmissionForm = () => {
     <div className="border border-border bg-card">
       <div className="border-b border-border p-4">
         <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-          // {language === "en" ? "Community submission" : "Sugerencia de la comunidad"}
+          // Community submission
         </div>
       </div>
 
@@ -172,22 +161,18 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Type *" : "Tipo *"}
+                  Type *
                 </FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="font-mono">
-                      <SelectValue
-                        placeholder={
-                          language === "en" ? "Select type..." : "Seleccionar tipo..."
-                        }
-                      />
+                      <SelectValue placeholder="Select type..." />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {Object.entries(typeLabels).map(([value, label]) => (
                       <SelectItem key={value} value={value} className="font-mono">
-                        {label[language]}
+                        {label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -204,16 +189,12 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Name *" : "Nombre *"}
+                  Name *
                 </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder={
-                      language === "en"
-                        ? "e.g., Paula Temple, Bassiani, Dekmantel"
-                        : "ej., Paula Temple, Bassiani, Dekmantel"
-                    }
+                    placeholder="e.g., Paula Temple, Bassiani, Dekmantel"
                     className="font-mono"
                   />
                 </FormControl>
@@ -229,16 +210,12 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Location" : "Ubicación"}
+                  Location
                 </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder={
-                      language === "en"
-                        ? "e.g., Berlin, Germany"
-                        : "ej., Berlín, Alemania"
-                    }
+                    placeholder="e.g., Berlin, Germany"
                     className="font-mono"
                   />
                 </FormControl>
@@ -254,16 +231,12 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Description" : "Descripción"}
+                  Description
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder={
-                      language === "en"
-                        ? "Why should this be in the archive? What makes it significant to underground techno?"
-                        : "¿Por qué debería estar en el archivo? ¿Qué lo hace significativo para el techno underground?"
-                    }
+                    placeholder="Why should this be in the archive? What makes it significant to underground techno?"
                     className="font-mono min-h-[100px]"
                   />
                 </FormControl>
@@ -279,7 +252,7 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Website / Link" : "Sitio Web / Enlace"}
+                  Website / Link
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -301,16 +274,12 @@ const CommunitySubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {language === "en" ? "Additional Info" : "Información Adicional"}
+                  Additional Info
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder={
-                      language === "en"
-                        ? "Any other relevant details, social links, notable releases, etc."
-                        : "Cualquier otro detalle relevante, redes sociales, lanzamientos notables, etc."
-                    }
+                    placeholder="Any other relevant details, social links, notable releases, etc."
                     className="font-mono min-h-[80px]"
                   />
                 </FormControl>
@@ -329,20 +298,18 @@ const CommunitySubmissionForm = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {language === "en" ? "Submitting..." : "Enviando..."}
+                  Submitting...
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {language === "en" ? "Submit Suggestion" : "Enviar Sugerencia"}
+                  Submit Suggestion
                 </>
               )}
             </Button>
 
             <p className="font-mono text-xs text-muted-foreground text-center mt-4">
-              {language === "en"
-                ? "Submissions are reviewed by our team. Only quality, underground-focused content will be added."
-                : "Las sugerencias son revisadas por nuestro equipo. Solo se añadirá contenido de calidad enfocado en el underground."}
+              Submissions are reviewed by our team. Only quality, underground-focused content will be added.
             </p>
           </div>
         </form>
