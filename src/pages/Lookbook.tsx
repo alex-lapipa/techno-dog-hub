@@ -86,6 +86,77 @@ const lookbookImages = [
     handle: "eulogio-x-techno-dog",
     setting: "DJ Booth",
   },
+  // NEW: Festival & Rave Lifestyle Photos
+  {
+    src: "/src/assets/products/lifestyle-hoodie-festival.jpg",
+    alt: "Hoodie at outdoor festival sunset",
+    product: "Night Shift Hoodie",
+    handle: "night-shift",
+    setting: "Outdoor Festival",
+  },
+  {
+    src: "/src/assets/products/lifestyle-crop-top-diverse1.jpg",
+    alt: "Crop Top dancing at sunset festival",
+    product: "Rave Crop Top",
+    handle: "rave-crop-top",
+    setting: "Festival Stage",
+  },
+  {
+    src: "/src/assets/products/lifestyle-leggings-diverse1.jpg",
+    alt: "Leggings on packed dancefloor with lasers",
+    product: "Mainroom Leggings",
+    handle: "mainroom-leggings",
+    setting: "Dancefloor",
+  },
+  {
+    src: "/src/assets/products/lifestyle-warehouse-tshirt-diverse1.jpg",
+    alt: "Tee at forest rave with laser beams",
+    product: "Warehouse Tee",
+    handle: "warehouse",
+    setting: "Forest Rave",
+  },
+  {
+    src: "/src/assets/products/lifestyle-sports-bra-diverse1.jpg",
+    alt: "Sports Bra dancing at sunrise festival",
+    product: "Peak Hour Sports Bra",
+    handle: "peak-hour-sports-bra",
+    setting: "Sunrise Set",
+  },
+  {
+    src: "/src/assets/products/lifestyle-shorts-diverse1.jpg",
+    alt: "Shorts on crowded dancefloor with lasers",
+    product: "Afterhours Bike Shorts",
+    handle: "afterhours-bike-shorts",
+    setting: "Peak Time",
+  },
+  {
+    src: "/src/assets/products/lifestyle-longsleeve-diverse1.jpg",
+    alt: "Longsleeve at main stage festival",
+    product: "Closing Set Longsleeve",
+    handle: "closing-set",
+    setting: "Main Stage",
+  },
+  {
+    src: "/src/assets/products/lifestyle-tote-diverse1.jpg",
+    alt: "Record Bag at industrial outdoor rave",
+    product: "Record Bag",
+    handle: "record-bag",
+    setting: "Industrial Rave",
+  },
+  {
+    src: "/src/assets/products/lifestyle-cap-diverse1.jpg",
+    alt: "Cap on dancefloor hands in air",
+    product: "Low Profile Cap",
+    handle: "low-profile",
+    setting: "Hands Up",
+  },
+  {
+    src: "/src/assets/products/lifestyle-vneck-diverse1.jpg",
+    alt: "V-Neck at dusty outdoor festival",
+    product: "Fitted V-Neck",
+    handle: "womens-fitted-v-neck",
+    setting: "Festival Dust",
+  },
 ];
 
 // Import lifestyle images for bundling
@@ -100,6 +171,17 @@ import lifestyleTote from "@/assets/products/lifestyle-tote-street.jpg";
 import lifestyleSportsBra from "@/assets/products/lifestyle-sports-bra-club.jpg";
 import lifestyleWomensTee from "@/assets/products/lifestyle-womens-tee-rave.jpg";
 import lifestyleWarehouseSessions from "@/assets/products/lifestyle-warehouse-sessions-club.jpg";
+// NEW: Festival & Rave imports
+import lifestyleHoodieFestival from "@/assets/products/lifestyle-hoodie-festival.jpg";
+import lifestyleCropTopDiverse1 from "@/assets/products/lifestyle-crop-top-diverse1.jpg";
+import lifestyleLeggingsDiverse1 from "@/assets/products/lifestyle-leggings-diverse1.jpg";
+import lifestyleWarehouseTshirtDiverse1 from "@/assets/products/lifestyle-warehouse-tshirt-diverse1.jpg";
+import lifestyleSportsBraDiverse1 from "@/assets/products/lifestyle-sports-bra-diverse1.jpg";
+import lifestyleShortsDiverse1 from "@/assets/products/lifestyle-shorts-diverse1.jpg";
+import lifestyleLongsleeveDiverse1 from "@/assets/products/lifestyle-longsleeve-diverse1.jpg";
+import lifestyleToteDiverse1 from "@/assets/products/lifestyle-tote-diverse1.jpg";
+import lifestyleCapDiverse1 from "@/assets/products/lifestyle-cap-diverse1.jpg";
+import lifestyleVneckDiverse1 from "@/assets/products/lifestyle-vneck-diverse1.jpg";
 
 const imageImports = [
   lifestyleWarehouse,
@@ -113,6 +195,17 @@ const imageImports = [
   lifestyleSportsBra,
   lifestyleWomensTee,
   lifestyleWarehouseSessions,
+  // NEW images
+  lifestyleHoodieFestival,
+  lifestyleCropTopDiverse1,
+  lifestyleLeggingsDiverse1,
+  lifestyleWarehouseTshirtDiverse1,
+  lifestyleSportsBraDiverse1,
+  lifestyleShortsDiverse1,
+  lifestyleLongsleeveDiverse1,
+  lifestyleToteDiverse1,
+  lifestyleCapDiverse1,
+  lifestyleVneckDiverse1,
 ];
 
 const Lookbook = () => {
