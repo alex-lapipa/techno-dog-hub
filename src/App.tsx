@@ -11,6 +11,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { HelmetProvider } from 'react-helmet-async';
 import ParticleBackground from "@/components/ParticleBackground";
+import FilmGrainOverlay from "@/components/FilmGrainOverlay";
 
 // Eager load - critical path
 import Index from "./pages/Index";
@@ -71,6 +72,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ParticleBackground />
+              <FilmGrainOverlay />
               <ScrollToTop />
               <ScrollToTopButton />
               <Suspense fallback={<PageLoader />}>
