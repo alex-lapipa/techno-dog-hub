@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, Shield } from "lucide-react";
+import { ChevronDown, Menu, Shield, Heart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
@@ -113,7 +113,13 @@ const Header = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Link to="/support">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-crimson hover:text-crimson hover:bg-crimson/10">
+                <Heart className="w-3.5 h-3.5 mr-1.5" />
+                Support
+              </Button>
+            </Link>
             <Link to="/admin">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
                 <Shield className="w-3.5 h-3.5 mr-1.5" />
@@ -166,7 +172,13 @@ const Header = () => {
                       </div>
                     ))}
                   </nav>
-                  <div className="p-4 border-t border-border">
+                  <div className="p-4 border-t border-border space-y-2">
+                    <Link to="/support" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider text-crimson border-crimson/50 hover:bg-crimson/10">
+                        <Heart className="w-3.5 h-3.5 mr-1.5" />
+                        Support
+                      </Button>
+                    </Link>
                     <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="brutalist" size="sm" className="w-full font-mono text-xs uppercase tracking-wider">
                         <Shield className="w-3.5 h-3.5 mr-1.5" />

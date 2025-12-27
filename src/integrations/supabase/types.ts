@@ -343,6 +343,48 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_sponsor_requests: {
+        Row: {
+          admin_notes: string | null
+          company_name: string
+          contact_email: string
+          created_at: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          requested_amount_cents: number
+          status: string
+          tier: string | null
+          vat_number: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          company_name: string
+          contact_email: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          requested_amount_cents: number
+          status?: string
+          tier?: string | null
+          vat_number?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          company_name?: string
+          contact_email?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          requested_amount_cents?: number
+          status?: string
+          tier?: string | null
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
       dj_artists: {
         Row: {
           artist_name: string
@@ -634,6 +676,69 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      supporters: {
+        Row: {
+          amount_cents: number
+          cancelled_at: string | null
+          company_name: string | null
+          created_at: string
+          currency: string
+          email: string
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          notes: string | null
+          stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          support_mode: Database["public"]["Enums"]["support_mode"]
+          supporter_tier: Database["public"]["Enums"]["supporter_tier"]
+          updated_at: string
+          user_id: string | null
+          vat_number: string | null
+        }
+        Insert: {
+          amount_cents: number
+          cancelled_at?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          notes?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          support_mode: Database["public"]["Enums"]["support_mode"]
+          supporter_tier?: Database["public"]["Enums"]["supporter_tier"]
+          updated_at?: string
+          user_id?: string | null
+          vat_number?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          cancelled_at?: string | null
+          company_name?: string | null
+          created_at?: string
+          currency?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          notes?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          support_mode?: Database["public"]["Enums"]["support_mode"]
+          supporter_tier?: Database["public"]["Enums"]["supporter_tier"]
+          updated_at?: string
+          user_id?: string | null
+          vat_number?: string | null
         }
         Relationships: []
       }
@@ -1063,6 +1168,16 @@ export type Database = {
         | "community_page"
         | "other"
       community_status: "pending" | "verified" | "banned"
+      support_mode: "one_time" | "recurring" | "corporate"
+      supporter_tier:
+        | "free"
+        | "member"
+        | "patron"
+        | "founding"
+        | "bronze"
+        | "silver"
+        | "gold"
+        | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1199,6 +1314,17 @@ export const Constants = {
         "other",
       ],
       community_status: ["pending", "verified", "banned"],
+      support_mode: ["one_time", "recurring", "corporate"],
+      supporter_tier: [
+        "free",
+        "member",
+        "patron",
+        "founding",
+        "bronze",
+        "silver",
+        "gold",
+        "custom",
+      ],
     },
   },
 } as const
