@@ -102,3 +102,15 @@ verify_jwt = false
 
 [functions.regenerate-embeddings]
 verify_jwt = false
+
+[functions.media-curator]
+verify_jwt = false
+
+[functions.media-verify]
+verify_jwt = false
+
+[functions.media-api]
+verify_jwt = false
+
+[functions.media-scheduler]
+verify_jwt = false
