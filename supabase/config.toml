@@ -114,3 +114,6 @@ verify_jwt = false
 
 [functions.media-scheduler]
 verify_jwt = false
+
+[functions.admin-audit]
+verify_jwt = false
