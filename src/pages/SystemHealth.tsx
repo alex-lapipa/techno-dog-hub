@@ -22,7 +22,20 @@ import {
   XCircle,
   HelpCircle,
   Clock,
+  Bell,
+  BellOff,
 } from "lucide-react";
+
+interface HealthAlert {
+  id: string;
+  service_name: string;
+  alert_type: string;
+  severity: string;
+  message: string;
+  notified_at: string;
+  resolved_at: string | null;
+  created_at: string;
+}
 
 interface HealthCheck {
   name: string;
@@ -126,6 +139,184 @@ const FunctionRow = ({ check }: { check: HealthCheck }) => (
     </div>
   </div>
 );
+
+const HealthAlertsPanel = () => {
+  const [alerts, setAlerts] = useState<HealthAlert[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAlerts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("health_alerts")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      setAlerts(data || []);
+    } catch (e) {
+      console.error("Failed to fetch health alerts:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel("health-alerts-feed")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "health_alerts",
+        },
+        () => {
+          fetchAlerts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const formatTimeAgo = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  };
+
+  const getSeverityBadge = (severity: string, resolved: boolean) => {
+    if (resolved) {
+      return (
+        <Badge className="bg-logo-green/20 text-logo-green border-logo-green/30 font-mono text-[9px] uppercase">
+          Resolved
+        </Badge>
+      );
+    }
+    const variants: Record<string, string> = {
+      critical: "bg-crimson/20 text-crimson border-crimson/30",
+      warning: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
+      info: "bg-blue-500/20 text-blue-500 border-blue-500/30",
+    };
+    return (
+      <Badge className={`${variants[severity] || variants.warning} font-mono text-[9px] uppercase`}>
+        {severity}
+      </Badge>
+    );
+  };
+
+  const activeAlerts = alerts.filter((a) => !a.resolved_at);
+  const resolvedAlerts = alerts.filter((a) => a.resolved_at);
+
+  if (loading) {
+    return (
+      <div className="border border-border bg-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Bell className="w-4 h-4 text-muted-foreground animate-pulse" />
+          <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            Health Alerts
+          </h3>
+        </div>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse h-12 bg-muted rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-border bg-card p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          {activeAlerts.length > 0 ? (
+            <div className="relative">
+              <Bell className="w-4 h-4 text-crimson" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-crimson rounded-full flex items-center justify-center">
+                <span className="font-mono text-[8px] text-white">{activeAlerts.length}</span>
+              </span>
+            </div>
+          ) : (
+            <BellOff className="w-4 h-4 text-muted-foreground" />
+          )}
+          <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            Health Alerts
+          </h3>
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {activeAlerts.length} active / {resolvedAlerts.length} resolved
+        </span>
+      </div>
+
+      {alerts.length === 0 ? (
+        <div className="text-center py-8 border border-dashed border-border/50">
+          <CheckCircle2 className="w-8 h-8 mx-auto text-logo-green mb-2" />
+          <p className="font-mono text-xs text-muted-foreground">No alerts recorded</p>
+          <p className="font-mono text-[10px] text-muted-foreground mt-1">
+            System monitoring is active
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-[400px] overflow-y-auto">
+          {alerts.map((alert) => (
+            <div
+              key={alert.id}
+              className={`p-3 border transition-colors ${
+                alert.resolved_at
+                  ? "border-border/50 bg-muted/20"
+                  : alert.severity === "critical"
+                  ? "border-crimson/30 bg-crimson/5"
+                  : "border-yellow-500/30 bg-yellow-500/5"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="font-mono text-xs font-medium">
+                      {alert.service_name}
+                    </span>
+                    {getSeverityBadge(alert.severity, !!alert.resolved_at)}
+                    <Badge variant="outline" className="font-mono text-[9px]">
+                      {alert.alert_type}
+                    </Badge>
+                  </div>
+                  <p className="font-mono text-[11px] text-muted-foreground line-clamp-2">
+                    {alert.message}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {formatTimeAgo(alert.created_at)}
+                  </span>
+                  {alert.resolved_at && (
+                    <div className="font-mono text-[9px] text-logo-green mt-0.5">
+                      ✓ {formatTimeAgo(alert.resolved_at)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SystemHealth = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
@@ -344,6 +535,11 @@ const SystemHealth = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Health Alerts Panel */}
+            <div className="mb-8">
+              <HealthAlertsPanel />
             </div>
 
             {/* Latency Summary */}
