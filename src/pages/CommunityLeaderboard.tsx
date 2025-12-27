@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Trophy, 
   Medal, 
@@ -37,7 +36,6 @@ interface LeaderboardEntry {
 }
 
 const CommunityLeaderboard = () => {
-  const { language } = useLanguage();
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
@@ -65,7 +63,6 @@ const CommunityLeaderboard = () => {
       try {
         const dateFilter = getDateFilter(timeFilter);
 
-        // Get verified community profiles with trust scores
         const { data: profiles, error: profilesError } = await supabase
           .from("community_profiles")
           .select("id, display_name, email, trust_score, roles, city, country")
@@ -76,7 +73,6 @@ const CommunityLeaderboard = () => {
 
         if (profilesError) throw profilesError;
 
-        // Get approved submissions with optional date filter
         let submissionsQuery = supabase
           .from("community_submissions")
           .select("email, reviewed_at")
@@ -90,7 +86,6 @@ const CommunityLeaderboard = () => {
 
         if (submissionsError) throw submissionsError;
 
-        // Count submissions per email
         const submissionCounts: Record<string, number> = {};
         submissions?.forEach((sub) => {
           if (sub.email) {
@@ -98,27 +93,23 @@ const CommunityLeaderboard = () => {
           }
         });
 
-        // Merge data
         const leaderboardData: LeaderboardEntry[] = (profiles || []).map((profile) => ({
           ...profile,
           approved_count: submissionCounts[profile.email] || 0,
         }));
 
-        // Sort by combined score (trust_score * 2 + approved_count)
         leaderboardData.sort((a, b) => {
           const scoreA = a.trust_score * 2 + a.approved_count;
           const scoreB = b.trust_score * 2 + b.approved_count;
           return scoreB - scoreA;
         });
 
-        // For time-filtered views, only show those with recent activity
         const filteredData = dateFilter 
           ? leaderboardData.filter(entry => entry.approved_count > 0)
           : leaderboardData;
 
         setLeaders(filteredData.slice(0, 25));
 
-        // Calculate stats
         setStats({
           totalContributors: dateFilter 
             ? filteredData.filter(e => e.approved_count > 0).length 
@@ -164,102 +155,45 @@ const CommunityLeaderboard = () => {
 
   const getDisplayName = (entry: LeaderboardEntry) => {
     if (entry.display_name) return entry.display_name;
-    // Mask email: show first 2 chars + *** + domain
     const [local, domain] = entry.email.split("@");
     return `${local.slice(0, 2)}***@${domain}`;
   };
 
-  const content = {
-    en: {
-      title: "Community Leaderboard",
-      subtitle: "Top contributors to the techno.dog knowledge base",
-      backToComm: "Back to Community",
-      stats: {
-        contributors: "Active Contributors",
-        approved: "Approved Submissions",
-        topScore: "Highest Trust Score",
-      },
-      columns: {
-        rank: "Rank",
-        contributor: "Contributor",
-        trustScore: "Trust Score",
-        approved: "Approved",
-        location: "Location",
-      },
-      empty: "No contributors yet. Be the first!",
-      filters: {
-        all: "All Time",
-        weekly: "This Week",
-        monthly: "This Month",
-      },
-      periodLabel: "Period",
-    },
-    es: {
-      title: "Tabla de Líderes",
-      subtitle: "Principales contribuyentes a la base de conocimiento de techno.dog",
-      backToComm: "Volver a Comunidad",
-      stats: {
-        contributors: "Contribuyentes Activos",
-        approved: "Envíos Aprobados",
-        topScore: "Puntuación Más Alta",
-      },
-      columns: {
-        rank: "Rango",
-        contributor: "Contribuyente",
-        trustScore: "Confianza",
-        approved: "Aprobados",
-        location: "Ubicación",
-      },
-      empty: "Sin contribuyentes aún. ¡Sé el primero!",
-      filters: {
-        all: "Todo el tiempo",
-        weekly: "Esta Semana",
-        monthly: "Este Mes",
-      },
-      periodLabel: "Período",
-    },
-  };
-
-  const t = content[language];
-
   return (
     <>
       <Helmet>
-        <title>{t.title} | techno.dog</title>
-        <meta name="description" content={t.subtitle} />
+        <title>Community Leaderboard | techno.dog</title>
+        <meta name="description" content="Top contributors to the techno.dog knowledge base" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
         <Header />
 
         <main className="container mx-auto px-4 py-12 pt-24">
-          {/* Back Link */}
           <Link
             to="/community"
             className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            {t.backToComm}
+            Back to Community
           </Link>
 
-          {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Trophy className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold">{t.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold">Community Leaderboard</h1>
             </div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t.subtitle}
+              Top contributors to the techno.dog knowledge base
             </p>
           </div>
 
-          {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <Card className="border-border/50">
               <CardHeader className="pb-2">
                 <Users className="h-6 w-6 text-primary mb-2" />
                 <CardDescription className="text-xs uppercase tracking-wider">
-                  {t.stats.contributors}
+                  Active Contributors
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -275,7 +209,7 @@ const CommunityLeaderboard = () => {
               <CardHeader className="pb-2">
                 <CheckCircle2 className="h-6 w-6 text-green-500 mb-2" />
                 <CardDescription className="text-xs uppercase tracking-wider">
-                  {t.stats.approved}
+                  Approved Submissions
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -291,7 +225,7 @@ const CommunityLeaderboard = () => {
               <CardHeader className="pb-2">
                 <TrendingUp className="h-6 w-6 text-yellow-500 mb-2" />
                 <CardDescription className="text-xs uppercase tracking-wider">
-                  {t.stats.topScore}
+                  Highest Trust Score
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -304,28 +238,26 @@ const CommunityLeaderboard = () => {
             </Card>
           </div>
 
-          {/* Time Filter */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground font-mono">{t.periodLabel}:</span>
+              <span className="text-sm text-muted-foreground font-mono">Period:</span>
               <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
                 <TabsList className="bg-card border border-border">
                   <TabsTrigger value="all" className="font-mono text-xs">
-                    {t.filters.all}
+                    All Time
                   </TabsTrigger>
                   <TabsTrigger value="weekly" className="font-mono text-xs">
-                    {t.filters.weekly}
+                    This Week
                   </TabsTrigger>
                   <TabsTrigger value="monthly" className="font-mono text-xs">
-                    {t.filters.monthly}
+                    This Month
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
           </div>
 
-          {/* Leaderboard */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -333,8 +265,8 @@ const CommunityLeaderboard = () => {
                 {timeFilter === "all" 
                   ? "Top 25 Contributors" 
                   : timeFilter === "weekly" 
-                    ? (language === "en" ? "Top Contributors This Week" : "Mejores Contribuyentes Esta Semana")
-                    : (language === "en" ? "Top Contributors This Month" : "Mejores Contribuyentes Este Mes")}
+                    ? "Top Contributors This Week"
+                    : "Top Contributors This Month"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -351,31 +283,27 @@ const CommunityLeaderboard = () => {
               ) : leaders.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">{t.empty}</p>
+                  <p className="text-muted-foreground">No contributors yet. Be the first!</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {/* Header Row */}
                   <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 text-xs font-mono text-muted-foreground uppercase tracking-wider border-b border-border">
-                    <div className="col-span-1">{t.columns.rank}</div>
-                    <div className="col-span-5">{t.columns.contributor}</div>
-                    <div className="col-span-2 text-center">{t.columns.trustScore}</div>
-                    <div className="col-span-2 text-center">{t.columns.approved}</div>
-                    <div className="col-span-2 text-right">{t.columns.location}</div>
+                    <div className="col-span-1">Rank</div>
+                    <div className="col-span-5">Contributor</div>
+                    <div className="col-span-2 text-center">Trust Score</div>
+                    <div className="col-span-2 text-center">Approved</div>
+                    <div className="col-span-2 text-right">Location</div>
                   </div>
 
-                  {/* Leader Rows */}
                   {leaders.map((entry, index) => (
                     <div
                       key={entry.id}
                       className={`grid grid-cols-12 gap-4 px-4 py-3 rounded-lg border ${getRankBg(index + 1)} transition-colors hover:bg-card/80`}
                     >
-                      {/* Rank */}
                       <div className="col-span-2 md:col-span-1 flex items-center">
                         {getRankIcon(index + 1)}
                       </div>
 
-                      {/* Name & Roles */}
                       <div className="col-span-10 md:col-span-5 flex flex-col justify-center">
                         <p className="font-medium truncate">{getDisplayName(entry)}</p>
                         <div className="flex gap-1 mt-1">
@@ -387,7 +315,6 @@ const CommunityLeaderboard = () => {
                         </div>
                       </div>
 
-                      {/* Trust Score */}
                       <div className="col-span-4 md:col-span-2 flex items-center justify-center">
                         <Badge variant="secondary" className="font-mono">
                           <TrendingUp className="h-3 w-3 mr-1" />
@@ -395,7 +322,6 @@ const CommunityLeaderboard = () => {
                         </Badge>
                       </div>
 
-                      {/* Approved Count */}
                       <div className="col-span-4 md:col-span-2 flex items-center justify-center">
                         <Badge variant="outline" className="font-mono text-green-500 border-green-500/30">
                           <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -403,7 +329,6 @@ const CommunityLeaderboard = () => {
                         </Badge>
                       </div>
 
-                      {/* Location */}
                       <div className="col-span-4 md:col-span-2 flex items-center justify-end">
                         {entry.city || entry.country ? (
                           <span className="font-mono text-xs text-muted-foreground truncate">
@@ -420,12 +345,9 @@ const CommunityLeaderboard = () => {
             </CardContent>
           </Card>
 
-          {/* CTA */}
           <div className="mt-12 text-center">
             <p className="text-muted-foreground mb-4">
-              {language === "en"
-                ? "Want to climb the ranks? Start contributing!"
-                : "¿Quieres subir en la tabla? ¡Empieza a contribuir!"}
+              Want to climb the ranks? Start contributing!
             </p>
             <div className="flex justify-center gap-4">
               <Link
@@ -433,14 +355,14 @@ const CommunityLeaderboard = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 border border-border hover:bg-card transition-colors font-mono text-sm"
               >
                 <Camera className="h-4 w-4" />
-                {language === "en" ? "Upload Photos" : "Subir Fotos"}
+                Upload Photos
               </Link>
               <Link
                 to="/artists"
                 className="inline-flex items-center gap-2 px-4 py-2 border border-border hover:bg-card transition-colors font-mono text-sm"
               >
                 <FileText className="h-4 w-4" />
-                {language === "en" ? "Submit Corrections" : "Enviar Correcciones"}
+                Submit Corrections
               </Link>
             </div>
           </div>

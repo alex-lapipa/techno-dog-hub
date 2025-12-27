@@ -1,119 +1,67 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
-type Language = 'en' | 'es';
+// Simplified English-only translations
+const translations: Record<string, string> = {
+  // Header
+  'nav.festivals': 'Festivals',
+  'nav.aquasella': 'Aquasella',
+  'nav.lev': 'L.E.V.',
+  'nav.chat': 'AI Chat',
+  'nav.login': 'Login',
+  'nav.logout': 'Logout',
+  
+  // Hero
+  'hero.terminal': 'cat /festivals/europe/2025',
+  'hero.title': 'techno.dog',
+  'hero.subtitle': 'Global Techno Knowledge Hub',
+  'hero.tagline': 'A daily, open platform dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.',
+  'hero.description': 'The collaborative digital magazine and Technopedia. From Detroit to Tbilisi, Tokyo to Madrid, London to Berlin.',
+  'hero.explore': 'Explore festivals',
+  'hero.festivals': 'Festivals',
+  'hero.countries': 'Countries',
+  'hero.attendees': 'Attendees',
+  'hero.scroll': '[ scroll ]',
+  
+  // Festivals Section
+  'festivals.title': 'Festival Guide',
+  'festivals.subtitle': 'Essential European Events',
+  
+  // Aquasella
+  'aquasella.title': 'Aquasella',
+  'aquasella.subtitle': 'Asturias, Spain',
+  
+  // LEV
+  'lev.title': 'L.E.V. Festival',
+  'lev.subtitle': 'Audio Visual Art',
+  
+  // Chat
+  'chat.title': 'AI Assistant',
+  'chat.subtitle': 'Ask about festivals',
+  
+  // Footer
+  'footer.description': 'Community led open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream. Curated by Alex Lawton, Paloma Rocha, Antaine Reilly and Carlos González.',
+  'footer.explore': '// Explore',
+  'footer.social': '// Social',
+  'footer.artists': 'Artists',
+  'footer.calendar': 'Calendar',
+  'footer.news': 'News',
+  'footer.archive': 'Archive',
+};
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+  language: 'en';
   t: (key: string) => string;
 }
-
-const translations: Record<Language, Record<string, string>> = {
-  en: {
-    // Header
-    'nav.festivals': 'Festivals',
-    'nav.aquasella': 'Aquasella',
-    'nav.lev': 'L.E.V.',
-    'nav.chat': 'AI Chat',
-    'nav.login': 'Login',
-    'nav.logout': 'Logout',
-    
-    // Hero
-    'hero.terminal': 'cat /festivals/europe/2025',
-    'hero.title': 'techno.dog',
-    'hero.subtitle': 'Global Techno Knowledge Hub',
-    'hero.tagline': 'A daily, open platform dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.',
-    'hero.description': 'The collaborative digital magazine and Technopedia. From Detroit to Tbilisi, Tokyo to Madrid, London to Berlin.',
-    'hero.explore': 'Explore festivals',
-    'hero.festivals': 'Festivals',
-    'hero.countries': 'Countries',
-    'hero.attendees': 'Attendees',
-    'hero.scroll': '[ scroll ]',
-    
-    // Festivals Section
-    'festivals.title': 'Festival Guide',
-    'festivals.subtitle': 'Essential European Events',
-    
-    // Aquasella
-    'aquasella.title': 'Aquasella',
-    'aquasella.subtitle': 'Asturias, Spain',
-    
-    // LEV
-    'lev.title': 'L.E.V. Festival',
-    'lev.subtitle': 'Audio Visual Art',
-    
-    // Chat
-    'chat.title': 'AI Assistant',
-    'chat.subtitle': 'Ask about festivals',
-    
-    // Footer
-    'footer.description': 'Community led open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream. Curated by Alex Lawton, Paloma Rocha, Antaine Reilly and Carlos González.',
-    'footer.explore': '// Explore',
-    'footer.social': '// Social',
-    'footer.artists': 'Artists',
-    'footer.calendar': 'Calendar',
-    'footer.news': 'News',
-    'footer.archive': 'Archive',
-  },
-  es: {
-    // Header
-    'nav.festivals': 'Festivales',
-    'nav.aquasella': 'Aquasella',
-    'nav.lev': 'L.E.V.',
-    'nav.chat': 'Chat IA',
-    'nav.login': 'Entrar',
-    'nav.logout': 'Salir',
-    
-    // Hero
-    'hero.terminal': 'cat /festivales/europa/2025',
-    'hero.title': 'techno.dog',
-    'hero.subtitle': 'Centro Global de Conocimiento Techno',
-    'hero.tagline': 'Una plataforma abierta y diaria dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream.',
-    'hero.description': 'La revista digital colaborativa y Technopedia. De Detroit a Tbilisi, Tokio a Madrid, Londres a Berlín.',
-    'hero.explore': 'Explorar festivales',
-    'hero.festivals': 'Festivales',
-    'hero.countries': 'Países',
-    'hero.attendees': 'Asistentes',
-    'hero.scroll': '[ scroll ]',
-    
-    // Festivals Section
-    'festivals.title': 'Guía de Festivales',
-    'festivals.subtitle': 'Eventos Esenciales de Europa',
-    
-    // Aquasella
-    'aquasella.title': 'Aquasella',
-    'aquasella.subtitle': 'Asturias, España',
-    
-    // LEV
-    'lev.title': 'L.E.V. Festival',
-    'lev.subtitle': 'Arte Audiovisual',
-    
-    // Chat
-    'chat.title': 'Asistente IA',
-    'chat.subtitle': 'Pregunta sobre festivales',
-    
-    // Footer
-    'footer.description': 'Plataforma abierta y base de datos liderada por la comunidad, dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream. Curado por Alex Lawton, Paloma Rocha, Antaine Reilly y Carlos González.',
-    'footer.explore': '// Explorar',
-    'footer.social': '// Redes',
-    'footer.artists': 'Artistas',
-    'footer.calendar': 'Calendario',
-    'footer.news': 'Noticias',
-    'footer.archive': 'Archivo',
-  }
-};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
-
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    return translations[key] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language: 'en', t }}>
       {children}
     </LanguageContext.Provider>
   );

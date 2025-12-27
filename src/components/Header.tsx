@@ -1,8 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import LanguageToggle from "./LanguageToggle";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
 import { ChevronDown, Menu, Shield } from "lucide-react";
@@ -10,7 +8,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
   const location = useLocation();
-  const { language } = useLanguage();
   const { trackNavigation } = useAnalytics();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,50 +23,22 @@ const Header = () => {
 
   const navItems = [
     {
-      label: { en: 'News', es: 'Noticias' },
+      label: 'News',
       path: '/news',
       sub: [
-        { label: { en: 'Latest', es: 'Últimas' }, path: '/news' },
-        { label: { en: 'Your Stories', es: 'Tus Historias' }, path: '/news/your-stories' },
+        { label: 'Latest', path: '/news' },
+        { label: 'Your Stories', path: '/news/your-stories' },
       ]
     },
-    {
-      label: { en: 'Festivals', es: 'Festivales' },
-      path: '/festivals',
-    },
-    {
-      label: { en: 'Venues', es: 'Clubs' },
-      path: '/venues',
-    },
-    {
-      label: { en: 'Artists', es: 'Artistas' },
-      path: '/artists',
-    },
-    {
-      label: { en: 'Labels', es: 'Sellos' },
-      path: '/labels',
-    },
-    {
-      label: { en: 'Crews', es: 'Crews' },
-      path: '/crews',
-    },
-    {
-      label: { en: 'Releases', es: 'Lanzamientos' },
-      path: '/releases',
-    },
-    {
-      label: { en: 'Gear', es: 'Equipo' },
-      path: '/gear',
-    },
-    {
-      label: { en: 'Technopedia', es: 'Technopedia' },
-      path: '/technopedia',
-    },
-    {
-      label: { en: 'Developer API', es: 'API' },
-      path: '/developer',
-      highlight: true,
-    },
+    { label: 'Festivals', path: '/festivals' },
+    { label: 'Venues', path: '/venues' },
+    { label: 'Artists', path: '/artists' },
+    { label: 'Labels', path: '/labels' },
+    { label: 'Crews', path: '/crews' },
+    { label: 'Releases', path: '/releases' },
+    { label: 'Gear', path: '/gear' },
+    { label: 'Technopedia', path: '/technopedia' },
+    { label: 'Developer API', path: '/developer', highlight: true },
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -116,7 +85,7 @@ const Header = () => {
                   }`}
                 >
                   {item.highlight && <span className="w-1.5 h-1.5 rounded-full bg-logo-green animate-pulse" />}
-                  {item.label[language]}
+                  {item.label}
                   {item.sub && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
                 </Link>
                 
@@ -134,7 +103,7 @@ const Header = () => {
                             : 'text-muted-foreground hover:text-logo-green hover:bg-card'
                         }`}
                       >
-                        {subItem.label[language]}
+                        {subItem.label}
                       </Link>
                     ))}
                   </div>
@@ -145,7 +114,6 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
-            <LanguageToggle />
             <Link to="/admin">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
                 <Shield className="w-3.5 h-3.5 mr-1.5" />
@@ -175,7 +143,7 @@ const Header = () => {
                             isActive(item.path) ? 'text-logo-green bg-card' : 'text-muted-foreground'
                           }`}
                         >
-                          {item.label[language]}
+                          {item.label}
                         </Link>
                         {item.sub && (
                           <div className="bg-card/50">
@@ -190,7 +158,7 @@ const Header = () => {
                                     : 'text-muted-foreground hover:text-logo-green'
                                 }`}
                               >
-                                {subItem.label[language]}
+                                {subItem.label}
                               </Link>
                             ))}
                           </div>
