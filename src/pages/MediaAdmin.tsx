@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Play, CheckCircle, XCircle, Clock, Image, AlertTriangle } from "lucide-react";
+import { RefreshCw, Play, CheckCircle, XCircle, Clock, Image, Upload, Users, Building, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 interface MediaAsset {
@@ -39,6 +39,12 @@ interface PipelineJob {
   created_at: string;
 }
 
+interface MissingEntity {
+  id: string;
+  name: string;
+  type: 'artist' | 'venue' | 'festival';
+}
+
 const MediaAdmin = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
   const [assets, setAssets] = useState<MediaAsset[]>([]);
@@ -46,6 +52,9 @@ const MediaAdmin = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [bulkEnqueuing, setBulkEnqueuing] = useState(false);
+  const [missingEntities, setMissingEntities] = useState<MissingEntity[]>([]);
+  const [scanningMissing, setScanningMissing] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -95,6 +104,102 @@ const MediaAdmin = () => {
       toast.error('Failed to process queue');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const scanForMissingImages = async () => {
+    setScanningMissing(true);
+    try {
+      // Load all entity data
+      const [artistsModule, venuesModule, festivalsModule] = await Promise.all([
+        import('@/data/artists-legacy'),
+        import('@/data/venues-legacy'),
+        import('@/data/festivals-legacy'),
+      ]);
+
+      // Get existing assets and queued jobs
+      const [assetsRes, jobsRes] = await Promise.all([
+        supabase.from('media_assets').select('entity_type, entity_id').eq('final_selected', true),
+        supabase.from('media_pipeline_jobs').select('entity_type, entity_id').in('status', ['queued', 'running']),
+      ]);
+
+      const existingAssets = new Set(
+        (assetsRes.data || []).map(a => `${a.entity_type}:${a.entity_id}`)
+      );
+      const pendingJobs = new Set(
+        (jobsRes.data || []).map(j => `${j.entity_type}:${j.entity_id}`)
+      );
+
+      const missing: MissingEntity[] = [];
+
+      // Check artists
+      for (const artist of artistsModule.artists) {
+        const key = `artist:${artist.id}`;
+        if (!existingAssets.has(key) && !pendingJobs.has(key) && !artist.image?.url) {
+          missing.push({ id: artist.id, name: artist.name, type: 'artist' });
+        }
+      }
+
+      // Check venues
+      for (const venue of venuesModule.venues) {
+        const key = `venue:${venue.id}`;
+        if (!existingAssets.has(key) && !pendingJobs.has(key) && !venue.image?.url) {
+          missing.push({ id: venue.id, name: venue.name, type: 'venue' });
+        }
+      }
+
+      // Check festivals
+      for (const festival of festivalsModule.festivals) {
+        const key = `festival:${festival.id}`;
+        if (!existingAssets.has(key) && !pendingJobs.has(key)) {
+          missing.push({ id: festival.id, name: festival.name, type: 'festival' });
+        }
+      }
+
+      setMissingEntities(missing);
+      toast.success(`Found ${missing.length} entities without images`);
+    } catch (error) {
+      console.error('Scan error:', error);
+      toast.error('Failed to scan for missing images');
+    } finally {
+      setScanningMissing(false);
+    }
+  };
+
+  const bulkEnqueue = async (entityType?: 'artist' | 'venue' | 'festival') => {
+    const toEnqueue = entityType 
+      ? missingEntities.filter(e => e.type === entityType)
+      : missingEntities;
+    
+    if (toEnqueue.length === 0) {
+      toast.info('No entities to enqueue');
+      return;
+    }
+
+    setBulkEnqueuing(true);
+    let enqueued = 0;
+    const batchSize = 10;
+
+    try {
+      for (let i = 0; i < toEnqueue.length; i += batchSize) {
+        const batch = toEnqueue.slice(i, i + batchSize);
+        const promises = batch.map(entity =>
+          supabase.functions.invoke('media-curator', {
+            body: { action: 'enqueue', entityType: entity.type, entityId: entity.id, entityName: entity.name }
+          })
+        );
+        await Promise.all(promises);
+        enqueued += batch.length;
+        toast.info(`Enqueued ${enqueued}/${toEnqueue.length}...`);
+      }
+      toast.success(`Successfully enqueued ${enqueued} entities`);
+      setMissingEntities(prev => prev.filter(e => !toEnqueue.includes(e)));
+      fetchData();
+    } catch (error) {
+      console.error('Bulk enqueue error:', error);
+      toast.error(`Enqueued ${enqueued} before error`);
+    } finally {
+      setBulkEnqueuing(false);
     }
   };
 
@@ -166,6 +271,7 @@ const MediaAdmin = () => {
           <TabsList>
             <TabsTrigger value="assets"><Image className="w-4 h-4 mr-2" />Assets</TabsTrigger>
             <TabsTrigger value="jobs"><Clock className="w-4 h-4 mr-2" />Jobs</TabsTrigger>
+            <TabsTrigger value="bulk"><Upload className="w-4 h-4 mr-2" />Bulk Enqueue</TabsTrigger>
           </TabsList>
 
           <TabsContent value="assets" className="mt-4">
@@ -218,6 +324,81 @@ const MediaAdmin = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="bulk" className="mt-4">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-lg">Bulk Enqueue Missing Images</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Scan all artists, venues, and festivals to find entities without images, then enqueue them for processing.
+                </p>
+                <div className="flex gap-2 mb-6">
+                  <Button onClick={scanForMissingImages} disabled={scanningMissing}>
+                    <RefreshCw className={`w-4 h-4 mr-2 ${scanningMissing ? 'animate-spin' : ''}`} />
+                    Scan for Missing Images
+                  </Button>
+                </div>
+
+                {missingEntities.length > 0 && (
+                  <>
+                    <div className="flex items-center gap-4 mb-4">
+                      <Badge variant="outline" className="gap-1">
+                        <Users className="w-3 h-3" />
+                        {missingEntities.filter(e => e.type === 'artist').length} Artists
+                      </Badge>
+                      <Badge variant="outline" className="gap-1">
+                        <Building className="w-3 h-3" />
+                        {missingEntities.filter(e => e.type === 'venue').length} Venues
+                      </Badge>
+                      <Badge variant="outline" className="gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {missingEntities.filter(e => e.type === 'festival').length} Festivals
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      <Button onClick={() => bulkEnqueue()} disabled={bulkEnqueuing} size="sm">
+                        {bulkEnqueuing ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
+                        Enqueue All ({missingEntities.length})
+                      </Button>
+                      <Button onClick={() => bulkEnqueue('artist')} disabled={bulkEnqueuing} variant="outline" size="sm">
+                        <Users className="w-4 h-4 mr-2" />
+                        Artists Only
+                      </Button>
+                      <Button onClick={() => bulkEnqueue('venue')} disabled={bulkEnqueuing} variant="outline" size="sm">
+                        <Building className="w-4 h-4 mr-2" />
+                        Venues Only
+                      </Button>
+                      <Button onClick={() => bulkEnqueue('festival')} disabled={bulkEnqueuing} variant="outline" size="sm">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Festivals Only
+                      </Button>
+                    </div>
+
+                    <div className="max-h-96 overflow-y-auto border rounded-md">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 p-2">
+                        {missingEntities.slice(0, 100).map(entity => (
+                          <div key={`${entity.type}-${entity.id}`} className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm">
+                            {entity.type === 'artist' && <Users className="w-4 h-4 text-muted-foreground" />}
+                            {entity.type === 'venue' && <Building className="w-4 h-4 text-muted-foreground" />}
+                            {entity.type === 'festival' && <Calendar className="w-4 h-4 text-muted-foreground" />}
+                            <span className="truncate">{entity.name}</span>
+                          </div>
+                        ))}
+                        {missingEntities.length > 100 && (
+                          <div className="p-2 text-sm text-muted-foreground">
+                            ...and {missingEntities.length - 100} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
