@@ -20,10 +20,10 @@ function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200
   return chunks;
 }
 
-// Generate embedding using Lovable AI
+// Generate embedding using OpenAI API
 async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/embeddings', {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -37,7 +37,7 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
     });
 
     if (!response.ok) {
-      console.error('Embedding API error:', response.status);
+      console.error('OpenAI Embedding API error:', response.status);
       return null;
     }
 
@@ -57,7 +57,7 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Missing required environment variables');
@@ -133,8 +133,8 @@ serve(async (req) => {
         
         // Generate embedding if API key is available
         let embedding = null;
-        if (generateEmbeddings && LOVABLE_API_KEY) {
-          embedding = await generateEmbedding(chunk, LOVABLE_API_KEY);
+        if (generateEmbeddings && OPENAI_API_KEY) {
+          embedding = await generateEmbedding(chunk, OPENAI_API_KEY);
           if (embedding) {
             embeddingsGenerated++;
           }
