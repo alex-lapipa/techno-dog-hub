@@ -351,8 +351,8 @@ export default function Developer() {
   // Platform documentation content (shown to all users)
   const PlatformDocs = () => (
     <div className="space-y-6">
-      {/* Download link */}
-      <div className="p-4 border border-border bg-card rounded-lg">
+      {/* Quick links */}
+      <div className="p-4 border border-border bg-card rounded-lg flex flex-wrap items-center gap-4">
         <a 
           href="/project-documentation.txt" 
           download 
@@ -361,6 +361,13 @@ export default function Developer() {
           <FileText className="w-4 h-4" />
           Download full documentation as TXT file
         </a>
+        <Link 
+          to="/community/docs"
+          className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:underline"
+        >
+          <Shield className="w-4 h-4" />
+          Community System Docs
+        </Link>
       </div>
 
       {/* Content Sync Panel - Admin only */}
