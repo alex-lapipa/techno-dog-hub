@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, ArrowLeft, Check } from "lucide-react";
@@ -11,14 +11,44 @@ import { fetchProductByHandle, formatPrice, ShopifyVariant } from "@/lib/shopify
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const StoreProduct = () => {
   const { handle } = useParams<{ handle: string }>();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   
   const addItem = useCartStore(state => state.addItem);
   const setCartOpen = useCartStore(state => state.setOpen);
+
+  // Sync carousel with thumbnail selection
+  const onSelect = useCallback(() => {
+    if (!carouselApi) return;
+    setSelectedImageIndex(carouselApi.selectedScrollSnap());
+  }, [carouselApi]);
+
+  // Set up carousel event listener
+  useState(() => {
+    if (!carouselApi) return;
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  });
+
+  // Scroll to selected thumbnail
+  const scrollToImage = (index: number) => {
+    setSelectedImageIndex(index);
+    carouselApi?.scrollTo(index);
+  };
 
   // Fetch product
   const { data: product, isLoading } = useQuery({
@@ -144,23 +174,37 @@ const StoreProduct = () => {
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Images */}
+              {/* Images Carousel */}
               <div className="space-y-4">
-                {/* Main image */}
-                <div className="aspect-square overflow-hidden">
-                  {images[selectedImageIndex] ? (
-                    <GlitchImage
-                      src={images[selectedImageIndex].node.url}
-                      alt={images[selectedImageIndex].node.altText || product.title}
-                      className="w-full h-full"
-                      frameNumber={String(selectedImageIndex + 1).padStart(2, '0')}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-zinc-800">
-                      <span className="font-mono text-xs text-muted-foreground">No image</span>
-                    </div>
+                {/* Main carousel */}
+                <Carousel
+                  setApi={setCarouselApi}
+                  className="w-full"
+                  opts={{
+                    loop: images.length > 1,
+                  }}
+                >
+                  <CarouselContent>
+                    {images.map((img, index) => (
+                      <CarouselItem key={index}>
+                        <div className="aspect-square overflow-hidden">
+                          <GlitchImage
+                            src={img.node.url}
+                            alt={img.node.altText || `${product.title} ${index + 1}`}
+                            className="w-full h-full"
+                            frameNumber={String(index + 1).padStart(2, '0')}
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  {images.length > 1 && (
+                    <>
+                      <CarouselPrevious className="left-2 bg-background/80 border-border hover:bg-background" />
+                      <CarouselNext className="right-2 bg-background/80 border-border hover:bg-background" />
+                    </>
                   )}
-                </div>
+                </Carousel>
 
                 {/* Thumbnails */}
                 {images.length > 1 && (
@@ -168,10 +212,10 @@ const StoreProduct = () => {
                     {images.map((img, index) => (
                       <button
                         key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`flex-shrink-0 transition-opacity ${
+                        onClick={() => scrollToImage(index)}
+                        className={`flex-shrink-0 transition-all ${
                           selectedImageIndex === index 
-                            ? 'opacity-100' 
+                            ? 'opacity-100 ring-2 ring-foreground ring-offset-2 ring-offset-background' 
                             : 'opacity-60 hover:opacity-80'
                         }`}
                       >
