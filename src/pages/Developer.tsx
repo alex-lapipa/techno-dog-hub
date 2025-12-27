@@ -368,13 +368,6 @@ export default function Developer() {
           <Shield className="w-4 h-4" />
           Community System Docs
         </Link>
-        <Link 
-          to="/developer/tdog"
-          className="inline-flex items-center gap-2 font-mono text-sm text-logo-green hover:underline"
-        >
-          <Zap className="w-4 h-4" />
-          T:DOG Sound Machine Docs
-        </Link>
       </div>
 
       {/* Content Sync Panel - Admin only */}

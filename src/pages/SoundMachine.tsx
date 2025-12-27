@@ -6,8 +6,8 @@ const SoundMachine = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO 
-        title="T:DOG Sound Machine | AI-Powered Rhythm Machine"
-        description="Next-gen AI-powered rhythm machine inspired by classic hardware. Create dark, warehouse techno patterns with the T:DOG Sound Machine."
+        title="Audio Lab | Techno Dog"
+        description="Experimental audio tools and creative sound applications."
         path="/sound-machine"
       />
       <Header />
@@ -17,28 +17,21 @@ const SoundMachine = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="font-mono text-3xl md:text-4xl font-bold tracking-tighter mb-2">
-              T<span className="text-logo-green">:</span>DOG
+              Audio Lab
             </h1>
             <p className="text-muted-foreground font-mono text-xs tracking-widest uppercase">
-              AI-Powered Rhythm Machine
+              Creative Sound Tools
             </p>
             <p className="text-muted-foreground/60 font-mono text-[10px] tracking-wider mt-1">
-              NEXT-GEN • API-READY • v2.0
+              Coming Soon
             </p>
           </div>
 
-          {/* Embedded Sound Machine */}
-          <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
-            <iframe 
-              src="https://claude.site/public/artifacts/99cde411-6677-4e8e-8195-4998ec8b3cf5/embed" 
-              title="T:DOG Sound Machine" 
-              width="100%" 
-              height="600" 
-              frameBorder="0" 
-              allow="clipboard-write" 
-              allowFullScreen
-              className="w-full"
-            />
+          {/* Placeholder for new app */}
+          <div className="border border-border bg-card/30 rounded-lg overflow-hidden p-12 text-center">
+            <p className="text-muted-foreground font-mono text-sm">
+              New audio application coming soon.
+            </p>
           </div>
         </div>
       </main>

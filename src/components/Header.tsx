@@ -221,7 +221,7 @@ const Header = () => {
             <Link to="/sound-machine">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-foreground border border-foreground/50 bg-foreground/10 hover:bg-foreground/20 hover:border-foreground px-2.5 py-1.5 h-auto">
                 <Radio className="w-3 h-3 mr-1.5" />
-                T:DOG
+                Audio Lab
               </Button>
             </Link>
             <Link to="/admin">
@@ -292,7 +292,7 @@ const Header = () => {
                     <Link to="/sound-machine" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider border-foreground/50 hover:bg-foreground/10">
                         <Radio className="w-3.5 h-3.5 mr-1.5" />
-                        T:DOG
+                        Audio Lab
                       </Button>
                     </Link>
                     <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
