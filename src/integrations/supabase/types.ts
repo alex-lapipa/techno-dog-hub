@@ -221,12 +221,17 @@ export type Database = {
         Row: {
           additional_info: string | null
           admin_notes: string | null
+          consent_confirmed: boolean
+          consent_text_version: string | null
           created_at: string
           description: string | null
           email: string | null
+          entity_id: string | null
+          entity_type: string | null
           file_urls: string[] | null
           id: string
           location: string | null
+          media_metadata: Json | null
           name: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -240,12 +245,17 @@ export type Database = {
         Insert: {
           additional_info?: string | null
           admin_notes?: string | null
+          consent_confirmed?: boolean
+          consent_text_version?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
           file_urls?: string[] | null
           id?: string
           location?: string | null
+          media_metadata?: Json | null
           name?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -259,12 +269,17 @@ export type Database = {
         Update: {
           additional_info?: string | null
           admin_notes?: string | null
+          consent_confirmed?: boolean
+          consent_text_version?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
           file_urls?: string[] | null
           id?: string
           location?: string | null
+          media_metadata?: Json | null
           name?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null

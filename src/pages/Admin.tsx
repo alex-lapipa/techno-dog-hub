@@ -8,7 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -102,8 +102,15 @@ const AdminDashboard = () => {
 
   const adminTools = [
     {
+      title: "Content Moderation",
+      description: "Review photos and corrections from the community",
+      icon: Shield,
+      path: "/admin/moderation",
+      count: null,
+    },
+    {
       title: "Community Submissions",
-      description: "Review, approve, or reject community contributions",
+      description: "Full submission management with editing",
       icon: FileText,
       path: "/admin/submissions",
       count: null,
