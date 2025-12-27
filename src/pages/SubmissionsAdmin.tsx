@@ -266,7 +266,7 @@ const SubmissionsAdmin = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(language === "en" ? "en-US" : "es-ES", {
+    return new Date(dateString).toLocaleDateString('en-US', {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -360,7 +360,6 @@ const SubmissionsAdmin = () => {
         title="Submissions Admin"
         description="Review and manage community submissions"
         path="/admin/submissions"
-        locale={language}
       />
       <Header />
 

@@ -57,7 +57,6 @@ const VenueDetail = () => {
           description={venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}.`}
           path={`/venues/${venue.id}`}
           image={venue.image?.url}
-          locale={language}
           structuredData={placeSchema}
         />
       )}

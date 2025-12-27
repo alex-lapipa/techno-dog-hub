@@ -92,7 +92,6 @@ const ArtistDetail = () => {
         path={`/artists/${artist.id}`}
         image={artist.image?.url}
         type="profile"
-        locale={language}
         structuredData={personSchema}
       />
       <Header />

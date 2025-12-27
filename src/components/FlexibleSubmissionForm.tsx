@@ -197,22 +197,16 @@ const FlexibleSubmissionForm = () => {
       form.reset();
       setUploadedFiles([]);
       toast({
-        title: language === "en" ? "Submission received" : "Contribución recibida",
-        description:
-          language === "en"
-            ? "Thank you for contributing to the techno knowledge base!"
-            : "¡Gracias por contribuir a la base de conocimiento techno!",
+        title: "Submission received",
+        description: "Thank you for contributing to the techno knowledge base!",
       });
 
       setTimeout(() => setIsSuccess(false), 10000);
     } catch (error) {
       console.error("Submission error:", error);
       toast({
-        title: language === "en" ? "Submission failed" : "Error al enviar",
-        description:
-          language === "en"
-            ? "Please try again later."
-            : "Por favor, inténtalo más tarde.",
+        title: "Submission failed",
+        description: "Please try again later.",
         variant: "destructive",
       });
     } finally {

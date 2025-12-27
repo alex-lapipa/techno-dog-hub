@@ -87,12 +87,9 @@ const FestivalsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Festivals Worldwide' : 'Festivales de Techno en el Mundo'}
-        description={language === 'en' 
-          ? 'Discover techno festivals from Detroit to Tbilisi, Tokyo to Bogotá. Comprehensive guide to the global gatherings that matter.'
-          : 'Descubre festivales de techno de Detroit a Tbilisi, Tokyo a Bogotá. Guía completa de los encuentros globales que importan.'}
+        title="Techno Festivals Worldwide"
+        description="Discover techno festivals from Detroit to Tbilisi, Tokyo to Bogotá. Comprehensive guide to the global gatherings that matter."
         path="/festivals"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

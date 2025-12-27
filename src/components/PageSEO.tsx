@@ -8,7 +8,6 @@ interface PageSEOProps {
   path: string;
   image?: string;
   type?: 'website' | 'article' | 'profile';
-  locale?: 'en' | 'es';
   noindex?: boolean;
   structuredData?: object;
 }
@@ -19,14 +18,12 @@ const PageSEO = ({
   path,
   image = '/og-image.png',
   type = 'website',
-  locale = 'en',
   noindex = false,
   structuredData,
 }: PageSEOProps) => {
   const fullUrl = `${BASE_URL}${path}`;
   const imageUrl = image.startsWith('http') ? image : `${BASE_URL}${image}`;
   const fullTitle = title.includes('techno.dog') ? title : `${title} | techno.dog`;
-  const ogLocale = locale === 'es' ? 'es_ES' : 'en_US';
 
   return (
     <Helmet>
@@ -44,7 +41,7 @@ const PageSEO = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={imageUrl} />
-      <meta property="og:locale" content={ogLocale} />
+      <meta property="og:locale" content="en_US" />
       <meta property="og:site_name" content="techno.dog" />
       
       {/* Twitter */}
