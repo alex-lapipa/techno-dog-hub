@@ -32,7 +32,7 @@ export const GlitchImage = ({ src, alt, className = "", frameNumber = "01" }: Gl
       >
         {/* VHS overlay */}
         <div 
-          className="absolute inset-0 z-10 pointer-events-none"
+          className="absolute inset-0 z-10 pointer-events-none opacity-100 group-hover/film:opacity-70 transition-opacity duration-500"
           style={{
             background: `
               repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.2) 1px, rgba(0,0,0,0.2) 2px),
