@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Package, ArrowRight } from "lucide-react";
+import { Loader2, Package, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -52,6 +52,22 @@ const Store = () => {
       <CartDrawer />
 
       <main className="pt-24 lg:pt-16">
+        {/* Coming Soon Notice */}
+        <section className="bg-logo-green/10 border-b border-logo-green/30">
+          <div className="container mx-auto px-4 md:px-8 py-4">
+            <div className="flex items-center gap-3">
+              <Clock className="w-4 h-4 text-logo-green shrink-0" />
+              <p className="font-mono text-xs text-foreground">
+                <span className="text-logo-green font-semibold uppercase">Coming Soon</span>
+                <span className="text-muted-foreground mx-2">—</span>
+                <span className="text-muted-foreground">
+                  We're setting up fulfillment. Browse the collection, orders will ship in early 2025.
+                </span>
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Hero */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
