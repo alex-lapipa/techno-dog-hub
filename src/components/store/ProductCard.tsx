@@ -8,9 +8,10 @@ import { GlitchImage } from "./GlitchImage";
 
 interface ProductCardProps {
   product: ShopifyProductNode;
+  index?: number;
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const addItem = useCartStore(state => state.addItem);
   const setOpen = useCartStore(state => state.setOpen);
   
@@ -53,6 +54,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             src={firstImage.url}
             alt={firstImage.altText || product.title}
             className="w-full h-full"
+            frameNumber={String(index + 1).padStart(2, '0')}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-zinc-800">
