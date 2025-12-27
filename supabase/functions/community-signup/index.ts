@@ -11,6 +11,7 @@ interface SignupRequest {
   source?: "upload_widget" | "newsletter" | "api_signup" | "community_page" | "other";
   newsletter_opt_in?: boolean;
   display_name?: string;
+  redirect_path?: string; // Allow custom redirect path after verification
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -23,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { email, source = "community_page", newsletter_opt_in = false, display_name }: SignupRequest = await req.json();
+    const { email, source = "community_page", newsletter_opt_in = false, display_name, redirect_path }: SignupRequest = await req.json();
 
     if (!email || !email.includes("@")) {
       return new Response(
@@ -98,10 +99,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send magic link via Supabase Auth
     const siteUrl = Deno.env.get("SITE_URL") || "https://techno.dog";
+    // Use custom redirect path if provided, otherwise default to community page
+    const redirectTo = redirect_path 
+      ? `${siteUrl}${redirect_path}?verified=true`
+      : `${siteUrl}/community?verified=true`;
+    
     const { error: authError } = await supabase.auth.signInWithOtp({
       email: normalizedEmail,
       options: {
-        emailRedirectTo: `${siteUrl}/community?verified=true`,
+        emailRedirectTo: redirectTo,
         shouldCreateUser: true,
       },
     });

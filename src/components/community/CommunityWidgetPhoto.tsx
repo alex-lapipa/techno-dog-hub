@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,16 +18,29 @@ import {
   CheckCircle2,
   Mail,
   Image as ImageIcon,
-  ChevronDown
+  ChevronDown,
+  RefreshCw
 } from "lucide-react";
 import { z } from "zod";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_FILES = 5;
+const PENDING_UPLOAD_KEY = "technodog_pending_upload";
 
 const emailSchema = z.string().email("Please enter a valid email").max(255);
 const captionSchema = z.string().max(500, "Caption must be under 500 characters").optional();
+
+interface PendingUploadData {
+  entityType: string;
+  entityId: string;
+  entityName?: string;
+  submissionType: string;
+  caption: string;
+  credit: string;
+  email: string;
+  timestamp: number;
+}
 
 interface CommunityWidgetPhotoProps {
   entityType: string;
@@ -58,6 +72,7 @@ export const CommunityWidgetPhoto = ({
 }: CommunityWidgetPhotoProps) => {
   const { toast } = useToast();
   const { user, session } = useAuth();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isOpen, setIsOpen] = useState(!collapsible);
@@ -69,6 +84,39 @@ export const CommunityWidgetPhoto = ({
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [hasPendingUpload, setHasPendingUpload] = useState(false);
+
+  // Check for pending uploads when user becomes authenticated
+  useEffect(() => {
+    if (user) {
+      const pendingData = localStorage.getItem(PENDING_UPLOAD_KEY);
+      if (pendingData) {
+        try {
+          const pending: PendingUploadData = JSON.parse(pendingData);
+          // Only show if pending upload is less than 1 hour old
+          if (Date.now() - pending.timestamp < 3600000) {
+            setHasPendingUpload(true);
+            setCaption(pending.caption || "");
+            setCredit(pending.credit || "");
+            toast({
+              title: "Welcome back!",
+              description: "You can now complete your photo upload. Please select your files again.",
+            });
+          } else {
+            localStorage.removeItem(PENDING_UPLOAD_KEY);
+          }
+        } catch {
+          localStorage.removeItem(PENDING_UPLOAD_KEY);
+        }
+      }
+    }
+  }, [user, toast]);
+
+  // Clear pending upload after successful submission
+  const clearPendingUpload = () => {
+    localStorage.removeItem(PENDING_UPLOAD_KEY);
+    setHasPendingUpload(false);
+  };
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -185,10 +233,24 @@ export const CommunityWidgetPhoto = ({
 
     try {
       if (!user) {
+        // Store pending upload data before verification
+        const pendingData: PendingUploadData = {
+          entityType,
+          entityId,
+          entityName,
+          submissionType,
+          caption,
+          credit,
+          email: email.toLowerCase().trim(),
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(PENDING_UPLOAD_KEY, JSON.stringify(pendingData));
+
         const { error } = await supabase.functions.invoke("community-signup", {
           body: {
             email: email.toLowerCase().trim(),
             source: "upload_widget",
+            redirect_path: location.pathname, // Redirect back to current page
           },
         });
 
@@ -197,7 +259,7 @@ export const CommunityWidgetPhoto = ({
         setNeedsVerification(true);
         toast({
           title: "Verify your email first",
-          description: "Check your email for the magic link, then come back to upload",
+          description: "Check your email for the magic link. After clicking it, return to this page to complete your upload.",
         });
         setLoading(false);
         return;
@@ -251,6 +313,7 @@ export const CommunityWidgetPhoto = ({
       if (submissionError) throw submissionError;
 
       setSubmitted(true);
+      clearPendingUpload();
       toast({
         title: "Photos submitted!",
         description: "Your photos are pending review. Thank you for contributing!",
@@ -291,24 +354,73 @@ export const CommunityWidgetPhoto = ({
           <Mail className="h-12 w-12 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">Check your email</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Click the magic link we sent to <strong>{email}</strong>, then return here to upload.
+            Click the magic link we sent to <strong>{email}</strong>
           </p>
-          <Button variant="outline" size="sm" onClick={() => setNeedsVerification(false)}>
-            Use different email
-          </Button>
+          <div className="bg-muted/50 border border-border rounded-lg p-4 mb-4 text-left">
+            <p className="text-xs text-muted-foreground">
+              <strong>After clicking the link:</strong>
+            </p>
+            <ol className="text-xs text-muted-foreground mt-2 space-y-1 list-decimal list-inside">
+              <li>You'll be signed in automatically</li>
+              <li>Return to this page</li>
+              <li>Select your photos again to complete upload</li>
+            </ol>
+          </div>
+          <div className="flex gap-2 justify-center">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setNeedsVerification(false);
+                localStorage.removeItem(PENDING_UPLOAD_KEY);
+              }}
+            >
+              Use different email
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
+  // Show prompt when user returns after verification
+  const showReturnPrompt = hasPendingUpload && user && files.length === 0;
+
   const formContent = (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Return prompt for users who verified */}
+      {showReturnPrompt && (
+        <div className="bg-logo-green/10 border border-logo-green/30 rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-logo-green" />
+            <span className="font-medium text-sm">Email verified!</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            You're now signed in. Select your photos again to complete the upload.
+          </p>
+          <Button 
+            type="button"
+            variant="ghost" 
+            size="sm" 
+            className="mt-2 text-xs"
+            onClick={clearPendingUpload}
+          >
+            <X className="h-3 w-3 mr-1" />
+            Dismiss
+          </Button>
+        </div>
+      )}
+
       {/* Drop zone */}
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          showReturnPrompt 
+            ? "border-logo-green/50 bg-logo-green/5 hover:border-logo-green" 
+            : "border-border hover:border-primary/50"
+        }`}
       >
         <input
           ref={fileInputRef}
@@ -318,13 +430,27 @@ export const CommunityWidgetPhoto = ({
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
         />
-        <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-        <p className="text-sm text-muted-foreground">
-          Drop photos here or click to browse
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          JPG, PNG, WebP, GIF • Max 5MB each • Up to {MAX_FILES} files
-        </p>
+        {showReturnPrompt ? (
+          <>
+            <RefreshCw className="h-8 w-8 text-logo-green mx-auto mb-2" />
+            <p className="text-sm font-medium text-logo-green">
+              Click here to select your photos
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Your caption and credit info have been saved
+            </p>
+          </>
+        ) : (
+          <>
+            <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Drop photos here or click to browse
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              JPG, PNG, WebP, GIF • Max 5MB each • Up to {MAX_FILES} files
+            </p>
+          </>
+        )}
       </div>
 
       {/* Preview grid */}
