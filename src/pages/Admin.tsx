@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -142,6 +142,13 @@ const AdminDashboard = () => {
       description: "AI-powered analysis of tools, gaps, and recommendations",
       icon: Brain,
       path: "/admin/audit",
+      count: null,
+    },
+    {
+      title: "Activity Log",
+      description: "Track all admin actions for audit purposes",
+      icon: ClipboardList,
+      path: "/admin/activity-log",
       count: null,
     },
     {
