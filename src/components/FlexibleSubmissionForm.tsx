@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Send, CheckCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -80,7 +79,6 @@ interface UploadedFile {
 }
 
 const FlexibleSubmissionForm = () => {
-  const { language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,76 +100,17 @@ const FlexibleSubmissionForm = () => {
   });
 
   const typeLabels = {
-    artist: { en: "Artist / DJ", es: "Artista / DJ" },
-    venue: { en: "Venue / Club", es: "Club / Local" },
-    festival: { en: "Festival", es: "Festival" },
-    label: { en: "Record Label", es: "Sello Discográfico" },
-    crew: { en: "Crew / Collective", es: "Crew / Colectivo" },
-    release: { en: "Release / Track", es: "Lanzamiento / Track" },
-    gear: { en: "Gear / Equipment", es: "Equipo / Instrumento" },
-    story: { en: "Story / History", es: "Historia / Anécdota" },
-    correction: { en: "Correction / Update", es: "Corrección / Actualización" },
-    other: { en: "Other", es: "Otro" },
+    artist: "Artist / DJ",
+    venue: "Venue / Club",
+    festival: "Festival",
+    label: "Record Label",
+    crew: "Crew / Collective",
+    release: "Release / Track",
+    gear: "Gear / Equipment",
+    story: "Story / History",
+    correction: "Correction / Update",
+    other: "Other",
   };
-
-  const content = {
-    en: {
-      header: "Share your knowledge",
-      subheader: "Everything is optional except your email. Share as much or as little as you want.",
-      email: "Email",
-      emailDesc: "We'll only use this to follow up if needed",
-      type: "What are you sharing?",
-      typePlaceholder: "Select a category...",
-      name: "Name / Title",
-      namePlaceholder: "e.g., Paula Temple, Bassiani, Dekmantel",
-      description: "Tell us about it",
-      descriptionPlaceholder: "Share your knowledge, story, or suggestion. Any detail helps — historical context, personal experiences, technical information...",
-      location: "Location",
-      locationPlaceholder: "e.g., Berlin, Germany",
-      website: "Website / Link",
-      additional: "Additional Information",
-      additionalPlaceholder: "Social links, discography, notable events, connections to other artists or venues...",
-      files: "Attachments",
-      filesDesc: "Upload photos, documents, audio recordings, or any relevant files",
-      moreFields: "Show more fields",
-      lessFields: "Show fewer fields",
-      submit: "Submit",
-      submitting: "Submitting...",
-      successTitle: "Thank You!",
-      successMessage: "Your contribution has been received. Our team will review it and add it to the archive.",
-      submitAnother: "Submit another",
-      note: "All submissions help preserve techno culture for future generations."
-    },
-    es: {
-      header: "Comparte tu conocimiento",
-      subheader: "Todo es opcional excepto tu email. Comparte tanto o tan poco como quieras.",
-      email: "Email",
-      emailDesc: "Solo lo usaremos para hacer seguimiento si es necesario",
-      type: "¿Qué estás compartiendo?",
-      typePlaceholder: "Seleccionar categoría...",
-      name: "Nombre / Título",
-      namePlaceholder: "ej., Paula Temple, Bassiani, Dekmantel",
-      description: "Cuéntanos",
-      descriptionPlaceholder: "Comparte tu conocimiento, historia o sugerencia. Cualquier detalle ayuda — contexto histórico, experiencias personales, información técnica...",
-      location: "Ubicación",
-      locationPlaceholder: "ej., Berlín, Alemania",
-      website: "Sitio Web / Enlace",
-      additional: "Información Adicional",
-      additionalPlaceholder: "Redes sociales, discografía, eventos notables, conexiones con otros artistas o clubs...",
-      files: "Archivos adjuntos",
-      filesDesc: "Sube fotos, documentos, grabaciones de audio o cualquier archivo relevante",
-      moreFields: "Mostrar más campos",
-      lessFields: "Mostrar menos campos",
-      submit: "Enviar",
-      submitting: "Enviando...",
-      successTitle: "¡Gracias!",
-      successMessage: "Tu contribución ha sido recibida. Nuestro equipo la revisará y la añadirá al archivo.",
-      submitAnother: "Enviar otra",
-      note: "Todas las contribuciones ayudan a preservar la cultura techno para futuras generaciones."
-    }
-  };
-
-  const t = content[language];
 
   const onSubmit = async (data: SubmissionFormData) => {
     setIsSubmitting(true);
@@ -219,17 +158,17 @@ const FlexibleSubmissionForm = () => {
       <div className="border border-logo-green bg-card p-8 sm:p-12 text-center">
         <CheckCircle className="w-16 h-16 text-logo-green mx-auto mb-6" />
         <h3 className="font-mono text-2xl uppercase tracking-tight mb-3">
-          {t.successTitle}
+          Thank You!
         </h3>
         <p className="font-mono text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-          {t.successMessage}
+          Your contribution has been received. Our team will review it and add it to the archive.
         </p>
         <Button
           variant="outline"
           onClick={() => setIsSuccess(false)}
           className="font-mono text-xs uppercase hover:bg-logo-green hover:text-background hover:border-logo-green"
         >
-          {t.submitAnother}
+          Submit another
         </Button>
       </div>
     );
@@ -239,10 +178,10 @@ const FlexibleSubmissionForm = () => {
     <div className="border border-border bg-card">
       <div className="border-b border-border p-4 sm:p-6">
         <h3 className="font-mono text-lg uppercase tracking-wider mb-2">
-          {t.header}
+          Share your knowledge
         </h3>
         <p className="font-mono text-xs text-muted-foreground">
-          {t.subheader}
+          Everything is optional except your email. Share as much or as little as you want.
         </p>
       </div>
 
@@ -255,7 +194,7 @@ const FlexibleSubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {t.email} *
+                  Email *
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -266,7 +205,7 @@ const FlexibleSubmissionForm = () => {
                   />
                 </FormControl>
                 <FormDescription className="font-mono text-[10px] text-muted-foreground/60">
-                  {t.emailDesc}
+                  We'll only use this to follow up if needed
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -280,12 +219,12 @@ const FlexibleSubmissionForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                  {t.description}
+                  Tell us about it
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder={t.descriptionPlaceholder}
+                    placeholder="Share your knowledge, story, or suggestion. Any detail helps — historical context, personal experiences, technical information..."
                     className="font-mono min-h-[150px]"
                   />
                 </FormControl>
@@ -297,10 +236,10 @@ const FlexibleSubmissionForm = () => {
           {/* File Upload */}
           <div className="space-y-2">
             <label className="font-mono text-xs uppercase tracking-wider text-foreground">
-              {t.files}
+              Attachments
             </label>
             <p className="font-mono text-[10px] text-muted-foreground/60 mb-3">
-              {t.filesDesc}
+              Upload photos, documents, audio recordings, or any relevant files
             </p>
             <FileUploadZone onFilesChange={setUploadedFiles} />
           </div>
@@ -313,7 +252,7 @@ const FlexibleSubmissionForm = () => {
                 variant="ghost"
                 className="w-full font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
               >
-                {showOptionalFields ? t.lessFields : t.moreFields}
+                {showOptionalFields ? "Show fewer fields" : "Show more fields"}
                 {showOptionalFields ? (
                   <ChevronUp className="w-4 h-4 ml-2" />
                 ) : (
@@ -329,18 +268,18 @@ const FlexibleSubmissionForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                      {t.type}
+                      What are you sharing?
                     </FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="font-mono">
-                          <SelectValue placeholder={t.typePlaceholder} />
+                          <SelectValue placeholder="Select a category..." />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {Object.entries(typeLabels).map(([value, label]) => (
                           <SelectItem key={value} value={value} className="font-mono">
-                            {label[language]}
+                            {label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -357,12 +296,12 @@ const FlexibleSubmissionForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                      {t.name}
+                      Name / Title
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder={t.namePlaceholder}
+                        placeholder="e.g., Paula Temple, Bassiani, Dekmantel"
                         className="font-mono"
                       />
                     </FormControl>
@@ -378,12 +317,12 @@ const FlexibleSubmissionForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                      {t.location}
+                      Location
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder={t.locationPlaceholder}
+                        placeholder="e.g., Berlin, Germany"
                         className="font-mono"
                       />
                     </FormControl>
@@ -399,7 +338,7 @@ const FlexibleSubmissionForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                      {t.website}
+                      Website / Link
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -421,12 +360,12 @@ const FlexibleSubmissionForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-xs uppercase tracking-wider">
-                      {t.additional}
+                      Additional Information
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder={t.additionalPlaceholder}
+                        placeholder="Social links, discography, notable events, connections to other artists or venues..."
                         className="font-mono min-h-[80px]"
                       />
                     </FormControl>
@@ -447,18 +386,18 @@ const FlexibleSubmissionForm = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t.submitting}
+                  Submitting...
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {t.submit}
+                  Submit
                 </>
               )}
             </Button>
 
             <p className="font-mono text-[10px] text-muted-foreground/60 text-center mt-4">
-              {t.note}
+              All submissions help preserve techno culture for future generations.
             </p>
           </div>
         </form>

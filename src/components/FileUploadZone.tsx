@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { Upload, X, FileText, Image, Music, File, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +22,6 @@ const FileUploadZone = ({
   maxFiles = 10,
   maxSizeMB = 20 
 }: FileUploadZoneProps) => {
-  const { language } = useLanguage();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -131,25 +129,6 @@ const FileUploadZone = ({
     handleFiles(e.dataTransfer.files);
   };
 
-  const content = {
-    en: {
-      dropzone: "Drop files here or click to upload",
-      types: "Photos, documents, audio files",
-      limit: `Max ${maxFiles} files, ${maxSizeMB}MB each`,
-      uploading: "Uploading",
-      browse: "Browse files"
-    },
-    es: {
-      dropzone: "Arrastra archivos aquí o haz clic para subir",
-      types: "Fotos, documentos, archivos de audio",
-      limit: `Máx ${maxFiles} archivos, ${maxSizeMB}MB cada uno`,
-      uploading: "Subiendo",
-      browse: "Explorar archivos"
-    }
-  };
-
-  const t = content[language];
-
   return (
     <div className="space-y-4">
       {/* Drop zone */}
@@ -179,7 +158,7 @@ const FileUploadZone = ({
             <>
               <Loader2 className="w-10 h-10 text-logo-green animate-spin" />
               <p className="font-mono text-sm text-logo-green">
-                {t.uploading} {uploadProgress}...
+                Uploading {uploadProgress}...
               </p>
             </>
           ) : (
@@ -187,13 +166,13 @@ const FileUploadZone = ({
               <Upload className="w-10 h-10 text-muted-foreground" />
               <div>
                 <p className="font-mono text-sm text-foreground mb-1">
-                  {t.dropzone}
+                  Drop files here or click to upload
                 </p>
                 <p className="font-mono text-xs text-muted-foreground">
-                  {t.types}
+                  Photos, documents, audio files
                 </p>
                 <p className="font-mono text-[10px] text-muted-foreground/60 mt-1">
-                  {t.limit}
+                  Max {maxFiles} files, {maxSizeMB}MB each
                 </p>
               </div>
             </>
