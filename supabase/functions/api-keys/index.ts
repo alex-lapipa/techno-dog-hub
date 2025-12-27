@@ -72,8 +72,24 @@ Deno.serve(async (req) => {
       // Generate new API key
       const body = await req.json().catch(() => ({}));
       const keyName = body.name || 'Default API Key';
+      const keyDescription = body.description || null;
+      const keyScopes = body.scopes || ['read:public'];
       
       console.log(`Creating API key for user: ${user.id}`);
+
+      // Check if user is a verified community member
+      const { data: profile } = await supabase
+        .from('community_profiles')
+        .select('status')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!profile || profile.status !== 'verified') {
+        return new Response(
+          JSON.stringify({ error: 'Email verification required to create API keys' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
       // Revoke any existing active keys for this user (one active key per user)
       const { error: revokeError } = await supabase
@@ -90,7 +106,7 @@ Deno.serve(async (req) => {
       const { prefix, fullKey } = generateSecureKey();
       const keyHash = await hashKey(fullKey);
 
-      // Store the key
+      // Store the key with scopes
       const { data: newKey, error: insertError } = await supabase
         .from('api_keys')
         .insert({
@@ -98,9 +114,11 @@ Deno.serve(async (req) => {
           name: keyName,
           prefix: `td_live_${prefix}`,
           key_hash: keyHash,
-          status: 'active'
+          status: 'active',
+          scopes: keyScopes,
+          description: keyDescription,
         })
-        .select('id, name, prefix, status, created_at')
+        .select('id, name, prefix, status, created_at, scopes')
         .single();
 
       if (insertError) {
@@ -108,7 +126,7 @@ Deno.serve(async (req) => {
         throw insertError;
       }
 
-      console.log(`API key created: ${newKey.prefix}`);
+      console.log(`API key created: ${newKey.prefix} with scopes: ${keyScopes.join(', ')}`);
 
       return new Response(
         JSON.stringify({
@@ -124,7 +142,7 @@ Deno.serve(async (req) => {
       // List user's API keys (without the actual key values)
       const { data: keys, error: listError } = await supabase
         .from('api_keys')
-        .select('id, name, prefix, status, created_at, last_used_at, rate_limit_per_minute, rate_limit_per_day, total_requests')
+        .select('id, name, prefix, status, created_at, last_used_at, rate_limit_per_minute, rate_limit_per_day, total_requests, scopes, description')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 

@@ -50,6 +50,14 @@ interface ApiKey {
   rate_limit_per_minute: number;
   rate_limit_per_day: number;
   total_requests: number;
+  scopes?: string[];
+  description?: string;
+}
+
+interface CommunityProfile {
+  status: string;
+  roles: string[];
+  trust_score: number;
 }
 
 interface WebhookData {
@@ -71,6 +79,12 @@ const AVAILABLE_EVENTS = [
   { id: 'content.deleted', label: 'Content Deleted', description: 'When content is removed' },
 ];
 
+const AVAILABLE_SCOPES = [
+  { id: 'read:public', label: 'Read Public', description: 'Access public artist, venue, festival data' },
+  { id: 'read:documents', label: 'Read Documents', description: 'Access knowledge base documents' },
+  { id: 'write:submissions', label: 'Write Submissions', description: 'Submit content corrections' },
+];
+
 export default function Developer() {
   const { user, loading: authLoading } = useAuth();
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -80,9 +94,13 @@ export default function Developer() {
   const [creating, setCreating] = useState(false);
   const [creatingWebhook, setCreatingWebhook] = useState(false);
   const [newKeyName, setNewKeyName] = useState('Default API Key');
+  const [newKeyDescription, setNewKeyDescription] = useState('');
+  const [newKeyScopes, setNewKeyScopes] = useState<string[]>(['read:public']);
   const [showNewKeyDialog, setShowNewKeyDialog] = useState(false);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showKey, setShowKey] = useState(false);
+  const [communityProfile, setCommunityProfile] = useState<CommunityProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   
   // Webhook form state
   const [showWebhookDialog, setShowWebhookDialog] = useState(false);
@@ -92,6 +110,36 @@ export default function Developer() {
   const [newWebhookSecret, setNewWebhookSecret] = useState<string | null>(null);
   const [showWebhookSecretDialog, setShowWebhookSecretDialog] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
+
+  // Check community verification status
+  useEffect(() => {
+    const checkCommunityStatus = async () => {
+      if (!user?.email) {
+        setProfileLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await supabase
+          .from('community_profiles')
+          .select('status, roles, trust_score')
+          .eq('email', user.email)
+          .maybeSingle();
+
+        if (data) {
+          setCommunityProfile(data as CommunityProfile);
+        }
+      } catch (error) {
+        console.error('Error checking community status:', error);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    checkCommunityStatus();
+  }, [user]);
+
+  const isVerified = communityProfile?.status === 'verified';
 
   const fetchKeys = async () => {
     if (!user) return;
@@ -139,11 +187,20 @@ export default function Developer() {
   }, [user]);
 
   const createKey = async () => {
+    if (!isVerified) {
+      toast.error('You must verify your email to create API keys');
+      return;
+    }
+
     setCreating(true);
     try {
       const response = await supabase.functions.invoke('api-keys', {
         method: 'POST',
-        body: { name: newKeyName },
+        body: { 
+          name: newKeyName,
+          description: newKeyDescription || undefined,
+          scopes: newKeyScopes,
+        },
       });
 
       if (response.error) throw response.error;
@@ -151,6 +208,8 @@ export default function Developer() {
       setNewApiKey(response.data.apiKey);
       setShowNewKeyDialog(true);
       setNewKeyName('Default API Key');
+      setNewKeyDescription('');
+      setNewKeyScopes(['read:public']);
       await fetchKeys();
       toast.success('API key created successfully');
     } catch (error) {
@@ -159,6 +218,14 @@ export default function Developer() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const toggleScope = (scopeId: string) => {
+    setNewKeyScopes(prev => 
+      prev.includes(scopeId) 
+        ? prev.filter(s => s !== scopeId)
+        : [...prev, scopeId]
+    );
   };
 
   const revokeKey = async (keyId: string) => {
@@ -550,62 +617,127 @@ export default function Developer() {
 
           {/* API Keys Tab */}
           <TabsContent value="keys" className="space-y-8">
-            {activeKey && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <Zap className="h-4 w-4" />
-                      Rate Limit
-                    </div>
-                    <div className="text-2xl font-bold">{activeKey.rate_limit_per_minute}/min</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <Activity className="h-4 w-4" />
-                      Daily Limit
-                    </div>
-                    <div className="text-2xl font-bold">{formatNumber(activeKey.rate_limit_per_day)}/day</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                      <Key className="h-4 w-4" />
-                      Total Requests
-                    </div>
-                    <div className="text-2xl font-bold">{formatNumber(activeKey.total_requests)}</div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Create API Key</CardTitle>
-                <CardDescription>Only one active key per user.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4 items-end">
-                  <div className="flex-1">
-                    <Label htmlFor="keyName">Key Name</Label>
-                    <Input
-                      id="keyName"
-                      value={newKeyName}
-                      onChange={(e) => setNewKeyName(e.target.value)}
-                      placeholder="My API Key"
-                      className="mt-1"
-                    />
-                  </div>
-                  <Button onClick={createKey} disabled={creating}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    {creating ? 'Creating...' : 'Create'}
+            {/* Verification Status Banner */}
+            {profileLoading ? (
+              <Card className="border-muted">
+                <CardContent className="py-6">
+                  <div className="text-center text-muted-foreground">Checking verification status...</div>
+                </CardContent>
+              </Card>
+            ) : !isVerified ? (
+              <Card className="border-yellow-500/30 bg-yellow-500/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-yellow-500">
+                    <AlertTriangle className="h-5 w-5" />
+                    Email Verification Required
+                  </CardTitle>
+                  <CardDescription>
+                    You must verify your email to create API keys. Join the community to get started.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => window.location.href = '/community'}>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Join Community
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Stats Cards */}
+                {activeKey && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                          <Zap className="h-4 w-4" />
+                          Rate Limit
+                        </div>
+                        <div className="text-2xl font-bold">{activeKey.rate_limit_per_minute}/min</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                          <Activity className="h-4 w-4" />
+                          Daily Limit
+                        </div>
+                        <div className="text-2xl font-bold">{formatNumber(activeKey.rate_limit_per_day)}/day</div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                          <Key className="h-4 w-4" />
+                          Total Requests
+                        </div>
+                        <div className="text-2xl font-bold">{formatNumber(activeKey.total_requests)}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Create Key Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Create API Key</CardTitle>
+                    <CardDescription>
+                      Only one active key per user. Select the permissions you need.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="keyName">Key Name</Label>
+                        <Input
+                          id="keyName"
+                          value={newKeyName}
+                          onChange={(e) => setNewKeyName(e.target.value)}
+                          placeholder="My API Key"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="keyDescription">Description (optional)</Label>
+                        <Input
+                          id="keyDescription"
+                          value={newKeyDescription}
+                          onChange={(e) => setNewKeyDescription(e.target.value)}
+                          placeholder="What this key is used for"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="mb-3 block">Permissions (Scopes)</Label>
+                      <div className="space-y-3">
+                        {AVAILABLE_SCOPES.map((scope) => (
+                          <div key={scope.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                            <Checkbox
+                              id={scope.id}
+                              checked={newKeyScopes.includes(scope.id)}
+                              onCheckedChange={() => toggleScope(scope.id)}
+                            />
+                            <div className="space-y-1">
+                              <Label htmlFor={scope.id} className="font-medium cursor-pointer">
+                                {scope.label}
+                              </Label>
+                              <p className="text-xs text-muted-foreground">{scope.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button onClick={createKey} disabled={creating || newKeyScopes.length === 0}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      {creating ? 'Creating...' : 'Create API Key'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             <Card>
               <CardHeader>
@@ -619,37 +751,48 @@ export default function Developer() {
                 ) : (
                   <div className="space-y-4">
                     {keys.map((key) => (
-                      <div key={key.id} className="flex items-center justify-between p-4 border rounded-lg bg-card">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium">{key.name}</span>
-                            <Badge variant={key.status === 'active' ? 'default' : 'secondary'}>{key.status}</Badge>
+                      <div key={key.id} className="p-4 border rounded-lg bg-card">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium">{key.name}</span>
+                              <Badge variant={key.status === 'active' ? 'default' : 'secondary'}>{key.status}</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground font-mono">{key.prefix}...</div>
+                            {key.scopes && key.scopes.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {key.scopes.map((scope) => (
+                                  <Badge key={scope} variant="outline" className="text-xs">
+                                    {scope}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground mt-2">
+                              Created: {formatDate(key.created_at)}
+                              {key.last_used_at && ` • Last used: ${formatDate(key.last_used_at)}`}
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground font-mono">{key.prefix}...</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Created: {formatDate(key.created_at)}
-                            {key.last_used_at && ` • Last used: ${formatDate(key.last_used_at)}`}
-                          </div>
+                          {key.status === 'active' && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                  <Trash2 className="h-4 w-4 mr-1" />Revoke
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
+                                  <AlertDialogDescription>Applications using this key will stop working.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => revokeKey(key.id)}>Revoke</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
                         </div>
-                        {key.status === 'active' && (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="h-4 w-4 mr-1" />Revoke
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
-                                <AlertDialogDescription>Applications using this key will stop working.</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => revokeKey(key.id)}>Revoke</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )}
                       </div>
                     ))}
                   </div>
