@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useActivityLog } from "@/hooks/useActivityLog";
 import {
   ArrowLeft,
   Users,
@@ -62,6 +63,7 @@ const UserRoleManagement = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logActivity } = useActivityLog();
 
   const [users, setUsers] = useState<UserOverview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -163,6 +165,18 @@ const UserRoleManagement = () => {
           title: "Admin role granted",
           description: `${user.email || user.user_id} is now an admin`,
         });
+        
+        // Log role grant
+        logActivity({
+          action_type: "role_granted",
+          entity_type: "user",
+          entity_id: user.user_id,
+          details: {
+            target_email: user.email,
+            target_display_name: user.display_name,
+            role: "admin",
+          },
+        });
       } else {
         const { error } = await supabase.rpc("revoke_admin_role", {
           target_user_id: user.user_id,
@@ -171,6 +185,18 @@ const UserRoleManagement = () => {
         toast({
           title: "Admin role revoked",
           description: `${user.email || user.user_id} is now a regular user`,
+        });
+        
+        // Log role revoke
+        logActivity({
+          action_type: "role_revoked",
+          entity_type: "user",
+          entity_id: user.user_id,
+          details: {
+            target_email: user.email,
+            target_display_name: user.display_name,
+            previous_role: "admin",
+          },
         });
       }
 
