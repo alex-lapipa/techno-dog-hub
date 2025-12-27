@@ -3,22 +3,26 @@ interface GlitchImageProps {
   alt: string;
   className?: string;
   frameNumber?: string;
+  size?: 'default' | 'thumbnail';
 }
 
-export const GlitchImage = ({ src, alt, className = "", frameNumber = "01" }: GlitchImageProps) => {
+export const GlitchImage = ({ src, alt, className = "", frameNumber = "01", size = 'default' }: GlitchImageProps) => {
+  const isThumbnail = size === 'thumbnail';
+  const sprocketCount = isThumbnail ? 2 : 4;
+  
   return (
     <div className={`relative bg-zinc-800 p-1 ${className}`}>
       {/* Sprocket holes left */}
-      <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="w-1.5 h-2 bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto" />
+      <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-1">
+        {[...Array(sprocketCount)].map((_, i) => (
+          <div key={i} className={`${isThumbnail ? 'w-1 h-1.5' : 'w-1.5 h-2'} bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto`} />
         ))}
       </div>
       
       {/* Sprocket holes right */}
-      <div className="absolute right-0 top-0 bottom-0 w-2 flex flex-col justify-around py-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="w-1.5 h-2 bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto" />
+      <div className="absolute right-0 top-0 bottom-0 w-2 flex flex-col justify-around py-1">
+        {[...Array(sprocketCount)].map((_, i) => (
+          <div key={i} className={`${isThumbnail ? 'w-1 h-1.5' : 'w-1.5 h-2'} bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto`} />
         ))}
       </div>
       
@@ -66,8 +70,8 @@ export const GlitchImage = ({ src, alt, className = "", frameNumber = "01" }: Gl
         <div className="absolute inset-0 z-[11] pointer-events-none bg-gradient-to-t from-[rgba(220,38,38,0.4)] via-[rgba(220,38,38,0.15)] to-transparent opacity-0 group-hover/film:opacity-100 transition-opacity duration-500" />
         
         {/* Frame number */}
-        <div className="absolute top-2 left-2 z-20 px-1.5 py-1 bg-black/70 border border-[rgba(220,38,38,0.4)]">
-          <span className="text-xs text-[hsl(348,75%,52%)] tracking-wider font-bold font-mono">{frameNumber}</span>
+        <div className={`absolute top-1 left-1 z-20 ${isThumbnail ? 'px-1 py-0.5' : 'px-1.5 py-1'} bg-black/70 border border-[rgba(220,38,38,0.4)]`}>
+          <span className={`${isThumbnail ? 'text-[8px]' : 'text-xs'} text-[hsl(348,75%,52%)] tracking-wider font-bold font-mono`}>{frameNumber}</span>
         </div>
       </div>
     </div>
