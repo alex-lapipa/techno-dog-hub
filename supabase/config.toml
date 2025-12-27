@@ -93,3 +93,6 @@ verify_jwt = false
 
 [functions.submission-notification]
 verify_jwt = false
+
+[functions.community-signup]
+verify_jwt = false

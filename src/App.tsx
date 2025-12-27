@@ -43,6 +43,8 @@ const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
+const Community = lazy(() => import("./pages/Community"));
+const MySubmissions = lazy(() => import("./pages/MySubmissions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -128,6 +130,8 @@ const App = () => (
                   <Route path="/analytics" element={<Analytics />} />
                   
                   {/* Community */}
+                  <Route path="/community" element={<Community />} />
+                  <Route path="/my-submissions" element={<MySubmissions />} />
                   <Route path="/submit" element={<Navigate to="/technopedia#contribute" replace />} />
                   <Route path="/technopedia" element={<Technopedia />} />
                   
