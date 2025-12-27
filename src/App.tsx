@@ -57,6 +57,7 @@ const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
 const Lookbook = lazy(() => import("./pages/Lookbook"));
 const SoundMachine = lazy(() => import("./pages/SoundMachine"));
+const TDogDocs = lazy(() => import("./pages/TDogDocs"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -151,6 +152,7 @@ const App = () => (
                   
                   {/* Developers (merged docs + API) */}
                   <Route path="/developer" element={<Developer />} />
+                  <Route path="/developer/tdog" element={<TDogDocs />} />
                   <Route path="/docs" element={<Developer />} />
                   
                   {/* Analytics (Admin only) */}
