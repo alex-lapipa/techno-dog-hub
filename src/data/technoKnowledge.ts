@@ -37,50 +37,50 @@ In 2024, estimated €8+ million for local economy and 650 direct jobs. Local ho
 };
 
 export const technoUndergroundDocument = {
-  title: "Techno Underground Europeo: Historia, Escenas y Resistencia al Mainstream",
+  title: "European Underground Techno: History, Scenes, and Resistance to Mainstream",
   source: "techno-underground-europe",
-  content: `El techno nació como un sonido futurista en Detroit en los años 80, pero fue en Europa donde germinó una vasta cultura underground que se extiende desde los raves ilegales de los 90 hasta los clubes legendarios y festivales alternativos de hoy.
+  content: `Techno was born as a futuristic sound in Detroit in the 1980s, but it was in Europe where a vast underground culture germinated, extending from illegal raves of the 90s to legendary clubs and alternative festivals today.
 
-EVOLUCIÓN HISTÓRICA:
+HISTORICAL EVOLUTION:
 
-Los inicios (finales 80 y años 90): Tras su gestación en Detroit, el techno llegó a Europa a finales de los 80, encontrando terreno fértil especialmente en Alemania y el Reino Unido. La caída del Muro de Berlín en 1989 marcó un punto de inflexión: Berlín reunificado, lleno de edificios industriales abandonados, se convirtió en un lienzo en blanco para raves clandestinas y clubes improvisados. Techno aquí no era solo música, sino símbolo de una nueva libertad que unía a jóvenes del Este y Oeste en la pista de baile.
+The Beginnings (late 80s and 90s): After its gestation in Detroit, techno arrived in Europe in the late 80s, finding fertile ground especially in Germany and the United Kingdom. The fall of the Berlin Wall in 1989 marked a turning point: reunified Berlin, full of abandoned industrial buildings, became a blank canvas for clandestine raves and improvised clubs. Techno here was not just music, but a symbol of a new freedom that united young people from East and West on the dance floor.
 
-Clubes como Tresor (fundado en 1991) fueron verdaderos santuarios del techno berlinés. La Love Parade nacida en Berlín (1989) llevó el espíritu rave a las calles, atrayendo multitudes y celebrando ideales de paz y unidad.
+Clubs like Tresor (founded in 1991) were true sanctuaries of Berlin techno. The Love Parade born in Berlin (1989) brought the rave spirit to the streets, attracting crowds and celebrating ideals of peace and unity.
 
-En el Reino Unido, la explosión del acid house y los "veranos del amor" (1988-89) preparó el terreno. Colectivos como DiY Sound System y Spiral Tribe organizaron fiestas gratuitas en almacenes, descampados y canteras. El festival de Castlemorton (1992) – una rave de una semana con decenas de miles de asistentes – alarmó a las autoridades. El gobierno aprobó la Criminal Justice and Public Order Act de 1994, que criminalizó las fiestas rave.
+In the United Kingdom, the acid house explosion and the "summers of love" (1988-89) prepared the ground. Collectives like DiY Sound System and Spiral Tribe organized free parties in warehouses, wastelands, and quarries. The Castlemorton festival (1992)—a week-long rave with tens of thousands of attendees—alarmed authorities. The government passed the Criminal Justice and Public Order Act of 1994, which criminalized rave parties.
 
-FESTIVALES INDEPENDIENTES EMBLEMÁTICOS:
+ICONIC INDEPENDENT FESTIVALS:
 
-REINO UNIDO: Boomtown Fair (sin grandes patrocinadores), One Tribe (benéfico), Freerotation (solo por invitación). Colectivos: Spiral Tribe, DiY Sound System.
+UNITED KINGDOM: Boomtown Fair (no major sponsors), One Tribe (charity), Freerotation (invitation only). Collectives: Spiral Tribe, DiY Sound System.
 
-ALEMANIA: Fusion Festival (desde 1997, sin publicidad, lotería para entradas), Nation of Gondwana. Clubes: Tresor (1991), Berghain (2004) con política anti-fotografía.
+GERMANY: Fusion Festival (since 1997, no advertising, lottery for tickets), Nation of Gondwana. Clubs: Tresor (1991), Berghain (2004) with anti-photography policy.
 
-FRANCIA: Teknivals (free parties itinerantes como Frenchtek desde 1993), Astropolis (nacido de raves clandestinas en 1995), Peacock Society. Technopol (asociación desde 1996 para defender la cultura rave).
+FRANCE: Teknivals (traveling free parties like Frenchtek since 1993), Astropolis (born from clandestine raves in 1995), Peacock Society. Technopol (association since 1996 to defend rave culture).
 
-ESPAÑA: Monegros Desert Festival (Aragón, desde 1994), Ruta del Bakalao (movimiento valenciano 80s-90s), ElectroSplash (desde 2003). Sellos: PoleGroup (Óscar Mulero), SEMANTICA. Centros sociales okupados como CSO La Makabra en Barcelona.
+SPAIN: Monegros Desert Festival (Aragon, since 1994), Ruta del Bakalao (Valencian movement 80s-90s), ElectroSplash (since 2003). Labels: PoleGroup (Oscar Mulero), SEMANTICA. Occupied social centers like CSO La Makabra in Barcelona.
 
-EUROPA DEL ESTE: CzechTek (1994-2006), Unsound (Cracovia), Kazantip (Crimea 1992-2013). Colectivos: Oramics (Polonia, mujeres y queer desde 2017).
+EASTERN EUROPE: CzechTek (1994-2006), Unsound (Krakow), Kazantip (Crimea 1992-2013). Collectives: Oramics (Poland, women and queer since 2017).
 
-ESPÍRITU DIY Y FREE PARTIES:
+DIY SPIRIT AND FREE PARTIES:
 
-Las free parties surgieron como respuesta a la comercialización de los raves a principios de los 90. Eventos ilegales, gratuitos o de donación voluntaria, en lugares remotos sin permisos oficiales. La ubicación se mantiene en secreto hasta el último momento, divulgándose boca a boca o mediante cadenas de SMS/WhatsApp/Telegram.
+Free parties emerged as a response to the commercialization of raves in the early 90s. Illegal events, free or donation-based, in remote locations without official permits. The location is kept secret until the last moment, spread by word of mouth or through SMS/WhatsApp/Telegram chains.
 
-Valores fundamentales: filosofía antiautoritaria, rechazo al capitalismo en el ocio, comunidad e inclusión. Como dijo Javier Blánquez: el underground se define por "no someterse a la cultura dominante ni a las leyes del mercado".
+Core values: anti-authoritarian philosophy, rejection of capitalism in leisure, community and inclusion. As Javier Blanquez said: the underground is defined by "not submitting to dominant culture or market laws."
 
-COMERCIALIZACIÓN VS RESISTENCIA:
+COMMERCIALIZATION VS RESISTANCE:
 
-A partir de los 2000, gigantes como Live Nation y SFX entraron agresivamente en el mercado de festivales. La compra de Tomorrowland por SFX (2013), Sónar expandiéndose globalmente, Ultra Music Festival con franquicias en 6 continentes. El auge del EDM llevó a festivales con precios astronómicos, VIPs, y booking de DJs-celebridad.
+From the 2000s, giants like Live Nation and SFX entered the festival market aggressively. SFX's purchase of Tomorrowland (2013), Sonar expanding globally, Ultra Music Festival with franchises on 6 continents. The rise of EDM led to festivals with astronomical prices, VIPs, and celebrity-DJ bookings.
 
-Sin embargo, la comunidad underground ha respondido: festivales como Boom (Portugal) 100% sin patrocinadores, Draaimolen (Países Bajos) sin ningún banner comercial, movimiento freetekno vivo en Europa.
+However, the underground community has responded: festivals like Boom (Portugal) 100% without sponsors, Draaimolen (Netherlands) without any commercial banners, freetekno movement alive in Europe.
 
-FESTIVALES QUE MANTIENEN SU ESENCIA:
+FESTIVALS THAT MAINTAIN THEIR ESSENCE:
 
-Boom Festival (Portugal): 100% independiente, sin logos corporativos ni financiación pública.
-Draaimolen (Países Bajos): Sin banners de patrocinadores.
-Aquasella (España): Independiente, sin venta a conglomerados.
-Fusion Festival (Alemania): Organizado por voluntarios, sin publicidad.
+Boom Festival (Portugal): 100% independent, no corporate logos or public funding.
+Draaimolen (Netherlands): No sponsor banners.
+Aquasella (Spain): Independent, not sold to conglomerates.
+Fusion Festival (Germany): Organized by volunteers, no advertising.
 
-La tensión entre comercialización y underground sigue definiendo la escena. Como escribió Simon Reynolds: "El rave siempre fue utópico en el sentido más literal: un no-lugar, un espacio fuera del orden social ordinario donde las reglas habituales quedaban en suspenso". Esta utopía temporal sigue siendo el corazón del techno underground europeo.`
+The tension between commercialization and underground continues to define the scene. As Simon Reynolds wrote: "Rave was always utopian in the most literal sense: a no-place, a space outside the ordinary social order where the usual rules were suspended." This temporary utopia remains the heart of European underground techno.`
 };
 
 export const greatestTechnoArtistsDocument = {
