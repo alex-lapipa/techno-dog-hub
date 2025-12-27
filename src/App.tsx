@@ -50,6 +50,7 @@ const UserRoleManagement = lazy(() => import("./pages/UserRoleManagement"));
 const AdminControlCenter = lazy(() => import("./pages/AdminControlCenter"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const Support = lazy(() => import("./pages/Support"));
+const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -107,7 +108,7 @@ const App = () => (
                   <Route path="/admin/users" element={<UserRoleManagement />} />
                   <Route path="/admin/control-center" element={<AdminControlCenter />} />
                   <Route path="/admin/health" element={<SystemHealth />} />
-                  
+                  <Route path="/admin/images" element={<AIImageGallery />} />
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
                   <Route path="/festivals/:id" element={<FestivalDetail />} />

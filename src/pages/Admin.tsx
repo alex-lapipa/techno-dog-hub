@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -128,6 +128,13 @@ const AdminDashboard = () => {
       description: "Auto Fetch → Verify → Curate → Enrich pipeline",
       icon: Zap,
       path: "/admin/media-engine",
+      count: null,
+    },
+    {
+      title: "AI Image Gallery",
+      description: "Preview and manage all AI-generated images",
+      icon: Palette,
+      path: "/admin/images",
       count: null,
     },
     {
