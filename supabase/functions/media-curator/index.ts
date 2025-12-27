@@ -30,55 +30,76 @@ interface CandidateImage {
 async function fetchWikimediaImages(entityName: string, entityType: string): Promise<CandidateImage[]> {
   const candidates: CandidateImage[] = [];
   
-  try {
-    // Search Wikimedia Commons for images
-    const searchQuery = entityType === 'artist' 
-      ? `${entityName} DJ musician` 
-      : entityType === 'synth' 
-        ? `${entityName} synthesizer`
-        : entityType === 'venue'
-          ? `${entityName} nightclub concert venue`
-          : entityName;
+  // Build multiple search queries for better coverage
+  const searchQueries: string[] = [];
+  
+  if (entityType === 'artist') {
+    // Try multiple query variations for artists
+    searchQueries.push(entityName); // Exact name first
+    searchQueries.push(`${entityName} DJ`);
+    searchQueries.push(`${entityName} techno`);
+  } else if (entityType === 'synth') {
+    searchQueries.push(`${entityName} synthesizer`);
+    searchQueries.push(entityName);
+  } else if (entityType === 'venue') {
+    searchQueries.push(`${entityName} nightclub`);
+    searchQueries.push(`${entityName} club`);
+  } else if (entityType === 'festival') {
+    searchQueries.push(`${entityName} festival`);
+    searchQueries.push(entityName);
+  } else {
+    searchQueries.push(entityName);
+  }
+  
+  const seenUrls = new Set<string>();
+  
+  for (const searchQuery of searchQueries) {
+    if (candidates.length >= 5) break; // Enough candidates
     
-    const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&srnamespace=6&srlimit=5&format=json&origin=*`;
-    
-    const searchResponse = await fetch(searchUrl);
-    const searchData = await searchResponse.json();
-    
-    if (searchData.query?.search) {
-      for (const result of searchData.query.search.slice(0, 5)) {
-        const title = result.title;
-        
-        // Get image info
-        const infoUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|size|extmetadata&format=json&origin=*`;
-        const infoResponse = await fetch(infoUrl);
-        const infoData = await infoResponse.json();
-        
-        const pages = infoData.query?.pages;
-        if (pages) {
-          for (const pageId of Object.keys(pages)) {
-            const imageInfo = pages[pageId]?.imageinfo?.[0];
-            if (imageInfo?.url) {
-              const extmeta = imageInfo.extmetadata || {};
-              candidates.push({
-                url: imageInfo.url,
-                provider: 'wikimedia',
-                license: extmeta.LicenseShortName?.value || 'Unknown',
-                licenseUrl: extmeta.LicenseUrl?.value,
-                author: extmeta.Artist?.value?.replace(/<[^>]*>/g, '') || 'Unknown',
-                sourceUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(title)}`,
-                width: imageInfo.width,
-                height: imageInfo.height,
-              });
+    try {
+      const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&srnamespace=6&srlimit=5&format=json&origin=*`;
+      
+      console.log(`Wikimedia search: ${searchQuery}`);
+      const searchResponse = await fetch(searchUrl);
+      const searchData = await searchResponse.json();
+      
+      if (searchData.query?.search) {
+        for (const result of searchData.query.search.slice(0, 3)) {
+          const title = result.title;
+          
+          // Get image info
+          const infoUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=imageinfo&iiprop=url|size|extmetadata&format=json&origin=*`;
+          const infoResponse = await fetch(infoUrl);
+          const infoData = await infoResponse.json();
+          
+          const pages = infoData.query?.pages;
+          if (pages) {
+            for (const pageId of Object.keys(pages)) {
+              const imageInfo = pages[pageId]?.imageinfo?.[0];
+              if (imageInfo?.url && !seenUrls.has(imageInfo.url)) {
+                seenUrls.add(imageInfo.url);
+                const extmeta = imageInfo.extmetadata || {};
+                candidates.push({
+                  url: imageInfo.url,
+                  provider: 'wikimedia',
+                  license: extmeta.LicenseShortName?.value || 'Unknown',
+                  licenseUrl: extmeta.LicenseUrl?.value,
+                  author: extmeta.Artist?.value?.replace(/<[^>]*>/g, '') || 'Unknown',
+                  sourceUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(title)}`,
+                  width: imageInfo.width,
+                  height: imageInfo.height,
+                });
+              }
             }
           }
         }
       }
+    } catch (error) {
+      console.error(`Wikimedia search error for "${searchQuery}":`, error);
     }
-  } catch (error) {
-    console.error('Wikimedia fetch error:', error);
   }
   
+  console.log(`Wikimedia found ${candidates.length} candidates for ${entityName}`);
   return candidates;
 }
 
