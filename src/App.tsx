@@ -55,6 +55,7 @@ const ActivityLog = lazy(() => import("./pages/ActivityLog"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
+const Lookbook = lazy(() => import("./pages/Lookbook"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -170,6 +171,7 @@ const App = () => (
                   <Route path="/store" element={<Store />} />
                   <Route path="/store/product/:handle" element={<StoreProduct />} />
                   <Route path="/store/info" element={<StoreInfo />} />
+                  <Route path="/store/lookbook" element={<Lookbook />} />
                   
                   {/* Catch all */}
                   <Route path="*" element={<NotFound />} />
