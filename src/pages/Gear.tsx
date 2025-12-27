@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight, Search, Sliders } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { gear, gearCategories, GearCategory } from "@/data/gear";
 import Header from "@/components/Header";
@@ -10,7 +9,6 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 
 const GearPage = () => {
-  const { language } = useLanguage();
   const { trackClick, trackSearch } = useAnalytics();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,10 +49,8 @@ const GearPage = () => {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Gear & Equipment" : "Equipo de Techno",
-    "description": language === 'en' 
-      ? "Synthesizers, drum machines, samplers and tools that shaped techno"
-      : "Sintetizadores, cajas de ritmos, samplers y herramientas que dieron forma al techno",
+    "name": "Techno Gear & Equipment",
+    "description": "Synthesizers, drum machines, samplers and tools that shaped techno",
     "numberOfItems": gear.length,
     "itemListElement": gear.slice(0, 20).map((item, index) => ({
       "@type": "ListItem",
@@ -82,15 +78,13 @@ const GearPage = () => {
           {/* Hero */}
           <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
             <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-              // {language === 'en' ? 'Studio Archive' : 'Archivo de Estudio'}
+              // Studio Archive
             </div>
             <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Gear' : 'Equipo'}
+              Gear
             </h1>
             <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses.' 
-                : 'Los sintetizadores, cajas de ritmos, samplers y herramientas que dieron forma al techno. De los sótanos de Detroit a los almacenes de Berlín.'}
+              The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses.
             </p>
           </div>
 
@@ -100,7 +94,7 @@ const GearPage = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder={language === 'en' ? 'Search gear...' : 'Buscar equipo...'}
+                placeholder="Search gear..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onBlur={() => {
@@ -127,8 +121,8 @@ const GearPage = () => {
                   }`}
                 >
                   {cat === 'all' 
-                    ? (language === 'en' ? 'All' : 'Todos')
-                    : gearCategories[cat][language]
+                    ? 'All'
+                    : gearCategories[cat].en
                   }
                 </button>
               ))}
@@ -161,7 +155,7 @@ const GearPage = () => {
                   <div className="flex justify-between items-start mb-2 sm:mb-3">
                     <div className="flex-1 min-w-0">
                       <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
-                        {gearCategories[item.category][language]}
+                        {gearCategories[item.category].en}
                       </span>
                       <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate">
                         {item.name}
@@ -177,7 +171,7 @@ const GearPage = () => {
                   </div>
 
                   <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
-                    {item.shortDescription[language]}
+                    {item.shortDescription.en}
                   </p>
 
                   <div className="flex flex-wrap gap-1">
@@ -197,7 +191,7 @@ const GearPage = () => {
 
           {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
-            {filteredGear.length} {language === 'en' ? 'items in archive' : 'elementos en archivo'}
+            {filteredGear.length} items in archive
           </div>
         </div>
       </main>

@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ChevronLeft, ChevronRight } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { getVenueById, venues } from "@/data/venues";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,7 +9,6 @@ import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/co
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { language } = useLanguage();
   const venue = id ? getVenueById(id) : null;
 
   const placeSchema = venue ? {
@@ -41,11 +39,11 @@ const VenueDetail = () => {
   const prevVenue = currentIndex > 0 ? venues[currentIndex - 1] : null;
   const nextVenue = currentIndex < venues.length - 1 ? venues[currentIndex + 1] : null;
 
-  const typeLabels: Record<string, { en: string; es: string }> = {
-    'club': { en: 'Club', es: 'Club' },
-    'warehouse': { en: 'Warehouse', es: 'Almacén' },
-    'outdoor': { en: 'Outdoor', es: 'Aire Libre' },
-    'multi-space': { en: 'Multi-Space', es: 'Multi-Espacio' }
+  const typeLabels: Record<string, string> = {
+    'club': 'Club',
+    'warehouse': 'Warehouse',
+    'outdoor': 'Outdoor',
+    'multi-space': 'Multi-Space'
   };
 
   if (!venue) {
@@ -64,10 +62,10 @@ const VenueDetail = () => {
         <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <p className="font-mono text-muted-foreground">
-              {language === 'en' ? 'Venue not found' : 'Club no encontrado'}
+              Venue not found
             </p>
             <Link to="/venues" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← {language === 'en' ? 'Back to Venues' : 'Volver a Clubs'}
+              ← Back to Venues
             </Link>
           </div>
         </main>
@@ -92,7 +90,7 @@ const VenueDetail = () => {
           {/* Breadcrumb Navigation */}
           <DetailBreadcrumb 
             items={[
-              { label: language === 'en' ? 'Venues' : 'Clubs', href: '/venues' },
+              { label: 'Venues', href: '/venues' },
               { label: venue.name }
             ]} 
           />
@@ -105,7 +103,7 @@ const VenueDetail = () => {
               className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              {language === 'en' ? 'Back to Venues' : 'Volver a Clubs'}
+              Back to Venues
             </Link>
 
             {/* Prev/Next Navigation */}
@@ -212,7 +210,7 @@ const VenueDetail = () => {
             <div className="space-y-4 sm:space-y-6">
               <div>
                 <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-2">
-                  // {typeLabels[venue.type]?.[language] || venue.type}
+                  // {typeLabels[venue.type] || venue.type}
                 </div>
                 <h1 className="font-mono text-2xl sm:text-4xl lg:text-5xl xl:text-6xl uppercase tracking-tight mb-2 hover:animate-glitch break-words">
                   {venue.name}
@@ -231,7 +229,7 @@ const VenueDetail = () => {
                 {venue.capacity && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                    {language === 'en' ? 'Capacity' : 'Capacidad'}: {venue.capacity}
+                    Capacity: {venue.capacity}
                   </div>
                 )}
               </div>
@@ -249,7 +247,7 @@ const VenueDetail = () => {
             <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
               <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
                 <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                {language === 'en' ? 'Sound System' : 'Sistema de Sonido'}
+                Sound System
               </h2>
               <div className="border border-border p-4 sm:p-6 bg-card/30">
                 <p className="font-mono text-xs sm:text-sm text-muted-foreground">
@@ -263,7 +261,7 @@ const VenueDetail = () => {
           {venue.historicLineups && venue.historicLineups.length > 0 && (
             <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
               <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">
-                {language === 'en' ? 'Historic Lineups' : 'Lineups Históricos'}
+                Historic Lineups
               </h2>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {venue.historicLineups.map((artist, i) => (
@@ -303,7 +301,7 @@ const VenueDetail = () => {
           {relatedVenues.length > 0 && (
             <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
               <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">
-                {language === 'en' ? 'Related Venues' : 'Clubs Relacionados'}
+                Related Venues
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {relatedVenues.map((v) => (
@@ -313,7 +311,7 @@ const VenueDetail = () => {
                     className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group"
                   >
                     <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
-                      {typeLabels[v.type]?.[language] || v.type}
+                      {typeLabels[v.type] || v.type}
                     </span>
                     <h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch">
                       {v.name}

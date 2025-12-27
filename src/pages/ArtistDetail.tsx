@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { getArtistById, artists } from "@/data/artists";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

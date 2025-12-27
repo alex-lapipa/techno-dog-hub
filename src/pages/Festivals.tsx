@@ -2,13 +2,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { loadFestivalsSummary, loadFestivalById } from "@/data/festivals-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCallback, useRef, useMemo, useState } from "react";
 
 const FestivalsPage = () => {
@@ -22,8 +21,6 @@ const FestivalsPage = () => {
       staleTime: 1000 * 60 * 10,
     });
   }, [queryClient]);
-  
-  const { language } = useLanguage();
 
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
 
@@ -59,10 +56,8 @@ const FestivalsPage = () => {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Festivals" : "Festivales de Techno",
-    "description": language === 'en' 
-      ? "Directory of techno music festivals worldwide"
-      : "Directorio de festivales de música techno en el mundo",
+    "name": "Techno Festivals",
+    "description": "Directory of techno music festivals worldwide",
     "numberOfItems": festivals.length,
     "itemListElement": festivals.slice(0, 20).map((festival, index) => ({
       "@type": "ListItem",
@@ -97,15 +92,13 @@ const FestivalsPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="mb-8 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-              // {language === 'en' ? 'Global gatherings' : 'Encuentros globales'}
+              // Global gatherings
             </div>
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Festivals' : 'Festivales'}
+              Festivals
             </h1>
             <p className="font-mono text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'From Detroit to Tbilisi, Tokyo to Bogotá. The gatherings that matter.' 
-                : 'De Detroit a Tbilisi, de Tokio a Bogotá. Los encuentros que importan.'}
+              From Detroit to Tbilisi, Tokyo to Bogotá. The gatherings that matter.
             </p>
           </div>
 
@@ -116,7 +109,7 @@ const FestivalsPage = () => {
                 value="all" 
                 className="font-mono text-xs uppercase tracking-wider border border-border px-4 py-2 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground hover:bg-card transition-colors"
               >
-                {language === 'en' ? 'All' : 'Todos'}
+                All
                 <span className="ml-2 text-muted-foreground data-[state=active]:text-background/70">
                   ({festivals.length})
                 </span>
@@ -200,7 +193,7 @@ const FestivalsPage = () => {
                   </div>
                   
                   <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                    <span>{language === 'en' ? 'Explore' : 'Explorar'}</span>
+                    <span>Explore</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -211,7 +204,7 @@ const FestivalsPage = () => {
           {/* Directory with virtual scrolling */}
           <div className="mb-12">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
-              // {language === 'en' ? 'Full directory' : 'Directorio completo'}
+              // Full directory
             </div>
             <div className="border-t border-border">
               {isLoading ? (
@@ -282,20 +275,20 @@ const FestivalsPage = () => {
 
           <div className="border border-border p-6">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
-              // {language === 'en' ? 'Go deeper' : 'Profundiza'}
+              // Go deeper
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Link to="/venues" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → {language === 'en' ? 'Venues' : 'Clubs'}
+                → Venues
               </Link>
               <Link to="/mad/calendar" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → {language === 'en' ? 'Calendar' : 'Calendario'}
+                → Calendar
               </Link>
               <Link to="/mad/map" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → {language === 'en' ? 'Map' : 'Mapa'}
+                → Map
               </Link>
               <Link to="/artists" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → {language === 'en' ? 'Artists' : 'Artistas'}
+                → Artists
               </Link>
             </div>
           </div>
