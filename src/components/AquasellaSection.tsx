@@ -11,28 +11,28 @@ const AquasellaSection = () => {
             {/* Header */}
             <div className="space-y-4">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-                // Festival destacado
+                // Featured festival
               </div>
               <h2 className="font-mono text-4xl md:text-6xl uppercase tracking-tight text-foreground">
                 Aquasella
               </h2>
               <div className="font-mono text-sm text-muted-foreground uppercase tracking-wider">
-                Arriondas, Asturias — España
+                Arriondas, Asturias — Spain
               </div>
             </div>
 
             {/* Description */}
             <div className="space-y-4 font-mono text-sm text-muted-foreground leading-relaxed">
               <p>
-                Aquasella es uno de los festivales de música electrónica más 
-                emblemáticos de la península ibérica. Desde 1997, combina 
-                techno, house y música experimental en un entorno natural 
-                incomparable en el corazón de Asturias.
+                Aquasella is one of the most iconic electronic music festivals 
+                on the Iberian Peninsula. Since 1997, it has combined techno, 
+                house, and experimental music in an incomparable natural setting 
+                in the heart of Asturias.
               </p>
               <p>
-                El festival se celebra junto al río Sella, donde las montañas 
-                asturianas crean una atmósfera única que ha atraído a artistas 
-                de renombre internacional durante casi tres décadas.
+                The festival takes place next to the Sella River, where the 
+                Asturian mountains create a unique atmosphere that has attracted 
+                internationally renowned artists for nearly three decades.
               </p>
             </div>
 
@@ -40,16 +40,16 @@ const AquasellaSection = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Fecha
+                  Date
                 </div>
                 <div className="font-mono text-foreground flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  14-17 Ago 2025
+                  14-17 Aug 2025
                 </div>
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Ubicación
+                  Location
                 </div>
                 <div className="font-mono text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
@@ -58,15 +58,15 @@ const AquasellaSection = () => {
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Edición
+                  Edition
                 </div>
                 <div className="font-mono text-foreground">
-                  28ª Edición
+                  28th Edition
                 </div>
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Precio desde
+                  Price from
                 </div>
                 <div className="font-mono text-foreground">
                   85€
@@ -77,11 +77,11 @@ const AquasellaSection = () => {
             {/* Actions */}
             <div className="flex flex-wrap gap-4 pt-4">
               <Button variant="brutalist" size="lg">
-                Comprar entradas
+                Buy tickets
                 <ExternalLink className="w-4 h-4" />
               </Button>
               <Button variant="terminal" size="lg">
-                Ver lineup
+                View lineup
               </Button>
             </div>
           </div>
@@ -109,7 +109,7 @@ const AquasellaSection = () => {
             {/* Lineup preview */}
             <div className="border border-border p-6">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-4">
-                // Headliners confirmados
+                // Confirmed headliners
               </div>
               <div className="space-y-2">
                 {[
@@ -118,7 +118,7 @@ const AquasellaSection = () => {
                   "Adam Beyer",
                   "Nina Kraviz",
                   "Richie Hawtin",
-                  "+ 50 artistas más",
+                  "+ 50 more artists",
                 ].map((artist, i) => (
                   <div
                     key={artist}

@@ -230,7 +230,7 @@ const Auth = () => {
               onClick={() => navigate('/')}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              ← Volver al inicio
+              ← Back to home
             </button>
           </div>
         </div>

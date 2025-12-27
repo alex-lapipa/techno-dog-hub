@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,7 +28,6 @@ interface NewsArticle {
 
 const NewsDrafts = () => {
   const { user } = useAuth();
-  const { language } = useLanguage();
   const navigate = useNavigate();
   const [drafts, setDrafts] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,13 +92,13 @@ const NewsDrafts = () => {
               className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
-              {language === 'en' ? 'Back to News' : 'Volver a Noticias'}
+              Back to News
             </Link>
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
-              // {language === 'en' ? 'Admin Only' : 'Solo Admin'}
+              // Admin Only
             </div>
             <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight">
-              {language === 'en' ? 'Draft Articles' : 'Borradores'}
+              Draft Articles
             </h1>
           </div>
 
@@ -108,13 +106,13 @@ const NewsDrafts = () => {
           {loading ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground font-mono">
-                {language === 'en' ? 'Loading...' : 'Cargando...'}
+                Loading...
               </CardContent>
             </Card>
           ) : drafts.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground font-mono">
-                {language === 'en' ? 'No draft articles.' : 'No hay borradores.'}
+                No draft articles.
               </CardContent>
             </Card>
           ) : (
@@ -179,7 +177,7 @@ const NewsDrafts = () => {
               to="/admin/news-agent"
               className="font-mono text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              → {language === 'en' ? 'Go to News Agent Admin' : 'Ir al Admin del Agente'}
+              → Go to News Agent Admin
             </Link>
           </div>
         </div>
