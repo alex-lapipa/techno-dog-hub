@@ -164,21 +164,23 @@ const StoreProduct = () => {
 
                 {/* Thumbnails */}
                 {images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-2">
+                  <div className="flex gap-3 overflow-x-auto pb-2">
                     {images.map((img, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`w-16 h-16 flex-shrink-0 border ${
+                        className={`flex-shrink-0 transition-opacity ${
                           selectedImageIndex === index 
-                            ? 'border-foreground' 
-                            : 'border-border hover:border-foreground/50'
-                        } transition-colors overflow-hidden`}
+                            ? 'opacity-100' 
+                            : 'opacity-60 hover:opacity-80'
+                        }`}
                       >
-                        <img
+                        <GlitchImage
                           src={img.node.url}
                           alt={img.node.altText || `${product.title} ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          className="w-20 h-20"
+                          frameNumber={String(index + 1).padStart(2, '0')}
+                          size="thumbnail"
                         />
                       </button>
                     ))}
