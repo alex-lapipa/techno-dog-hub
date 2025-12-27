@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -213,7 +212,6 @@ const AdminDashboard = () => {
 
 const Admin = () => {
   const { isAdmin, loading } = useAdminAuth();
-  const { language } = useLanguage();
 
   if (loading) {
     return (

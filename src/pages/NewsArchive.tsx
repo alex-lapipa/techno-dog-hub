@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowUpRight, Filter, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -24,7 +23,6 @@ interface NewsArticle {
 }
 
 const NewsArchive = () => {
-  const { language } = useLanguage();
   const [searchParams] = useSearchParams();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +32,6 @@ const NewsArchive = () => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Initialize filters from URL params
   useEffect(() => {
     const cityParam = searchParams.get('city');
     const genreParam = searchParams.get('genre');
@@ -64,7 +61,6 @@ const NewsArchive = () => {
       const articlesData = (data as unknown as NewsArticle[]) || [];
       setArticles(articlesData);
 
-      // Extract unique tags
       const cities = new Set<string>();
       const genres = new Set<string>();
       
@@ -109,7 +105,7 @@ const NewsArchive = () => {
   const formatDate = (dateStr: string | null): string => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -142,16 +138,14 @@ const NewsArchive = () => {
               to="/news" 
               className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              ← {language === 'en' ? 'Back to News' : 'Volver a Noticias'}
+              ← Back to News
             </Link>
           </div>
           <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tighter mb-4">
-            {language === 'en' ? 'Archive' : 'Archivo'}
+            Archive
           </h1>
           <p className="font-mono text-muted-foreground max-w-xl">
-            {language === 'en' 
-              ? 'All published articles. Filter by city or genre to find what you\'re looking for.'
-              : 'Todos los artículos publicados. Filtra por ciudad o género para encontrar lo que buscas.'}
+            All published articles. Filter by city or genre to find what you're looking for.
           </p>
         </div>
 
@@ -163,7 +157,7 @@ const NewsArchive = () => {
             className="font-mono text-xs uppercase tracking-wider"
           >
             <Filter className="w-4 h-4 mr-2" />
-            {language === 'en' ? 'Filters' : 'Filtros'}
+            Filters
             {activeFilterCount > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {activeFilterCount}
@@ -177,7 +171,7 @@ const NewsArchive = () => {
               className="font-mono text-xs uppercase tracking-wider ml-2"
             >
               <X className="w-4 h-4 mr-1" />
-              {language === 'en' ? 'Clear' : 'Limpiar'}
+              Clear
             </Button>
           )}
         </div>
@@ -185,11 +179,10 @@ const NewsArchive = () => {
         {/* Filters Panel */}
         {showFilters && (
           <div className="border border-border p-6 mb-8 bg-card/50">
-            {/* City Tags */}
             {allCityTags.length > 0 && (
               <div className="mb-6">
                 <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  {language === 'en' ? 'Cities' : 'Ciudades'}
+                  Cities
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {allCityTags.map(city => (
@@ -209,11 +202,10 @@ const NewsArchive = () => {
               </div>
             )}
 
-            {/* Genre Tags */}
             {allGenreTags.length > 0 && (
               <div>
                 <h3 className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  {language === 'en' ? 'Genres' : 'Géneros'}
+                  Genres
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {allGenreTags.map(genre => (
@@ -238,14 +230,12 @@ const NewsArchive = () => {
         {/* Results Count */}
         <div className="font-mono text-xs text-muted-foreground mb-6">
           {loading ? (
-            language === 'en' ? 'Loading...' : 'Cargando...'
+            'Loading...'
           ) : (
             <>
-              {filteredArticles.length} {language === 'en' ? 'articles' : 'artículos'}
+              {filteredArticles.length} articles
               {activeFilterCount > 0 && (
-                <span className="ml-1">
-                  ({language === 'en' ? 'filtered' : 'filtrados'})
-                </span>
+                <span className="ml-1">(filtered)</span>
               )}
             </>
           )}
@@ -275,7 +265,6 @@ const NewsArchive = () => {
                   {getExcerpt(article.body_markdown)}
                 </p>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-1.5">
                   {article.city_tags?.slice(0, 2).map(tag => (
                     <span 
@@ -303,16 +292,14 @@ const NewsArchive = () => {
         {!loading && filteredArticles.length === 0 && (
           <div className="text-center py-16 border border-dashed border-border">
             <p className="font-mono text-muted-foreground mb-4">
-              {language === 'en' 
-                ? 'No articles match your filters.'
-                : 'Ningún artículo coincide con tus filtros.'}
+              No articles match your filters.
             </p>
             <Button
               variant="outline"
               onClick={clearFilters}
               className="font-mono text-xs uppercase"
             >
-              {language === 'en' ? 'Clear Filters' : 'Limpiar Filtros'}
+              Clear Filters
             </Button>
           </div>
         )}

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +24,6 @@ interface NewsArticle {
 
 const NewsArticleDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { language } = useLanguage();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +58,6 @@ const NewsArticleDetail = () => {
     });
   };
 
-  // Simple markdown to JSX conversion
   const renderMarkdown = (markdown: string) => {
     const lines = markdown.split('\n');
     const elements: JSX.Element[] = [];
@@ -77,7 +74,7 @@ const NewsArticleDetail = () => {
       }
     };
 
-    lines.forEach((line, index) => {
+    lines.forEach((line) => {
       const trimmedLine = line.trim();
 
       if (trimmedLine === '') {
@@ -136,7 +133,7 @@ const NewsArticleDetail = () => {
         <main className="pt-24 lg:pt-16 pb-16">
           <div className="container mx-auto px-4 md:px-8">
             <div className="font-mono text-sm text-muted-foreground animate-pulse">
-              {language === 'en' ? 'Loading...' : 'Cargando...'}
+              Loading...
             </div>
           </div>
         </main>
@@ -152,14 +149,14 @@ const NewsArticleDetail = () => {
         <main className="pt-24 lg:pt-16 pb-16">
           <div className="container mx-auto px-4 md:px-8">
             <div className="font-mono text-sm text-muted-foreground">
-              {language === 'en' ? 'Article not found.' : 'Artículo no encontrado.'}
+              Article not found.
             </div>
             <Link 
               to="/news" 
               className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mt-4"
             >
               <ArrowLeft className="w-4 h-4" />
-              {language === 'en' ? 'Back to News' : 'Volver a Noticias'}
+              Back to News
             </Link>
           </div>
         </main>
@@ -173,16 +170,14 @@ const NewsArticleDetail = () => {
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          {/* Back link */}
           <Link 
             to="/news" 
             className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
-            {language === 'en' ? 'Back to News' : 'Volver a Noticias'}
+            Back to News
           </Link>
 
-          {/* Article Header */}
           <article className="max-w-3xl">
             <header className="mb-8">
               <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -215,16 +210,14 @@ const NewsArticleDetail = () => {
               </div>
             </header>
 
-            {/* Article Body */}
             <div className="font-mono text-base leading-relaxed">
               {renderMarkdown(article.body_markdown)}
             </div>
 
-            {/* Entity Tags */}
             {article.entity_tags && article.entity_tags.length > 0 && (
               <div className="mt-8 pt-6 border-t border-border">
                 <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  {language === 'en' ? 'Mentioned' : 'Mencionados'}
+                  Mentioned
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {article.entity_tags.map(tag => (
@@ -236,11 +229,10 @@ const NewsArticleDetail = () => {
               </div>
             )}
 
-            {/* Sources */}
             {article.source_urls && article.source_urls.length > 0 && (
               <div className="mt-6 pt-6 border-t border-border">
                 <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  {language === 'en' ? 'Sources' : 'Fuentes'}
+                  Sources
                 </div>
                 <ul className="space-y-1">
                   {article.source_urls.map((url, i) => (

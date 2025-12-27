@@ -1,21 +1,16 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Disc } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { labels } from "@/data/labels";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 
 const LabelsPage = () => {
-  const { language } = useLanguage();
-
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Record Labels" : "Sellos Discográficos de Techno",
-    "description": language === 'en' 
-      ? "Underground techno record labels defining the sound"
-      : "Sellos discográficos de techno underground que definen el sonido",
+    "name": "Techno Record Labels",
+    "description": "Underground techno record labels defining the sound",
     "numberOfItems": labels.length,
     "itemListElement": labels.map((label, index) => ({
       "@type": "ListItem",
@@ -41,15 +36,13 @@ const LabelsPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="mb-12 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-              // {language === 'en' ? 'Archive' : 'Archivo'}
+              // Archive
             </div>
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Labels' : 'Sellos'}
+              Labels
             </h1>
             <p className="font-mono text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The imprints that define the underground. Quality over quantity.' 
-                : 'Los sellos que definen el underground. Calidad sobre cantidad.'}
+              The imprints that define the underground. Quality over quantity.
             </p>
           </div>
 
@@ -90,7 +83,7 @@ const LabelsPage = () => {
                 </div>
                 
                 <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                  <span>{language === 'en' ? 'View catalog' : 'Ver catálogo'}</span>
+                  <span>View catalog</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
@@ -98,7 +91,7 @@ const LabelsPage = () => {
           </div>
 
           <div className="mt-8 font-mono text-xs text-muted-foreground">
-            {labels.length} {language === 'en' ? 'labels in archive' : 'sellos en archivo'}
+            {labels.length} labels in archive
           </div>
         </div>
       </main>

@@ -1,28 +1,23 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Users } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { crews } from "@/data/crews";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 
+const typeLabels: Record<string, string> = {
+  'sound system': 'Sound System',
+  'collective': 'Collective',
+  'party series': 'Party Series',
+  'rave crew': 'Rave Crew'
+};
+
 const CrewsPage = () => {
-  const { language } = useLanguage();
-
-  const typeLabels: Record<string, { en: string; es: string }> = {
-    'sound system': { en: 'Sound System', es: 'Sound System' },
-    'collective': { en: 'Collective', es: 'Colectivo' },
-    'party series': { en: 'Party Series', es: 'Serie de Fiestas' },
-    'rave crew': { en: 'Rave Crew', es: 'Crew de Rave' }
-  };
-
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Crews & Collectives" : "Crews y Colectivos de Techno",
-    "description": language === 'en' 
-      ? "Sound systems, collectives and movements building the techno scene"
-      : "Sound systems, colectivos y movimientos que construyen la escena techno",
+    "name": "Techno Crews & Collectives",
+    "description": "Sound systems, collectives and movements building the techno scene",
     "numberOfItems": crews.length,
     "itemListElement": crews.map((crew, index) => ({
       "@type": "ListItem",
@@ -48,15 +43,13 @@ const CrewsPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="mb-12 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-              // {language === 'en' ? 'Archive' : 'Archivo'}
+              // Archive
             </div>
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Crews & Collectives' : 'Crews y Colectivos'}
+              Crews & Collectives
             </h1>
             <p className="font-mono text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The sound systems, collectives, and movements that build the scene.' 
-                : 'Los sound systems, colectivos y movimientos que construyen la escena.'}
+              The sound systems, collectives, and movements that build the scene.
             </p>
           </div>
 
@@ -71,11 +64,11 @@ const CrewsPage = () => {
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-muted-foreground" />
                     <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
-                      {typeLabels[crew.type]?.[language] || crew.type}
+                      {typeLabels[crew.type] || crew.type}
                     </span>
                   </div>
                   <span className="font-mono text-xs text-muted-foreground">
-                    {crew.active ? (language === 'en' ? 'Active' : 'Activo') : (language === 'en' ? 'Inactive' : 'Inactivo')}
+                    {crew.active ? 'Active' : 'Inactive'}
                   </span>
                 </div>
                 
@@ -85,7 +78,7 @@ const CrewsPage = () => {
                 
                 <div className="font-mono text-sm text-muted-foreground mb-4">
                   {crew.city}, {crew.country}
-                  {crew.founded && ` — ${language === 'en' ? 'Est.' : 'Fund.'} ${crew.founded}`}
+                  {crew.founded && ` — Est. ${crew.founded}`}
                 </div>
                 
                 {crew.description && (
@@ -111,7 +104,7 @@ const CrewsPage = () => {
                 </div>
                 
                 <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                  <span>{language === 'en' ? 'View details' : 'Ver detalles'}</span>
+                  <span>View details</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
@@ -119,7 +112,7 @@ const CrewsPage = () => {
           </div>
 
           <div className="mt-8 font-mono text-xs text-muted-foreground">
-            {crews.length} {language === 'en' ? 'crews in archive' : 'crews en archivo'}
+            {crews.length} crews in archive
           </div>
         </div>
       </main>

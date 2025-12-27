@@ -1,21 +1,16 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Music } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { ArrowRight } from "lucide-react";
 import { releases } from "@/data/releases";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 
 const ReleasesPage = () => {
-  const { language } = useLanguage();
-
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Releases" : "Lanzamientos de Techno",
-    "description": language === 'en' 
-      ? "Essential techno records, vinyl and digital releases"
-      : "Discos esenciales de techno, lanzamientos en vinilo y digital",
+    "name": "Techno Releases",
+    "description": "Essential techno records, vinyl and digital releases",
     "numberOfItems": releases.length,
     "itemListElement": releases.slice(0, 20).map((release, index) => ({
       "@type": "ListItem",
@@ -42,15 +37,13 @@ const ReleasesPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="mb-12 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-              // {language === 'en' ? 'Archive' : 'Archivo'}
+              // Archive
             </div>
             <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Releases' : 'Lanzamientos'}
+              Releases
             </h1>
             <p className="font-mono text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The records that shaped the sound. Vinyl, digital, essential.' 
-                : 'Los discos que definieron el sonido. Vinilo, digital, esencial.'}
+              The records that shaped the sound. Vinyl, digital, essential.
             </p>
           </div>
 
@@ -115,7 +108,7 @@ const ReleasesPage = () => {
           </div>
 
           <div className="mt-8 font-mono text-xs text-muted-foreground">
-            {releases.length} {language === 'en' ? 'releases in archive' : 'lanzamientos en archivo'}
+            {releases.length} releases in archive
           </div>
         </div>
       </main>
