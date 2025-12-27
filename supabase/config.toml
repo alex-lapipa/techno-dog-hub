@@ -117,3 +117,6 @@ verify_jwt = false
 
 [functions.admin-audit]
 verify_jwt = false
+
+[functions.media-engine]
+verify_jwt = false
