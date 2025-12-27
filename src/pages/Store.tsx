@@ -126,8 +126,8 @@ const Store = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.node.id} product={product.node} />
+                {filteredProducts.map((product, index) => (
+                  <ProductCard key={product.node.id} product={product.node} index={index} />
                 ))}
               </div>
             )}
