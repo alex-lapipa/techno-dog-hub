@@ -52,6 +52,9 @@ const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const Support = lazy(() => import("./pages/Support"));
 const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
 const ActivityLog = lazy(() => import("./pages/ActivityLog"));
+const Store = lazy(() => import("./pages/Store"));
+const StoreProduct = lazy(() => import("./pages/StoreProduct"));
+const StoreInfo = lazy(() => import("./pages/StoreInfo"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -162,6 +165,12 @@ const App = () => (
                   
                   {/* Support */}
                   <Route path="/support" element={<Support />} />
+                  
+                  {/* Store */}
+                  <Route path="/store" element={<Store />} />
+                  <Route path="/store/product/:handle" element={<StoreProduct />} />
+                  <Route path="/store/info" element={<StoreInfo />} />
+                  
                   {/* Catch all */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
