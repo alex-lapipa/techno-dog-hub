@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +14,8 @@ import {
   Loader2, 
   CheckCircle2,
   Mail,
-  Send
+  Send,
+  ChevronDown
 } from "lucide-react";
 import { z } from "zod";
 
@@ -27,6 +29,7 @@ interface CommunityWidgetCorrectionProps {
   title?: string;
   description?: string;
   className?: string;
+  collapsible?: boolean;
   onSuccess?: () => void;
 }
 
@@ -37,11 +40,13 @@ export const CommunityWidgetCorrection = ({
   title = "Submit a Correction",
   description = "Help us keep our data accurate",
   className = "",
+  collapsible = false,
   onSuccess,
 }: CommunityWidgetCorrectionProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  const [isOpen, setIsOpen] = useState(!collapsible);
   const [email, setEmail] = useState("");
   const [correctionText, setCorrectionText] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
@@ -53,7 +58,6 @@ export const CommunityWidgetCorrection = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate
     if (!user && !email) {
       toast({
         title: "Email required",
@@ -97,7 +101,6 @@ export const CommunityWidgetCorrection = ({
     setLoading(true);
 
     try {
-      // If not logged in, need to verify email first
       if (!user) {
         const { error } = await supabase.functions.invoke("community-signup", {
           body: {
@@ -117,7 +120,6 @@ export const CommunityWidgetCorrection = ({
         return;
       }
 
-      // Create submission record
       const { error: submissionError } = await supabase
         .from("community_submissions")
         .insert({
@@ -187,6 +189,110 @@ export const CommunityWidgetCorrection = ({
     );
   }
 
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Email (only if not logged in) */}
+      {!user && (
+        <div className="space-y-2">
+          <Label htmlFor="email-correction">Email *</Label>
+          <Input
+            id="email-correction"
+            type="email"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      )}
+
+      {/* Correction text */}
+      <div className="space-y-2">
+        <Label htmlFor="correction">What needs correcting? *</Label>
+        <Textarea
+          id="correction"
+          placeholder="Describe what's incorrect and what the correct information should be..."
+          value={correctionText}
+          onChange={(e) => setCorrectionText(e.target.value)}
+          disabled={loading}
+          rows={4}
+        />
+      </div>
+
+      {/* Source URL */}
+      <div className="space-y-2">
+        <Label htmlFor="source">Source URL (optional)</Label>
+        <Input
+          id="source"
+          type="url"
+          placeholder="https://..."
+          value={sourceUrl}
+          onChange={(e) => setSourceUrl(e.target.value)}
+          disabled={loading}
+        />
+        <p className="text-xs text-muted-foreground">
+          Link to verify the correct information
+        </p>
+      </div>
+
+      {/* Consent */}
+      <div className="flex items-start space-x-2">
+        <Checkbox
+          id="consent-correction"
+          checked={consent}
+          onCheckedChange={(checked) => setConsent(!!checked)}
+          disabled={loading}
+        />
+        <Label htmlFor="consent-correction" className="text-sm text-muted-foreground leading-tight">
+          I confirm this information is accurate to the best of my knowledge
+        </Label>
+      </div>
+
+      {/* Submit */}
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={loading || !correctionText.trim() || !consent}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          <>
+            <Send className="h-4 w-4 mr-2" />
+            Submit Correction
+          </>
+        )}
+      </Button>
+    </form>
+  );
+
+  if (collapsible) {
+    return (
+      <Card className={`border-border/50 ${className}`}>
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-3 cursor-pointer hover:bg-card/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Edit3 className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">{title}</CardTitle>
+                </div>
+                <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+              </div>
+              <CardDescription>{description}</CardDescription>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>{formContent}</CardContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </Card>
+    );
+  }
+
   return (
     <Card className={`border-border/50 ${className}`}>
       <CardHeader className="pb-3">
@@ -196,85 +302,7 @@ export const CommunityWidgetCorrection = ({
         </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email (only if not logged in) */}
-          {!user && (
-            <div className="space-y-2">
-              <Label htmlFor="email-correction">Email *</Label>
-              <Input
-                id="email-correction"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          {/* Correction text */}
-          <div className="space-y-2">
-            <Label htmlFor="correction">What needs correcting? *</Label>
-            <Textarea
-              id="correction"
-              placeholder="Describe what's incorrect and what the correct information should be..."
-              value={correctionText}
-              onChange={(e) => setCorrectionText(e.target.value)}
-              disabled={loading}
-              rows={4}
-            />
-          </div>
-
-          {/* Source URL */}
-          <div className="space-y-2">
-            <Label htmlFor="source">Source URL (optional)</Label>
-            <Input
-              id="source"
-              type="url"
-              placeholder="https://..."
-              value={sourceUrl}
-              onChange={(e) => setSourceUrl(e.target.value)}
-              disabled={loading}
-            />
-            <p className="text-xs text-muted-foreground">
-              Link to verify the correct information
-            </p>
-          </div>
-
-          {/* Consent */}
-          <div className="flex items-start space-x-2">
-            <Checkbox
-              id="consent-correction"
-              checked={consent}
-              onCheckedChange={(checked) => setConsent(!!checked)}
-              disabled={loading}
-            />
-            <Label htmlFor="consent-correction" className="text-sm text-muted-foreground leading-tight">
-              I confirm this information is accurate to the best of my knowledge
-            </Label>
-          </div>
-
-          {/* Submit */}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={loading || !correctionText.trim() || !consent}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Submit Correction
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
+      <CardContent>{formContent}</CardContent>
     </Card>
   );
 };
