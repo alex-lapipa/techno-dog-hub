@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -101,6 +101,14 @@ const AdminDashboard = () => {
 
   const adminTools = [
     {
+      title: "AI Admin Audit",
+      description: "AI-powered analysis of tools, gaps, and recommendations",
+      icon: Brain,
+      path: "/admin/audit",
+      count: null,
+      highlight: true,
+    },
+    {
       title: "Content Moderation",
       description: "Review photos and corrections from the community",
       icon: Shield,
@@ -112,6 +120,13 @@ const AdminDashboard = () => {
       description: "Full submission management with editing",
       icon: FileText,
       path: "/admin/submissions",
+      count: null,
+    },
+    {
+      title: "Media Curator",
+      description: "Photo retrieval, verification, and management",
+      icon: Image,
+      path: "/admin/media",
       count: null,
     },
     {
@@ -165,14 +180,30 @@ const AdminDashboard = () => {
           <Link
             key={tool.path}
             to={tool.path}
-            className="group border border-border bg-card p-6 hover:border-logo-green/50 hover:bg-card/80 transition-all duration-300"
+            className={`group border bg-card p-6 transition-all duration-300 ${
+              tool.highlight 
+                ? 'border-crimson/50 hover:border-crimson hover:bg-crimson/10' 
+                : 'border-border hover:border-logo-green/50 hover:bg-card/80'
+            }`}
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 border border-muted bg-muted/50 flex items-center justify-center group-hover:border-logo-green/50 group-hover:bg-logo-green/10 transition-colors">
-                <tool.icon className="w-6 h-6 text-muted-foreground group-hover:text-logo-green transition-colors" />
+              <div className={`w-12 h-12 border bg-muted/50 flex items-center justify-center transition-colors ${
+                tool.highlight
+                  ? 'border-crimson/50 group-hover:border-crimson group-hover:bg-crimson/20'
+                  : 'border-muted group-hover:border-logo-green/50 group-hover:bg-logo-green/10'
+              }`}>
+                <tool.icon className={`w-6 h-6 transition-colors ${
+                  tool.highlight
+                    ? 'text-crimson'
+                    : 'text-muted-foreground group-hover:text-logo-green'
+                }`} />
               </div>
               <div className="flex-1">
-                <h3 className="font-mono text-sm uppercase tracking-tight group-hover:text-logo-green transition-colors">
+                <h3 className={`font-mono text-sm uppercase tracking-tight transition-colors ${
+                  tool.highlight
+                    ? 'text-crimson'
+                    : 'group-hover:text-logo-green'
+                }`}>
                   {tool.title}
                 </h3>
                 <p className="font-mono text-xs text-muted-foreground mt-1">
