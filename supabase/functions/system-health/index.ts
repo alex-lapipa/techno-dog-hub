@@ -1,6 +1,9 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
+declare const EdgeRuntime: {
+  waitUntil: (promise: Promise<unknown>) => void;
+};
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -39,6 +42,9 @@ const API_ENDPOINTS = [
   { name: "Docs API", path: "/api-v1-docs" },
   { name: "Chunks API", path: "/api-v1-chunks" },
 ];
+
+// Notification cooldown: don't re-notify for same issue within 30 minutes
+const NOTIFICATION_COOLDOWN_MS = 30 * 60 * 1000;
 
 async function checkDatabase(supabase: any): Promise<HealthCheck> {
   const start = Date.now();
@@ -117,7 +123,6 @@ async function checkStorage(supabase: any): Promise<HealthCheck> {
 async function checkAuth(supabase: any): Promise<HealthCheck> {
   const start = Date.now();
   try {
-    // Just check if auth service responds by getting session
     const { error } = await supabase.auth.getSession();
     const latency = Date.now() - start;
 
@@ -174,7 +179,6 @@ async function checkEdgeFunction(
     clearTimeout(timeoutId);
     const latency = Date.now() - start;
 
-    // OPTIONS returning anything means the function exists and is deployed
     return {
       name: functionName,
       status: "healthy",
@@ -248,7 +252,164 @@ async function checkApiEndpoint(
   }
 }
 
-serve(async (req) => {
+async function shouldNotify(
+  supabase: any,
+  serviceName: string
+): Promise<boolean> {
+  // Check if there's a recent unresolved alert for this service
+  const { data: existingAlert } = await supabase
+    .from("health_alerts")
+    .select("id, notified_at")
+    .eq("service_name", serviceName)
+    .is("resolved_at", null)
+    .order("notified_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!existingAlert) return true;
+
+  // Check if cooldown has passed
+  const lastNotified = new Date(existingAlert.notified_at).getTime();
+  return Date.now() - lastNotified > NOTIFICATION_COOLDOWN_MS;
+}
+
+async function sendEmailNotification(
+  issues: HealthCheck[],
+  overall: string
+): Promise<void> {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendApiKey) {
+    console.log("RESEND_API_KEY not configured, skipping email notification");
+    return;
+  }
+
+  const resend = new Resend(resendApiKey);
+  
+  const issueList = issues
+    .map((i) => `• ${i.name}: ${i.status.toUpperCase()} - ${i.message || "No details"}`)
+    .join("\n");
+
+  const severity = overall === "down" ? "🚨 CRITICAL" : "⚠️ WARNING";
+  
+  try {
+    await resend.emails.send({
+      from: "techno.dog Alerts <onboarding@resend.dev>",
+      to: ["admin@techno.dog"], // Change to actual admin email
+      subject: `${severity} System Health Alert - techno.dog`,
+      html: `
+        <div style="font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff;">
+          <h1 style="color: ${overall === "down" ? "#ef4444" : "#eab308"};">
+            ${severity} System Health Alert
+          </h1>
+          <p style="color: #888;">Detected at: ${new Date().toISOString()}</p>
+          <h2 style="color: #22c55e;">Affected Services:</h2>
+          <pre style="background: #2a2a2a; padding: 15px; border-radius: 4px; color: #f0f0f0;">
+${issueList}
+          </pre>
+          <p style="margin-top: 20px;">
+            <a href="https://techno.dog/admin/health" style="color: #22c55e;">
+              View System Health Dashboard →
+            </a>
+          </p>
+        </div>
+      `,
+    });
+    console.log("Email notification sent successfully");
+  } catch (error) {
+    console.error("Failed to send email notification:", error);
+  }
+}
+
+async function sendWebhookNotifications(
+  supabase: any,
+  issues: HealthCheck[],
+  overall: string
+): Promise<void> {
+  // Get all active webhooks subscribed to health events
+  const { data: webhooks } = await supabase
+    .from("webhooks")
+    .select("*")
+    .eq("status", "active")
+    .contains("events", ["health.alert"]);
+
+  if (!webhooks || webhooks.length === 0) {
+    console.log("No webhooks subscribed to health.alert events");
+    return;
+  }
+
+  const payload = {
+    event: "health.alert",
+    timestamp: new Date().toISOString(),
+    overall_status: overall,
+    issues: issues.map((i) => ({
+      name: i.name,
+      status: i.status,
+      message: i.message,
+      latency: i.latency,
+    })),
+  };
+
+  for (const webhook of webhooks) {
+    try {
+      const response = await fetch(webhook.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Webhook-Secret": webhook.secret,
+          "X-Event-Type": "health.alert",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      // Log delivery
+      await supabase.from("webhook_deliveries").insert({
+        webhook_id: webhook.id,
+        event_type: "health.alert",
+        payload,
+        response_status: response.status,
+        success: response.ok,
+      });
+
+      console.log(`Webhook ${webhook.name} notified: ${response.status}`);
+    } catch (error) {
+      console.error(`Failed to notify webhook ${webhook.name}:`, error);
+      await supabase.from("webhook_deliveries").insert({
+        webhook_id: webhook.id,
+        event_type: "health.alert",
+        payload,
+        response_status: 0,
+        success: false,
+        response_body: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
+}
+
+async function createHealthAlert(
+  supabase: any,
+  check: HealthCheck,
+  severity: "critical" | "warning"
+): Promise<void> {
+  await supabase.from("health_alerts").insert({
+    alert_type: "service_degradation",
+    severity,
+    service_name: check.name,
+    message: `${check.name} is ${check.status}: ${check.message || "No details"}`,
+  });
+}
+
+async function resolveHealthAlerts(
+  supabase: any,
+  serviceName: string
+): Promise<void> {
+  await supabase
+    .from("health_alerts")
+    .update({ resolved_at: new Date().toISOString() })
+    .eq("service_name", serviceName)
+    .is("resolved_at", null);
+}
+
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -259,6 +420,10 @@ serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Check if notifications should be sent (query param)
+    const url = new URL(req.url);
+    const sendNotifications = url.searchParams.get("notify") === "true";
 
     // Run all health checks in parallel
     const [database, storage, auth, ...edgeFunctionResults] = await Promise.all([
@@ -279,6 +444,42 @@ serve(async (req) => {
     const hasDegraded = allChecks.some((c) => c.status === "degraded");
 
     const overall = hasDown ? "down" : hasDegraded ? "degraded" : "healthy";
+
+    // Handle notifications for critical issues
+    if (sendNotifications && (hasDown || hasDegraded)) {
+      const criticalIssues = allChecks.filter((c) => c.status === "down");
+      const warningIssues = allChecks.filter((c) => c.status === "degraded");
+      const allIssues = [...criticalIssues, ...warningIssues];
+
+      // Check which services need notification
+      const issuesToNotify: HealthCheck[] = [];
+      for (const issue of allIssues) {
+        if (await shouldNotify(supabase, issue.name)) {
+          issuesToNotify.push(issue);
+          const severity = issue.status === "down" ? "critical" : "warning";
+          await createHealthAlert(supabase, issue, severity);
+        }
+      }
+
+      // Send notifications if there are new issues
+      if (issuesToNotify.length > 0) {
+        console.log(`Sending notifications for ${issuesToNotify.length} issues`);
+        
+        // Send email and webhook notifications in background
+        EdgeRuntime.waitUntil(
+          Promise.all([
+            sendEmailNotification(issuesToNotify, overall),
+            sendWebhookNotifications(supabase, issuesToNotify, overall),
+          ])
+        );
+      }
+
+      // Resolve alerts for healthy services
+      const healthyServices = allChecks.filter((c) => c.status === "healthy");
+      for (const service of healthyServices) {
+        await resolveHealthAlerts(supabase, service.name);
+      }
+    }
 
     const health: SystemHealth = {
       overall,
