@@ -56,6 +56,7 @@ const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
 const Lookbook = lazy(() => import("./pages/Lookbook"));
+const SoundMachine = lazy(() => import("./pages/SoundMachine"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -166,6 +167,9 @@ const App = () => (
                   
                   {/* Support */}
                   <Route path="/support" element={<Support />} />
+                  
+                  {/* Sound Machine */}
+                  <Route path="/sound-machine" element={<SoundMachine />} />
                   
                   {/* Store */}
                   <Route path="/store" element={<Store />} />
