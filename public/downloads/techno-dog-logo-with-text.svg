@@ -45,7 +45,7 @@
     <line x1="93" y1="73" x2="72" y2="65" stroke="#66FF33" stroke-width="3" />
   </g>
   
-  <!-- Text: TECHNO.DOG - IBM Plex Mono uppercase with letter spacing -->
+  <!-- Text: techno.dog - IBM Plex Mono lowercase with letter spacing -->
   <text
     x="115"
     y="60"
@@ -53,7 +53,6 @@
     font-size="24"
     font-weight="400"
     letter-spacing="8"
-    text-transform="uppercase"
     fill="#E5E5E5"
-  >TECHNO.DOG</text>
+  >techno.dog</text>
 </svg>
