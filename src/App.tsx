@@ -49,6 +49,7 @@ const MediaEngine = lazy(() => import("./pages/MediaEngine"));
 const UserRoleManagement = lazy(() => import("./pages/UserRoleManagement"));
 const AdminControlCenter = lazy(() => import("./pages/AdminControlCenter"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
+const Support = lazy(() => import("./pages/Support"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
@@ -156,6 +157,8 @@ const App = () => (
                   <Route path="/submit" element={<Navigate to="/technopedia#contribute" replace />} />
                   <Route path="/technopedia" element={<Technopedia />} />
                   
+                  {/* Support */}
+                  <Route path="/support" element={<Support />} />
                   {/* Catch all */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
