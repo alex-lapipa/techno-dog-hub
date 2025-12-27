@@ -228,6 +228,49 @@ const lookbookImages = [
     handle: "warehouse",
     setting: "Festival Crew",
   },
+  // Eulogio × techno.dog Collaboration Lifestyle
+  {
+    src: "/src/assets/products/lifestyle-eulogio-cap-festival.jpg",
+    alt: "Black woman in Eulogio cap at outdoor festival",
+    product: "Eulogio × techno.dog Cap",
+    handle: "eulogio-techno-dog-cap",
+    setting: "Festival Golden Hour",
+  },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-hoodie-club.jpg",
+    alt: "Man in Eulogio hoodie in warehouse club with lasers",
+    product: "Eulogio × techno.dog Hoodie",
+    handle: "eulogio-techno-dog-hoodie",
+    setting: "Warehouse Lasers",
+  },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-hoodie-sunrise.jpg",
+    alt: "Asian woman in Eulogio hoodie at festival sunrise",
+    product: "Eulogio × techno.dog Hoodie",
+    handle: "eulogio-techno-dog-hoodie",
+    setting: "Festival Sunrise",
+  },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-cap-dj.jpg",
+    alt: "Latino DJ in Eulogio cap behind decks",
+    product: "Eulogio × techno.dog Cap",
+    handle: "eulogio-techno-dog-cap",
+    setting: "DJ Booth",
+  },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-crew-festival.jpg",
+    alt: "Festival crew wearing Eulogio hoodie and cap",
+    product: "Eulogio × techno.dog",
+    handle: "eulogio-techno-dog-hoodie",
+    setting: "Festival Crew",
+  },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-hoodie-dance.jpg",
+    alt: "Woman dancing in Eulogio hoodie at club",
+    product: "Eulogio × techno.dog Hoodie",
+    handle: "eulogio-techno-dog-hoodie",
+    setting: "Dancefloor",
+  },
 ];
 
 // Import lifestyle images for bundling
@@ -264,6 +307,13 @@ import lifestyleShortsDiverse2 from "@/assets/products/lifestyle-shorts-diverse2
 import lifestyleVneckDiverse2 from "@/assets/products/lifestyle-vneck-diverse2.jpg";
 import lifestyleCapDjBooth from "@/assets/products/lifestyle-cap-dj-booth.jpg";
 import lifestyleBundleDiverse1 from "@/assets/products/lifestyle-bundle-diverse1.jpg";
+// Eulogio × techno.dog Collaboration imports
+import lifestyleEulogioCapFestival from "@/assets/products/lifestyle-eulogio-cap-festival.jpg";
+import lifestyleEulogioHoodieClub from "@/assets/products/lifestyle-eulogio-hoodie-club.jpg";
+import lifestyleEulogioHoodieSunrise from "@/assets/products/lifestyle-eulogio-hoodie-sunrise.jpg";
+import lifestyleEulogioCapDj from "@/assets/products/lifestyle-eulogio-cap-dj.jpg";
+import lifestyleEulogioCrewFestival from "@/assets/products/lifestyle-eulogio-crew-festival.jpg";
+import lifestyleEulogioHoodieDance from "@/assets/products/lifestyle-eulogio-hoodie-dance.jpg";
 
 const imageImports = [
   lifestyleWarehouse,
@@ -299,6 +349,13 @@ const imageImports = [
   lifestyleVneckDiverse2,
   lifestyleCapDjBooth,
   lifestyleBundleDiverse1,
+  // Eulogio × techno.dog Collaboration images
+  lifestyleEulogioCapFestival,
+  lifestyleEulogioHoodieClub,
+  lifestyleEulogioHoodieSunrise,
+  lifestyleEulogioCapDj,
+  lifestyleEulogioCrewFestival,
+  lifestyleEulogioHoodieDance,
 ];
 
 const Lookbook = () => {
