@@ -61,7 +61,7 @@ const Store = () => {
                 <span className="text-logo-green font-semibold uppercase">Coming Soon</span>
                 <span className="text-muted-foreground mx-2">—</span>
                 <span className="text-muted-foreground">
-                  We're setting up fulfillment. Browse the collection, orders will ship in early 2025.
+                  We're setting up fulfillment. Browse the collection, orders will ship in early 2026.
                 </span>
               </p>
             </div>
