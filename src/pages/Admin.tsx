@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -101,12 +101,19 @@ const AdminDashboard = () => {
 
   const adminTools = [
     {
+      title: "Media Engine",
+      description: "Auto Fetch → Verify → Curate → Enrich pipeline",
+      icon: Zap,
+      path: "/admin/media-engine",
+      count: null,
+      highlight: true,
+    },
+    {
       title: "AI Admin Audit",
       description: "AI-powered analysis of tools, gaps, and recommendations",
       icon: Brain,
       path: "/admin/audit",
       count: null,
-      highlight: true,
     },
     {
       title: "Content Moderation",
