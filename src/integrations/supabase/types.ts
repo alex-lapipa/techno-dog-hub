@@ -949,7 +949,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      admin_user_overview: {
+        Row: {
+          city: string | null
+          community_status:
+            | Database["public"]["Enums"]["community_status"]
+            | null
+          country: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          role_id: string | null
+          trust_score: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_rate_limit: {
@@ -987,6 +1005,7 @@ export type Database = {
         Returns: string
       }
       get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
+      grant_admin_role: { Args: { target_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1013,6 +1032,7 @@ export type Database = {
           title: string
         }[]
       }
+      revoke_admin_role: { Args: { target_user_id: string }; Returns: boolean }
       search_dj_artists: {
         Args: {
           match_count?: number
