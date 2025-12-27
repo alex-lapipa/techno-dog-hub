@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminAuthProvider } from "@/hooks/useAdminAuth";
+import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
@@ -57,8 +58,9 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <AdminAuthProvider>
-          <TooltipProvider>
+        <AuthProvider>
+          <AdminAuthProvider>
+            <TooltipProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
@@ -134,8 +136,9 @@ const App = () => (
                 </Routes>
               </Suspense>
             </BrowserRouter>
-          </TooltipProvider>
-        </AdminAuthProvider>
+            </TooltipProvider>
+          </AdminAuthProvider>
+        </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>
   </HelmetProvider>
