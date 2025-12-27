@@ -80,6 +80,7 @@ export type Database = {
       api_keys: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           key_hash: string
           last_used_at: string | null
@@ -87,6 +88,7 @@ export type Database = {
           prefix: string
           rate_limit_per_day: number
           rate_limit_per_minute: number
+          scopes: string[]
           status: string
           total_requests: number
           usage_notification_sent_at: string | null
@@ -94,6 +96,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           key_hash: string
           last_used_at?: string | null
@@ -101,6 +104,7 @@ export type Database = {
           prefix: string
           rate_limit_per_day?: number
           rate_limit_per_minute?: number
+          scopes?: string[]
           status?: string
           total_requests?: number
           usage_notification_sent_at?: string | null
@@ -108,6 +112,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           key_hash?: string
           last_used_at?: string | null
@@ -115,6 +120,7 @@ export type Database = {
           prefix?: string
           rate_limit_per_day?: number
           rate_limit_per_minute?: number
+          scopes?: string[]
           status?: string
           total_requests?: number
           usage_notification_sent_at?: string | null
@@ -841,6 +847,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_verified_community_member: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
       match_documents: {
