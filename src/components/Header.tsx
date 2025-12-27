@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, Shield, Heart } from "lucide-react";
+import { ChevronDown, Menu, Shield, Heart, Code } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
@@ -38,7 +38,6 @@ const Header = () => {
     { label: 'Releases', path: '/releases' },
     { label: 'Gear', path: '/gear' },
     { label: 'Technopedia', path: '/technopedia' },
-    { label: 'Developer API', path: '/developer', highlight: true },
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -77,14 +76,11 @@ const Header = () => {
                   to={item.path}
                   onClick={() => trackNavigation(location.pathname, item.path)}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
-                    item.highlight 
-                      ? 'text-logo-green border border-logo-green/50 bg-logo-green/10 rounded-sm hover:bg-logo-green/20 hover:border-logo-green' 
-                      : isActive(item.path) 
-                        ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
-                        : 'text-muted-foreground hover:text-logo-green'
+                    isActive(item.path) 
+                      ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
+                      : 'text-muted-foreground hover:text-logo-green'
                   }`}
                 >
-                  {item.highlight && <span className="w-1.5 h-1.5 rounded-full bg-logo-green animate-pulse" />}
                   {item.label}
                   {item.sub && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
                 </Link>
@@ -114,9 +110,15 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            <Link to="/developer">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-logo-green border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 hover:border-logo-green hover:text-logo-green px-2.5 py-1.5 h-auto">
+                <Code className="w-3 h-3 mr-1.5" />
+                Developer API
+              </Button>
+            </Link>
             <Link to="/support">
-              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-crimson hover:text-crimson hover:bg-crimson/10">
-                <Heart className="w-3.5 h-3.5 mr-1.5" />
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-crimson border border-crimson/50 bg-crimson/10 hover:bg-crimson/20 hover:border-crimson hover:text-crimson px-2.5 py-1.5 h-auto">
+                <Heart className="w-3 h-3 mr-1.5" />
                 Support
               </Button>
             </Link>
@@ -173,6 +175,12 @@ const Header = () => {
                     ))}
                   </nav>
                   <div className="p-4 border-t border-border space-y-2">
+                    <Link to="/developer" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider text-logo-green border-logo-green/50 hover:bg-logo-green/10">
+                        <Code className="w-3.5 h-3.5 mr-1.5" />
+                        Developer API
+                      </Button>
+                    </Link>
                     <Link to="/support" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider text-crimson border-crimson/50 hover:bg-crimson/10">
                         <Heart className="w-3.5 h-3.5 mr-1.5" />
