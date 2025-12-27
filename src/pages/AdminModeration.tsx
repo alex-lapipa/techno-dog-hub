@@ -94,6 +94,32 @@ const AdminModeration = () => {
     }
   }, [isAdmin, activeTab]);
 
+  const sendNotificationEmail = async (
+    email: string,
+    submissionName: string,
+    status: "approved" | "rejected",
+    notes?: string
+  ) => {
+    try {
+      const { error } = await supabase.functions.invoke("submission-notification", {
+        body: {
+          email,
+          submissionName,
+          status,
+          adminNotes: notes,
+        },
+      });
+
+      if (error) {
+        console.error("Failed to send notification email:", error);
+      } else {
+        console.log(`Notification email sent to ${email}`);
+      }
+    } catch (err) {
+      console.error("Email notification error:", err);
+    }
+  };
+
   const handleAction = async (action: "approve" | "reject") => {
     if (!selectedSubmission) return;
 
@@ -123,9 +149,21 @@ const AdminModeration = () => {
           .eq("email", selectedSubmission.email);
       }
 
+      // Send email notification if email exists
+      if (selectedSubmission.email) {
+        await sendNotificationEmail(
+          selectedSubmission.email,
+          selectedSubmission.name || selectedSubmission.submission_type || "Your submission",
+          newStatus as "approved" | "rejected",
+          adminNotes || undefined
+        );
+      }
+
       toast({
         title: action === "approve" ? "Submission approved" : "Submission rejected",
-        description: `The submission has been ${newStatus}`,
+        description: selectedSubmission.email 
+          ? `The submission has been ${newStatus} and the user was notified`
+          : `The submission has been ${newStatus}`,
       });
 
       setSelectedSubmission(null);
