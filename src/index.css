@@ -47,6 +47,10 @@
     /* Logo green - laser green */
     --logo-green: 100 100% 60%;
     
+    /* Crimson accent - film/VHS aesthetic */
+    --crimson: 348 75% 52%;
+    --frame-bg: 240 5% 26%;
+    
     --glitch-1: 180 100% 50%;
     --glitch-2: 320 100% 60%;
     
@@ -254,5 +258,40 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Film/VHS Image Effects */
+  .gallery-image {
+    filter: grayscale(1) contrast(1.1) brightness(1.05) saturate(0);
+    transition: all 700ms ease-out;
+  }
+
+  .gallery-image:hover {
+    filter: grayscale(0.7) contrast(1.1) brightness(1.1) saturate(0.3);
+    transform: scale(1.1);
+  }
+
+  /* VHS scanline overlay */
+  .vhs-overlay {
+    background: 
+      repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.15) 1px, rgba(0,0,0,0.15) 2px),
+      radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%),
+      linear-gradient(to top, hsl(var(--crimson) / 0.05), hsl(var(--crimson) / 0.05));
+  }
+
+  /* Film frame border glow */
+  .film-border {
+    border-color: hsl(var(--crimson) / 0.2);
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .film-border:hover {
+    border-color: hsl(var(--crimson) / 0.6);
+    box-shadow: 0 0 30px hsl(var(--crimson) / 0.3);
+  }
+
+  /* Crimson glow overlay */
+  .crimson-glow {
+    background: linear-gradient(to top, hsl(var(--crimson) / 0.4), hsl(var(--crimson) / 0.15) 50%, transparent);
   }
 }

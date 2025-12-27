@@ -57,6 +57,12 @@ export default {
         logo: {
           green: "hsl(var(--logo-green))",
         },
+        crimson: {
+          DEFAULT: "hsl(var(--crimson))",
+        },
+        frame: {
+          bg: "hsl(var(--frame-bg))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
