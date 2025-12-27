@@ -18,7 +18,7 @@ export interface GearItem {
   category: GearCategory;
   shortDescription: {
     en: string;
-    es: string;
+    es?: string;
   };
   technicalOverview: {
     synthesisType?: string;
@@ -43,7 +43,7 @@ export interface GearItem {
   }[];
   technoApplications: {
     en: string;
-    es: string;
+    es?: string;
   };
   relatedGear: string[];
   tags: string[];
@@ -59,14 +59,14 @@ export interface GearItem {
   }[];
 }
 
-export const gearCategories: Record<GearCategory, { en: string; es: string }> = {
-  'synth': { en: 'Synthesizer', es: 'Sintetizador' },
-  'drum-machine': { en: 'Drum Machine', es: 'Caja de Ritmos' },
-  'sampler': { en: 'Sampler', es: 'Sampler' },
-  'sequencer': { en: 'Sequencer', es: 'Secuenciador' },
-  'effect': { en: 'Effect', es: 'Efecto' },
-  'daw': { en: 'DAW', es: 'DAW' },
-  'midi-tool': { en: 'MIDI Tool', es: 'Herramienta MIDI' },
+export const gearCategories: Record<GearCategory, { en: string; es?: string }> = {
+  'synth': { en: 'Synthesizer' },
+  'drum-machine': { en: 'Drum Machine' },
+  'sampler': { en: 'Sampler' },
+  'sequencer': { en: 'Sequencer' },
+  'effect': { en: 'Effect' },
+  'daw': { en: 'DAW' },
+  'midi-tool': { en: 'MIDI Tool' },
 };
 
 export const gear: GearItem[] = [

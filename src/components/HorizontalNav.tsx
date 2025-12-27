@@ -1,4 +1,3 @@
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -9,7 +8,6 @@ interface HorizontalNavProps {
 }
 
 const HorizontalNav = ({ activeSection, onSectionChange, sections }: HorizontalNavProps) => {
-  const { t } = useLanguage();
   const { trackNavigation } = useAnalytics();
   
   const handlePrev = () => {
