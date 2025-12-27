@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import eulogioIcon from "@/assets/eulogio-e-icon.jpg";
+import eulogioHeroImage from "@/assets/products/lifestyle-eulogio-crew-festival.jpg";
+import eulogioHoodieClub from "@/assets/products/lifestyle-eulogio-hoodie-club.jpg";
 
 const Store = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -234,64 +236,112 @@ const Store = () => {
 
         {/* Eulogio Collaboration Section */}
         {products?.some(p => p.node.title.toLowerCase().includes('eulogio')) && (
-          <section className="border-b border-border bg-gradient-to-br from-background via-background to-amber-950/10">
-            <div className="container mx-auto px-4 md:px-8 py-12">
-              {/* Banner */}
-              <div className="relative mb-10 overflow-hidden border border-amber-500/30 bg-gradient-to-r from-amber-950/20 via-background to-amber-950/20">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNDUsMTU4LDExLDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-50" />
-                <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-10 p-6 md:p-10">
-                  {/* Logo */}
-                  <div className="shrink-0 bg-[#333] p-3 md:p-4">
-                    <img 
-                      src={eulogioIcon}
-                      alt="Eulogio" 
-                      className="h-12 md:h-16 w-auto object-contain"
-                    />
-                  </div>
-                  
-                  {/* Text */}
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-amber-500" />
-                      <span className="font-mono text-[10px] text-amber-500 uppercase tracking-widest">
-                        Limited Collaboration
-                      </span>
-                    </div>
-                    <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight text-foreground">
-                      Eulogio × techno.dog
-                    </h2>
-                    <p className="font-mono text-xs text-muted-foreground mt-2 max-w-lg">
-                      A fusion of underground sound and bold visual identity. Five exclusive pieces celebrating the raw energy of warehouse culture.
-                    </p>
-                  </div>
-                  
-                  {/* CTA */}
-                  <div className="shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="font-mono text-[10px] uppercase tracking-wider border-amber-500/50 text-amber-500 hover:bg-amber-500/10 hover:border-amber-500"
-                      onClick={() => setSelectedType("collaborations")}
-                    >
-                      View All 5 Items
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Decorative corner accents */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-amber-500/30" />
-                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-amber-500/30" />
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-amber-500/30" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-amber-500/30" />
+          <section className="border-b border-border overflow-hidden">
+            {/* Hero Image Banner */}
+            <div className="relative h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
+              <div className="absolute inset-0">
+                <img 
+                  src={eulogioHeroImage}
+                  alt="Eulogio × techno.dog collaboration at festival"
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
               </div>
               
-              {/* Collab Products Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Content Overlay */}
+              <div className="absolute inset-0 flex items-end">
+                <div className="container mx-auto px-4 md:px-8 pb-8 md:pb-12">
+                  <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                    <div className="max-w-xl">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-[#1a1a1a] p-2">
+                          <img 
+                            src={eulogioIcon}
+                            alt="Eulogio" 
+                            className="h-8 md:h-10 w-auto object-contain"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          <span className="font-mono text-[10px] text-amber-400 uppercase tracking-widest">
+                            Limited Collaboration
+                          </span>
+                        </div>
+                      </div>
+                      <h2 className="font-mono text-3xl md:text-4xl lg:text-5xl uppercase tracking-tight text-foreground drop-shadow-lg">
+                        Eulogio × techno.dog
+                      </h2>
+                      <p className="font-mono text-sm text-foreground/80 mt-3 max-w-md leading-relaxed drop-shadow-md">
+                        Berlin techno heritage meets underground culture. Two exclusive pieces celebrating the raw energy of warehouse nights.
+                      </p>
+                    </div>
+                    
+                    <div className="shrink-0">
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="font-mono text-xs uppercase tracking-wider bg-amber-500 text-background hover:bg-amber-400"
+                        onClick={() => setSelectedType("collaborations")}
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Shop Collection
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative Elements */}
+              <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-amber-500/50" />
+              <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-amber-500/50" />
+            </div>
+            
+            {/* Products Grid */}
+            <div className="container mx-auto px-4 md:px-8 py-12 bg-gradient-to-b from-background to-amber-950/5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {products
                   ?.filter(p => p.node.title.toLowerCase().includes('eulogio'))
                   .map((product, index) => (
-                    <ProductCard key={product.node.id} product={product.node} index={index} />
+                    <div key={product.node.id} className="relative group">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative">
+                        <ProductCard product={product.node} index={index} />
+                      </div>
+                    </div>
                   ))}
+              </div>
+              
+              {/* Lifestyle Preview */}
+              <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="aspect-square overflow-hidden border border-amber-500/20">
+                  <img 
+                    src={eulogioHoodieClub}
+                    alt="Eulogio hoodie in warehouse"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="aspect-square overflow-hidden border border-amber-500/20 hidden md:block">
+                  <img 
+                    src={eulogioHeroImage}
+                    alt="Eulogio crew at festival"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <Link 
+                  to="/store/lookbook"
+                  className="aspect-square border border-amber-500/30 bg-amber-950/10 flex flex-col items-center justify-center text-center p-4 hover:bg-amber-950/20 transition-colors col-span-2 md:col-span-2"
+                >
+                  <span className="font-mono text-[10px] text-amber-500 uppercase tracking-widest mb-2">
+                    // Lookbook
+                  </span>
+                  <span className="font-mono text-lg uppercase tracking-tight">
+                    See the full story
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground mt-2">
+                    Festival shots, club nights, warehouse vibes →
+                  </span>
+                </Link>
               </div>
             </div>
           </section>
