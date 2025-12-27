@@ -272,6 +272,26 @@ const TDogDocs = () => {
             </AccordionItem>
           </Accordion>
 
+          {/* Live Demo */}
+          <div className="mt-12">
+            <h2 className="font-mono text-xl font-bold mb-4 flex items-center gap-2">
+              <Play className="w-5 h-5 text-logo-green" />
+              Live Demo
+            </h2>
+            <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
+              <iframe 
+                src="https://claude.site/public/artifacts/b2055d9e-8a20-4c9c-be9b-d6b2297cbcc4/embed" 
+                title="T:DOG Demo" 
+                width="100%" 
+                height="600" 
+                frameBorder="0" 
+                allow="clipboard-write" 
+                allowFullScreen
+                className="w-full"
+              />
+            </div>
+          </div>
+
           {/* CTA */}
           <div className="mt-12 text-center">
             <Link to="/sound-machine">
