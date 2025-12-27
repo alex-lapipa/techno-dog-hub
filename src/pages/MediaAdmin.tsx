@@ -40,7 +40,7 @@ interface PipelineJob {
 }
 
 const MediaAdmin = () => {
-  const { isAdmin, isLoading: authLoading } = useAdminAuth();
+  const { isAdmin, loading: authLoading } = useAdminAuth();
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [jobs, setJobs] = useState<PipelineJob[]>([]);
   const [stats, setStats] = useState<any>(null);

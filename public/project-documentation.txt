@@ -835,6 +835,94 @@ All user-facing content must be in ENGLISH only.
 - UI text is in English
 
 ================================================================================
+                        16. MEDIA CURATOR ENGINE
+================================================================================
+
+PURPOSE:
+--------
+Automatically fetches, verifies, stores, and assigns images for all entities
+across the site. Ensures no page ever shows empty image placeholders.
+
+ARCHITECTURE:
+-------------
+1. Database Tables:
+   - media_assets: Stores all candidate images with metadata
+   - media_pipeline_jobs: Background job queue for processing
+
+2. Storage:
+   - media-assets bucket in Supabase Storage (public, 10MB limit)
+
+3. Edge Functions:
+   - media-curator: Enqueue jobs, fetch from providers, orchestrate pipeline
+   - media-verify: OpenAI Vision verification of images
+   - media-api: REST API for searching and managing media
+   - media-scheduler: Process queue in batches, cleanup stale jobs
+
+PROVIDERS (Priority Order):
+---------------------------
+1. Wikimedia Commons - FREE, CC-licensed, preferred source
+2. MusicBrainz / Cover Art Archive - FREE, for artists
+3. Discogs - Requires API key (optional)
+4. Web Search - Via Firecrawl (optional fallback)
+
+VERIFICATION PROCESS:
+--------------------
+OpenAI Vision (gpt-4o-mini) analyzes each candidate and scores:
+- match_score: 0-100 (does image match entity?)
+- quality_score: 0-100 (resolution, composition, clarity)
+- copyright_risk: low/medium/high
+- license_status: safe/unknown/rejected
+- tags: Array of genre, era, equipment, style tags
+- alt_text: SEO-friendly accessibility text
+
+SELECTION RULES:
+----------------
+Best image is selected if:
+- match_score >= 60
+- copyright_risk != 'high'
+- license_status != 'rejected'
+Combined score = (match_score * 0.6) + (quality_score * 0.4)
+
+ENTITY IMAGE COMPONENT:
+-----------------------
+<EntityImage> component replaces standard image tags:
+1. Checks media_assets for curated image
+2. If missing, auto-enqueues fetch job
+3. Shows gradient+initials fallback (never empty)
+
+ADMIN PANEL:
+------------
+Route: /admin/media
+Features:
+- Dashboard with queue stats
+- View all assets with scores and status
+- Approve/reject images
+- Manually select best image
+- Process queue on demand
+- View job history and errors
+
+API ENDPOINTS:
+--------------
+GET  /media-api/search?q=...&type=...  - Search curated images
+GET  /media-api/entity/:type/:id       - Get image for entity
+GET  /media-api/stats                  - Get stats
+POST /media-api/candidates             - Get all candidates for entity
+POST /media-api/select                 - Select an asset
+POST /media-api/reject                 - Reject an asset
+
+ADDING NEW ENTITY TYPES:
+------------------------
+1. Use EntityImage component: <EntityImage entityType="newtype" entityId={id} entityName={name} />
+2. Pipeline will auto-fetch when missing
+3. Add type-specific fetch logic to fetchWikimediaImages() if needed
+
+CRON SCHEDULING:
+----------------
+Call media-scheduler with action='process-queue' periodically:
+- Recommended: Every 5 minutes via external cron or Supabase scheduled function
+- Batch size: 3-5 jobs per run to avoid rate limits
+
+================================================================================
                                 END OF DOCUMENT
 ================================================================================
 
