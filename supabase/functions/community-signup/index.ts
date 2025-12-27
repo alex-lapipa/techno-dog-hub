@@ -14,6 +14,29 @@ interface SignupRequest {
   redirect_path?: string; // Allow custom redirect path after verification
 }
 
+// Simple in-memory rate limiting (per function instance)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 5; // Max 5 requests per window
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute window
+
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const key = email.toLowerCase().trim();
+  const entry = rateLimitMap.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,6 +57,15 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    // Rate limiting check
+    if (!checkRateLimit(normalizedEmail)) {
+      console.warn(`[community-signup] Rate limit exceeded for: ${normalizedEmail}`);
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please wait a minute and try again." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log(`[community-signup] Processing signup for: ${normalizedEmail}, source: ${source}`);
 

@@ -12,22 +12,44 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const logHealthAlert = async (
+    serviceName: string,
+    alertType: string,
+    severity: string,
+    message: string
+  ) => {
+    try {
+      await supabase.from("health_alerts").insert({
+        service_name: serviceName,
+        alert_type: alertType,
+        severity,
+        message,
+        notified_at: new Date().toISOString(),
+      });
+      console.log(`[stripe-webhook] Health alert logged: ${severity} - ${message}`);
+    } catch (err) {
+      console.error("[stripe-webhook] Failed to log health alert:", err);
+    }
+  };
+
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     
     if (!stripeKey) {
-      throw new Error("Stripe secret key not configured");
+      const errorMsg = "Stripe secret key not configured";
+      await logHealthAlert("stripe-webhook", "configuration_error", "error", errorMsg);
+      throw new Error(errorMsg);
     }
 
     const stripe = new Stripe(stripeKey, {
       apiVersion: "2023-10-16",
       httpClient: Stripe.createFetchHttpClient(),
     });
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
@@ -39,19 +61,16 @@ serve(async (req) => {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       } catch (err: unknown) {
         const error = err as Error;
-        console.error("Webhook signature verification failed:", error.message);
-        return new Response(JSON.stringify({ error: "Invalid signature" }), { 
-          status: 400,
-          headers: corsHeaders 
-        });
+        console.error("[stripe-webhook] Signature verification failed:", error.message);
+        await logHealthAlert("stripe-webhook", "signature_verification_failed", "warn", `Webhook signature verification failed: ${error.message}`);
+        return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400, headers: corsHeaders });
       }
     } else {
-      // No webhook secret configured, parse event directly (less secure)
       event = JSON.parse(body);
-      console.warn("No webhook secret configured - signature not verified");
+      console.warn("[stripe-webhook] No webhook secret configured - signature not verified");
     }
 
-    console.log(`Processing webhook event: ${event.type}`);
+    console.log(`[stripe-webhook] Processing event: ${event.type}`);
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -68,74 +87,54 @@ serve(async (req) => {
           amount_cents: parseInt(metadata.amount_cents || String(session.amount_total || 0)),
           currency: session.currency?.toUpperCase() || "EUR",
           is_active: true,
-          metadata: {
-            stripe_payment_intent: session.payment_intent,
-            stripe_mode: session.mode,
-          },
+          metadata: { stripe_payment_intent: session.payment_intent, stripe_mode: session.mode },
         };
 
-        console.log("Creating supporter record:", supporterData);
-
-        const { error } = await supabase
-          .from("supporters")
-          .insert(supporterData);
-
+        const { error } = await supabase.from("supporters").insert(supporterData);
         if (error) {
-          console.error("Error creating supporter:", error);
+          console.error("[stripe-webhook] Error creating supporter:", error);
+          await logHealthAlert("stripe-webhook", "database_error", "error", `Failed to create supporter: ${error.message}`);
         } else {
-          console.log("Supporter record created successfully");
+          console.log("[stripe-webhook] Supporter record created successfully");
         }
         break;
       }
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        
-        const { error } = await supabase
-          .from("supporters")
-          .update({
-            is_active: subscription.status === "active",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_subscription_id", subscription.id);
-
+        const { error } = await supabase.from("supporters").update({ is_active: subscription.status === "active", updated_at: new Date().toISOString() }).eq("stripe_subscription_id", subscription.id);
         if (error) {
-          console.error("Error updating supporter:", error);
+          console.error("[stripe-webhook] Error updating supporter:", error);
+          await logHealthAlert("stripe-webhook", "database_error", "error", `Failed to update subscription: ${error.message}`);
         }
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        
-        const { error } = await supabase
-          .from("supporters")
-          .update({
-            is_active: false,
-            cancelled_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq("stripe_subscription_id", subscription.id);
-
+        const { error } = await supabase.from("supporters").update({ is_active: false, cancelled_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("stripe_subscription_id", subscription.id);
         if (error) {
-          console.error("Error updating cancelled subscription:", error);
+          console.error("[stripe-webhook] Error updating cancelled subscription:", error);
+          await logHealthAlert("stripe-webhook", "database_error", "error", `Failed to cancel subscription: ${error.message}`);
         }
         break;
       }
 
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await logHealthAlert("stripe-webhook", "payment_failed", "warn", `Payment failed for invoice ${invoice.id}`);
+        break;
+      }
+
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`[stripe-webhook] Unhandled event type: ${event.type}`);
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ received: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error: unknown) {
     const err = error as Error;
-    console.error("Webhook error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("[stripe-webhook] Webhook error:", err);
+    await logHealthAlert("stripe-webhook", "unhandled_error", "error", `Webhook processing failed: ${err.message}`);
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

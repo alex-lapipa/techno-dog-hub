@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -30,6 +31,7 @@ export const CommunityWidgetCompact = ({
 }: CommunityWidgetCompactProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const location = useLocation();
   
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -86,7 +88,7 @@ export const CommunityWidgetCompact = ({
     if (!consent) {
       toast({
         title: "Consent required",
-        description: "Please confirm you have rights to share content",
+        description: "Please confirm you agree to the terms",
         variant: "destructive",
       });
       return;
@@ -99,6 +101,7 @@ export const CommunityWidgetCompact = ({
         body: {
           email: email.toLowerCase().trim(),
           source: "upload_widget",
+          redirect_path: location.pathname, // Redirect back to current page
         },
       });
 

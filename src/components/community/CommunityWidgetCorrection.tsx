@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,12 +16,26 @@ import {
   CheckCircle2,
   Mail,
   Send,
-  ChevronDown
+  ChevronDown,
+  RefreshCw,
+  X
 } from "lucide-react";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Please enter a valid email").max(255);
 const textSchema = z.string().min(10, "Please provide more detail").max(2000, "Text must be under 2000 characters");
+
+const PENDING_CORRECTION_KEY = "technodog_pending_correction";
+
+interface PendingCorrectionData {
+  entityType: string;
+  entityId: string;
+  entityName?: string;
+  correctionText: string;
+  sourceUrl: string;
+  email: string;
+  timestamp: number;
+}
 
 interface CommunityWidgetCorrectionProps {
   entityType: string;
@@ -45,6 +60,7 @@ export const CommunityWidgetCorrection = ({
 }: CommunityWidgetCorrectionProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const location = useLocation();
 
   const [isOpen, setIsOpen] = useState(!collapsible);
   const [email, setEmail] = useState("");
@@ -54,6 +70,45 @@ export const CommunityWidgetCorrection = ({
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [hasPendingCorrection, setHasPendingCorrection] = useState(false);
+
+  // Check for pending corrections when user becomes authenticated
+  useEffect(() => {
+    if (user) {
+      const pendingData = localStorage.getItem(PENDING_CORRECTION_KEY);
+      if (pendingData) {
+        try {
+          const pending: PendingCorrectionData = JSON.parse(pendingData);
+          // Only restore if pending data is less than 1 hour old
+          if (Date.now() - pending.timestamp < 3600000) {
+            setHasPendingCorrection(true);
+            setCorrectionText(pending.correctionText || "");
+            setSourceUrl(pending.sourceUrl || "");
+            toast({
+              title: "Welcome back!",
+              description: "Your correction has been saved. Submit it now.",
+            });
+          } else {
+            localStorage.removeItem(PENDING_CORRECTION_KEY);
+          }
+        } catch {
+          localStorage.removeItem(PENDING_CORRECTION_KEY);
+        }
+      }
+    }
+  }, [user, toast]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // No cleanup needed for this component
+    };
+  }, []);
+
+  const clearPendingCorrection = () => {
+    localStorage.removeItem(PENDING_CORRECTION_KEY);
+    setHasPendingCorrection(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +147,7 @@ export const CommunityWidgetCorrection = ({
     if (!consent) {
       toast({
         title: "Consent required",
-        description: "Please confirm you're submitting accurate information",
+        description: "Please confirm your submission is accurate",
         variant: "destructive",
       });
       return;
@@ -102,10 +157,23 @@ export const CommunityWidgetCorrection = ({
 
     try {
       if (!user) {
+        // Store pending correction data before verification
+        const pendingData: PendingCorrectionData = {
+          entityType,
+          entityId,
+          entityName,
+          correctionText,
+          sourceUrl,
+          email: email.toLowerCase().trim(),
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(PENDING_CORRECTION_KEY, JSON.stringify(pendingData));
+
         const { error } = await supabase.functions.invoke("community-signup", {
           body: {
             email: email.toLowerCase().trim(),
             source: "upload_widget",
+            redirect_path: location.pathname, // Redirect back to current page
           },
         });
 
@@ -114,7 +182,7 @@ export const CommunityWidgetCorrection = ({
         setNeedsVerification(true);
         toast({
           title: "Verify your email first",
-          description: "Check your email for the magic link, then come back to submit",
+          description: "Check your email for the magic link. After clicking it, return here to submit.",
         });
         setLoading(false);
         return;
@@ -139,6 +207,7 @@ export const CommunityWidgetCorrection = ({
       if (submissionError) throw submissionError;
 
       setSubmitted(true);
+      clearPendingCorrection();
       toast({
         title: "Correction submitted!",
         description: "We'll review your submission. Thank you for helping improve our data!",
@@ -179,9 +248,26 @@ export const CommunityWidgetCorrection = ({
           <Mail className="h-12 w-12 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">Check your email</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Click the magic link we sent to <strong>{email}</strong>, then return here to submit.
+            Click the magic link we sent to <strong>{email}</strong>
           </p>
-          <Button variant="outline" size="sm" onClick={() => setNeedsVerification(false)}>
+          <div className="bg-muted/50 border border-border rounded-lg p-4 mb-4 text-left">
+            <p className="text-xs text-muted-foreground">
+              <strong>After clicking the link:</strong>
+            </p>
+            <ol className="text-xs text-muted-foreground mt-2 space-y-1 list-decimal list-inside">
+              <li>You'll be signed in automatically</li>
+              <li>Return to this page</li>
+              <li>Your correction will be ready to submit</li>
+            </ol>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => {
+              setNeedsVerification(false);
+              localStorage.removeItem(PENDING_CORRECTION_KEY);
+            }}
+          >
             Use different email
           </Button>
         </CardContent>
@@ -189,8 +275,34 @@ export const CommunityWidgetCorrection = ({
     );
   }
 
+  // Show prompt when user returns after verification with pending data
+  const showReturnPrompt = hasPendingCorrection && user && correctionText;
+
   const formContent = (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Return prompt for users who verified */}
+      {showReturnPrompt && (
+        <div className="bg-logo-green/10 border border-logo-green/30 rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle2 className="h-5 w-5 text-logo-green" />
+            <span className="font-medium text-sm">Email verified!</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Your correction has been saved. Click submit to complete.
+          </p>
+          <Button 
+            type="button"
+            variant="ghost" 
+            size="sm" 
+            className="mt-2 text-xs"
+            onClick={clearPendingCorrection}
+          >
+            <X className="h-3 w-3 mr-1" />
+            Dismiss
+          </Button>
+        </div>
+      )}
+
       {/* Email (only if not logged in) */}
       {!user && (
         <div className="space-y-2">
