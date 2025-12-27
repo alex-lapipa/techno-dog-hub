@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getArtistById, artists } from "@/data/artists";
 import Header from "@/components/Header";
@@ -8,6 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import LazyImage from "@/components/LazyImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
+import { CommunityWidgetPhoto } from "@/components/community";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -414,6 +415,30 @@ const ArtistDetail = () => {
             )}
           </section>
 
+          {/* Community Photo Upload */}
+          <section className="mb-12 border-t border-border pt-8">
+            <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
+              <Camera className="w-5 h-5" />
+              {language === 'en' ? 'Contribute Photos' : 'Contribuir Fotos'}
+            </h2>
+            <div className="max-w-xl">
+              <p className="font-mono text-sm text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? `Have photos of ${artist.name} performing or in the studio? Share them with the community.`
+                  : `¿Tienes fotos de ${artist.name} actuando o en el estudio? Compártelas con la comunidad.`
+                }
+              </p>
+              <CommunityWidgetPhoto
+                entityType="artist"
+                entityId={artist.id}
+                title={language === 'en' ? `Upload photos of ${artist.name}` : `Subir fotos de ${artist.name}`}
+                description={language === 'en' 
+                  ? "Share live performance shots, studio photos, or event captures. All submissions are reviewed before publishing."
+                  : "Comparte fotos de actuaciones en vivo, estudio o eventos. Todas las contribuciones son revisadas antes de publicar."
+                }
+              />
+            </div>
+          </section>
 
           {/* Related Artists */}
           {relatedArtists.length > 0 && (
