@@ -1,12 +1,12 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ExternalLink, ChevronLeft, ChevronRight, Camera, Edit3 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getVenueById, venues } from "@/data/venues";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
-import { CommunityWidgetPhoto } from "@/components/community";
+import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -296,6 +296,32 @@ const VenueDetail = () => {
                 description={language === 'en' 
                   ? "Share venue photos, sound system shots, or event captures. All submissions are reviewed before publishing."
                   : "Comparte fotos del venue, sistema de sonido o eventos. Todas las contribuciones son revisadas antes de publicar."
+                }
+              />
+            </div>
+          </section>
+
+          {/* Community Corrections */}
+          <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+            <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+              <Edit3 className="w-4 h-4 sm:w-5 sm:h-5" />
+              {language === 'en' ? 'Suggest a Correction' : 'Sugerir una Corrección'}
+            </h2>
+            <div className="max-w-xl">
+              <p className="font-mono text-xs sm:text-sm text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? `Found an error in ${venue.name}'s information? Help us keep the data accurate.`
+                  : `¿Encontraste un error en la información de ${venue.name}? Ayúdanos a mantener los datos precisos.`
+                }
+              </p>
+              <CommunityWidgetCorrection
+                entityType="venue"
+                entityId={venue.id}
+                entityName={venue.name}
+                title={language === 'en' ? 'Submit a correction' : 'Enviar una corrección'}
+                description={language === 'en' 
+                  ? "Report incorrect information about capacity, sound system, residents, or other details."
+                  : "Reporta información incorrecta sobre capacidad, sistema de sonido, residentes u otros detalles."
                 }
               />
             </div>

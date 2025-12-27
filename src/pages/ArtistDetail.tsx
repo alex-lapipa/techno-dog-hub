@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight, Camera, Edit3 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getArtistById, artists } from "@/data/artists";
 import Header from "@/components/Header";
@@ -8,7 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import LazyImage from "@/components/LazyImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
-import { CommunityWidgetPhoto } from "@/components/community";
+import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -435,6 +435,32 @@ const ArtistDetail = () => {
                 description={language === 'en' 
                   ? "Share live performance shots, studio photos, or event captures. All submissions are reviewed before publishing."
                   : "Comparte fotos de actuaciones en vivo, estudio o eventos. Todas las contribuciones son revisadas antes de publicar."
+                }
+              />
+            </div>
+          </section>
+
+          {/* Community Corrections */}
+          <section className="mb-12 border-t border-border pt-8">
+            <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
+              <Edit3 className="w-5 h-5" />
+              {language === 'en' ? 'Suggest a Correction' : 'Sugerir una Corrección'}
+            </h2>
+            <div className="max-w-xl">
+              <p className="font-mono text-sm text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? `Found an error in ${artist.name}'s information? Help us keep the data accurate.`
+                  : `¿Encontraste un error en la información de ${artist.name}? Ayúdanos a mantener los datos precisos.`
+                }
+              </p>
+              <CommunityWidgetCorrection
+                entityType="artist"
+                entityId={artist.id}
+                entityName={artist.name}
+                title={language === 'en' ? 'Submit a correction' : 'Enviar una corrección'}
+                description={language === 'en' 
+                  ? "Report incorrect information about bio, labels, releases, or other details."
+                  : "Reporta información incorrecta sobre biografía, sellos, lanzamientos u otros detalles."
                 }
               />
             </div>

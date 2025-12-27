@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight, Camera } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight, Camera, Edit3 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { festivals, getFestivalById } from "@/data/festivals";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
-import { CommunityWidgetPhoto } from "@/components/community";
+import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 
 const FestivalDetail = () => {
   const { id } = useParams();
@@ -350,6 +350,30 @@ const FestivalDetail = () => {
                   description={language === 'en' 
                     ? "Share festival photos, stage shots, or crowd captures. All submissions are reviewed."
                     : "Comparte fotos del festival, escenarios o del público. Todas las contribuciones son revisadas."
+                  }
+                />
+              </div>
+
+              {/* Community Corrections */}
+              <div className="border border-border p-6">
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                  <Edit3 className="w-4 h-4" />
+                  // {language === 'en' ? 'Suggest a Correction' : 'Sugerir una Corrección'}
+                </div>
+                <p className="font-mono text-xs text-muted-foreground mb-4">
+                  {language === 'en' 
+                    ? `Found an error in ${festival.name}'s information? Help us keep the data accurate.`
+                    : `¿Encontraste un error en la información de ${festival.name}? Ayúdanos a mantener los datos precisos.`
+                  }
+                </p>
+                <CommunityWidgetCorrection
+                  entityType="festival"
+                  entityId={festival.id}
+                  entityName={festival.name}
+                  title={language === 'en' ? 'Submit a correction' : 'Enviar una corrección'}
+                  description={language === 'en' 
+                    ? "Report incorrect information about dates, location, capacity, or lineup."
+                    : "Reporta información incorrecta sobre fechas, ubicación, capacidad o lineup."
                   }
                 />
               </div>
