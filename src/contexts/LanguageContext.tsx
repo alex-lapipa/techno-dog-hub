@@ -47,7 +47,7 @@ const translations: Record<Language, Record<string, string>> = {
     'chat.subtitle': 'Ask about festivals',
     
     // Footer
-    'footer.description': 'Community led open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream. Curated by Alex Lawton, Paloma Rocha and Antaine Reilly.',
+    'footer.description': 'Community led open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream. Curated by Alex Lawton, Paloma Rocha, Antaine Reilly and Carlos González.',
     'footer.explore': '// Explore',
     'footer.social': '// Social',
     'footer.artists': 'Artists',
@@ -93,7 +93,7 @@ const translations: Record<Language, Record<string, string>> = {
     'chat.subtitle': 'Pregunta sobre festivales',
     
     // Footer
-    'footer.description': 'Plataforma abierta y base de datos liderada por la comunidad, dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream. Curado por Alex Lawton, Paloma Rocha y Antaine Reilly.',
+    'footer.description': 'Plataforma abierta y base de datos liderada por la comunidad, dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream. Curado por Alex Lawton, Paloma Rocha, Antaine Reilly y Carlos González.',
     'footer.explore': '// Explorar',
     'footer.social': '// Redes',
     'footer.artists': 'Artistas',
