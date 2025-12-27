@@ -11,7 +11,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
+    --background: 0 0% 4%;
     --foreground: 0 0% 100%;
 
     --card: 0 0% 5%;
@@ -50,6 +50,11 @@
     /* Crimson accent - film/VHS aesthetic */
     --crimson: 348 75% 52%;
     --frame-bg: 240 5% 26%;
+    
+    /* Film/Store border colors (rgba values for inline styles) */
+    --border-subtle: 348 75% 52%;
+    --border-hover: 348 75% 52%;
+    --glow-shadow: 0 0 30px hsl(348 75% 52% / 0.3);
     
     --glitch-1: 180 100% 50%;
     --glitch-2: 320 100% 60%;
