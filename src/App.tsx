@@ -46,6 +46,7 @@ const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Community = lazy(() => import("./pages/Community"));
 const CommunityDocs = lazy(() => import("./pages/CommunityDocs"));
+const CommunityLeaderboard = lazy(() => import("./pages/CommunityLeaderboard"));
 const MySubmissions = lazy(() => import("./pages/MySubmissions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -135,6 +136,8 @@ const App = () => (
                   {/* Community */}
                   <Route path="/community" element={<Community />} />
                   <Route path="/community/docs" element={<CommunityDocs />} />
+                  <Route path="/community/leaderboard" element={<CommunityLeaderboard />} />
+                  <Route path="/my-submissions" element={<MySubmissions />} />
                   <Route path="/my-submissions" element={<MySubmissions />} />
                   <Route path="/submit" element={<Navigate to="/technopedia#contribute" replace />} />
                   <Route path="/technopedia" element={<Technopedia />} />

@@ -23,7 +23,8 @@ import {
   Loader2,
   LogOut,
   User,
-  BookOpen
+  BookOpen,
+  Trophy
 } from "lucide-react";
 
 const Community = () => {
@@ -253,6 +254,14 @@ const Community = () => {
                     >
                       <BookOpen className="h-4 w-4 mr-2" />
                       Community Docs
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => navigate("/community/leaderboard")}
+                    >
+                      <Trophy className="h-4 w-4 mr-2" />
+                      Leaderboard
                     </Button>
                     <Button 
                       variant="ghost" 
