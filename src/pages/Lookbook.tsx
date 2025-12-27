@@ -157,6 +157,77 @@ const lookbookImages = [
     handle: "womens-fitted-v-neck",
     setting: "Festival Dust",
   },
+  // NEW: Diverse Model Lifestyle Photos
+  {
+    src: "/src/assets/products/lifestyle-hoodie-diverse1.jpg",
+    alt: "Black woman in hoodie at outdoor festival",
+    product: "Night Shift Hoodie",
+    handle: "night-shift",
+    setting: "Golden Hour",
+  },
+  {
+    src: "/src/assets/products/lifestyle-warehouse-v2.jpg",
+    alt: "Asian man in tee on dancefloor",
+    product: "Warehouse Tee",
+    handle: "warehouse",
+    setting: "Warehouse Floor",
+  },
+  {
+    src: "/src/assets/products/lifestyle-crop-top-diverse2.jpg",
+    alt: "Latina woman dancing at sunset festival",
+    product: "Rave Crop Top",
+    handle: "rave-crop-top",
+    setting: "Sunset Rave",
+  },
+  {
+    src: "/src/assets/products/lifestyle-night-shift-v2.jpg",
+    alt: "Man in longsleeve at night rave with lasers",
+    product: "Closing Set Longsleeve",
+    handle: "closing-set",
+    setting: "Laser Night",
+  },
+  {
+    src: "/src/assets/products/lifestyle-leggings-diverse2.jpg",
+    alt: "Woman in leggings on dancefloor with lights",
+    product: "Mainroom Leggings",
+    handle: "mainroom-leggings",
+    setting: "Club Lights",
+  },
+  {
+    src: "/src/assets/products/lifestyle-sports-bra-diverse2.jpg",
+    alt: "Asian woman at sunrise outdoor festival",
+    product: "Peak Hour Sports Bra",
+    handle: "peak-hour-sports-bra",
+    setting: "Festival Dawn",
+  },
+  {
+    src: "/src/assets/products/lifestyle-shorts-diverse2.jpg",
+    alt: "Man in shorts with green lasers",
+    product: "Afterhours Bike Shorts",
+    handle: "afterhours-bike-shorts",
+    setting: "Laser Storm",
+  },
+  {
+    src: "/src/assets/products/lifestyle-vneck-diverse2.jpg",
+    alt: "South Asian woman at festival sunset",
+    product: "Fitted V-Neck",
+    handle: "womens-fitted-v-neck",
+    setting: "Festival Glow",
+  },
+  {
+    src: "/src/assets/products/lifestyle-cap-dj-booth.jpg",
+    alt: "Black man DJ in cap at booth",
+    product: "Low Profile Cap",
+    handle: "low-profile",
+    setting: "DJ Booth",
+  },
+  {
+    src: "/src/assets/products/lifestyle-bundle-diverse1.jpg",
+    alt: "Diverse group at festival sunset",
+    product: "Collection",
+    handle: "warehouse",
+    setting: "Festival Crew",
+  },
 ];
 
 // Import lifestyle images for bundling
@@ -182,6 +253,17 @@ import lifestyleLongsleeveDiverse1 from "@/assets/products/lifestyle-longsleeve-
 import lifestyleToteDiverse1 from "@/assets/products/lifestyle-tote-diverse1.jpg";
 import lifestyleCapDiverse1 from "@/assets/products/lifestyle-cap-diverse1.jpg";
 import lifestyleVneckDiverse1 from "@/assets/products/lifestyle-vneck-diverse1.jpg";
+// NEW: Diverse Model imports
+import lifestyleHoodieDiverse1 from "@/assets/products/lifestyle-hoodie-diverse1.jpg";
+import lifestyleWarehouseV2 from "@/assets/products/lifestyle-warehouse-v2.jpg";
+import lifestyleCropTopDiverse2 from "@/assets/products/lifestyle-crop-top-diverse2.jpg";
+import lifestyleNightShiftV2 from "@/assets/products/lifestyle-night-shift-v2.jpg";
+import lifestyleLeggingsDiverse2 from "@/assets/products/lifestyle-leggings-diverse2.jpg";
+import lifestyleSportsBraDiverse2 from "@/assets/products/lifestyle-sports-bra-diverse2.jpg";
+import lifestyleShortsDiverse2 from "@/assets/products/lifestyle-shorts-diverse2.jpg";
+import lifestyleVneckDiverse2 from "@/assets/products/lifestyle-vneck-diverse2.jpg";
+import lifestyleCapDjBooth from "@/assets/products/lifestyle-cap-dj-booth.jpg";
+import lifestyleBundleDiverse1 from "@/assets/products/lifestyle-bundle-diverse1.jpg";
 
 const imageImports = [
   lifestyleWarehouse,
@@ -206,6 +288,17 @@ const imageImports = [
   lifestyleToteDiverse1,
   lifestyleCapDiverse1,
   lifestyleVneckDiverse1,
+  // NEW: Diverse Model images
+  lifestyleHoodieDiverse1,
+  lifestyleWarehouseV2,
+  lifestyleCropTopDiverse2,
+  lifestyleNightShiftV2,
+  lifestyleLeggingsDiverse2,
+  lifestyleSportsBraDiverse2,
+  lifestyleShortsDiverse2,
+  lifestyleVneckDiverse2,
+  lifestyleCapDjBooth,
+  lifestyleBundleDiverse1,
 ];
 
 const Lookbook = () => {
