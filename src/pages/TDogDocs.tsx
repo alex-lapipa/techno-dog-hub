@@ -272,16 +272,38 @@ const TDogDocs = () => {
             </AccordionItem>
           </Accordion>
 
-          {/* Live Demo */}
-          <div className="mt-12">
+          {/* Live Demos */}
+          <div className="mt-12 space-y-8">
             <h2 className="font-mono text-xl font-bold mb-4 flex items-center gap-2">
               <Play className="w-5 h-5 text-logo-green" />
-              Live Demo
+              Live Demos
             </h2>
+            
+            {/* Demo 1 */}
             <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
+              <div className="px-4 py-2 border-b border-border bg-card/50">
+                <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">Demo 1</span>
+              </div>
               <iframe 
                 src="https://claude.site/public/artifacts/b2055d9e-8a20-4c9c-be9b-d6b2297cbcc4/embed" 
-                title="T:DOG Demo" 
+                title="T:DOG Demo 1" 
+                width="100%" 
+                height="600" 
+                frameBorder="0" 
+                allow="clipboard-write" 
+                allowFullScreen
+                className="w-full"
+              />
+            </div>
+
+            {/* Demo 2 */}
+            <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
+              <div className="px-4 py-2 border-b border-border bg-card/50">
+                <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">Demo 2</span>
+              </div>
+              <iframe 
+                src="https://claude.site/public/artifacts/7162bc0f-4101-43e1-b190-bf4ba91a35d0/embed" 
+                title="T:DOG Demo 2" 
                 width="100%" 
                 height="600" 
                 frameBorder="0" 
