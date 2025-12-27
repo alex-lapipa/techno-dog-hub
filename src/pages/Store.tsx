@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Package, Clock } from "lucide-react";
+import { Loader2, Package, Clock, Mail, CheckCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -10,9 +10,47 @@ import { CartDrawer, CartButton } from "@/components/store/CartDrawer";
 import { GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { fetchProducts, fetchCollections, ShopifyProductEdge, ShopifyCollection } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Store = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleNotifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notifyEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("launch_notifications")
+        .insert({ email: notifyEmail.toLowerCase().trim() });
+
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("You're already on the list!");
+          setIsSubscribed(true);
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success("You're on the list! We'll notify you when we launch.");
+        setIsSubscribed(true);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Fetch products
   const { data: products, isLoading: productsLoading } = useQuery({
@@ -52,18 +90,53 @@ const Store = () => {
       <CartDrawer />
 
       <main className="pt-24 lg:pt-16">
-        {/* Coming Soon Notice */}
+        {/* Coming Soon Notice with Email Signup */}
         <section className="bg-logo-green/10 border-b border-logo-green/30">
-          <div className="container mx-auto px-4 md:px-8 py-4">
-            <div className="flex items-center gap-3">
-              <Clock className="w-4 h-4 text-logo-green shrink-0" />
-              <p className="font-mono text-xs text-foreground">
-                <span className="text-logo-green font-semibold uppercase">Coming Soon</span>
-                <span className="text-muted-foreground mx-2">—</span>
-                <span className="text-muted-foreground">
-                  We're setting up fulfillment. Browse the collection, orders will ship in early 2026.
-                </span>
-              </p>
+          <div className="container mx-auto px-4 md:px-8 py-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Clock className="w-4 h-4 text-logo-green shrink-0" />
+                <p className="font-mono text-xs text-foreground">
+                  <span className="text-logo-green font-semibold uppercase">Coming Soon</span>
+                  <span className="text-muted-foreground mx-2">—</span>
+                  <span className="text-muted-foreground">
+                    Orders will ship in early 2026.
+                  </span>
+                </p>
+              </div>
+              
+              {isSubscribed ? (
+                <div className="flex items-center gap-2 text-logo-green">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="font-mono text-xs">You're on the list!</span>
+                </div>
+              ) : (
+                <form onSubmit={handleNotifySubmit} className="flex gap-2 w-full md:w-auto">
+                  <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.value)}
+                    className="font-mono text-xs h-8 bg-background/50 border-logo-green/30 focus:border-logo-green w-full md:w-56"
+                    disabled={isSubmitting}
+                  />
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="font-mono text-[10px] uppercase tracking-wider h-8 bg-logo-green text-background hover:bg-logo-green/80 shrink-0"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <>
+                        <Mail className="w-3 h-3 mr-1" />
+                        Notify Me
+                      </>
+                    )}
+                  </Button>
+                </form>
+              )}
             </div>
           </div>
         </section>
