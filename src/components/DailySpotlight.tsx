@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,7 +26,6 @@ interface NewsArticle {
 }
 
 const DailySpotlight = () => {
-  const { language } = useLanguage();
   const [artist, setArtist] = useState<DjArtist | null>(null);
   const [news, setNews] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,7 +100,7 @@ const DailySpotlight = () => {
       <section className="border-b border-border">
         <div className="container mx-auto px-4 md:px-8 py-16">
           <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
-            // {language === 'en' ? 'Daily spotlight' : 'Destacado del día'}
+            // Daily spotlight
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Skeleton className="h-64 border border-border" />
@@ -117,7 +115,7 @@ const DailySpotlight = () => {
     <section className="border-b border-border">
       <div className="container mx-auto px-4 md:px-8 py-16">
         <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
-          // {language === 'en' ? 'Daily spotlight' : 'Destacado del día'}
+          // Daily spotlight
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -129,7 +127,7 @@ const DailySpotlight = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground group-hover:text-background/70">
-                  {language === 'en' ? 'Artist of the day' : 'Artista del día'}
+                  Artist of the day
                 </span>
                 <Badge variant="outline" className="font-mono text-[10px] group-hover:border-background/50 group-hover:text-background/70">
                   #{artist.rank}
@@ -168,7 +166,7 @@ const DailySpotlight = () => {
               )}
               
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider mt-auto pt-4 border-t border-border group-hover:border-background/30">
-                <span>{language === 'en' ? 'View profile' : 'Ver perfil'}</span>
+                <span>View profile</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
@@ -182,7 +180,7 @@ const DailySpotlight = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  {language === 'en' ? 'Latest transmission' : 'Última transmisión'}
+                  Latest transmission
                 </span>
               </div>
               
@@ -222,7 +220,7 @@ const DailySpotlight = () => {
               )}
               
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider mt-auto pt-4 border-t border-border">
-                <span>{language === 'en' ? 'Read article' : 'Leer artículo'}</span>
+                <span>Read article</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
@@ -232,18 +230,16 @@ const DailySpotlight = () => {
               className="group block border border-border p-6 hover:bg-card transition-colors flex flex-col justify-center"
             >
               <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
-                // {language === 'en' ? 'Latest transmission' : 'Última transmisión'}
+                // Latest transmission
               </div>
               <h3 className="font-mono text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                {language === 'en' ? 'News & Features' : 'Noticias y Reportajes'}
+                News & Features
               </h3>
               <p className="font-mono text-sm text-muted-foreground mb-4">
-                {language === 'en' 
-                  ? 'The latest transmissions from the underground.' 
-                  : 'Las últimas transmisiones del underground.'}
+                The latest transmissions from the underground.
               </p>
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
-                <span>{language === 'en' ? 'Browse all' : 'Ver todo'}</span>
+                <span>Browse all</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>

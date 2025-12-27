@@ -73,16 +73,16 @@ const TechnoChat = () => {
       if (!response.ok) {
         if (response.status === 429) {
           toast({
-            title: 'Límite de uso alcanzado',
-            description: 'Por favor, espera unos segundos e intenta de nuevo.',
+            title: 'Rate limit reached',
+            description: 'Please wait a few seconds and try again.',
             variant: 'destructive',
           });
           throw new Error('Rate limit exceeded');
         }
         if (response.status === 402) {
           toast({
-            title: 'Créditos agotados',
-            description: 'Por favor, añade créditos para continuar.',
+            title: 'Credits exhausted',
+            description: 'Please add credits to continue.',
             variant: 'destructive',
           });
           throw new Error('Payment required');
@@ -188,7 +188,7 @@ const TechnoChat = () => {
                 onClick={clearChat}
                 disabled={isLoading}
                 className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors disabled:opacity-50 flex items-center gap-1"
-                title="Limpiar chat"
+                title="Clear chat"
               >
                 <RotateCcw className="w-3 h-3" />
                 CLEAR
@@ -198,21 +198,21 @@ const TechnoChat = () => {
           
           <div className="p-6">
             <h2 className="font-mono text-2xl md:text-3xl font-bold mb-2">
-              <span className="text-primary">&gt;</span> CONSULTA LA BASE DE CONOCIMIENTO
+              <span className="text-primary">&gt;</span> QUERY THE KNOWLEDGE BASE
             </h2>
             <p className="text-muted-foreground font-mono text-sm mb-6">
-              Pregunta sobre artistas, sellos, festivales o cualquier tema de la escena techno underground.
+              Ask about artists, labels, festivals or any topic from the underground techno scene.
             </p>
 
             {/* Chat Messages */}
             <div className="h-80 overflow-y-auto border border-border bg-background/50 p-4 mb-4 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center text-muted-foreground font-mono text-sm py-8">
-                  <p>// Escribe tu pregunta para empezar</p>
-                  <p className="mt-2 text-xs">Ejemplos:</p>
-                  <p className="text-xs">"¿Quién es Jeff Mills?"</p>
-                  <p className="text-xs">"¿Qué artistas lanzaron en Tresor?"</p>
-                  <p className="text-xs">"Háblame del techno de Detroit"</p>
+                  <p>// Type your question to begin</p>
+                  <p className="mt-2 text-xs">Examples:</p>
+                  <p className="text-xs">"Who is Jeff Mills?"</p>
+                  <p className="text-xs">"What artists released on Tresor?"</p>
+                  <p className="text-xs">"Tell me about Detroit techno"</p>
                 </div>
               )}
               
@@ -240,7 +240,7 @@ const TechnoChat = () => {
             {/* Referenced Artists Cards */}
             {referencedArtists.length > 0 && (
               <div className="mb-4">
-                <p className="font-mono text-xs text-muted-foreground mb-2">// Artistas referenciados:</p>
+                <p className="font-mono text-xs text-muted-foreground mb-2">// Referenced artists:</p>
                 <div className="flex flex-wrap gap-2">
                   {referencedArtists.map((artist, idx) => (
                     <Link 
@@ -277,11 +277,11 @@ const TechnoChat = () => {
             {/* Quick Query Suggestions */}
             <div className="flex flex-wrap gap-2 mb-4">
               {[
-                "¿Quién es Jeff Mills?",
+                "Who is Jeff Mills?",
                 "Top Detroit techno artists",
-                "¿Qué artistas lanzaron en Tresor?",
+                "What artists released on Tresor?",
                 "Industrial techno pioneers",
-                "¿Quién hizo The Bells?"
+                "Who made The Bells?"
               ].map((suggestion, idx) => (
                 <button
                   key={idx}
@@ -303,7 +303,7 @@ const TechnoChat = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Escribe tu pregunta..."
+                placeholder="Type your question..."
                 disabled={isLoading}
                 className="flex-1 bg-background border border-border px-4 py-2 font-mono text-sm 
                          focus:outline-none focus:border-primary disabled:opacity-50"
@@ -313,7 +313,7 @@ const TechnoChat = () => {
                 onClick={sendMessage}
                 disabled={isLoading || !input.trim()}
               >
-                {isLoading ? 'PROCESANDO...' : 'ENVIAR'}
+                {isLoading ? 'PROCESSING...' : 'SEND'}
               </Button>
             </div>
           </div>

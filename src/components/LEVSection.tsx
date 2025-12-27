@@ -33,14 +33,14 @@ const LEVSection = () => {
             {/* Program highlights */}
             <div className="border border-border p-6">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-4">
-                // Programa 2025
+                // Program 2025
               </div>
               <div className="space-y-3">
                 {[
-                  { icon: Eye, label: "Instalaciones audiovisuales", count: "15+" },
+                  { icon: Eye, label: "Audiovisual installations", count: "15+" },
                   { icon: Cpu, label: "Live A/V performances", count: "30+" },
-                  { label: "Talleres y conferencias", count: "12" },
-                  { label: "Artistas internacionales", count: "50+" },
+                  { label: "Workshops and conferences", count: "12" },
+                  { label: "International artists", count: "50+" },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -88,32 +88,32 @@ const LEVSection = () => {
             {/* Header */}
             <div className="space-y-4">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-                // Arte audiovisual + tecnología
+                // Audiovisual art + technology
               </div>
               <h2 className="font-mono text-4xl md:text-6xl uppercase tracking-tight text-foreground">
                 L.E.V.
               </h2>
               <div className="font-mono text-lg text-muted-foreground uppercase tracking-wider">
-                Laboratorio de Electrónica Visual
+                Laboratory of Electronic Visuals
               </div>
               <div className="font-mono text-sm text-muted-foreground uppercase tracking-wider">
-                Gijón, Asturias — España
+                Gijón, Asturias — Spain
               </div>
             </div>
 
             {/* Description */}
             <div className="space-y-4 font-mono text-sm text-muted-foreground leading-relaxed">
               <p>
-                L.E.V. Festival es un referente internacional en la exploración 
-                de las intersecciones entre música electrónica, arte visual y 
-                nuevas tecnologías. Desde 2007, Gijón se convierte cada mayo en 
-                el epicentro de la creación audiovisual contemporánea.
+                L.E.V. Festival is an international reference in exploring the 
+                intersections between electronic music, visual art, and new 
+                technologies. Since 2007, Gijón becomes every May the epicenter 
+                of contemporary audiovisual creation.
               </p>
               <p>
-                El festival combina conciertos, performances audiovisuales en 
-                directo, instalaciones interactivas, talleres y conferencias 
-                con artistas y creadores de todo el mundo que trabajan en la 
-                frontera entre sonido, imagen y código.
+                The festival combines concerts, live audiovisual performances, 
+                interactive installations, workshops, and conferences with 
+                artists and creators from around the world working at the 
+                frontier between sound, image, and code.
               </p>
             </div>
 
@@ -121,7 +121,7 @@ const LEVSection = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Fecha
+                  Date
                 </div>
                 <div className="font-mono text-foreground flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
@@ -130,7 +130,7 @@ const LEVSection = () => {
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Ubicación
+                  Location
                 </div>
                 <div className="font-mono text-foreground flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
@@ -139,15 +139,15 @@ const LEVSection = () => {
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Edición
+                  Edition
                 </div>
                 <div className="font-mono text-foreground">
-                  18ª Edición
+                  18th Edition
                 </div>
               </div>
               <div className="border border-border p-4">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-2">
-                  Precio desde
+                  Price from
                 </div>
                 <div className="font-mono text-foreground">
                   35€
@@ -157,7 +157,7 @@ const LEVSection = () => {
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
-              {["live a/v", "instalación", "generativo", "inmersivo", "vj", "código creativo"].map(
+              {["live a/v", "installation", "generative", "immersive", "vj", "creative code"].map(
                 (tag) => (
                   <span
                     key={tag}
@@ -172,11 +172,11 @@ const LEVSection = () => {
             {/* Actions */}
             <div className="flex flex-wrap gap-4 pt-4">
               <Button variant="brutalist" size="lg">
-                Web oficial
+                Official website
                 <ExternalLink className="w-4 h-4" />
               </Button>
               <Button variant="terminal" size="lg">
-                Ver programa
+                View program
               </Button>
             </div>
           </div>
