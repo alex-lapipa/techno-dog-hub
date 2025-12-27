@@ -120,3 +120,6 @@ verify_jwt = false
 
 [functions.media-engine]
 verify_jwt = false
+
+[functions.ai-orchestration]
+verify_jwt = false
