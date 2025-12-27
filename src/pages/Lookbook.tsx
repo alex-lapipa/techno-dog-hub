@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
+import FilmFrame from "@/components/FilmFrame";
+import FilmGrainOverlay from "@/components/FilmGrainOverlay";
 
 // Lifestyle images with product references
 const lookbookImages = [
@@ -115,6 +117,8 @@ const imageImports = [
 
 const Lookbook = () => {
   return (
+    <>
+      <FilmGrainOverlay />
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
         title="Lookbook | techno.dog"
@@ -153,46 +157,42 @@ const Lookbook = () => {
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
             {/* Masonry-style grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {lookbookImages.map((image, index) => (
                 <Link
                   key={index}
                   to={`/store/product/${image.handle}`}
-                  className={`group relative overflow-hidden bg-muted ${
+                  className={`block ${
                     // Create visual interest with varied heights
                     index % 5 === 0 ? "md:row-span-2" : ""
                   } ${
                     index % 7 === 3 ? "lg:col-span-2" : ""
                   }`}
                 >
-                  {/* Image */}
-                  <div className="aspect-square overflow-hidden">
-                    <img
+                  <div className="relative group">
+                    <FilmFrame
                       src={imageImports[index]}
                       alt={image.alt}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
+                      frameNumber={String(index + 1).padStart(2, '0')}
+                      aspectRatio={index % 5 === 0 ? "portrait" : "square"}
+                      showSprockets={true}
+                      size={index % 7 === 3 ? "lg" : "md"}
                     />
-                  </div>
-
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest">
-                        {image.setting}
-                      </span>
-                      <h3 className="font-mono text-lg uppercase tracking-tight text-white mt-1">
-                        {image.product}
-                      </h3>
-                      <span className="font-mono text-xs text-white/60 mt-2 inline-block">
-                        View Product →
-                      </span>
+                    
+                    {/* Info overlay */}
+                    <div className="absolute bottom-3 left-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="bg-background/90 backdrop-blur-sm border border-border p-3">
+                        <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest block">
+                          {image.setting}
+                        </span>
+                        <h3 className="font-mono text-sm uppercase tracking-tight text-foreground mt-1">
+                          {image.product}
+                        </h3>
+                        <span className="font-mono text-[10px] text-muted-foreground mt-2 inline-block">
+                          View Product →
+                        </span>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* VHS scan line effect */}
-                  <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-30 transition-opacity">
-                    <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.1)_2px,rgba(0,0,0,0.1)_4px)]" />
                   </div>
                 </Link>
               ))}
@@ -220,6 +220,7 @@ const Lookbook = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 
