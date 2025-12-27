@@ -4,7 +4,7 @@ import { getArtistById, artists } from "@/data/artists";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
-import LazyImage from "@/components/LazyImage";
+import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
@@ -158,22 +158,24 @@ const ArtistDetail = () => {
 
           {/* Hero Section */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Artist Photo */}
-            <div className="aspect-square relative overflow-hidden border border-border bg-card/30">
+            {/* Artist Photo - Film Frame */}
+            <div className="relative">
               {artist.image ? (
-                <>
-                  <LazyImage 
-                    src={artist.image.url} 
+                <div className="relative">
+                  <FilmFrame
+                    src={artist.image.url}
                     alt={artist.name}
-                    className="w-full h-full"
+                    frameNumber={String(currentIndex + 1).padStart(2, '0')}
+                    aspectRatio="square"
+                    size="lg"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm border border-border px-2 py-1 text-xs font-mono">
+                  {/* Attribution overlay */}
+                  <div className="absolute top-6 right-6 z-30 bg-background/90 backdrop-blur-sm border border-crimson/30 px-2 py-1 text-xs font-mono">
                     <a 
                       href={artist.image.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                      className="text-muted-foreground hover:text-crimson transition-colors flex items-center gap-1"
                     >
                       📷 {artist.image.author}
                       <ExternalLink className="w-3 h-3" />
@@ -187,9 +189,23 @@ const ArtistDetail = () => {
                       {artist.image.license}
                     </a>
                   </div>
-                </>
+                  {/* Tags overlay */}
+                  <div className="absolute bottom-6 left-6 right-6 z-30">
+                    <div className="flex flex-wrap gap-2">
+                      {artist.tags.map(tag => (
+                        <Link
+                          key={tag}
+                          to={`/artists?tag=${tag}`}
+                          className="font-mono text-xs bg-background/90 border border-crimson/30 px-2 py-1 hover:bg-crimson hover:text-foreground transition-colors"
+                        >
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
+                <div className="aspect-square relative overflow-hidden border border-border bg-zinc-800 flex items-center justify-center">
                   <div className="text-center p-8">
                     <User className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 text-muted-foreground/30" />
                     <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-tight mb-2 text-muted-foreground">
@@ -199,21 +215,22 @@ const ArtistDetail = () => {
                       {artist.city}, {artist.country}
                     </p>
                   </div>
+                  {/* Tags for no-image state */}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="flex flex-wrap gap-2">
+                      {artist.tags.map(tag => (
+                        <Link
+                          key={tag}
+                          to={`/artists?tag=${tag}`}
+                          className="font-mono text-xs bg-background/90 border border-border px-2 py-1 hover:bg-primary hover:text-primary-foreground transition-colors"
+                        >
+                          {tag}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
-              <div className="absolute bottom-4 left-4 right-4">
-                <div className="flex flex-wrap gap-2">
-                  {artist.tags.map(tag => (
-                    <Link
-                      key={tag}
-                      to={`/artists?tag=${tag}`}
-                      className="font-mono text-xs bg-background/90 border border-border px-2 py-1 hover:bg-primary hover:text-primary-foreground transition-colors"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              </div>
             </div>
 
             {/* Artist Info */}
