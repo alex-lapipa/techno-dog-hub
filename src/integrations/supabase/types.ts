@@ -457,6 +457,132 @@ export type Database = {
         }
         Relationships: []
       }
+      media_assets: {
+        Row: {
+          alt_text: string | null
+          copyright_risk: string | null
+          created_at: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          final_selected: boolean | null
+          id: string
+          license_name: string | null
+          license_status: string | null
+          license_url: string | null
+          match_score: number | null
+          meta: Json | null
+          openai_verified: boolean | null
+          provider: string | null
+          quality_score: number | null
+          reasoning_summary: string | null
+          source_url: string | null
+          storage_path: string | null
+          storage_url: string | null
+          tags: Json | null
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          copyright_risk?: string | null
+          created_at?: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          final_selected?: boolean | null
+          id?: string
+          license_name?: string | null
+          license_status?: string | null
+          license_url?: string | null
+          match_score?: number | null
+          meta?: Json | null
+          openai_verified?: boolean | null
+          provider?: string | null
+          quality_score?: number | null
+          reasoning_summary?: string | null
+          source_url?: string | null
+          storage_path?: string | null
+          storage_url?: string | null
+          tags?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          copyright_risk?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          final_selected?: boolean | null
+          id?: string
+          license_name?: string | null
+          license_status?: string | null
+          license_url?: string | null
+          match_score?: number | null
+          meta?: Json | null
+          openai_verified?: boolean | null
+          provider?: string | null
+          quality_score?: number | null
+          reasoning_summary?: string | null
+          source_url?: string | null
+          storage_path?: string | null
+          storage_url?: string | null
+          tags?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      media_pipeline_jobs: {
+        Row: {
+          attempts: number | null
+          completed_at: string | null
+          created_at: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          error_log: string | null
+          id: string
+          max_attempts: number | null
+          priority: number | null
+          result: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          error_log?: string | null
+          id?: string
+          max_attempts?: number | null
+          priority?: number | null
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number | null
+          completed_at?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          error_log?: string | null
+          id?: string
+          max_attempts?: number | null
+          priority?: number | null
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pending_webhook_events: {
         Row: {
           created_at: string
@@ -840,7 +966,26 @@ export type Database = {
           reset_at: string
         }[]
       }
+      claim_next_media_job: {
+        Args: never
+        Returns: {
+          attempts: number
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          job_id: string
+        }[]
+      }
       cleanup_old_api_usage: { Args: never; Returns: number }
+      enqueue_media_job: {
+        Args: {
+          p_entity_id: string
+          p_entity_name: string
+          p_entity_type: string
+          p_priority?: number
+        }
+        Returns: string
+      }
       get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
       has_role: {
         Args: {
