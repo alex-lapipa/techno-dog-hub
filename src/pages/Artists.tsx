@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Film } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { useCallback, useRef } from "react";
 
 const ArtistsPage = () => {
@@ -71,9 +72,17 @@ const ArtistsPage = () => {
             <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
               Artists
             </h1>
-            <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              The producers, DJs, and live performers shaping techno culture.
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
+                The producers, DJs, and live performers shaping techno culture.
+              </p>
+              <Link to="/artists/gallery">
+                <Button variant="outline" size="sm" className="gap-2 border-crimson/30 hover:bg-crimson/10 hover:border-crimson">
+                  <Film className="w-4 h-4" />
+                  <span className="font-mono text-xs uppercase tracking-wider">Film Gallery</span>
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="border-t border-border">

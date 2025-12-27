@@ -21,6 +21,7 @@ const News = lazy(() => import("./pages/News"));
 const Festivals = lazy(() => import("./pages/Festivals"));
 const FestivalDetail = lazy(() => import("./pages/FestivalDetail"));
 const Artists = lazy(() => import("./pages/Artists"));
+const ArtistsGallery = lazy(() => import("./pages/ArtistsGallery"));
 const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const Venues = lazy(() => import("./pages/Venues"));
 const VenueDetail = lazy(() => import("./pages/VenueDetail"));
@@ -100,6 +101,7 @@ const App = () => (
                   
                   {/* Artists */}
                   <Route path="/artists" element={<Artists />} />
+                  <Route path="/artists/gallery" element={<ArtistsGallery />} />
                   <Route path="/artists/:id" element={<ArtistDetail />} />
                   
                   {/* Venues */}
