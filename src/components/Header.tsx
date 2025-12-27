@@ -46,7 +46,6 @@ const Header = () => {
     },
     { label: 'Artists', path: '/artists' },
     { label: 'Labels', path: '/labels' },
-    { label: 'Releases', path: '/releases' },
     { label: 'Gear', path: '/gear' },
     { label: 'Technopedia', path: '/technopedia' },
   ];
