@@ -11,7 +11,6 @@ import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/co
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { language } = useLanguage();
   const artist = id ? getArtistById(id) : null;
 
   const personSchema = artist ? {
@@ -63,10 +62,10 @@ const ArtistDetail = () => {
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-4 md:px-8">
             <p className="font-mono text-muted-foreground">
-              {language === 'en' ? 'Artist not found' : 'Artista no encontrado'}
+              Artist not found
             </p>
             <Link to="/artists" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← {language === 'en' ? 'Back to Artists' : 'Volver a Artistas'}
+              ← Back to Artists
             </Link>
           </div>
         </main>
@@ -99,7 +98,7 @@ const ArtistDetail = () => {
           {/* Breadcrumb Navigation */}
           <DetailBreadcrumb 
             items={[
-              { label: language === 'en' ? 'Artists' : 'Artistas', href: '/artists' },
+              { label: 'Artists', href: '/artists' },
               { label: artist.name }
             ]} 
           />
@@ -112,7 +111,7 @@ const ArtistDetail = () => {
               className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              {language === 'en' ? 'Back to Artists' : 'Volver a Artistas'}
+              Back to Artists
             </Link>
 
             {/* Prev/Next Navigation */}
@@ -251,7 +250,7 @@ const ArtistDetail = () => {
               {artist.labels && artist.labels.length > 0 && (
                 <div>
                   <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                    {language === 'en' ? 'Labels' : 'Sellos'}
+                    Labels
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {artist.labels.map(label => (
@@ -270,7 +269,7 @@ const ArtistDetail = () => {
               {artist.collaborators && artist.collaborators.length > 0 && (
                 <div>
                   <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                    {language === 'en' ? 'Collaborators' : 'Colaboradores'}
+                    Collaborators
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {artist.collaborators.map(collab => (
@@ -291,7 +290,7 @@ const ArtistDetail = () => {
           {artist.careerHighlights && artist.careerHighlights.length > 0 && (
             <section className="mb-12 border-t border-border pt-8">
               <h2 className="font-mono text-xl uppercase tracking-wide mb-6">
-                {language === 'en' ? 'Career Highlights' : 'Momentos Destacados'}
+                Career Highlights
               </h2>
               <ul className="space-y-3">
                 {artist.careerHighlights.map((highlight, i) => (
@@ -309,7 +308,7 @@ const ArtistDetail = () => {
             <section className="mb-12 border-t border-border pt-8">
               <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
                 <Disc3 className="w-5 h-5" />
-                {language === 'en' ? 'Key Releases' : 'Lanzamientos Clave'}
+                Key Releases
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {artist.keyReleases.map((release, i) => (
@@ -346,7 +345,7 @@ const ArtistDetail = () => {
           <section className="mb-12 border-t border-border pt-8">
             <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
               <Wrench className="w-5 h-5" />
-              {language === 'en' ? 'Gear & Rider' : 'Equipo y Rider'}
+              Gear & Rider
             </h2>
             
             <div className="grid md:grid-cols-3 gap-6">
@@ -355,7 +354,7 @@ const ArtistDetail = () => {
                 <div className="border border-border p-4">
                   <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
                     <Radio className="w-4 h-4" />
-                    {language === 'en' ? 'Studio' : 'Estudio'}
+                    Studio
                   </h3>
                   <ul className="space-y-2">
                     {artist.studioGear.map((gear, i) => (
@@ -371,7 +370,7 @@ const ArtistDetail = () => {
               {artist.liveSetup && artist.liveSetup.length > 0 && (
                 <div className="border border-border p-4">
                   <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
-                    {language === 'en' ? 'Live Setup' : 'Setup Live'}
+                    Live Setup
                   </h3>
                   <ul className="space-y-2">
                     {artist.liveSetup.map((gear, i) => (
@@ -387,7 +386,7 @@ const ArtistDetail = () => {
               {artist.djSetup && artist.djSetup.length > 0 && (
                 <div className="border border-border p-4">
                   <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
-                    {language === 'en' ? 'DJ Setup' : 'Setup DJ'}
+                    DJ Setup
                   </h3>
                   <ul className="space-y-2">
                     {artist.djSetup.map((gear, i) => (
@@ -404,7 +403,7 @@ const ArtistDetail = () => {
             {artist.riderNotes && (
               <div className="mt-4 border border-border p-4 bg-card/50">
                 <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  {language === 'en' ? 'Rider Notes' : 'Notas del Rider'}
+                  Rider Notes
                 </h3>
                 <p className="font-mono text-sm text-muted-foreground">
                   {artist.riderNotes}
@@ -444,7 +443,7 @@ const ArtistDetail = () => {
           {relatedArtists.length > 0 && (
             <section className="border-t border-border pt-8">
               <h2 className="font-mono text-xl uppercase tracking-wide mb-6">
-                {language === 'en' ? 'Related Artists' : 'Artistas Relacionados'}
+                Related Artists
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {relatedArtists.map(related => (
@@ -478,20 +477,20 @@ const ArtistDetail = () => {
           {/* Deep Links */}
           <section className="mt-12 border-t border-border pt-8">
             <h2 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
-              {language === 'en' ? 'Explore More' : 'Explorar Más'}
+              Explore More
             </h2>
             <div className="flex flex-wrap gap-3">
               <Link 
                 to={`/releases?artist=${artist.id}`}
                 className="font-mono text-xs border border-border px-4 py-2 hover:bg-card transition-colors"
               >
-                → {language === 'en' ? 'Releases' : 'Lanzamientos'}
+                → Releases
               </Link>
               <Link 
                 to={`/artists?region=${artist.region}`}
                 className="font-mono text-xs border border-border px-4 py-2 hover:bg-card transition-colors"
               >
-                → {artist.region} {language === 'en' ? 'Artists' : 'Artistas'}
+                → {artist.region} Artists
               </Link>
               {artist.labels && artist.labels[0] && (
                 <Link 
@@ -505,7 +504,7 @@ const ArtistDetail = () => {
                 to="/mad/timeline"
                 className="font-mono text-xs border border-border px-4 py-2 hover:bg-card transition-colors"
               >
-                → {language === 'en' ? 'Timeline' : 'Línea temporal'}
+                → Timeline
               </Link>
             </div>
           </section>
