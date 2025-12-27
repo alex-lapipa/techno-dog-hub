@@ -1,5 +1,6 @@
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Camera } from "lucide-react";
+import { ArrowLeft, Camera, Filter } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -367,7 +368,48 @@ const imageImports = [
   lifestyleEulogioTshirtRave,
 ];
 
+// Setting categories for grouping filters
+const settingCategories: Record<string, string[]> = {
+  "All": [],
+  "Festival": ["Festival", "Outdoor Festival", "Festival Stage", "Main Stage", "Festival Dust", "Festival Golden Hour", "Festival Sunrise", "Festival Dawn", "Festival Glow", "Festival Crew", "Sunset Rave", "Golden Hour"],
+  "Club": ["Club", "Underground Club", "Warehouse", "Warehouse Rave", "Warehouse Floor", "Warehouse Lasers", "Club Lights", "Laser Room", "Laser Night", "Laser Storm"],
+  "DJ Booth": ["DJ Booth", "DJ Studio", "Backstage"],
+  "Dancefloor": ["Dancefloor", "Peak Time", "Hands Up"],
+  "Rave": ["Rave", "Forest Rave", "Industrial Rave"],
+  "Street": ["Night Street"],
+  "Sunrise": ["Sunrise Set", "Festival Sunrise", "Festival Dawn"],
+  "Eulogio": ["Festival Golden Hour", "Warehouse Lasers", "Festival Sunrise", "DJ Booth", "Festival Crew", "Dancefloor", "Warehouse Rave"].filter((_, i) => i < 10),
+};
+
 const Lookbook = () => {
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+
+  // Get all unique settings
+  const allSettings = useMemo(() => {
+    const settings = new Set(lookbookImages.map(img => img.setting));
+    return Array.from(settings).sort();
+  }, []);
+
+  // Filter images based on active filter
+  const filteredImages = useMemo(() => {
+    if (activeFilter === "All") return lookbookImages;
+    if (activeFilter === "Eulogio") {
+      return lookbookImages.filter(img => img.product.includes("Eulogio"));
+    }
+    const categorySettings = settingCategories[activeFilter];
+    if (categorySettings && categorySettings.length > 0) {
+      return lookbookImages.filter(img => 
+        categorySettings.some(setting => img.setting.includes(setting) || setting.includes(img.setting))
+      );
+    }
+    return lookbookImages.filter(img => img.setting === activeFilter);
+  }, [activeFilter]);
+
+  // Get image index in original array for proper import mapping
+  const getOriginalIndex = (image: typeof lookbookImages[0]) => {
+    return lookbookImages.findIndex(img => img.src === image.src);
+  };
+
   return (
     <>
       <FilmGrainOverlay />
@@ -405,49 +447,91 @@ const Lookbook = () => {
           </div>
         </section>
 
+        {/* Filters */}
+        <section className="border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+          <div className="container mx-auto px-4 md:px-8 py-4">
+            <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide pb-1">
+              <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              {Object.keys(settingCategories).map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveFilter(category)}
+                  className={`font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 border transition-all flex-shrink-0 ${
+                    activeFilter === category
+                      ? "bg-logo-green text-background border-logo-green"
+                      : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                  }`}
+                >
+                  {category}
+                  {category !== "All" && (
+                    <span className="ml-1.5 opacity-60">
+                      ({category === "Eulogio" 
+                        ? lookbookImages.filter(img => img.product.includes("Eulogio")).length
+                        : settingCategories[category]?.length > 0
+                          ? lookbookImages.filter(img => 
+                              settingCategories[category].some(s => img.setting.includes(s) || s.includes(img.setting))
+                            ).length
+                          : 0
+                      })
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Magazine Grid */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
+            {/* Results count */}
+            <p className="font-mono text-[10px] text-muted-foreground mb-6">
+              Showing {filteredImages.length} of {lookbookImages.length} images
+            </p>
+            
             {/* Masonry-style grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {lookbookImages.map((image, index) => (
-                <Link
-                  key={index}
-                  to={`/store/product/${image.handle}`}
-                  className={`block ${
-                    // Create visual interest with varied heights
-                    index % 5 === 0 ? "md:row-span-2" : ""
-                  } ${
-                    index % 7 === 3 ? "lg:col-span-2" : ""
-                  }`}
-                >
-                  <div className="relative group">
-                    <FilmFrame
-                      src={imageImports[index]}
-                      alt={image.alt}
-                      frameNumber={String(index + 1).padStart(2, '0')}
-                      aspectRatio={index % 5 === 0 ? "portrait" : "square"}
-                      showSprockets={true}
-                      size={index % 7 === 3 ? "lg" : "md"}
-                    />
-                    
-                    {/* Info overlay */}
-                    <div className="absolute bottom-3 left-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-background/90 backdrop-blur-sm border border-border p-3">
-                        <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest block">
-                          {image.setting}
-                        </span>
-                        <h3 className="font-mono text-sm uppercase tracking-tight text-foreground mt-1">
-                          {image.product}
-                        </h3>
-                        <span className="font-mono text-[10px] text-muted-foreground mt-2 inline-block">
-                          View Product →
-                        </span>
+              {filteredImages.map((image, index) => {
+                const originalIndex = getOriginalIndex(image);
+                return (
+                  <Link
+                    key={originalIndex}
+                    to={`/store/product/${image.handle}`}
+                    className={`block ${
+                      // Create visual interest with varied heights
+                      index % 5 === 0 ? "md:row-span-2" : ""
+                    } ${
+                      index % 7 === 3 ? "lg:col-span-2" : ""
+                    }`}
+                  >
+                    <div className="relative group">
+                      <FilmFrame
+                        src={imageImports[originalIndex]}
+                        alt={image.alt}
+                        frameNumber={String(originalIndex + 1).padStart(2, '0')}
+                        aspectRatio={index % 5 === 0 ? "portrait" : "square"}
+                        showSprockets={true}
+                        size={index % 7 === 3 ? "lg" : "md"}
+                      />
+                      
+                      {/* Info overlay */}
+                      <div className="absolute bottom-3 left-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-background/90 backdrop-blur-sm border border-border p-3">
+                          <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest block">
+                            {image.setting}
+                          </span>
+                          <h3 className="font-mono text-sm uppercase tracking-tight text-foreground mt-1">
+                            {image.product}
+                          </h3>
+                          <span className="font-mono text-[10px] text-muted-foreground mt-2 inline-block">
+                            View Product →
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
