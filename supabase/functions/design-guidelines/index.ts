@@ -15,6 +15,10 @@ const corsHeaders = {
  * 2. ONLY use official approved assets from src/assets/
  * 3. ALL product images must follow the dark brutalist VHS aesthetic
  * 4. Artist branding must remain EXACTLY as provided - no interpretation
+ * 5. ABSOLUTELY NO DOGS IN ANY IMAGERY - The brand is techno.dog (a URL), NOT a dog
+ * 6. techno.dog branding = HEXAGON LOGO ONLY + "techno.dog" text in IBM Plex Mono uppercase
+ * 7. NEVER generate, create, or include any dog imagery, dog icons, dog silhouettes
+ * 8. The hexagon logo is a geometric shape with internal cube structure - NO DOG
  */
 
 interface DesignGuidelines {
@@ -25,6 +29,8 @@ interface DesignGuidelines {
       icon: string;
       font: string;
       textStyle: string;
+      description: string;
+      forbidden: string[];
       colors: {
         primary: string;
         accent: string;
@@ -60,10 +66,19 @@ const DESIGN_GUIDELINES: DesignGuidelines = {
   branding: {
     primary: {
       name: "techno.dog",
-      logo: "src/assets/techno-dog-logo.png",
+      logo: "src/assets/hexagon-logo-green.png",
       icon: "src/assets/hexagon-logo-green.png",
       font: "IBM Plex Mono",
       textStyle: "uppercase tracking-widest text-xs",
+      description: "techno.dog is a URL/domain name, NOT a dog. The logo is a HEXAGON with internal geometric cube structure. NEVER include any dog imagery.",
+      forbidden: [
+        "Dog images",
+        "Dog icons", 
+        "Dog silhouettes",
+        "Any canine imagery",
+        "Paw prints",
+        "Dog-related symbols"
+      ],
       colors: {
         primary: "hsl(100, 100%, 60%)", // logo-green
         accent: "hsl(0, 100%, 50%)", // crimson
@@ -91,7 +106,7 @@ const DESIGN_GUIDELINES: DesignGuidelines = {
     dimensions: "1024x1024 square",
     background: "Pure black or very dark gradient",
     aesthetic: "Dark brutalist, minimal, industrial techno",
-    brandingPlacement: "Small discreet techno.dog hexagon logo in corner. For collabs: artist branding prominent, techno.dog secondary",
+    brandingPlacement: "Small discreet techno.dog hexagon logo (geometric, NO DOG) in corner + 'techno.dog' text in IBM Plex Mono uppercase. For collabs: artist official logo prominent, techno.dog secondary",
     forbidden: [
       "Bright colors",
       "Gradients that aren't dark",
@@ -100,6 +115,10 @@ const DESIGN_GUIDELINES: DesignGuidelines = {
       "Any design elements not in the official asset library",
       "Busy patterns or maximalist design",
       "Stock imagery aesthetics",
+      "DOG IMAGERY OF ANY KIND",
+      "Dog icons, silhouettes, or representations",
+      "Paw prints or canine symbols",
+      "Any animal imagery except if specifically requested",
     ],
   },
   lifestyleImageRules: {
