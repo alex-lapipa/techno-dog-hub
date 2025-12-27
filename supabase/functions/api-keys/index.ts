@@ -34,6 +34,35 @@ async function hashKey(key: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Send email notification (fire and forget)
+async function sendEmailNotification(
+  supabaseUrl: string,
+  supabaseKey: string,
+  type: 'api_key_created' | 'api_key_revoked',
+  email: string,
+  data: Record<string, unknown>
+) {
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-community-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({ type, to: email, data }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Failed to send email notification:', error);
+    } else {
+      console.log(`Email notification sent: ${type} to ${email}`);
+    }
+  } catch (error) {
+    console.error('Error sending email notification:', error);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -128,6 +157,19 @@ Deno.serve(async (req) => {
 
       console.log(`API key created: ${newKey.prefix} with scopes: ${keyScopes.join(', ')}`);
 
+      // Send email notification (async, don't block response)
+      sendEmailNotification(
+        supabaseUrl,
+        supabaseServiceKey,
+        'api_key_created',
+        user.email!,
+        {
+          keyName: newKey.name,
+          keyPrefix: newKey.prefix,
+          scopes: newKey.scopes,
+        }
+      );
+
       return new Response(
         JSON.stringify({
           apiKey: fullKey,
@@ -168,6 +210,14 @@ Deno.serve(async (req) => {
         );
       }
 
+      // Get key info before revoking
+      const { data: keyInfo } = await supabase
+        .from('api_keys')
+        .select('name, prefix')
+        .eq('id', keyId)
+        .eq('user_id', user.id)
+        .single();
+
       const { error: revokeError } = await supabase
         .from('api_keys')
         .update({ status: 'revoked' })
@@ -179,6 +229,21 @@ Deno.serve(async (req) => {
       }
 
       console.log(`API key revoked: ${keyId}`);
+
+      // Send email notification (async, don't block response)
+      if (keyInfo) {
+        sendEmailNotification(
+          supabaseUrl,
+          supabaseServiceKey,
+          'api_key_revoked',
+          user.email!,
+          {
+            keyName: keyInfo.name,
+            keyPrefix: keyInfo.prefix,
+            revokedAt: new Date().toISOString(),
+          }
+        );
+      }
 
       return new Response(
         JSON.stringify({ success: true, message: 'API key revoked' }),
