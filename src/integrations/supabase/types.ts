@@ -568,6 +568,27 @@ export type Database = {
         }
         Relationships: []
       }
+      launch_notifications: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          notified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          notified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          notified_at?: string | null
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
