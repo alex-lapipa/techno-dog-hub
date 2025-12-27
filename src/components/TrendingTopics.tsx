@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TagCount {
   tag: string;
@@ -10,7 +9,6 @@ interface TagCount {
 }
 
 const TrendingTopics = () => {
-  const { language } = useLanguage();
   const [cityTags, setCityTags] = useState<TagCount[]>([]);
   const [genreTags, setGenreTags] = useState<TagCount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +67,7 @@ const TrendingTopics = () => {
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="w-4 h-4 text-muted-foreground" />
         <h2 className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          // {language === 'en' ? 'Trending Topics' : 'Temas Tendencia'}
+          // Trending Topics
         </h2>
       </div>
 
@@ -78,7 +76,7 @@ const TrendingTopics = () => {
         {cityTags.length > 0 && (
           <div>
             <h3 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-              {language === 'en' ? 'Cities' : 'Ciudades'}
+              Cities
             </h3>
             <div className="flex flex-wrap gap-2">
               {cityTags.map(({ tag, count }) => (
@@ -99,7 +97,7 @@ const TrendingTopics = () => {
         {genreTags.length > 0 && (
           <div>
             <h3 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-              {language === 'en' ? 'Genres' : 'Géneros'}
+              Genres
             </h3>
             <div className="flex flex-wrap gap-2">
               {genreTags.map(({ tag, count }) => (

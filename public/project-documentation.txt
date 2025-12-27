@@ -653,24 +653,22 @@ NAVIGATION STRUCTURE:
 - Prev/Next: Horizontal navigation on detail pages
 
 ================================================================================
-                            11. INTERNATIONALIZATION
+                            11. LANGUAGE POLICY
 ================================================================================
 
+POLICY: English Only
+
+All user-facing content is in English. The application previously supported 
+Spanish (ES) but has been standardized to English-only as of December 2025.
+
 IMPLEMENTATION:
-- LanguageContext provides current language and translations
-- useLanguage hook for accessing translations
-- t() function for getting translated strings
+- All UI text is in English
+- Knowledge base documents are in English
+- AI chat responses are enforced English-only
+- Data files use English content
 
-SUPPORTED LANGUAGES:
-- English (EN) - Default
-- Spanish (ES)
-
-TRANSLATION COVERAGE:
-- Navigation labels
-- Section headings
-- Button text
-- Form labels
-- Error messages
+Note: Some legacy data structures may retain {en: string} format for 
+backward compatibility, but only the English values are used.
 
 ================================================================================
                             12. AUTHENTICATION

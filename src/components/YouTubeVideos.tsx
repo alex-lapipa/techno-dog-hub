@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Youtube, Play, ExternalLink, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Video {
   id: string;
@@ -17,7 +16,6 @@ interface YouTubeVideosProps {
 }
 
 const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
-  const { language } = useLanguage();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,12 +62,12 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
       <section className="mb-12 border-t border-border pt-8">
         <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
           <Youtube className="w-5 h-5 text-red-500" />
-          {language === 'en' ? 'DJ Sets & Live Performances' : 'Sets de DJ y Actuaciones en Vivo'}
+          DJ Sets & Live Performances
         </h2>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           <span className="ml-3 font-mono text-sm text-muted-foreground">
-            {language === 'en' ? 'Loading videos...' : 'Cargando videos...'}
+            Loading videos...
           </span>
         </div>
       </section>
@@ -84,7 +82,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
     <section className="mb-12 border-t border-border pt-8">
       <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
         <Youtube className="w-5 h-5 text-red-500" />
-        {language === 'en' ? 'DJ Sets & Live Performances' : 'Sets de DJ y Actuaciones en Vivo'}
+        DJ Sets & Live Performances
       </h2>
 
       {/* Embedded Player */}
@@ -103,7 +101,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
             onClick={() => setSelectedVideo(null)}
             className="mt-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            ✕ {language === 'en' ? 'Close player' : 'Cerrar reproductor'}
+            ✕ Close player
           </button>
         </div>
       )}
@@ -131,7 +129,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
               </div>
               <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 text-xs font-mono text-white">
                 <Youtube className="w-3 h-3 inline mr-1" />
-                {language === 'en' ? 'Play' : 'Reproducir'}
+                Play
               </div>
             </div>
 
