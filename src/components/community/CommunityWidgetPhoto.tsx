@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +16,8 @@ import {
   Loader2, 
   CheckCircle2,
   Mail,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ChevronDown
 } from "lucide-react";
 import { z } from "zod";
 
@@ -34,6 +36,7 @@ interface CommunityWidgetPhotoProps {
   title?: string;
   description?: string;
   className?: string;
+  collapsible?: boolean;
   onSuccess?: () => void;
 }
 
@@ -50,12 +53,14 @@ export const CommunityWidgetPhoto = ({
   title = "Share a Photo",
   description = "Help build the archive by sharing your photos",
   className = "",
+  collapsible = false,
   onSuccess,
 }: CommunityWidgetPhotoProps) => {
   const { toast } = useToast();
   const { user, session } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [isOpen, setIsOpen] = useState(!collapsible);
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [email, setEmail] = useState("");
   const [caption, setCaption] = useState("");
@@ -127,7 +132,6 @@ export const CommunityWidgetPhoto = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate
     if (!user && !email) {
       toast({
         title: "Email required",
@@ -180,7 +184,6 @@ export const CommunityWidgetPhoto = ({
     setLoading(true);
 
     try {
-      // If not logged in, need to verify email first
       if (!user) {
         const { error } = await supabase.functions.invoke("community-signup", {
           body: {
@@ -200,7 +203,6 @@ export const CommunityWidgetPhoto = ({
         return;
       }
 
-      // Upload files to storage
       const uploadedUrls: string[] = [];
       
       for (const { file } of files) {
@@ -226,7 +228,6 @@ export const CommunityWidgetPhoto = ({
         uploadedUrls.push(publicUrl);
       }
 
-      // Create submission record
       const { error: submissionError } = await supabase
         .from("community_submissions")
         .insert({
@@ -300,6 +301,153 @@ export const CommunityWidgetPhoto = ({
     );
   }
 
+  const formContent = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Drop zone */}
+      <div
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+        onClick={() => fileInputRef.current?.click()}
+        className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={ALLOWED_TYPES.join(",")}
+          multiple
+          onChange={(e) => handleFileSelect(e.target.files)}
+          className="hidden"
+        />
+        <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">
+          Drop photos here or click to browse
+        </p>
+        <p className="text-xs text-muted-foreground mt-1">
+          JPG, PNG, WebP, GIF • Max 5MB each • Up to {MAX_FILES} files
+        </p>
+      </div>
+
+      {/* Preview grid */}
+      {files.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {files.map((file, index) => (
+            <div key={index} className="relative aspect-square rounded-md overflow-hidden bg-muted">
+              <img
+                src={file.preview}
+                alt={`Preview ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="absolute top-1 right-1 p-1 bg-black/60 rounded-full hover:bg-black/80"
+              >
+                <X className="h-3 w-3 text-white" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Email (only if not logged in) */}
+      {!user && (
+        <div className="space-y-2">
+          <Label htmlFor="email">Email *</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      )}
+
+      {/* Caption */}
+      <div className="space-y-2">
+        <Label htmlFor="caption">Caption (optional)</Label>
+        <Textarea
+          id="caption"
+          placeholder="Add context: event date, location, etc."
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          disabled={loading}
+          rows={2}
+        />
+      </div>
+
+      {/* Credit */}
+      <div className="space-y-2">
+        <Label htmlFor="credit">Photo credit (optional)</Label>
+        <Input
+          id="credit"
+          type="text"
+          placeholder="Your name or @instagram"
+          value={credit}
+          onChange={(e) => setCredit(e.target.value)}
+          disabled={loading}
+        />
+      </div>
+
+      {/* Consent */}
+      <div className="flex items-start space-x-2">
+        <Checkbox
+          id="consent"
+          checked={consent}
+          onCheckedChange={(checked) => setConsent(!!checked)}
+          disabled={loading}
+        />
+        <Label htmlFor="consent" className="text-sm text-muted-foreground leading-tight">
+          I confirm I own rights or have permission to share this content
+        </Label>
+      </div>
+
+      {/* Submit */}
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={loading || files.length === 0 || !consent}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Uploading...
+          </>
+        ) : (
+          <>
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Submit {files.length > 0 ? `${files.length} Photo${files.length > 1 ? "s" : ""}` : "Photos"}
+          </>
+        )}
+      </Button>
+    </form>
+  );
+
+  if (collapsible) {
+    return (
+      <Card className={`border-border/50 ${className}`}>
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-3 cursor-pointer hover:bg-card/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">{title}</CardTitle>
+                </div>
+                <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+              </div>
+              <CardDescription>{description}</CardDescription>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent>{formContent}</CardContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </Card>
+    );
+  }
+
   return (
     <Card className={`border-border/50 ${className}`}>
       <CardHeader className="pb-3">
@@ -309,128 +457,7 @@ export const CommunityWidgetPhoto = ({
         </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Drop zone */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={ALLOWED_TYPES.join(",")}
-              multiple
-              onChange={(e) => handleFileSelect(e.target.files)}
-              className="hidden"
-            />
-            <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
-              Drop photos here or click to browse
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              JPG, PNG, WebP, GIF • Max 5MB each • Up to {MAX_FILES} files
-            </p>
-          </div>
-
-          {/* Preview grid */}
-          {files.length > 0 && (
-            <div className="grid grid-cols-3 gap-2">
-              {files.map((file, index) => (
-                <div key={index} className="relative aspect-square rounded-md overflow-hidden bg-muted">
-                  <img
-                    src={file.preview}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="absolute top-1 right-1 p-1 bg-black/60 rounded-full hover:bg-black/80"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Email (only if not logged in) */}
-          {!user && (
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-          )}
-
-          {/* Caption */}
-          <div className="space-y-2">
-            <Label htmlFor="caption">Caption (optional)</Label>
-            <Textarea
-              id="caption"
-              placeholder="Add context: event date, location, etc."
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              disabled={loading}
-              rows={2}
-            />
-          </div>
-
-          {/* Credit */}
-          <div className="space-y-2">
-            <Label htmlFor="credit">Photo credit (optional)</Label>
-            <Input
-              id="credit"
-              type="text"
-              placeholder="Your name or @instagram"
-              value={credit}
-              onChange={(e) => setCredit(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-
-          {/* Consent */}
-          <div className="flex items-start space-x-2">
-            <Checkbox
-              id="consent"
-              checked={consent}
-              onCheckedChange={(checked) => setConsent(!!checked)}
-              disabled={loading}
-            />
-            <Label htmlFor="consent" className="text-sm text-muted-foreground leading-tight">
-              I confirm I own rights or have permission to share this content
-            </Label>
-          </div>
-
-          {/* Submit */}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={loading || files.length === 0 || !consent}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <ImageIcon className="h-4 w-4 mr-2" />
-                Submit {files.length > 0 ? `${files.length} Photo${files.length > 1 ? "s" : ""}` : "Photos"}
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
+      <CardContent>{formContent}</CardContent>
     </Card>
   );
 };
