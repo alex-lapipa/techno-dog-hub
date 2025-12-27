@@ -118,6 +118,15 @@ export const CommunityWidgetPhoto = ({
     setHasPendingUpload(false);
   };
 
+  // Cleanup blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      files.forEach(({ preview }) => {
+        URL.revokeObjectURL(preview);
+      });
+    };
+  }, []);
+
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
       return `${file.name}: Only JPG, PNG, WebP, and GIF are allowed`;

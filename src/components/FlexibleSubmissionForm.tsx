@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -67,6 +68,9 @@ const submissionSchema = z.object({
     .trim()
     .max(3000, "Additional info must be less than 3000 characters")
     .optional(),
+  consent: z.boolean().refine((val) => val === true, {
+    message: "You must confirm you have rights to share this content",
+  }),
 });
 
 type SubmissionFormData = z.infer<typeof submissionSchema>;
@@ -89,13 +93,14 @@ const FlexibleSubmissionForm = () => {
   const form = useForm<SubmissionFormData>({
     resolver: zodResolver(submissionSchema),
     defaultValues: {
-      email: "",
+      email: user?.email || "",
       submission_type: undefined,
       name: "",
       description: "",
       location: "",
       website_url: "",
       additional_info: "",
+      consent: false,
     },
   });
 
@@ -128,6 +133,8 @@ const FlexibleSubmissionForm = () => {
         website_url: data.website_url || null,
         additional_info: data.additional_info || null,
         file_urls: fileUrls.length > 0 ? fileUrls : null,
+        consent_confirmed: true,
+        consent_text_version: "v1",
       });
 
       if (error) throw error;
@@ -181,7 +188,7 @@ const FlexibleSubmissionForm = () => {
           Share your knowledge
         </h3>
         <p className="font-mono text-xs text-muted-foreground">
-          Everything is optional except your email. Share as much or as little as you want.
+          Everything is optional except your email and consent. Share as much or as little as you want.
         </p>
       </div>
 
@@ -375,6 +382,28 @@ const FlexibleSubmissionForm = () => {
               />
             </CollapsibleContent>
           </Collapsible>
+
+          {/* Consent Checkbox */}
+          <FormField
+            control={form.control}
+            name="consent"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-mono text-xs text-muted-foreground">
+                    I confirm this information is accurate and I have rights to share it *
+                  </FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
 
           {/* Submit */}
           <div className="pt-4 border-t border-border">

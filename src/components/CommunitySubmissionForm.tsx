@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -23,9 +24,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 
 const submissionSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email")
+    .max(255, "Email must be less than 255 characters"),
   submission_type: z.enum(["artist", "venue", "festival", "label", "other"], {
     required_error: "Please select a type",
   }),
@@ -56,6 +63,9 @@ const submissionSchema = z.object({
     .trim()
     .max(1000, "Additional info must be less than 1000 characters")
     .optional(),
+  consent: z.boolean().refine((val) => val === true, {
+    message: "You must confirm you have rights to share this content",
+  }),
 });
 
 type SubmissionFormData = z.infer<typeof submissionSchema>;
@@ -69,12 +79,14 @@ const CommunitySubmissionForm = () => {
   const form = useForm<SubmissionFormData>({
     resolver: zodResolver(submissionSchema),
     defaultValues: {
+      email: user?.email || "",
       submission_type: undefined,
       name: "",
       description: "",
       location: "",
       website_url: "",
       additional_info: "",
+      consent: false,
     },
   });
 
@@ -92,12 +104,15 @@ const CommunitySubmissionForm = () => {
     try {
       const { error } = await supabase.from("community_submissions").insert({
         user_id: user?.id || null,
+        email: data.email,
         submission_type: data.submission_type,
         name: data.name,
         description: data.description || null,
         location: data.location || null,
         website_url: data.website_url || null,
         additional_info: data.additional_info || null,
+        consent_confirmed: true,
+        consent_text_version: "v1",
       });
 
       if (error) throw error;
@@ -154,6 +169,31 @@ const CommunitySubmissionForm = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+          {/* Email - Required */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-mono text-xs uppercase tracking-wider">
+                  Email *
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    placeholder="your@email.com"
+                    className="font-mono"
+                  />
+                </FormControl>
+                <FormDescription className="font-mono text-[10px] text-muted-foreground/60">
+                  We'll only use this to follow up if needed
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Type Selection */}
           <FormField
             control={form.control}
@@ -284,6 +324,28 @@ const CommunitySubmissionForm = () => {
                   />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Consent Checkbox */}
+          <FormField
+            control={form.control}
+            name="consent"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-mono text-xs text-muted-foreground">
+                    I confirm this information is accurate and I have rights to share it *
+                  </FormLabel>
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />

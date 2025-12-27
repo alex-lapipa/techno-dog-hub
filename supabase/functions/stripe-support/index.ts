@@ -1,23 +1,27 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface CheckoutRequest {
-  mode: "one_time" | "recurring" | "corporate";
-  amount_cents: number;
-  email?: string;
-  tier?: string;
-  company_name?: string;
-  vat_number?: string;
-  notes?: string;
-  success_url?: string;
-  cancel_url?: string;
-}
+// Validation schemas
+const checkoutRequestSchema = z.object({
+  mode: z.enum(["one_time", "recurring", "corporate"]),
+  amount_cents: z.number().int().min(100, "Minimum amount is €1 (100 cents)"),
+  email: z.string().email("Invalid email address").max(255).optional(),
+  tier: z.string().max(50).optional(),
+  company_name: z.string().max(200).optional(),
+  vat_number: z.string().max(50).optional(),
+  notes: z.string().max(1000).optional(),
+  success_url: z.string().url().optional(),
+  cancel_url: z.string().url().optional(),
+});
+
+type CheckoutRequest = z.infer<typeof checkoutRequestSchema>;
 
 const TIER_THRESHOLDS = {
   member: 700, // €7/month
@@ -66,7 +70,20 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const body: CheckoutRequest = await req.json();
+    // Parse and validate request body
+    const rawBody = await req.json();
+    const validationResult = checkoutRequestSchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      console.error("[stripe-support] Validation error:", validationResult.error.errors);
+      return new Response(
+        JSON.stringify({ 
+          error: validationResult.error.errors[0]?.message || "Invalid request data" 
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const {
       mode,
       amount_cents,
@@ -77,19 +94,17 @@ serve(async (req) => {
       notes,
       success_url = `${req.headers.get("origin")}/support?success=true`,
       cancel_url = `${req.headers.get("origin")}/support?cancelled=true`,
-    } = body;
+    } = validationResult.data;
 
-    console.log(`Creating ${mode} checkout for ${amount_cents} cents`);
-
-    // Validate amount
-    if (!amount_cents || amount_cents < 100) {
-      throw new Error("Minimum amount is €1 (100 cents)");
-    }
+    console.log(`[stripe-support] Creating ${mode} checkout for ${amount_cents} cents`);
 
     // Handle corporate sponsor request (no Stripe checkout, just log request)
     if (mode === "corporate") {
       if (!company_name || !email) {
-        throw new Error("Company name and email required for corporate sponsorship");
+        return new Response(
+          JSON.stringify({ error: "Company name and email required for corporate sponsorship" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
 
       const determinedTier = tier || determineTier(mode, amount_cents);
@@ -108,11 +123,11 @@ serve(async (req) => {
         .single();
 
       if (error) {
-        console.error("Error creating corporate request:", error);
+        console.error("[stripe-support] Error creating corporate request:", error);
         throw new Error("Failed to submit corporate request");
       }
 
-      console.log("Corporate sponsor request created:", data.id);
+      console.log(`[stripe-support] Corporate sponsor request created: ${data.id}`);
 
       return new Response(
         JSON.stringify({
@@ -136,7 +151,7 @@ serve(async (req) => {
           email,
           metadata: {
             project: "techno.dog",
-            operator: "Miramonte Somió SL",
+            operator: "Miramonte Somío SL",
             commercial_name: "Project La PIPA",
           },
         });
@@ -149,7 +164,7 @@ serve(async (req) => {
     // Common metadata for all sessions
     const metadata: Record<string, string> = {
       project: "techno.dog",
-      operator: "Miramonte Somió SL",
+      operator: "Miramonte Somío SL",
       commercial_name: "Project La PIPA",
       support_mode: mode,
       supporter_tier: determinedTier,
@@ -214,7 +229,7 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    console.log(`Checkout session created: ${session.id}`);
+    console.log(`[stripe-support] Checkout session created: ${session.id}`);
 
     return new Response(
       JSON.stringify({
@@ -227,7 +242,7 @@ serve(async (req) => {
     );
   } catch (error: unknown) {
     const err = error as Error;
-    console.error("Stripe support error:", err);
+    console.error("[stripe-support] Error:", err);
     return new Response(
       JSON.stringify({ error: err.message }),
       {
