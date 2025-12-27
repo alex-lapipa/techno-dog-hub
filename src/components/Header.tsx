@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, Shield, Heart, Code, ShoppingBag } from "lucide-react";
+import { ChevronDown, Menu, Shield, Heart, Code, ShoppingBag, Radio } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
@@ -128,6 +128,12 @@ const Header = () => {
                 Support
               </Button>
             </Link>
+            <Link to="/sound-machine">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-foreground border border-foreground/50 bg-foreground/10 hover:bg-foreground/20 hover:border-foreground px-2.5 py-1.5 h-auto">
+                <Radio className="w-3 h-3 mr-1.5" />
+                T:DOG
+              </Button>
+            </Link>
             <Link to="/admin">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
                 <Shield className="w-3.5 h-3.5 mr-1.5" />
@@ -191,6 +197,12 @@ const Header = () => {
                       <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider text-crimson border-crimson/50 hover:bg-crimson/10">
                         <Heart className="w-3.5 h-3.5 mr-1.5" />
                         Support
+                      </Button>
+                    </Link>
+                    <Link to="/sound-machine" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider border-foreground/50 hover:bg-foreground/10">
+                        <Radio className="w-3.5 h-3.5 mr-1.5" />
+                        T:DOG
                       </Button>
                     </Link>
                     <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
