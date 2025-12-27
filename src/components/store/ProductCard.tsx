@@ -44,10 +44,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link 
       to={`/store/product/${product.handle}`}
-      className="group block border border-border bg-card hover:border-foreground/30 transition-all duration-300"
+      className="group block bg-card hover:border-foreground/30 transition-all duration-300"
     >
       {/* Image */}
-      <div className="aspect-square bg-muted relative overflow-hidden">
+      <div className="aspect-square relative overflow-hidden">
         {firstImage ? (
           <GlitchImage
             src={firstImage.url}
@@ -55,7 +55,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             className="w-full h-full"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center bg-zinc-800">
             <span className="font-mono text-xs text-muted-foreground uppercase">
               No image
             </span>
@@ -66,7 +66,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <Button
           variant="default"
           size="sm"
-          className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[10px] uppercase tracking-wider"
+          className="absolute bottom-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity font-mono text-[10px] uppercase tracking-wider"
           onClick={handleAddToCart}
         >
           <Plus className="w-3 h-3 mr-1" />
