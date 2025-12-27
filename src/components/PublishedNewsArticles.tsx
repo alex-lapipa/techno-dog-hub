@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 
 interface NewsArticle {
@@ -19,7 +18,6 @@ interface NewsArticle {
 }
 
 const PublishedNewsArticles = () => {
-  const { language } = useLanguage();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,22 +44,22 @@ const PublishedNewsArticles = () => {
   if (loading) {
     return (
       <div className="py-8 text-center text-muted-foreground font-mono text-sm">
-        {language === 'en' ? 'Loading articles...' : 'Cargando artículos...'}
+        Loading articles...
       </div>
     );
   }
 
   if (articles.length === 0) {
-    return null; // Don't render if no published articles
+    return null;
   }
 
   const featured = articles.slice(0, 2);
   const regular = articles.slice(2);
 
   const getCategoryFromTags = (article: NewsArticle): string => {
-    if (article.genre_tags?.includes('interview')) return language === 'en' ? 'INTERVIEW' : 'ENTREVISTA';
-    if (article.city_tags?.length > 0) return language === 'en' ? 'SCENE' : 'ESCENA';
-    return language === 'en' ? 'NEWS' : 'NOTICIAS';
+    if (article.genre_tags?.includes('interview')) return 'INTERVIEW';
+    if (article.city_tags?.length > 0) return 'SCENE';
+    return 'NEWS';
   };
 
   const getExcerpt = (markdown: string, maxLength = 200): string => {
@@ -83,7 +81,7 @@ const PublishedNewsArticles = () => {
       {/* Section Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-          // {language === 'en' ? 'Community-Agent generated stories' : 'Historias generadas por comunidad-agente'}
+          // Community-Agent generated stories
         </div>
       </div>
 
@@ -117,7 +115,7 @@ const PublishedNewsArticles = () => {
               </p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground">
-                  <span>{language === 'en' ? 'Read' : 'Leer'}</span>
+                  <span>Read</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
                 <span className="font-mono text-xs text-muted-foreground">
