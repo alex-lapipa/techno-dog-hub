@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
+import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
 
 const AdminLoginForm = () => {
   const [password, setPassword] = useState("");
@@ -258,24 +259,30 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Quick Stats */}
-      <div className="border border-border bg-card p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Settings className="w-4 h-4 text-muted-foreground" />
-          <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-            Quick Info
-          </h3>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 border border-border/50">
-            <div className="font-mono text-2xl text-logo-green">●</div>
-            <div className="font-mono text-[10px] text-muted-foreground uppercase mt-1">
-              System Online
-            </div>
+      {/* Activity Feed & Quick Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Real-time Activity Feed */}
+        <RealtimeActivityFeed />
+
+        {/* Quick Stats */}
+        <div className="border border-border bg-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Settings className="w-4 h-4 text-muted-foreground" />
+            <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              Quick Info
+            </h3>
           </div>
-          <div className="text-center p-4 border border-border/50">
-            <div className="font-mono text-xs text-muted-foreground">
-              Session active for 24h
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-4 border border-border/50">
+              <div className="font-mono text-2xl text-logo-green">●</div>
+              <div className="font-mono text-[10px] text-muted-foreground uppercase mt-1">
+                System Online
+              </div>
+            </div>
+            <div className="text-center p-4 border border-border/50">
+              <div className="font-mono text-xs text-muted-foreground">
+                Session active for 24h
+              </div>
             </div>
           </div>
         </div>
