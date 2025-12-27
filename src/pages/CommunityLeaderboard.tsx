@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { 
@@ -17,8 +18,12 @@ import {
   CheckCircle2,
   Camera,
   FileText,
-  ArrowLeft
+  ArrowLeft,
+  Calendar
 } from "lucide-react";
+import { subDays, subMonths, startOfDay } from "date-fns";
+
+type TimeFilter = "all" | "weekly" | "monthly";
 
 interface LeaderboardEntry {
   id: string;
@@ -35,15 +40,31 @@ const CommunityLeaderboard = () => {
   const { language } = useLanguage();
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [stats, setStats] = useState({
     totalContributors: 0,
     totalApproved: 0,
     topScore: 0,
   });
 
+  const getDateFilter = (filter: TimeFilter): Date | null => {
+    const now = new Date();
+    switch (filter) {
+      case "weekly":
+        return startOfDay(subDays(now, 7));
+      case "monthly":
+        return startOfDay(subMonths(now, 1));
+      default:
+        return null;
+    }
+  };
+
   useEffect(() => {
     const loadLeaderboard = async () => {
+      setLoading(true);
       try {
+        const dateFilter = getDateFilter(timeFilter);
+
         // Get verified community profiles with trust scores
         const { data: profiles, error: profilesError } = await supabase
           .from("community_profiles")
@@ -55,11 +76,17 @@ const CommunityLeaderboard = () => {
 
         if (profilesError) throw profilesError;
 
-        // Get approved submission counts per email
-        const { data: submissions, error: submissionsError } = await supabase
+        // Get approved submissions with optional date filter
+        let submissionsQuery = supabase
           .from("community_submissions")
-          .select("email")
+          .select("email, reviewed_at")
           .eq("status", "approved");
+
+        if (dateFilter) {
+          submissionsQuery = submissionsQuery.gte("reviewed_at", dateFilter.toISOString());
+        }
+
+        const { data: submissions, error: submissionsError } = await submissionsQuery;
 
         if (submissionsError) throw submissionsError;
 
@@ -84,11 +111,18 @@ const CommunityLeaderboard = () => {
           return scoreB - scoreA;
         });
 
-        setLeaders(leaderboardData.slice(0, 25));
+        // For time-filtered views, only show those with recent activity
+        const filteredData = dateFilter 
+          ? leaderboardData.filter(entry => entry.approved_count > 0)
+          : leaderboardData;
+
+        setLeaders(filteredData.slice(0, 25));
 
         // Calculate stats
         setStats({
-          totalContributors: profiles?.length || 0,
+          totalContributors: dateFilter 
+            ? filteredData.filter(e => e.approved_count > 0).length 
+            : profiles?.length || 0,
           totalApproved: submissions?.length || 0,
           topScore: profiles?.[0]?.trust_score || 0,
         });
@@ -100,7 +134,7 @@ const CommunityLeaderboard = () => {
     };
 
     loadLeaderboard();
-  }, []);
+  }, [timeFilter]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -153,6 +187,12 @@ const CommunityLeaderboard = () => {
         location: "Location",
       },
       empty: "No contributors yet. Be the first!",
+      filters: {
+        all: "All Time",
+        weekly: "This Week",
+        monthly: "This Month",
+      },
+      periodLabel: "Period",
     },
     es: {
       title: "Tabla de Líderes",
@@ -171,6 +211,12 @@ const CommunityLeaderboard = () => {
         location: "Ubicación",
       },
       empty: "Sin contribuyentes aún. ¡Sé el primero!",
+      filters: {
+        all: "Todo el tiempo",
+        weekly: "Esta Semana",
+        monthly: "Este Mes",
+      },
+      periodLabel: "Período",
     },
   };
 
@@ -258,12 +304,37 @@ const CommunityLeaderboard = () => {
             </Card>
           </div>
 
+          {/* Time Filter */}
+          <div className="flex items-center justify-center mb-8">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground font-mono">{t.periodLabel}:</span>
+              <Tabs value={timeFilter} onValueChange={(v) => setTimeFilter(v as TimeFilter)}>
+                <TabsList className="bg-card border border-border">
+                  <TabsTrigger value="all" className="font-mono text-xs">
+                    {t.filters.all}
+                  </TabsTrigger>
+                  <TabsTrigger value="weekly" className="font-mono text-xs">
+                    {t.filters.weekly}
+                  </TabsTrigger>
+                  <TabsTrigger value="monthly" className="font-mono text-xs">
+                    {t.filters.monthly}
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          </div>
+
           {/* Leaderboard */}
           <Card className="border-border/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-primary" />
-                Top 25 Contributors
+                {timeFilter === "all" 
+                  ? "Top 25 Contributors" 
+                  : timeFilter === "weekly" 
+                    ? (language === "en" ? "Top Contributors This Week" : "Mejores Contribuyentes Esta Semana")
+                    : (language === "en" ? "Top Contributors This Month" : "Mejores Contribuyentes Este Mes")}
               </CardTitle>
             </CardHeader>
             <CardContent>
