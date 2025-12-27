@@ -75,13 +75,12 @@ serve(async (req) => {
       throw new Error('Query is required');
     }
 
-    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    if (!GROQ_API_KEY) {
-      throw new Error('GROQ_API_KEY is not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
@@ -105,11 +104,8 @@ serve(async (req) => {
     }> | null = null;
 
     // Generate embedding for vector searches
-    let queryEmbedding: number[] | null = null;
-    if (LOVABLE_API_KEY) {
-      console.log('Generating embedding for query:', query);
-      queryEmbedding = await generateEmbedding(query, LOVABLE_API_KEY);
-    }
+    console.log('Generating embedding for query:', query);
+    const queryEmbedding = await generateEmbedding(query, LOVABLE_API_KEY);
 
     // Search DJ artists using vector similarity
     if (queryEmbedding) {
@@ -223,30 +219,29 @@ If asked about rankings, tiers, or comparisons, base your answers on the provide
 CONTEXT:
 ${combinedContext || 'No relevant data found. Respond based on general techno knowledge.'}`;
 
-    console.log('Calling Groq API with model: llama-3.1-70b-versatile');
+    console.log('Calling Lovable AI with model: google/gemini-2.5-flash');
 
-    // Generate response with Groq AI
-    const aiResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    // Generate response with Lovable AI
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: query }
         ],
         stream: stream,
-        temperature: 0.7,
         max_tokens: 1024
       }),
     });
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
-      console.error('Groq API error:', aiResponse.status, errText);
+      console.error('Lovable AI error:', aiResponse.status, errText);
       
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
@@ -254,13 +249,13 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (aiResponse.status === 401) {
-        return new Response(JSON.stringify({ error: 'Invalid API key. Please check your Groq API key.' }), {
-          status: 401,
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }), {
+          status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      throw new Error(`Groq API request failed: ${errText}`);
+      throw new Error(`AI API request failed: ${errText}`);
     }
 
     if (stream) {
