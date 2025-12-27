@@ -22,7 +22,8 @@ import {
   Shield,
   Loader2,
   LogOut,
-  User
+  User,
+  BookOpen
 } from "lucide-react";
 
 const Community = () => {
@@ -244,6 +245,14 @@ const Community = () => {
                     >
                       <Key className="h-4 w-4 mr-2" />
                       API Keys
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => navigate("/community/docs")}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Community Docs
                     </Button>
                     <Button 
                       variant="ghost" 
