@@ -1,13 +1,21 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
-import { useState, useEffect } from "react";
-import { ChevronDown, Menu, Shield, Heart, Code, ShoppingBag, Radio } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, Shield, Heart, Code, ShoppingBag, Radio } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+// Scenes group: Festivals, Venues, Crews with horizontal navigation
+const SCENES_ITEMS = [
+  { label: 'Festivals', path: '/festivals' },
+  { label: 'Venues', path: '/venues' },
+  { label: 'Crews', path: '/crews' },
+];
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { trackNavigation } = useAnalytics();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,11 +38,14 @@ const Header = () => {
         { label: 'Your Stories', path: '/news/your-stories' },
       ]
     },
-    { label: 'Festivals', path: '/festivals' },
-    { label: 'Venues', path: '/venues' },
+    { 
+      label: 'Scenes', 
+      path: '/scenes',
+      isScenes: true,
+      sub: SCENES_ITEMS
+    },
     { label: 'Artists', path: '/artists' },
     { label: 'Labels', path: '/labels' },
-    { label: 'Crews', path: '/crews' },
     { label: 'Releases', path: '/releases' },
     { label: 'Gear', path: '/gear' },
     { label: 'Technopedia', path: '/technopedia' },
@@ -49,64 +60,144 @@ const Header = () => {
     return location.pathname === path;
   };
 
-  return (
-    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
-      scrolled ? 'bg-background shadow-lg' : 'bg-background/80 backdrop-blur-sm'
-    }`}>
-      <div className="container mx-auto px-4 md:px-6">
-        <nav className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <HexagonLogo className="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(100_100%_60%/0.8)]" />
-            <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
-              techno.dog
-            </span>
-          </Link>
+  // Check if any scene item is active
+  const isScenesActive = SCENES_ITEMS.some(item => isActive(item.path));
+  
+  // Get current scene index for navigation arrows
+  const getCurrentSceneIndex = useCallback(() => {
+    return SCENES_ITEMS.findIndex(item => isActive(item.path));
+  }, [location.pathname]);
 
-          {/* Navigation */}
-          <div className="hidden lg:flex items-center gap-0.5">
-            {navItems.map((item) => (
-              <div
-                key={item.path}
-                className="relative"
-                onMouseEnter={() => setActiveDropdown(item.path)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <Link
-                  to={item.path}
-                  onClick={() => trackNavigation(location.pathname, item.path)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
-                    isActive(item.path) 
-                      ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
-                      : 'text-muted-foreground hover:text-logo-green'
-                  }`}
+  const navigateScene = useCallback((direction: 'prev' | 'next') => {
+    const currentIndex = getCurrentSceneIndex();
+    let newIndex: number;
+    
+    if (currentIndex === -1) {
+      newIndex = direction === 'next' ? 0 : SCENES_ITEMS.length - 1;
+    } else {
+      newIndex = direction === 'next' 
+        ? (currentIndex + 1) % SCENES_ITEMS.length
+        : (currentIndex - 1 + SCENES_ITEMS.length) % SCENES_ITEMS.length;
+    }
+    
+    const targetPath = SCENES_ITEMS[newIndex].path;
+    trackNavigation(location.pathname, targetPath);
+    navigate(targetPath);
+  }, [getCurrentSceneIndex, navigate, trackNavigation, location.pathname]);
+
+  // Show floating arrows when on a scenes page
+  const showSceneArrows = isScenesActive;
+
+  return (
+    <>
+      {/* Floating Scene Navigation Arrows */}
+      {showSceneArrows && (
+        <>
+          <button
+            onClick={() => navigateScene('prev')}
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-40 p-3 bg-background/90 border border-border hover:border-logo-green hover:bg-card transition-all group"
+            aria-label="Previous scene"
+          >
+            <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+          </button>
+          <button
+            onClick={() => navigateScene('next')}
+            className="fixed right-4 top-1/2 -translate-y-1/2 z-40 p-3 bg-background/90 border border-border hover:border-logo-green hover:bg-card transition-all group"
+            aria-label="Next scene"
+          >
+            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+          </button>
+        </>
+      )}
+
+      <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
+        scrolled ? 'bg-background shadow-lg' : 'bg-background/80 backdrop-blur-sm'
+      }`}>
+        <div className="container mx-auto px-4 md:px-6">
+          <nav className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group shrink-0">
+              <HexagonLogo className="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(100_100%_60%/0.8)]" />
+              <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
+                techno.dog
+              </span>
+            </Link>
+
+            {/* Navigation */}
+            <div className="hidden lg:flex items-center gap-0.5">
+              {navItems.map((item) => (
+                <div
+                  key={item.path}
+                  className="relative"
+                  onMouseEnter={() => setActiveDropdown(item.path)}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  {item.label}
-                  {item.sub && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
-                </Link>
-                
-                {/* Dropdown */}
-                {item.sub && activeDropdown === item.path && (
-                  <div className="absolute top-full left-0 mt-0 py-1.5 bg-background border border-border min-w-[160px] z-50 shadow-lg">
-                    {item.sub.map((subItem) => (
-                      <Link
-                        key={subItem.path}
-                        to={subItem.path}
-                        onClick={() => trackNavigation(location.pathname, subItem.path)}
-                        className={`block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
-                          isSubItemActive(subItem.path) 
-                            ? 'text-logo-green bg-card border-l-2 border-logo-green' 
-                            : 'text-muted-foreground hover:text-logo-green hover:bg-card'
-                        }`}
-                      >
-                        {subItem.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  {item.isScenes ? (
+                    // Scenes dropdown trigger (not a link itself)
+                    <button
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
+                        isScenesActive 
+                          ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
+                          : 'text-muted-foreground hover:text-logo-green'
+                      }`}
+                    >
+                      {item.label}
+                      <ChevronDown className="w-2.5 h-2.5 opacity-60" />
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      onClick={() => trackNavigation(location.pathname, item.path)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
+                        isActive(item.path) 
+                          ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
+                          : 'text-muted-foreground hover:text-logo-green'
+                      }`}
+                    >
+                      {item.label}
+                      {item.sub && !item.isScenes && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
+                    </Link>
+                  )}
+                  
+                  {/* Dropdown */}
+                  {item.sub && activeDropdown === item.path && (
+                    <div className="absolute top-full left-0 mt-0 py-1.5 bg-background border border-border min-w-[160px] z-50 shadow-lg">
+                      {item.isScenes && (
+                        <div className="flex items-center justify-between px-3 py-1 border-b border-border mb-1">
+                          <button 
+                            onClick={() => navigateScene('prev')}
+                            className="p-1 hover:text-logo-green transition-colors"
+                          >
+                            <ChevronLeft className="w-3 h-3" />
+                          </button>
+                          <span className="text-[9px] font-mono uppercase text-muted-foreground">Navigate</span>
+                          <button 
+                            onClick={() => navigateScene('next')}
+                            className="p-1 hover:text-logo-green transition-colors"
+                          >
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      {item.sub.map((subItem) => (
+                        <Link
+                          key={subItem.path}
+                          to={subItem.path}
+                          onClick={() => trackNavigation(location.pathname, subItem.path)}
+                          className={`block px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                            isSubItemActive(subItem.path) || isActive(subItem.path)
+                              ? 'text-logo-green bg-card border-l-2 border-logo-green' 
+                              : 'text-muted-foreground hover:text-logo-green hover:bg-card'
+                          }`}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -219,6 +310,7 @@ const Header = () => {
         </nav>
       </div>
     </header>
+    </>
   );
 };
 
