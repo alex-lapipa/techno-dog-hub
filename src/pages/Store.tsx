@@ -324,6 +324,33 @@ const Store = () => {
           </div>
         </section>
 
+        {/* Lookbook CTA */}
+        <section className="border-b border-border bg-gradient-to-br from-background via-background to-logo-green/5">
+          <div className="container mx-auto px-4 md:px-8 py-12">
+            <Link 
+              to="/store/lookbook" 
+              className="group block p-8 border border-logo-green/30 hover:border-logo-green/60 transition-all bg-gradient-to-r from-logo-green/5 to-transparent"
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest">
+                    // Lookbook
+                  </span>
+                  <h3 className="font-mono text-xl uppercase tracking-tight mt-2 group-hover:text-logo-green transition-colors">
+                    From the warehouse floor
+                  </h3>
+                  <p className="font-mono text-xs text-muted-foreground mt-2">
+                    See our pieces in their natural habitat — clubs, festivals, and studios.
+                  </p>
+                </div>
+                <div className="font-mono text-xs text-logo-green group-hover:translate-x-1 transition-transform">
+                  View Lookbook →
+                </div>
+              </div>
+            </Link>
+          </div>
+        </section>
+
         {/* Info Links */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
