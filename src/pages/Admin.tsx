@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot } from "lucide-react";
+import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLoginForm = () => {
@@ -105,6 +105,14 @@ const AdminDashboard = () => {
       description: "Claude + GPT orchestration: Review → Implement → Validate",
       icon: Bot,
       path: "/admin/control-center",
+      count: null,
+      highlight: true,
+    },
+    {
+      title: "System Health",
+      description: "Real-time status of edge functions, DB, and APIs",
+      icon: Activity,
+      path: "/admin/health",
       count: null,
       highlight: true,
     },
