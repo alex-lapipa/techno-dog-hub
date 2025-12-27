@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 type TrackName = "KICK" | "SNARE" | "CLAP" | "CH" | "OH" | "PERC" | "TOM" | "ACID";
 
@@ -12,6 +13,12 @@ interface Track {
   name: TrackName;
   steps: boolean[];
   color: string;
+}
+
+interface TrackParams {
+  decay: number;
+  tone: number;
+  level: number;
 }
 
 const PRESETS = {
@@ -69,21 +76,34 @@ const PRESETS = {
 
 const AI_TAGS = ["dark", "berlin", "techno", "detroit soul", "warehouse", "minimal", "hypnotic loop", "industrial", "hard"];
 
+const DEFAULT_TRACK_PARAMS: Record<TrackName, TrackParams> = {
+  KICK: { decay: 50, tone: 50, level: 80 },
+  SNARE: { decay: 40, tone: 60, level: 75 },
+  CLAP: { decay: 35, tone: 50, level: 70 },
+  CH: { decay: 20, tone: 70, level: 60 },
+  OH: { decay: 60, tone: 70, level: 55 },
+  PERC: { decay: 30, tone: 80, level: 65 },
+  TOM: { decay: 55, tone: 40, level: 70 },
+  ACID: { decay: 70, tone: 50, level: 75 },
+};
+
 const SoundMachine = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(130);
   const [currentStep, setCurrentStep] = useState(0);
-  const [drive, setDrive] = useState(50);
-  const [cutoff, setCutoff] = useState(70);
+  const [drive, setDrive] = useState(20);
+  const [cutoff, setCutoff] = useState(80);
   const [reso, setReso] = useState(30);
   const [swing, setSwing] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>(["dark", "techno"]);
   const [selectedTrack, setSelectedTrack] = useState<TrackName>("KICK");
-  const [kickDecay, setKickDecay] = useState(50);
-  const [kickTone, setKickTone] = useState(50);
-  const [kickLevel, setKickLevel] = useState(80);
+  const [trackParams, setTrackParams] = useState<Record<TrackName, TrackParams>>(DEFAULT_TRACK_PARAMS);
+  const [audioInitialized, setAudioInitialized] = useState(false);
   
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
+  const tracksRef = useRef<Track[]>([]);
+  
+  const { initAudio, playSound, updateMasterEffects } = useSoundEngine();
 
   const [tracks, setTracks] = useState<Track[]>([
     { name: "KICK", steps: Array(16).fill(false), color: "hsl(var(--crimson))" },
@@ -95,6 +115,18 @@ const SoundMachine = () => {
     { name: "TOM", steps: Array(16).fill(false), color: "hsl(160 100% 50%)" },
     { name: "ACID", steps: Array(16).fill(false), color: "hsl(60 100% 50%)" },
   ]);
+
+  // Keep tracksRef in sync
+  useEffect(() => {
+    tracksRef.current = tracks;
+  }, [tracks]);
+
+  // Update master effects when sliders change
+  useEffect(() => {
+    if (audioInitialized) {
+      updateMasterEffects(drive, cutoff, reso);
+    }
+  }, [drive, cutoff, reso, audioInitialized, updateMasterEffects]);
 
   const toggleStep = useCallback((trackIndex: number, stepIndex: number) => {
     setTracks(prev => prev.map((track, i) => 
@@ -118,6 +150,7 @@ const SoundMachine = () => {
       steps: Array(16).fill(false)
     })));
     setCurrentStep(0);
+    setIsPlaying(false);
   }, []);
 
   const toggleTag = useCallback((tag: string) => {
@@ -129,29 +162,80 @@ const SoundMachine = () => {
   }, []);
 
   const generatePattern = useCallback(() => {
-    // Simple AI generation based on selected tags
     const presetKeys = Object.keys(PRESETS) as (keyof typeof PRESETS)[];
     const randomPreset = presetKeys[Math.floor(Math.random() * presetKeys.length)];
     loadPreset(randomPreset);
   }, [loadPreset]);
 
+  const handlePlay = useCallback(() => {
+    if (!audioInitialized) {
+      initAudio();
+      setAudioInitialized(true);
+    }
+    setIsPlaying(prev => !prev);
+  }, [audioInitialized, initAudio]);
+
+  // Sequencer loop with audio playback
   useEffect(() => {
     if (isPlaying) {
       const stepDuration = (60 / bpm / 4) * 1000;
-      intervalRef.current = setInterval(() => {
-        setCurrentStep(prev => (prev + 1) % 16);
-      }, stepDuration);
+      
+      const tick = () => {
+        setCurrentStep(prev => {
+          const nextStep = (prev + 1) % 16;
+          
+          // Play sounds for active steps
+          tracksRef.current.forEach(track => {
+            if (track.steps[nextStep]) {
+              playSound(track.name, trackParams[track.name]);
+            }
+          });
+          
+          return nextStep;
+        });
+      };
+      
+      // Play sounds for initial step
+      tracksRef.current.forEach(track => {
+        if (track.steps[currentStep]) {
+          playSound(track.name, trackParams[track.name]);
+        }
+      });
+      
+      intervalRef.current = window.setInterval(tick, stepDuration);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     }
+    
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isPlaying, bpm]);
+  }, [isPlaying, bpm, playSound, trackParams]);
+
+  // Update track params
+  const updateTrackParam = useCallback((param: keyof TrackParams, value: number) => {
+    setTrackParams(prev => ({
+      ...prev,
+      [selectedTrack]: {
+        ...prev[selectedTrack],
+        [param]: value
+      }
+    }));
+  }, [selectedTrack]);
+
+  // Preview sound on track select
+  const handleTrackSelect = useCallback((trackName: TrackName) => {
+    setSelectedTrack(trackName);
+    if (audioInitialized) {
+      playSound(trackName, trackParams[trackName]);
+    }
+  }, [audioInitialized, playSound, trackParams]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -211,7 +295,7 @@ const SoundMachine = () => {
             {/* Transport */}
             <div className="flex items-center gap-2">
               <Button
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlay}
                 className={`w-20 h-10 font-mono text-xs uppercase ${
                   isPlaying 
                     ? "bg-crimson/20 border border-crimson text-crimson hover:bg-crimson/30" 
@@ -301,7 +385,7 @@ const SoundMachine = () => {
             {tracks.map((track, trackIndex) => (
               <div key={track.name} className="flex items-center mb-2 last:mb-0">
                 <button
-                  onClick={() => setSelectedTrack(track.name)}
+                  onClick={() => handleTrackSelect(track.name)}
                   className={`w-16 shrink-0 font-mono text-[10px] uppercase tracking-wider py-2 text-left transition-colors ${
                     selectedTrack === track.name ? "text-logo-green" : "text-muted-foreground hover:text-foreground"
                   }`}
@@ -343,18 +427,18 @@ const SoundMachine = () => {
             </div>
             <div className="grid grid-cols-3 gap-6">
               {[
-                { label: "Decay", value: kickDecay, setter: setKickDecay },
-                { label: "Tone", value: kickTone, setter: setKickTone },
-                { label: "Level", value: kickLevel, setter: setKickLevel },
-              ].map(({ label, value, setter }) => (
+                { label: "Decay", param: "decay" as const },
+                { label: "Tone", param: "tone" as const },
+                { label: "Level", param: "level" as const },
+              ].map(({ label, param }) => (
                 <div key={label} className="flex flex-col gap-2">
                   <div className="flex justify-between">
                     <span className="font-mono text-[10px] uppercase text-muted-foreground">{label}</span>
-                    <span className="font-mono text-[10px] text-logo-green">{value}</span>
+                    <span className="font-mono text-[10px] text-logo-green">{trackParams[selectedTrack][param]}</span>
                   </div>
                   <Slider
-                    value={[value]}
-                    onValueChange={([v]) => setter(v)}
+                    value={[trackParams[selectedTrack][param]]}
+                    onValueChange={([v]) => updateTrackParam(param, v)}
                     max={100}
                     className="w-full"
                   />
@@ -366,7 +450,7 @@ const SoundMachine = () => {
           {/* Footer Note */}
           <div className="text-center mt-8">
             <p className="font-mono text-[10px] text-muted-foreground/60 tracking-wider">
-              Visual sequencer interface • Audio synthesis coming soon via Web Audio API
+              Web Audio API synthesis • Click a track name to preview its sound
             </p>
           </div>
         </div>
