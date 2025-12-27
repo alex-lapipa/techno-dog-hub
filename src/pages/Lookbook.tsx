@@ -271,6 +271,13 @@ const lookbookImages = [
     handle: "eulogio-techno-dog-hoodie",
     setting: "Dancefloor",
   },
+  {
+    src: "/src/assets/products/lifestyle-eulogio-tshirt-rave.jpg",
+    alt: "Man dancing in Eulogio T-shirt at warehouse rave",
+    product: "Eulogio × techno.dog Tee",
+    handle: "eulogio-techno-dog-tee",
+    setting: "Warehouse Rave",
+  },
 ];
 
 // Import lifestyle images for bundling
@@ -314,6 +321,7 @@ import lifestyleEulogioHoodieSunrise from "@/assets/products/lifestyle-eulogio-h
 import lifestyleEulogioCapDj from "@/assets/products/lifestyle-eulogio-cap-dj.jpg";
 import lifestyleEulogioCrewFestival from "@/assets/products/lifestyle-eulogio-crew-festival.jpg";
 import lifestyleEulogioHoodieDance from "@/assets/products/lifestyle-eulogio-hoodie-dance.jpg";
+import lifestyleEulogioTshirtRave from "@/assets/products/lifestyle-eulogio-tshirt-rave.jpg";
 
 const imageImports = [
   lifestyleWarehouse,
@@ -356,6 +364,7 @@ const imageImports = [
   lifestyleEulogioCapDj,
   lifestyleEulogioCrewFestival,
   lifestyleEulogioHoodieDance,
+  lifestyleEulogioTshirtRave,
 ];
 
 const Lookbook = () => {
