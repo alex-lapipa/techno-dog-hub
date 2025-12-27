@@ -740,7 +740,101 @@ ENVIRONMENT:
 - VITE_SUPABASE_URL
 - VITE_SUPABASE_PUBLISHABLE_KEY
 - VITE_SUPABASE_PROJECT_ID
-- LOVABLE_API_KEY (Edge Functions)
+
+================================================================================
+                    15. API SELECTION & INTEGRATION GUIDE
+================================================================================
+
+CORE PRINCIPLE: Intelligent API Selection
+-----------------------------------------
+This project uses multiple AI and service APIs. Always select the BEST tool 
+for each specific task rather than defaulting to any single provider.
+
+AVAILABLE API SECRETS:
+----------------------
+1. LOVABLE_API_KEY   - Lovable AI Gateway (chat/text generation)
+2. OPENAI_API_KEY    - OpenAI Direct (embeddings, images, audio)
+3. ANTHROPIC_API_KEY - Claude (long documents, complex reasoning)
+4. GEMINI_API_KEY    - Google Gemini Direct
+5. GROQ_API_KEY      - Groq (ultra-fast inference)
+6. XAI_KEY           - xAI / Grok
+7. FIRECRAWL_API_KEY - Web scraping
+8. YOUTUBE_API_KEY   - YouTube Data API
+9. RESEND_API_KEY    - Email delivery
+
+API SELECTION DECISION TREE:
+----------------------------
+TASK: Generate embeddings?
+  └─> USE: OPENAI_API_KEY (Lovable AI doesn't support embeddings)
+
+TASK: Chat completion / text generation?
+  └─> Is speed critical (real-time)?
+      └─> YES: Consider GROQ_API_KEY
+      └─> NO: USE: LOVABLE_API_KEY (default: gemini-2.5-flash)
+
+TASK: Very long document (>100K tokens)?
+  └─> USE: ANTHROPIC_API_KEY (Claude 200K context)
+
+TASK: Image generation?
+  └─> For chat apps: LOVABLE_API_KEY (gemini-3-pro-image-preview)
+  └─> For high-quality: OPENAI_API_KEY (gpt-image-1)
+
+TASK: Web scraping?
+  └─> USE: FIRECRAWL_API_KEY
+
+TASK: Video search?
+  └─> USE: YOUTUBE_API_KEY
+
+TASK: Email sending?
+  └─> USE: RESEND_API_KEY
+
+CURRENT IMPLEMENTATIONS:
+------------------------
+| Function               | Embeddings API    | Chat API          |
+|------------------------|-------------------|-------------------|
+| rag-chat               | OPENAI            | LOVABLE           |
+| generate-embedding     | OPENAI            | -                 |
+| ingest-documents       | OPENAI            | -                 |
+| regenerate-embeddings  | OPENAI            | -                 |
+| news-agent             | -                 | LOVABLE           |
+| write-article          | -                 | LOVABLE           |
+| youtube-search         | -                 | YOUTUBE           |
+| send-community-email   | -                 | RESEND            |
+
+LOVABLE AI MODELS (via LOVABLE_API_KEY):
+----------------------------------------
+- google/gemini-2.5-flash      (DEFAULT - balanced speed/quality)
+- google/gemini-2.5-pro        (complex reasoning, large context)
+- google/gemini-2.5-flash-lite (fast, simple tasks)
+- google/gemini-3-pro-preview  (next-gen reasoning)
+- google/gemini-3-pro-image-preview (image generation)
+- openai/gpt-5                 (powerful reasoning, expensive)
+- openai/gpt-5-mini            (cost-effective, strong)
+- openai/gpt-5-nano            (fastest, cheapest)
+
+OPENAI MODELS (via OPENAI_API_KEY):
+-----------------------------------
+- text-embedding-3-small (768 dimensions) - DEFAULT for embeddings
+- text-embedding-3-large (3072 dimensions) - higher quality embeddings
+- gpt-5-2025-08-07       (flagship chat)
+- gpt-4o-mini            (fast vision)
+- gpt-image-1            (image generation)
+
+KEY RULES:
+----------
+1. Embeddings MUST use OPENAI_API_KEY (Lovable AI doesn't support)
+2. Chat/text generation defaults to LOVABLE_API_KEY
+3. Speed-critical tasks may use GROQ_API_KEY
+4. Long documents (>100K) should use ANTHROPIC_API_KEY
+5. Always check available secrets before implementing
+6. Fallback gracefully if an API is unavailable
+
+LANGUAGE POLICY:
+----------------
+All user-facing content must be in ENGLISH only.
+- System prompts must specify English-only responses
+- Knowledge base documents are in English
+- UI text is in English
 
 ================================================================================
                                 END OF DOCUMENT
@@ -748,5 +842,6 @@ ENVIRONMENT:
 
 For questions or contributions, this project is maintained via Lovable.dev
 Documentation generated automatically from codebase analysis.
+Last Updated: 2025-12-27
 
 #Techno #GlobalTechno #LovableKnowledge 🖤
