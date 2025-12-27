@@ -111,7 +111,7 @@ const Header = () => {
           {/* Actions */}
           <div className="flex items-center gap-2">
             <Link to="/store">
-              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-logo-green px-2.5 py-1.5 h-auto">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-crimson border border-crimson/50 bg-crimson/10 hover:bg-crimson/20 hover:border-crimson hover:text-crimson px-2.5 py-1.5 h-auto">
                 <ShoppingBag className="w-3 h-3 mr-1.5" />
                 Store
               </Button>
