@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, Shield, Heart, Code } from "lucide-react";
+import { ChevronDown, Menu, Shield, Heart, Code, ShoppingBag } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Header = () => {
@@ -110,6 +110,12 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            <Link to="/store">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-logo-green px-2.5 py-1.5 h-auto">
+                <ShoppingBag className="w-3 h-3 mr-1.5" />
+                Store
+              </Button>
+            </Link>
             <Link to="/developer">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-logo-green border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 hover:border-logo-green hover:text-logo-green px-2.5 py-1.5 h-auto">
                 <Code className="w-3 h-3 mr-1.5" />
