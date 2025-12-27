@@ -51,7 +51,6 @@ const HeroSection = () => {
           {/* Description */}
           <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-xl leading-relaxed tracking-wide">
             {t('hero.description')}
-            <span className="text-foreground"> [EN/ES]</span>
           </p>
 
           {/* Actions */}

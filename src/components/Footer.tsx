@@ -3,22 +3,22 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import HexagonLogo from "./HexagonLogo";
 
 const Footer = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   
   const exploreLinks = [
-    { label: t('nav.festivals'), path: '/festivals' },
-    { label: t('footer.artists'), path: '/artists' },
-    { label: t('footer.news'), path: '/news' },
-    { label: language === 'en' ? 'Venues' : 'Clubs', path: '/venues' },
-    { label: language === 'en' ? 'User Stories' : 'Historias', path: '/mad/stories' },
+    { label: 'Festivals', path: '/festivals' },
+    { label: 'Artists', path: '/artists' },
+    { label: 'News', path: '/news' },
+    { label: 'Venues', path: '/venues' },
+    { label: 'User Stories', path: '/mad/stories' },
   ];
 
   const resourceLinks = [
-    { label: language === 'en' ? 'Labels' : 'Sellos', path: '/labels' },
-    { label: language === 'en' ? 'Releases' : 'Lanzamientos', path: '/releases' },
-    { label: language === 'en' ? 'Gear' : 'Equipo', path: '/gear' },
-    { label: language === 'en' ? 'Submit' : 'Enviar', path: '/submit' },
-    { label: language === 'en' ? 'Developers' : 'Desarrolladores', path: '/developer' },
+    { label: 'Labels', path: '/labels' },
+    { label: 'Releases', path: '/releases' },
+    { label: 'Gear', path: '/gear' },
+    { label: 'Submit', path: '/submit' },
+    { label: 'Developers', path: '/developer' },
   ];
   
   return (
@@ -64,9 +64,9 @@ const Footer = () => {
           </div>
 
           {/* Explore Navigation */}
-          <nav aria-label={language === 'en' ? 'Explore navigation' : 'Navegación explorar'} className="space-y-4">
+          <nav aria-label="Explore navigation" className="space-y-4">
             <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              {t('footer.explore')}
+              // Explore
             </h2>
             <ul className="space-y-2" role="list">
               {exploreLinks.map((link) => (
@@ -83,30 +83,19 @@ const Footer = () => {
           </nav>
 
           {/* Resources Navigation */}
-          <nav aria-label={language === 'en' ? 'Resources navigation' : 'Navegación recursos'} className="space-y-4">
+          <nav aria-label="Resources navigation" className="space-y-4">
             <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              // {language === 'en' ? 'Resources' : 'Recursos'}
+              // Resources
             </h2>
             <ul className="space-y-2" role="list">
               {resourceLinks.map((link) => (
                 <li key={link.path}>
-                  {'external' in link && link.external ? (
-                    <a
-                      href={link.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      to={link.path}
-                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
+                  <Link
+                    to={link.path}
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

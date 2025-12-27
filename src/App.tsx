@@ -9,7 +9,6 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
-import HreflangTags from "@/components/HreflangTags";
 import { HelmetProvider } from 'react-helmet-async';
 import ParticleBackground from "@/components/ParticleBackground";
 
@@ -72,7 +71,6 @@ const App = () => (
               <ParticleBackground />
               <ScrollToTop />
               <ScrollToTopButton />
-              <HreflangTags />
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   {/* Main */}
