@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy, Edit, Eye, FileText, Image, Music, ExternalLink, ArrowLeft } from "lucide-react";
+import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy, Edit, Eye, FileText, Image, Music, ExternalLink, ArrowLeft, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -57,6 +57,7 @@ const SubmissionsAdmin = () => {
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
   const [actionType, setActionType] = useState<"approve" | "reject" | "duplicate" | "edit" | "view" | null>(null);
+  const [sendNotification, setSendNotification] = useState(true);
   
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -88,16 +89,52 @@ const SubmissionsAdmin = () => {
     enabled: isAdmin,
   });
 
+  // Send email notification
+  const sendEmailNotification = async (submission: Submission, status: "approved" | "rejected" | "duplicate", notes: string) => {
+    if (!submission.email) {
+      console.log("No email for submission, skipping notification");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("submission-notification", {
+        body: {
+          email: submission.email,
+          submissionName: submission.name || "Unnamed submission",
+          status,
+          adminNotes: notes || undefined,
+        },
+      });
+
+      if (error) {
+        console.error("Failed to send notification:", error);
+        toast({
+          title: "Email notification failed",
+          description: "Status was updated but email could not be sent.",
+          variant: "destructive",
+        });
+      } else {
+        console.log("Email notification sent:", data);
+      }
+    } catch (err) {
+      console.error("Email notification error:", err);
+    }
+  };
+
   // Update submission status mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({
       id,
       status,
       notes,
+      submission,
+      notify,
     }: {
       id: string;
       status: string;
       notes: string;
+      submission: Submission;
+      notify: boolean;
     }) => {
       const { error } = await supabase
         .from("community_submissions")
@@ -109,13 +146,18 @@ const SubmissionsAdmin = () => {
         .eq("id", id);
 
       if (error) throw error;
+
+      // Send email notification if enabled
+      if (notify && (status === "approved" || status === "rejected" || status === "duplicate")) {
+        await sendEmailNotification(submission, status as "approved" | "rejected" | "duplicate", notes);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-submissions"] });
       const actionLabels = { approve: "approved", reject: "rejected", duplicate: "marked as duplicate" };
       toast({
         title: "Submission updated",
-        description: `Submission has been ${actionLabels[actionType as keyof typeof actionLabels] || "updated"}.`,
+        description: `Submission has been ${actionLabels[actionType as keyof typeof actionLabels] || "updated"}.${sendNotification && selectedSubmission?.email ? " Email sent." : ""}`,
       });
       closeDialog();
     },
@@ -167,6 +209,7 @@ const SubmissionsAdmin = () => {
     setSelectedSubmission(null);
     setAdminNotes("");
     setActionType(null);
+    setSendNotification(true);
     setEditForm({
       name: "",
       submission_type: "",
@@ -201,6 +244,8 @@ const SubmissionsAdmin = () => {
       id: selectedSubmission.id,
       status: statusMap[actionType as keyof typeof statusMap],
       notes: adminNotes,
+      submission: selectedSubmission,
+      notify: sendNotification,
     });
   };
 
@@ -739,6 +784,11 @@ const SubmissionsAdmin = () => {
                     {selectedSubmission.location}
                   </p>
                 )}
+                {selectedSubmission.email && (
+                  <p className="font-mono text-xs text-muted-foreground mt-1">
+                    ✉️ {selectedSubmission.email}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -751,6 +801,29 @@ const SubmissionsAdmin = () => {
                   placeholder="Add notes about this decision..."
                   className="font-mono text-sm min-h-[80px]"
                 />
+              </div>
+
+              {/* Email notification toggle */}
+              <div className="flex items-center gap-3 p-3 border border-border bg-muted/30">
+                <input
+                  type="checkbox"
+                  id="send-notification"
+                  checked={sendNotification}
+                  onChange={(e) => setSendNotification(e.target.checked)}
+                  className="w-4 h-4 accent-logo-green"
+                  disabled={!selectedSubmission.email}
+                />
+                <label htmlFor="send-notification" className="flex-1 font-mono text-xs cursor-pointer">
+                  <span className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5" />
+                    Send email notification to submitter
+                  </span>
+                  {!selectedSubmission.email && (
+                    <span className="block text-muted-foreground mt-1">
+                      No email provided for this submission
+                    </span>
+                  )}
+                </label>
               </div>
             </div>
           )}

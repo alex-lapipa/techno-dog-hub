@@ -87,3 +87,9 @@ verify_jwt = false
 
 [functions.write-article]
 verify_jwt = false
+
+[functions.admin-auth]
+verify_jwt = false
+
+[functions.submission-notification]
+verify_jwt = false
