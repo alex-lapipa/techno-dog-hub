@@ -99,3 +99,6 @@ verify_jwt = false
 
 [functions.send-community-email]
 verify_jwt = false
+
+[functions.regenerate-embeddings]
+verify_jwt = false
