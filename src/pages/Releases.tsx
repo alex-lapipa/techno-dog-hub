@@ -32,12 +32,9 @@ const ReleasesPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Releases Archive' : 'Archivo de Lanzamientos de Techno'}
-        description={language === 'en' 
-          ? 'The records that shaped the sound. Essential techno vinyl and digital releases from the underground.'
-          : 'Los discos que definieron el sonido. Lanzamientos esenciales de techno en vinilo y digital del underground.'}
+        title="Techno Releases Archive"
+        description="The records that shaped the sound. Essential techno vinyl and digital releases from the underground."
         path="/releases"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

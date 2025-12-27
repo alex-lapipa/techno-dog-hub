@@ -128,12 +128,9 @@ const NewsArchive = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO 
-        title={language === 'en' ? "News Archive | TechnoDog" : "Archivo de Noticias | TechnoDog"}
-        description={language === 'en' 
-          ? "Browse all techno news articles filtered by city and genre. Underground techno coverage from around the world."
-          : "Explora todos los artículos de noticias techno filtrados por ciudad y género. Cobertura techno underground de todo el mundo."}
+        title="News Archive | TechnoDog"
+        description="Browse all techno news articles filtered by city and genre. Underground techno coverage from around the world."
         path="/news/archive"
-        locale={language}
       />
       <Header />
       

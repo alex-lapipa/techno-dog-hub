@@ -67,12 +67,9 @@ const VenuesPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Venues & Clubs' : 'Clubs y Espacios de Techno'}
-        description={language === 'en' 
-          ? 'The clubs, warehouses, and spaces where techno lives. From Berghain to Bassiani, Tresor to Khidi.'
-          : 'Los clubs, almacenes y espacios donde vive el techno. De Berghain a Bassiani, de Tresor a Khidi.'}
+        title="Techno Venues & Clubs"
+        description="The clubs, warehouses, and spaces where techno lives. From Berghain to Bassiani, Tresor to Khidi."
         path="/venues"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

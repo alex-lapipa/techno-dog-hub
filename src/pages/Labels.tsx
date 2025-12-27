@@ -31,12 +31,9 @@ const LabelsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Record Labels' : 'Sellos Discográficos de Techno'}
-        description={language === 'en' 
-          ? 'The imprints that define the underground. Quality over quantity. Essential techno labels worldwide.'
-          : 'Los sellos que definen el underground. Calidad sobre cantidad. Sellos esenciales de techno en el mundo.'}
+        title="Techno Record Labels"
+        description="The imprints that define the underground. Quality over quantity. Essential techno labels worldwide."
         path="/labels"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

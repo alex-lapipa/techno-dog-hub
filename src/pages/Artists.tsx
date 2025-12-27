@@ -61,12 +61,9 @@ const ArtistsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Artists Directory' : 'Directorio de Artistas de Techno'}
-        description={language === 'en' 
-          ? 'The producers, DJs, and live performers shaping techno culture. From Detroit pioneers to Berlin residents.'
-          : 'Los productores, DJs e intérpretes que dan forma a la cultura techno. De los pioneros de Detroit a los residentes de Berlín.'}
+        title="Techno Artists Directory"
+        description="The producers, DJs, and live performers shaping techno culture. From Detroit pioneers to Berlin residents."
         path="/artists"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

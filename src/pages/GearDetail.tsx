@@ -56,11 +56,10 @@ const GearDetail = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={`${gearItem.name} - ${gearItem.manufacturer} ${gearCategories[gearItem.category][language]}`}
-        description={gearItem.shortDescription[language]}
+        title={`${gearItem.name} - ${gearItem.manufacturer} ${gearCategories[gearItem.category].en}`}
+        description={gearItem.shortDescription.en}
         path={`/gear/${gearItem.id}`}
         image={gearItem.image?.url}
-        locale={language}
         structuredData={productSchema}
       />
       <Header />

@@ -185,7 +185,6 @@ const TechnopediaPage = () => {
         title={`${t.title} | ${t.subtitle}`}
         description={t.intro}
         path="/technopedia"
-        locale={language}
         structuredData={structuredData}
       />
       <Header />

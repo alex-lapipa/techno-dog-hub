@@ -38,12 +38,9 @@ const CrewsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Crews & Collectives' : 'Crews y Colectivos de Techno'}
-        description={language === 'en' 
-          ? 'The sound systems, collectives, and movements that build the techno scene worldwide.'
-          : 'Los sound systems, colectivos y movimientos que construyen la escena techno mundial.'}
+        title="Techno Crews & Collectives"
+        description="The sound systems, collectives, and movements that build the techno scene worldwide."
         path="/crews"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />

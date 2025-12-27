@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +8,6 @@ import DailySpotlight from "@/components/DailySpotlight";
 import PageSEO from "@/components/PageSEO";
 
 const Index = () => {
-  const { language } = useLanguage();
   useScrollDepth({ pageName: 'index' });
 
   const organizationSchema = {
@@ -18,9 +16,7 @@ const Index = () => {
     "name": "techno.dog",
     "url": "https://techno.dog",
     "logo": "https://techno.dog/og-image.png",
-    "description": language === 'en' 
-      ? "Global techno culture archive - artists, festivals, venues, labels, and history from Detroit to Tbilisi"
-      : "Archivo de cultura techno global - artistas, festivales, clubs, sellos e historia de Detroit a Tbilisi",
+    "description": "Global techno culture archive - artists, festivals, venues, labels, and history from Detroit to Tbilisi",
     "foundingDate": "2024",
     "knowsAbout": ["Techno Music", "Electronic Music", "DJ Culture", "Music Festivals", "Record Labels"]
   };
@@ -30,10 +26,8 @@ const Index = () => {
     "@type": "WebSite",
     "name": "techno.dog",
     "url": "https://techno.dog",
-    "description": language === 'en'
-      ? "Discover the best techno festivals, artists, venues, and labels worldwide"
-      : "Descubre los mejores festivales, artistas, clubs y sellos de techno del mundo",
-    "inLanguage": ["en", "es"],
+    "description": "Discover the best techno festivals, artists, venues, and labels worldwide",
+    "inLanguage": "en",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://techno.dog/search?q={search_term_string}",
@@ -43,39 +37,20 @@ const Index = () => {
 
   const faqItems = [
     {
-      question: { en: 'What is techno.dog?', es: '¿Qué es techno.dog?' },
-      answer: { 
-        en: 'techno.dog is a comprehensive global techno culture archive featuring artists, festivals, venues, labels, crews, and gear from Detroit to Tbilisi, Tokyo to Bogotá.', 
-        es: 'techno.dog es un archivo completo de cultura techno global con artistas, festivales, clubs, sellos, crews y equipo de Detroit a Tbilisi, de Tokio a Bogotá.' 
-      }
+      question: 'What is techno.dog?',
+      answer: 'techno.dog is a comprehensive global techno culture archive featuring artists, festivals, venues, labels, crews, and gear from Detroit to Tbilisi, Tokyo to Bogotá.'
     },
     {
-      question: { en: 'What artists are featured on techno.dog?', es: '¿Qué artistas aparecen en techno.dog?' },
-      answer: { 
-        en: 'We feature legendary and contemporary techno artists including Jeff Mills, Underground Resistance, Surgeon, Helena Hauff, Paula Temple, Ben Klock, Marcel Dettmann, and many more from the global underground scene.', 
-        es: 'Presentamos artistas de techno legendarios y contemporáneos incluyendo Jeff Mills, Underground Resistance, Surgeon, Helena Hauff, Paula Temple, Ben Klock, Marcel Dettmann y muchos más de la escena underground global.' 
-      }
+      question: 'What artists are featured on techno.dog?',
+      answer: 'We feature legendary and contemporary techno artists including Jeff Mills, Underground Resistance, Surgeon, Helena Hauff, Paula Temple, Ben Klock, Marcel Dettmann, and many more from the global underground scene.'
     },
     {
-      question: { en: 'Which techno festivals are covered?', es: '¿Qué festivales de techno están cubiertos?' },
-      answer: { 
-        en: 'We cover major techno festivals worldwide including Awakenings, Dekmantel, Movement Detroit, Time Warp, Neopop, Sónar, MELT, and underground gatherings across Europe, Americas, and Asia.', 
-        es: 'Cubrimos los principales festivales de techno del mundo incluyendo Awakenings, Dekmantel, Movement Detroit, Time Warp, Neopop, Sónar, MELT y encuentros underground en Europa, América y Asia.' 
-      }
+      question: 'Which techno festivals are covered?',
+      answer: 'We cover major techno festivals worldwide including Awakenings, Dekmantel, Movement Detroit, Time Warp, Neopop, Sónar, MELT, and underground gatherings across Europe, Americas, and Asia.'
     },
     {
-      question: { en: 'What venues and clubs are in the archive?', es: '¿Qué clubs y locales están en el archivo?' },
-      answer: { 
-        en: 'Our archive includes iconic techno venues like Berghain, Tresor, Bassiani, Khidi, Concrete, De School, Fold, and legendary spots from Detroit to Melbourne.', 
-        es: 'Nuestro archivo incluye locales icónicos de techno como Berghain, Tresor, Bassiani, Khidi, Concrete, De School, Fold y lugares legendarios de Detroit a Melbourne.' 
-      }
-    },
-    {
-      question: { en: 'Is techno.dog available in Spanish?', es: '¿techno.dog está disponible en español?' },
-      answer: { 
-        en: 'Yes, techno.dog is fully bilingual with complete English and Spanish language support across all pages and content.', 
-        es: 'Sí, techno.dog es completamente bilingüe con soporte completo en inglés y español en todas las páginas y contenido.' 
-      }
+      question: 'What venues and clubs are in the archive?',
+      answer: 'Our archive includes iconic techno venues like Berghain, Tresor, Bassiani, Khidi, Concrete, De School, Fold, and legendary spots from Detroit to Melbourne.'
     }
   ];
 
@@ -84,10 +59,10 @@ const Index = () => {
     "@type": "FAQPage",
     "mainEntity": faqItems.map(item => ({
       "@type": "Question",
-      "name": item.question[language],
+      "name": item.question,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": item.answer[language]
+        "text": item.answer
       }
     }))
   };
@@ -96,50 +71,47 @@ const Index = () => {
 
   const featuredSections = [
     {
-      title: { en: 'News', es: 'Noticias' },
-      description: { en: 'Latest transmissions from the underground', es: 'Últimas transmisiones del underground' },
+      title: 'News',
+      description: 'Latest transmissions from the underground',
       path: '/news',
       accent: true
     },
     {
-      title: { en: 'Festivals', es: 'Festivales' },
-      description: { en: 'Global gatherings that matter', es: 'Encuentros globales que importan' },
+      title: 'Festivals',
+      description: 'Global gatherings that matter',
       path: '/festivals'
     },
     {
-      title: { en: 'Artists', es: 'Artistas' },
-      description: { en: 'The producers and DJs shaping the sound', es: 'Los productores y DJs que dan forma al sonido' },
+      title: 'Artists',
+      description: 'The producers and DJs shaping the sound',
       path: '/artists'
     },
     {
-      title: { en: 'Releases', es: 'Lanzamientos' },
-      description: { en: 'The records that define techno', es: 'Los discos que definen el techno' },
+      title: 'Releases',
+      description: 'The records that define techno',
       path: '/releases'
     },
     {
-      title: { en: 'Mad Stuff', es: 'Locuras' },
-      description: { en: 'Deep cuts, history, venues, crews', es: 'Cortes profundos, historia, clubs, crews' },
+      title: 'Mad Stuff',
+      description: 'Deep cuts, history, venues, crews',
       path: '/venues'
     }
   ];
 
   const quickLinks = [
-    { label: { en: 'Venues', es: 'Clubs' }, path: '/venues' },
-    { label: { en: 'Labels', es: 'Sellos' }, path: '/labels' },
-    { label: { en: 'Crews', es: 'Crews' }, path: '/crews' },
-    { label: { en: 'Gear', es: 'Equipo' }, path: '/gear' },
-    { label: { en: 'User Stories', es: 'Historias' }, path: '/mad/stories' },
+    { label: 'Venues', path: '/venues' },
+    { label: 'Labels', path: '/labels' },
+    { label: 'Crews', path: '/crews' },
+    { label: 'Gear', path: '/gear' },
+    { label: 'User Stories', path: '/mad/stories' },
   ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Global Techno Culture Archive' : 'Archivo Global de Cultura Techno'}
-        description={language === 'en' 
-          ? 'Discover the global techno archive. Artists, festivals, venues, labels, and history from Detroit to Tbilisi, Tokyo to Bogotá.'
-          : 'Descubre el archivo global de techno. Artistas, festivales, clubs, sellos e historia de Detroit a Tbilisi, Tokyo a Bogotá.'}
+        title="Global Techno Culture Archive"
+        description="Discover the global techno archive. Artists, festivals, venues, labels, and history from Detroit to Tbilisi, Tokyo to Bogotá."
         path="/"
-        locale={language}
         structuredData={combinedSchema}
       />
       <Header />
@@ -150,7 +122,7 @@ const Index = () => {
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
             <div className="max-w-4xl">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
-                // {language === 'en' ? 'Global Techno Knowledge Hub' : 'Centro Global de Conocimiento Techno'}
+                // Global Techno Knowledge Hub
               </div>
               <h1 className="font-mono text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight mb-6">
                 <span className="hover:animate-glitch inline-block">techno</span>
@@ -160,29 +132,25 @@ const Index = () => {
               
               {/* Mission Statement */}
               <p className="font-mono text-sm md:text-base text-foreground/90 leading-relaxed max-w-2xl mb-6 border-l-2 border-primary pl-4">
-                {language === 'en' 
-                  ? 'A daily, open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.' 
-                  : 'Una plataforma abierta y diaria dedicada a la cultura techno underground — artistas, clubs, festivales, máquinas e ideas. Estrictamente no mainstream.'}
+                A daily, open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.
               </p>
               
               <p className="font-mono text-sm text-muted-foreground leading-relaxed max-w-2xl mb-8">
-                {language === 'en' 
-                  ? 'The collaborative digital magazine and encyclopedia. From Detroit to Tbilisi, Tokyo to Bogotá.' 
-                  : 'La revista digital colaborativa y enciclopedia. De Detroit a Tbilisi, de Tokio a Bogotá.'}
+                The collaborative digital magazine and encyclopedia. From Detroit to Tbilisi, Tokyo to Bogotá.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link 
                   to="/news" 
                   className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-foreground px-6 py-3 hover:bg-foreground hover:text-background hover:animate-glitch transition-colors"
                 >
-                  {language === 'en' ? 'Enter' : 'Entrar'}
+                  Enter
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link 
                   to="/submit" 
                   className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-border px-6 py-3 hover:border-foreground transition-colors"
                 >
-                  {language === 'en' ? 'Contribute' : 'Contribuir'}
+                  Contribute
                 </Link>
               </div>
             </div>
@@ -204,13 +172,13 @@ const Index = () => {
                   }`}
                 >
                   <h2 className="font-mono text-3xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                    {section.title[language]}
+                    {section.title}
                   </h2>
                   <p className="font-mono text-sm text-muted-foreground group-hover:text-current mb-6">
-                    {section.description[language]}
+                    {section.description}
                   </p>
                   <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
-                    <span>{language === 'en' ? 'Explore' : 'Explorar'}</span>
+                    <span>Explore</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </Link>
@@ -225,7 +193,7 @@ const Index = () => {
           <div className="container mx-auto px-4 md:px-8 py-12">
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
               <span className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
-                // {language === 'en' ? 'Quick access' : 'Acceso rápido'}
+                // Quick access
               </span>
               {quickLinks.map((link) => (
                 <Link
@@ -233,7 +201,7 @@ const Index = () => {
                   to={link.path}
                   className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch transition-colors"
                 >
-                  → {link.label[language]}
+                  → {link.label}
                 </Link>
               ))}
             </div>
@@ -247,27 +215,23 @@ const Index = () => {
               {/* Latest article teaser */}
               <Link to="/news" className="group block border border-border p-6 hover:bg-card transition-colors">
                 <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
-                  // {language === 'en' ? 'Latest' : 'Último'}
+                  // Latest
                 </div>
                 <h3 className="font-mono text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                  {language === 'en' ? 'News & Features' : 'Noticias y Reportajes'}
+                  News & Features
                 </h3>
                 <p className="font-mono text-sm text-muted-foreground mb-4">
-                  {language === 'en' 
-                    ? 'The latest transmissions from the underground.' 
-                    : 'Las últimas transmisiones del underground.'}
+                  The latest transmissions from the underground.
                 </p>
                 <span className="font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                  {language === 'en' ? 'Read →' : 'Leer →'}
+                  Read →
                 </span>
               </Link>
 
               {/* Quote */}
               <div className="border border-border p-6 flex flex-col justify-center">
                 <blockquote className="font-mono text-xl md:text-2xl uppercase leading-tight tracking-tight mb-4">
-                  "{language === 'en' 
-                    ? 'Techno is not just music. It\'s a complete way of life.' 
-                    : 'El techno no es solo música. Es una forma de vida completa.'}"
+                  "Techno is not just music. It's a complete way of life."
                 </blockquote>
                 <cite className="font-mono text-sm text-muted-foreground not-italic">
                   — Jeff Mills
@@ -292,17 +256,17 @@ const Index = () => {
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16">
             <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight mb-8">
-              {language === 'en' ? 'Frequently Asked Questions' : 'Preguntas Frecuentes'}
+              Frequently Asked Questions
             </h2>
             <div className="grid gap-6 max-w-3xl">
               {faqItems.map((item, index) => (
                 <details key={index} className="group border border-border">
                   <summary className="font-mono text-sm md:text-base uppercase tracking-wide p-4 cursor-pointer hover:bg-card transition-colors list-none flex justify-between items-center">
-                    <span>{item.question[language]}</span>
+                    <span>{item.question}</span>
                     <span className="text-muted-foreground group-open:rotate-45 transition-transform">+</span>
                   </summary>
                   <div className="font-mono text-sm text-muted-foreground p-4 pt-0 leading-relaxed">
-                    {item.answer[language]}
+                    {item.answer}
                   </div>
                 </details>
               ))}

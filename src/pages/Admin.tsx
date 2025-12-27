@@ -229,7 +229,6 @@ const Admin = () => {
         title="Admin"
         description="techno.dog administration panel"
         path="/admin"
-        locale={language}
       />
       <Header />
 

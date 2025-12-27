@@ -224,7 +224,6 @@ const CommunityDocs = () => {
         title={`${t.title} - Documentation`}
         description={t.subtitle}
         path="/community/docs"
-        locale={language}
       />
       <Header />
       

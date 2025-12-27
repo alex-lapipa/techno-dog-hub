@@ -125,7 +125,6 @@ const FestivalDetail = () => {
         title={`${festival.name} - Techno Festival in ${festival.city}, ${festival.country}`}
         description={festival.description || `${festival.name} is a ${festival.type} techno festival in ${festival.city}, ${festival.country}. Established ${festival.founded}. Capacity: ${festival.capacity?.toLocaleString() || 'TBA'}.`}
         path={`/festivals/${festival.id}`}
-        locale={language}
         structuredData={eventSchema}
       />
       <Header />

@@ -66,10 +66,9 @@ const CrewDetail = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={`${crew.name} - Techno ${typeLabels[crew.type]?.[language] || crew.type}`}
+        title={`${crew.name} - Techno ${typeLabels[crew.type]?.en || crew.type}`}
         description={crew.description || `${crew.name} - ${crew.type} from ${crew.city}, ${crew.country}.`}
         path={`/crews/${crew.id}`}
-        locale={language}
         structuredData={crewSchema}
       />
       <Header />

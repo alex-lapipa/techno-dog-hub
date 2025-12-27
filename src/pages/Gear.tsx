@@ -71,12 +71,9 @@ const GearPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={language === 'en' ? 'Techno Gear & Equipment' : 'Equipo de Techno'}
-        description={language === 'en' 
-          ? 'The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses.'
-          : 'Los sintetizadores, cajas de ritmos, samplers y herramientas que dieron forma al techno. De los sótanos de Detroit a los almacenes de Berlín.'}
+        title="Techno Gear & Equipment"
+        description="The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses."
         path="/gear"
-        locale={language}
         structuredData={itemListSchema}
       />
       <Header />
