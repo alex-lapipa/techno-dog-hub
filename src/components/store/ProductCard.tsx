@@ -4,6 +4,7 @@ import { useCartStore, CartItem } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { GlitchImage } from "./GlitchImage";
 
 interface ProductCardProps {
   product: ShopifyProductNode;
@@ -48,11 +49,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       {/* Image */}
       <div className="aspect-square bg-muted relative overflow-hidden">
         {firstImage ? (
-          <img
+          <GlitchImage
             src={firstImage.url}
             alt={firstImage.altText || product.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            className="w-full h-full"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
