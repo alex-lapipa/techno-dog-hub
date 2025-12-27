@@ -535,6 +535,39 @@ export type Database = {
         }
         Relationships: []
       }
+      health_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          message: string
+          notified_at: string
+          resolved_at: string | null
+          service_name: string
+          severity: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          message: string
+          notified_at?: string
+          resolved_at?: string | null
+          service_name: string
+          severity: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          message?: string
+          notified_at?: string
+          resolved_at?: string | null
+          service_name?: string
+          severity?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
