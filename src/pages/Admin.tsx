@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
+import ScheduledJobsStatus from "@/components/admin/ScheduledJobsStatus";
 
 const AdminLoginForm = () => {
   const [password, setPassword] = useState("");
@@ -259,10 +260,13 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Activity Feed & Quick Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Activity Feed, Scheduled Jobs & Quick Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Real-time Activity Feed */}
         <RealtimeActivityFeed />
+
+        {/* Scheduled Jobs Status */}
+        <ScheduledJobsStatus />
 
         {/* Quick Stats */}
         <div className="border border-border bg-card p-6">
@@ -272,7 +276,7 @@ const AdminDashboard = () => {
               Quick Info
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="text-center p-4 border border-border/50">
               <div className="font-mono text-2xl text-logo-green">●</div>
               <div className="font-mono text-[10px] text-muted-foreground uppercase mt-1">
