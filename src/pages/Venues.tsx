@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight, MapPin } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { loadVenuesSummary, loadVenueById } from "@/data/venues-loader";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,8 +20,6 @@ const VenuesPage = () => {
       staleTime: 1000 * 60 * 10,
     });
   }, [queryClient]);
-  
-  const { language } = useLanguage();
 
   const { data: venues = [], isLoading } = useQuery({
     queryKey: ['venues-summary'],
@@ -43,10 +40,8 @@ const VenuesPage = () => {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Venues & Clubs" : "Clubs y Espacios de Techno",
-    "description": language === 'en' 
-      ? "Directory of techno clubs, warehouses and spaces worldwide"
-      : "Directorio de clubs, almacenes y espacios de techno en el mundo",
+    "name": "Techno Venues & Clubs",
+    "description": "Directory of techno clubs, warehouses and spaces worldwide",
     "numberOfItems": venues.length,
     "itemListElement": venues.slice(0, 20).map((venue, index) => ({
       "@type": "ListItem",
@@ -77,15 +72,13 @@ const VenuesPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
             <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-              // {language === 'en' ? 'Archive' : 'Archivo'}
+              // Archive
             </div>
             <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Venues' : 'Clubs'}
+              Venues
             </h1>
             <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The clubs, warehouses, and spaces where techno lives.' 
-                : 'Los clubs, almacenes y espacios donde vive el techno.'}
+              The clubs, warehouses, and spaces where techno lives.
             </p>
           </div>
 
@@ -157,7 +150,7 @@ const VenuesPage = () => {
                             </p>
                           )}
                           <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground">
-                            <span>{language === 'en' ? 'View details' : 'Ver detalles'}</span>
+                            <span>View details</span>
                             <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                           </div>
                         </Link>
@@ -189,7 +182,7 @@ const VenuesPage = () => {
                             </p>
                           )}
                           <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-muted-foreground group-hover:text-foreground">
-                            <span>{language === 'en' ? 'View details' : 'Ver detalles'}</span>
+                            <span>View details</span>
                             <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                           </div>
                         </Link>
@@ -202,7 +195,7 @@ const VenuesPage = () => {
           )}
 
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
-            {venues.length} {language === 'en' ? 'venues in archive' : 'clubs en archivo'}
+            {venues.length} venues in archive
           </div>
         </div>
       </main>

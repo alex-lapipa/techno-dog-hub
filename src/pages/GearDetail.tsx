@@ -1,6 +1,5 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

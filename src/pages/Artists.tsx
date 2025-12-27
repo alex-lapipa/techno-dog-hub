@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import { loadArtistsSummary, loadArtistById, type ArtistSummary } from "@/data/artists-loader";
 import Header from "@/components/Header";
@@ -23,8 +22,6 @@ const ArtistsPage = () => {
       staleTime: 1000 * 60 * 10,
     });
   }, [queryClient]);
-  
-  const { language } = useLanguage();
 
   const { data: artists = [], isLoading } = useQuery({
     queryKey: ['artists-summary'],
@@ -42,10 +39,8 @@ const ArtistsPage = () => {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": language === 'en' ? "Techno Artists" : "Artistas de Techno",
-    "description": language === 'en' 
-      ? "Directory of techno DJs, producers and live performers"
-      : "Directorio de DJs, productores e intérpretes de techno",
+    "name": "Techno Artists",
+    "description": "Directory of techno DJs, producers and live performers",
     "numberOfItems": artists.length,
     "itemListElement": artists.slice(0, 30).map((artist, index) => ({
       "@type": "ListItem",
@@ -71,15 +66,13 @@ const ArtistsPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
             <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-              // {language === 'en' ? 'Archive' : 'Archivo'}
+              // Archive
             </div>
             <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
-              {language === 'en' ? 'Artists' : 'Artistas'}
+              Artists
             </h1>
             <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              {language === 'en' 
-                ? 'The producers, DJs, and live performers shaping techno culture.' 
-                : 'Los productores, DJs e intérpretes que dan forma a la cultura techno.'}
+              The producers, DJs, and live performers shaping techno culture.
             </p>
           </div>
 
@@ -188,7 +181,7 @@ const ArtistsPage = () => {
           </div>
 
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
-            {artists.length} {language === 'en' ? 'artists in archive' : 'artistas en archivo'}
+            {artists.length} artists in archive
           </div>
 
         </div>
