@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useActivityLog } from "@/hooks/useActivityLog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ interface MissingEntity {
 
 const MediaAdmin = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const { logActivity } = useActivityLog();
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [jobs, setJobs] = useState<PipelineJob[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -284,6 +286,19 @@ const MediaAdmin = () => {
         .eq('id', asset.id);
         
       toast.success('Asset selected');
+      
+      // Log the selection
+      logActivity({
+        action_type: "media_asset_selected",
+        entity_type: asset.entity_type,
+        entity_id: asset.entity_id,
+        details: {
+          asset_id: asset.id,
+          entity_name: asset.entity_name,
+          source_url: asset.source_url,
+        },
+      });
+      
       fetchData();
     } catch (error) {
       toast.error('Failed to select asset');
@@ -292,10 +307,28 @@ const MediaAdmin = () => {
 
   const deleteAsset = async (assetId: string) => {
     if (!confirm('Delete this asset permanently?')) return;
+    
+    // Find the asset before deleting for logging
+    const assetToDelete = assets.find(a => a.id === assetId);
+    
     try {
       const { error } = await supabase.from('media_assets').delete().eq('id', assetId);
       if (error) throw error;
       toast.success('Asset deleted');
+      
+      // Log the deletion
+      if (assetToDelete) {
+        logActivity({
+          action_type: "media_asset_deleted",
+          entity_type: assetToDelete.entity_type,
+          entity_id: assetToDelete.entity_id,
+          details: {
+            asset_id: assetId,
+            entity_name: assetToDelete.entity_name,
+          },
+        });
+      }
+      
       fetchData();
     } catch (error) {
       toast.error('Failed to delete asset');
@@ -361,6 +394,19 @@ const MediaAdmin = () => {
       
       if (error) throw error;
       toast.success('Asset added successfully');
+      
+      // Log the manual addition
+      logActivity({
+        action_type: "media_asset_added",
+        entity_type: manualForm.entityType,
+        entity_id: manualForm.entityId,
+        details: {
+          entity_name: manualForm.entityName,
+          source_url: manualForm.sourceUrl,
+          provider: manualForm.provider,
+        },
+      });
+      
       setManualDialogOpen(false);
       setManualForm({
         entityType: "artist",

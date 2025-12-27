@@ -4,6 +4,7 @@ import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy, Edit
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useActivityLog } from "@/hooks/useActivityLog";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -50,6 +51,7 @@ const SubmissionsAdmin = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logActivity } = useActivityLog();
   
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -150,13 +152,27 @@ const SubmissionsAdmin = () => {
         await sendEmailNotification(submission, status as "approved" | "rejected" | "duplicate", notes);
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["admin-submissions"] });
       const actionLabels = { approve: "approved", reject: "rejected", duplicate: "marked as duplicate" };
       toast({
         title: "Submission updated",
         description: `Submission has been ${actionLabels[actionType as keyof typeof actionLabels] || "updated"}.${sendNotification && selectedSubmission?.email ? " Email sent." : ""}`,
       });
+      
+      // Log the activity
+      logActivity({
+        action_type: `submission_${variables.status}`,
+        entity_type: "submission",
+        entity_id: variables.id,
+        details: {
+          submission_name: variables.submission.name,
+          submission_type: variables.submission.submission_type,
+          admin_notes: variables.notes,
+          email_sent: variables.notify && !!variables.submission.email,
+        },
+      });
+      
       closeDialog();
     },
     onError: (error) => {
@@ -185,12 +201,23 @@ const SubmissionsAdmin = () => {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["admin-submissions"] });
       toast({
         title: "Submission edited",
         description: "Changes have been saved.",
       });
+      
+      // Log the edit activity
+      logActivity({
+        action_type: "submission_edited",
+        entity_type: "submission",
+        entity_id: variables.id,
+        details: {
+          updated_fields: Object.keys(variables.updates).filter(k => variables.updates[k as keyof typeof variables.updates] !== null),
+        },
+      });
+      
       closeDialog();
     },
     onError: (error) => {
