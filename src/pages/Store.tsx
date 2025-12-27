@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Package, Clock, Mail, CheckCircle } from "lucide-react";
+import { Loader2, Package, Clock, Mail, CheckCircle, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
@@ -81,10 +81,17 @@ const Store = () => {
     ? [...new Set(products.map(p => p.node.productType).filter(Boolean))]
     : [];
 
-  // Filter products by type
-  const filteredProducts = selectedType
-    ? products?.filter(p => p.node.productType === selectedType)
-    : products;
+  // Check if there are any collaboration products
+  const hasCollaborations = products?.some(p => 
+    p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration'))
+  );
+
+  // Filter products by type or special filters
+  const filteredProducts = selectedType === "collaborations"
+    ? products?.filter(p => p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration')))
+    : selectedType
+      ? products?.filter(p => p.node.productType === selectedType)
+      : products;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -175,7 +182,7 @@ const Store = () => {
         </section>
 
         {/* Filters */}
-        {productTypes.length > 0 && (
+        {(productTypes.length > 0 || hasCollaborations) && (
           <section className="border-b border-border">
             <div className="container mx-auto px-4 md:px-8 py-4">
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
@@ -190,6 +197,24 @@ const Store = () => {
                 >
                   All
                 </Button>
+                
+                {/* Collaborations filter - shown first if exists */}
+                {hasCollaborations && (
+                  <Button
+                    variant={selectedType === "collaborations" ? "default" : "outline"}
+                    size="sm"
+                    className={`font-mono text-[10px] uppercase tracking-wider shrink-0 ${
+                      selectedType === "collaborations" 
+                        ? "" 
+                        : "border-logo-green/50 text-logo-green hover:bg-logo-green/10"
+                    }`}
+                    onClick={() => setSelectedType("collaborations")}
+                  >
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Collaborations
+                  </Button>
+                )}
+                
                 {productTypes.map(type => (
                   <Button
                     key={type}
