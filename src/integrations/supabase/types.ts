@@ -160,6 +160,63 @@ export type Database = {
           },
         ]
       }
+      community_profiles: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          display_name: string | null
+          email: string
+          email_verified_at: string | null
+          id: string
+          interests: string[] | null
+          newsletter_opt_in: boolean
+          newsletter_opt_in_at: string | null
+          roles: string[]
+          source: Database["public"]["Enums"]["community_source"]
+          status: Database["public"]["Enums"]["community_status"]
+          trust_score: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email: string
+          email_verified_at?: string | null
+          id?: string
+          interests?: string[] | null
+          newsletter_opt_in?: boolean
+          newsletter_opt_in_at?: string | null
+          roles?: string[]
+          source?: Database["public"]["Enums"]["community_source"]
+          status?: Database["public"]["Enums"]["community_status"]
+          trust_score?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          email_verified_at?: string | null
+          id?: string
+          interests?: string[] | null
+          newsletter_opt_in?: boolean
+          newsletter_opt_in_at?: string | null
+          roles?: string[]
+          source?: Database["public"]["Enums"]["community_source"]
+          status?: Database["public"]["Enums"]["community_status"]
+          trust_score?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       community_submissions: {
         Row: {
           additional_info: string | null
@@ -349,6 +406,33 @@ export type Database = {
           source?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      email_events: {
+        Row: {
+          created_at: string
+          email: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          provider_message_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          provider_message_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          provider_message_id?: string | null
         }
         Relationships: []
       }
@@ -782,6 +866,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      community_source:
+        | "upload_widget"
+        | "newsletter"
+        | "api_signup"
+        | "community_page"
+        | "other"
+      community_status: "pending" | "verified" | "banned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -910,6 +1001,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      community_source: [
+        "upload_widget",
+        "newsletter",
+        "api_signup",
+        "community_page",
+        "other",
+      ],
+      community_status: ["pending", "verified", "banned"],
     },
   },
 } as const
