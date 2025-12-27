@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Zap, Play, Pause, RefreshCw, Image, CheckCircle, Sparkles, AlertTriangle,
-  Database, Clock, TrendingUp, Settings, Loader2, Search, Wand2
+  Database, Clock, TrendingUp, Settings, Loader2, Search, Wand2, Palette
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,6 +36,7 @@ interface PipelineResult {
     fetched: number;
     verified: number;
     enriched: number;
+    generated: number;
     failed: number;
   };
   remaining?: number;
@@ -132,10 +133,27 @@ const MediaEngine = () => {
     } catch (e) {
       toast.error("Enrichment failed");
     } finally {
-      setRunning(false);
+    setRunning(false);
     }
   };
 
+  const runGenerateBatch = async () => {
+    setRunning(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("media-engine", {
+        body: { action: "generate-batch", batchSize: Math.min(batchSize, 3) }, // Limit to 3 for image gen
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      toast.success(`Generated ${data.stats.generated} AI images`);
+      setResult(data);
+      fetchStatus();
+    } catch (e: any) {
+      toast.error(e.message || "Generation failed");
+    } finally {
+      setRunning(false);
+    }
+  };
   const processSingleEntity = async () => {
     if (!singleEntityId || !singleEntityName) {
       toast.error("Please fill in entity ID and name");
@@ -304,7 +322,7 @@ const MediaEngine = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Pipeline Visualization */}
-                <div className="flex items-center justify-between bg-muted/30 rounded-lg p-4">
+                <div className="flex items-center justify-between bg-muted/30 rounded-lg p-4 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
                     <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
                       <Search className="w-5 h-5 text-blue-500" />
@@ -317,6 +335,13 @@ const MediaEngine = () => {
                       <Image className="w-5 h-5 text-green-500" />
                     </div>
                     <span className="text-sm font-medium">Fetch</span>
+                  </div>
+                  <div className="text-muted-foreground">→</div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
+                      <Palette className="w-5 h-5 text-pink-500" />
+                    </div>
+                    <span className="text-sm font-medium">AI Generate*</span>
                   </div>
                   <div className="text-muted-foreground">→</div>
                   <div className="flex items-center gap-2">
@@ -333,6 +358,9 @@ const MediaEngine = () => {
                     <span className="text-sm font-medium">Enrich</span>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  *AI Generate: When no suitable images are found from external sources, the engine automatically generates a stylized image using AI.
+                </p>
 
                 {/* Batch Size Control */}
                 <div className="space-y-2">
@@ -374,7 +402,7 @@ const MediaEngine = () => {
                 {result && (
                   <Card className="border-green-500/30 bg-green-500/5">
                     <CardContent className="pt-4">
-                      <div className="grid grid-cols-5 gap-4 text-center">
+                      <div className="grid grid-cols-6 gap-4 text-center">
                         <div>
                           <div className="text-2xl font-bold">{result.stats.processed}</div>
                           <div className="text-xs text-muted-foreground">Processed</div>
@@ -382,6 +410,10 @@ const MediaEngine = () => {
                         <div>
                           <div className="text-2xl font-bold text-blue-500">{result.stats.fetched}</div>
                           <div className="text-xs text-muted-foreground">Fetched</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-pink-500">{result.stats.generated || 0}</div>
+                          <div className="text-xs text-muted-foreground">AI Generated</div>
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-purple-500">{result.stats.verified}</div>
@@ -468,7 +500,7 @@ const MediaEngine = () => {
 
           {/* Batch Operations Tab */}
           <TabsContent value="batch">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -502,6 +534,31 @@ const MediaEngine = () => {
                     {running ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     Enrich Batch ({batchSize})
                   </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-pink-500/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="w-5 h-5 text-pink-500" />
+                    AI Generate Images
+                  </CardTitle>
+                  <CardDescription>
+                    Generate images for entities with no suitable photos found
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    onClick={runGenerateBatch} 
+                    disabled={running || !status?.engineReady} 
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                  >
+                    {running ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Palette className="w-4 h-4 mr-2" />}
+                    Generate Batch (max 3)
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Creates stylized techno aesthetic images using AI when no photos exist
+                  </p>
                 </CardContent>
               </Card>
             </div>
