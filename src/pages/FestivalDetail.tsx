@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { festivals, getFestivalById } from "@/data/festivals";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
+import { CommunityWidgetPhoto } from "@/components/community";
 
 const FestivalDetail = () => {
   const { id } = useParams();
@@ -329,6 +330,29 @@ const FestivalDetail = () => {
                   </div>
                 </div>
               )}
+
+              {/* Community Photo Upload */}
+              <div className="border border-border p-6">
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                  <Camera className="w-4 h-4" />
+                  // {language === 'en' ? 'Contribute Photos' : 'Contribuir Fotos'}
+                </div>
+                <p className="font-mono text-xs text-muted-foreground mb-4">
+                  {language === 'en' 
+                    ? `Have photos from ${festival.name}? Share them with the community.`
+                    : `¿Tienes fotos de ${festival.name}? Compártelas con la comunidad.`
+                  }
+                </p>
+                <CommunityWidgetPhoto
+                  entityType="festival"
+                  entityId={festival.id}
+                  title={language === 'en' ? `Upload photos of ${festival.name}` : `Subir fotos de ${festival.name}`}
+                  description={language === 'en' 
+                    ? "Share festival photos, stage shots, or crowd captures. All submissions are reviewed."
+                    : "Comparte fotos del festival, escenarios o del público. Todas las contribuciones son revisadas."
+                  }
+                />
+              </div>
 
               {/* Deep links */}
               <div className="border border-border p-6">
