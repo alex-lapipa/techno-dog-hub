@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { CartDrawer, CartButton } from "@/components/store/CartDrawer";
+import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { fetchProductByHandle, formatPrice, ShopifyVariant } from "@/lib/shopify";
 import { useCartStore, CartItem } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,9 @@ const StoreProduct = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* SVG Filter for glitch effect */}
+      <GlitchSVGFilter />
+      
       <PageSEO
         title={`${product.title} | techno.dog Store`}
         description={product.description || `${product.title} - Official techno.dog merchandise`}
@@ -143,15 +147,16 @@ const StoreProduct = () => {
               {/* Images */}
               <div className="space-y-4">
                 {/* Main image */}
-                <div className="aspect-square bg-muted overflow-hidden">
+                <div className="aspect-square overflow-hidden">
                   {images[selectedImageIndex] ? (
-                    <img
+                    <GlitchImage
                       src={images[selectedImageIndex].node.url}
                       alt={images[selectedImageIndex].node.altText || product.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full"
+                      frameNumber={String(selectedImageIndex + 1).padStart(2, '0')}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center bg-zinc-800">
                       <span className="font-mono text-xs text-muted-foreground">No image</span>
                     </div>
                   )}
