@@ -43,7 +43,56 @@ serve(async (req) => {
 
     console.log(`[Orchestrator] Action: ${action}, Entity type: ${entityType || 'all'}`);
 
+    // Fetch entities from database if not provided
+    let entitiesToAnalyze = entities || [];
+    const limit = 50; // Process up to 50 at a time
+    
+    if (action === "analyze" && (!entities || entities.length === 0)) {
+      // Fetch entities based on type
+      if (entityType === 'artist' || !entityType) {
+        const { data: artists, error: artistsError } = await supabase
+          .from('dj_artists')
+          .select('*')
+          .limit(limit);
+        
+        if (!artistsError && artists) {
+          entitiesToAnalyze = artists.map((a: any) => ({
+            type: 'artist',
+            id: a.id.toString(),
+            name: a.artist_name,
+            currentData: {
+              realName: a.real_name,
+              nationality: a.nationality,
+              knownFor: a.known_for,
+              labels: a.labels,
+              subgenres: a.subgenres,
+              topTracks: a.top_tracks,
+              yearsActive: a.years_active,
+              born: a.born,
+              died: a.died,
+            }
+          }));
+        }
+      }
+      
+      console.log(`[Orchestrator] Fetched ${entitiesToAnalyze.length} entities from database`);
+    }
+
     if (action === "analyze") {
+      if (entitiesToAnalyze.length === 0) {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            action: "analyze",
+            results: [],
+            totalEntities: 0,
+            needsUpdate: 0,
+            message: "No entities found to analyze"
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       // Anthropic analyzes what needs to be updated
       const analysisPrompt = `You are a techno music data curator. Analyze these entities and identify:
 1. Missing or incomplete fields (bios, labels, gear, images)
@@ -52,11 +101,12 @@ serve(async (req) => {
 4. Missing image attributions
 
 Entities to analyze:
-${JSON.stringify(entities, null, 2)}
+${JSON.stringify(entitiesToAnalyze, null, 2)}
 
 Return a JSON array of objects with:
 - entityId: string
 - entityType: string
+- entityName: string
 - gaps: string[] (list of missing/incomplete fields)
 - missingImages: boolean
 - priority: 'high' | 'medium' | 'low'
@@ -73,7 +123,7 @@ Only return the JSON array, no other text.`;
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 4096,
+          max_tokens: 8192,
           messages: [{ role: "user", content: analysisPrompt }],
         }),
       });
@@ -100,12 +150,38 @@ Only return the JSON array, no other text.`;
 
       console.log(`[Orchestrator] Analysis complete: ${analysisResults.length} entities need updates`);
 
+      // Store the analysis report
+      if (analysisResults.length > 0) {
+        const { error: insertError } = await supabase.from("agent_reports").insert({
+          agent_name: "content-orchestrator",
+          agent_category: "content",
+          title: `Content Audit: ${entityType || 'all'} entities`,
+          description: `Analyzed ${entitiesToAnalyze.length} entities, found ${analysisResults.length} with gaps`,
+          severity: analysisResults.filter((r: any) => r.priority === 'high').length > 5 ? "warning" : "info",
+          status: "pending",
+          details: { 
+            results: analysisResults, 
+            timestamp: new Date().toISOString(),
+            summary: {
+              total: entitiesToAnalyze.length,
+              needsUpdate: analysisResults.length,
+              missingImages: analysisResults.filter((r: any) => r.missingImages).length,
+              highPriority: analysisResults.filter((r: any) => r.priority === 'high').length,
+            }
+          },
+        });
+
+        if (insertError) {
+          console.error("[Orchestrator] Failed to store report:", insertError);
+        }
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
           action: "analyze",
           results: analysisResults,
-          totalEntities: entities?.length || 0,
+          totalEntities: entitiesToAnalyze.length,
           needsUpdate: analysisResults.length,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
