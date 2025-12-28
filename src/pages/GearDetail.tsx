@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, E
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
+import GearYouTubeVideos from "@/components/GearYouTubeVideos";
 
 const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -414,65 +415,12 @@ const GearDetail = () => {
             </section>
           )}
 
-          {/* YouTube Videos - Embedded */}
+          {/* YouTube Videos - VHS Design System */}
           {gearItem.youtubeVideos && gearItem.youtubeVideos.length > 0 && (
-            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
-              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
-                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                Media & Demos
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {gearItem.youtubeVideos.map((video, i) => {
-                  // Extract YouTube video ID from various URL formats
-                  const getYouTubeId = (url: string) => {
-                    // Handle standard watch URLs
-                    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([^&\s]+)/);
-                    if (watchMatch) return watchMatch[1];
-                    
-                    // Handle short URLs
-                    const shortMatch = url.match(/(?:youtu\.be\/)([^?\s]+)/);
-                    if (shortMatch) return shortMatch[1];
-                    
-                    // Handle embed URLs
-                    const embedMatch = url.match(/(?:youtube\.com\/embed\/)([^?\s]+)/);
-                    if (embedMatch) return embedMatch[1];
-                    
-                    return null;
-                  };
-                  
-                  const videoId = getYouTubeId(video.url);
-                  
-                  return (
-                    <div key={i} className="border border-border overflow-hidden bg-card/30">
-                      {videoId ? (
-                        <div className="aspect-video">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${videoId}`}
-                            title={video.title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="w-full h-full"
-                          />
-                        </div>
-                      ) : (
-                        <a
-                          href={video.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="aspect-video bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
-                        >
-                          <Play className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground" />
-                        </a>
-                      )}
-                      <div className="p-3 sm:p-4">
-                        <h3 className="font-mono text-xs sm:text-sm mb-1 line-clamp-2">{video.title}</h3>
-                        <p className="font-mono text-[10px] sm:text-xs text-muted-foreground">{video.channel}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+            <GearYouTubeVideos 
+              videos={gearItem.youtubeVideos} 
+              gearName={gearItem.name} 
+            />
           )}
         </div>
       </PageLayout>

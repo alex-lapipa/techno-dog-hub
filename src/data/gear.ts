@@ -121,7 +121,7 @@ export const gear: GearItem[] = [
     },
     youtubeVideos: [
       { title: 'Roland TB-303 Bass Line In Action', url: 'https://www.youtube.com/watch?v=rt71d5LIV5M', channel: 'Doctor Mix' },
-      { title: 'TB-303 Patterns and Programming', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' }
+      { title: 'Roland TB-03: Complete Tutorial', url: 'https://www.youtube.com/watch?v=ts_3C07Zgtw', channel: 'Woochia' }
     ]
   },
   {
@@ -173,8 +173,8 @@ export const gear: GearItem[] = [
       sourceName: 'Wikimedia Commons'
     },
     youtubeVideos: [
-      { title: 'The Roland TR-808 In Action', url: 'https://www.youtube.com/watch?v=nEDuHsCEDfs', channel: 'Doctor Mix' },
-      { title: 'TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=Ov38brxRGks', channel: 'Roland' }
+      { title: 'Roland TR-808 Software Rhythm Composer', url: 'https://www.youtube.com/watch?v=BHzUYO3PQ3s', channel: 'Roland' },
+      { title: 'Roland TR-808 Give it up Demo', url: 'https://www.youtube.com/watch?v=0WivSAUv-68', channel: 'Performance Demo' }
     ]
   },
   {
@@ -226,8 +226,8 @@ export const gear: GearItem[] = [
       sourceName: 'Wikimedia Commons'
     },
     youtubeVideos: [
-      { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Roland' },
-      { title: 'Roland TR-909 Famous Patterns', url: 'https://www.youtube.com/watch?v=ld4n-dT-qQg', channel: 'Doctor Mix' }
+      { title: 'TR-909: The Beat Goes On', url: 'https://www.youtube.com/watch?v=4k35KPppf-U', channel: 'Alex Ball' },
+      { title: 'Roland TR-909 Drum Machine Demo', url: 'https://www.youtube.com/watch?v=sEFEivTgNVI', channel: 'Demo' }
     ]
   },
   {
@@ -278,7 +278,8 @@ export const gear: GearItem[] = [
       sourceName: 'Wikimedia Commons'
     },
     youtubeVideos: [
-      { title: 'Roland SH-101 History and Sound', url: 'https://www.youtube.com/watch?v=nPt6j-qFvQY', channel: 'Vintage Synth Explorer' }
+      { title: 'The Roland SH-101 In Action', url: 'https://www.youtube.com/watch?v=za6tzUIzoXQ', channel: 'Doctor Mix' },
+      { title: 'Roland SH-101 Tutorial and Overview', url: 'https://www.youtube.com/watch?v=PFXO4ZRsVC4', channel: 'Once Upon a Synth' }
     ]
   },
   {
@@ -329,8 +330,8 @@ export const gear: GearItem[] = [
       sourceName: 'Wikimedia Commons'
     },
     youtubeVideos: [
-      { title: 'Roland Cloud JUNO-106 Demo & Review', url: 'https://www.youtube.com/watch?v=xdh3hu3SMVU', channel: 'Roland' },
-      { title: 'Roland Icon Series: The JUNO-106', url: 'https://www.youtube.com/watch?v=nf4Y-8R0T9M', channel: 'Roland' }
+      { title: 'The Roland Juno-106 In Action', url: 'https://www.youtube.com/watch?v=B-N2EuqCmUs', channel: 'Doctor Mix' },
+      { title: 'Roland JUNO-106 Demo & Review', url: 'https://www.youtube.com/watch?v=HiOkALh4n5Y', channel: 'musictrackjp' }
     ]
   },
   {
