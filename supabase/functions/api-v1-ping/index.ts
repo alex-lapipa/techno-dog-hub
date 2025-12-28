@@ -1,9 +1,6 @@
-import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient } from "../_shared/supabase.ts";
 
 // SHA-256 hash function
 async function hashKey(key: string): Promise<string> {
@@ -84,7 +81,6 @@ async function checkRateLimit(
 
   if (error) {
     console.error('Rate limit check error:', error);
-    // Allow request on error but log it
     return { allowed: true, remaining: 0, resetAt: new Date().toISOString() };
   }
 
@@ -101,14 +97,11 @@ async function checkRateLimit(
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createServiceClient();
 
     // Extract API key from Authorization header
     const authHeader = req.headers.get('Authorization');
@@ -182,9 +175,6 @@ Deno.serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('API v1 ping error:', error);
-    return new Response(
-      JSON.stringify({ ok: false, error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse(errorMessage);
   }
 });

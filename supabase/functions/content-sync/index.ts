@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
 
 interface ContentEntity {
   type: 'artist' | 'venue' | 'festival' | 'gear' | 'label' | 'release' | 'crew';
@@ -153,10 +149,32 @@ If everything is correct, return empty corrections array and verified: true.
 `;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+function applyCorrections(
+  data: Record<string, unknown>,
+  corrections: Array<{ field: string; corrected: string }>
+): Record<string, unknown> {
+  const corrected = { ...data };
+  
+  for (const correction of corrections) {
+    const parts = correction.field.split('.');
+    let current = corrected;
+    
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (current[parts[i]] && typeof current[parts[i]] === 'object') {
+        current = current[parts[i]] as Record<string, unknown>;
+      }
+    }
+    
+    const lastPart = parts[parts.length - 1];
+    current[lastPart] = correction.corrected;
   }
+  
+  return corrected;
+}
+
+serve(async (req) => {
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
@@ -167,7 +185,7 @@ serve(async (req) => {
       throw new Error('Missing required environment variables');
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createServiceClient();
     
     // Security: Verify admin authorization
     const authHeader = req.headers.get('Authorization');
@@ -176,10 +194,7 @@ serve(async (req) => {
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       
       if (authError || !user) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return errorResponse('Unauthorized', 401);
       }
       
       // Check if user is admin
@@ -191,10 +206,7 @@ serve(async (req) => {
         .single();
       
       if (!roleData) {
-        return new Response(JSON.stringify({ error: 'Admin access required' }), {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return errorResponse('Admin access required', 403);
       }
     }
     
@@ -278,42 +290,14 @@ serve(async (req) => {
 
     console.log('Content sync completed:', summary);
 
-    return new Response(JSON.stringify({ 
+    return jsonResponse({ 
       success: true,
       summary,
       results
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in content-sync:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(message);
   }
 });
-
-function applyCorrections(
-  data: Record<string, unknown>,
-  corrections: Array<{ field: string; corrected: string }>
-): Record<string, unknown> {
-  const corrected = { ...data };
-  
-  for (const correction of corrections) {
-    const parts = correction.field.split('.');
-    let current = corrected;
-    
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (current[parts[i]] && typeof current[parts[i]] === 'object') {
-        current = current[parts[i]] as Record<string, unknown>;
-      }
-    }
-    
-    const lastPart = parts[parts.length - 1];
-    current[lastPart] = correction.corrected;
-  }
-  
-  return corrected;
-}
