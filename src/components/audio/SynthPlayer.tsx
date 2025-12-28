@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, RotateCcw } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, RotateCcw, Waves } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -64,7 +64,13 @@ const SynthPlayer = ({
   className 
 }: SynthPlayerProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
+  const dryGainRef = useRef<GainNode | null>(null);
+  const reverbGainRef = useRef<GainNode | null>(null);
+  const delayGainRef = useRef<GainNode | null>(null);
+  const delayNodeRef = useRef<DelayNode | null>(null);
+  const feedbackGainRef = useRef<GainNode | null>(null);
+  const convolverRef = useRef<ConvolverNode | null>(null);
   const sequencerRef = useRef<number | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
@@ -73,23 +79,97 @@ const SynthPlayer = ({
   const [patternType, setPatternType] = useState<PatternType>("warehouse");
   const [bpm, setBpm] = useState(PATTERNS.warehouse.bpm);
   const [currentStep, setCurrentStep] = useState(0);
+  const [reverbMix, setReverbMix] = useState(0.2);
+  const [delayMix, setDelayMix] = useState(0.15);
+  const [delayTime, setDelayTime] = useState(0.375); // 3/16 note at 120bpm
+  const [delayFeedback, setDelayFeedback] = useState(0.4);
+  const [showEffects, setShowEffects] = useState(false);
 
   const pattern = PATTERNS[patternType];
 
+  // Create impulse response for reverb
+  const createImpulseResponse = useCallback((ctx: AudioContext, duration: number, decay: number) => {
+    const sampleRate = ctx.sampleRate;
+    const length = sampleRate * duration;
+    const impulse = ctx.createBuffer(2, length, sampleRate);
+    
+    for (let channel = 0; channel < 2; channel++) {
+      const channelData = impulse.getChannelData(channel);
+      for (let i = 0; i < length; i++) {
+        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
+  }, []);
+
   const initAudio = useCallback(() => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-      gainNodeRef.current = audioContextRef.current.createGain();
-      gainNodeRef.current.connect(audioContextRef.current.destination);
-      gainNodeRef.current.gain.value = isMuted ? 0 : volume;
+      const ctx = new AudioContext();
+      audioContextRef.current = ctx;
+      
+      // Master output
+      masterGainRef.current = ctx.createGain();
+      masterGainRef.current.gain.value = isMuted ? 0 : volume;
+      masterGainRef.current.connect(ctx.destination);
+      
+      // Dry signal path
+      dryGainRef.current = ctx.createGain();
+      dryGainRef.current.gain.value = 1 - reverbMix - delayMix;
+      dryGainRef.current.connect(masterGainRef.current);
+      
+      // Reverb path
+      convolverRef.current = ctx.createConvolver();
+      convolverRef.current.buffer = createImpulseResponse(ctx, 2.5, 3);
+      reverbGainRef.current = ctx.createGain();
+      reverbGainRef.current.gain.value = reverbMix;
+      convolverRef.current.connect(reverbGainRef.current);
+      reverbGainRef.current.connect(masterGainRef.current);
+      
+      // Delay path
+      delayNodeRef.current = ctx.createDelay(2);
+      delayNodeRef.current.delayTime.value = delayTime;
+      feedbackGainRef.current = ctx.createGain();
+      feedbackGainRef.current.gain.value = delayFeedback;
+      delayGainRef.current = ctx.createGain();
+      delayGainRef.current.gain.value = delayMix;
+      
+      // Delay feedback loop
+      delayNodeRef.current.connect(feedbackGainRef.current);
+      feedbackGainRef.current.connect(delayNodeRef.current);
+      delayNodeRef.current.connect(delayGainRef.current);
+      delayGainRef.current.connect(masterGainRef.current);
     }
     return audioContextRef.current;
-  }, [volume, isMuted]);
+  }, [volume, isMuted, reverbMix, delayMix, delayTime, delayFeedback, createImpulseResponse]);
+
+  // Update effect parameters in real-time
+  useEffect(() => {
+    if (dryGainRef.current) {
+      dryGainRef.current.gain.value = Math.max(0, 1 - reverbMix - delayMix);
+    }
+    if (reverbGainRef.current) {
+      reverbGainRef.current.gain.value = reverbMix;
+    }
+    if (delayGainRef.current) {
+      delayGainRef.current.gain.value = delayMix;
+    }
+    if (delayNodeRef.current) {
+      delayNodeRef.current.delayTime.value = delayTime;
+    }
+    if (feedbackGainRef.current) {
+      feedbackGainRef.current.gain.value = delayFeedback;
+    }
+  }, [reverbMix, delayMix, delayTime, delayFeedback]);
+
+  const connectToEffects = useCallback((source: AudioNode) => {
+    if (dryGainRef.current) source.connect(dryGainRef.current);
+    if (convolverRef.current) source.connect(convolverRef.current);
+    if (delayNodeRef.current) source.connect(delayNodeRef.current);
+  }, []);
 
   const playKick = useCallback((time: number, hard = false) => {
     const ctx = audioContextRef.current;
-    const gain = gainNodeRef.current;
-    if (!ctx || !gain) return;
+    if (!ctx) return;
 
     const osc = ctx.createOscillator();
     const oscGain = ctx.createGain();
@@ -102,18 +182,17 @@ const SynthPlayer = ({
     oscGain.gain.exponentialRampToValueAtTime(0.01, time + (hard ? 0.2 : 0.3));
     
     osc.connect(oscGain);
-    oscGain.connect(gain);
+    connectToEffects(oscGain);
     
     osc.start(time);
     osc.stop(time + 0.3);
-  }, []);
+  }, [connectToEffects]);
 
-  const playHihat = useCallback((time: number, open = false) => {
+  const playHihat = useCallback((time: number) => {
     const ctx = audioContextRef.current;
-    const gain = gainNodeRef.current;
-    if (!ctx || !gain) return;
+    if (!ctx) return;
 
-    const duration = open ? 0.1 : 0.05;
+    const duration = 0.05;
     const bufferSize = ctx.sampleRate * duration;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -135,15 +214,14 @@ const SynthPlayer = ({
     
     noise.connect(filter);
     filter.connect(oscGain);
-    oscGain.connect(gain);
+    connectToEffects(oscGain);
     
     noise.start(time);
-  }, [patternType]);
+  }, [patternType, connectToEffects]);
 
   const playSnare = useCallback((time: number) => {
     const ctx = audioContextRef.current;
-    const gain = gainNodeRef.current;
-    if (!ctx || !gain) return;
+    if (!ctx) return;
 
     const isIndustrial = patternType === "industrial";
     
@@ -169,7 +247,7 @@ const SynthPlayer = ({
     
     noise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
-    noiseGain.connect(gain);
+    connectToEffects(noiseGain);
     
     noise.start(time);
 
@@ -185,16 +263,15 @@ const SynthPlayer = ({
     oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
     
     osc.connect(oscGain);
-    oscGain.connect(gain);
+    connectToEffects(oscGain);
     
     osc.start(time);
     osc.stop(time + 0.1);
-  }, [patternType]);
+  }, [patternType, connectToEffects]);
 
   const playBass = useCallback((time: number, note = 55) => {
     const ctx = audioContextRef.current;
-    const gain = gainNodeRef.current;
-    if (!ctx || !gain) return;
+    if (!ctx) return;
 
     const isAcid = patternType === "acid";
     
@@ -208,7 +285,6 @@ const SynthPlayer = ({
     filter.type = "lowpass";
     
     if (isAcid) {
-      // Acid-style resonant filter sweep
       filter.Q.value = 15;
       filter.frequency.setValueAtTime(200, time);
       filter.frequency.exponentialRampToValueAtTime(1500, time + 0.05);
@@ -223,11 +299,11 @@ const SynthPlayer = ({
     
     osc.connect(filter);
     filter.connect(oscGain);
-    oscGain.connect(gain);
+    connectToEffects(oscGain);
     
     osc.start(time);
     osc.stop(time + 0.25);
-  }, [patternType]);
+  }, [patternType, connectToEffects]);
 
   const startSequencer = useCallback(() => {
     const ctx = initAudio();
@@ -297,7 +373,6 @@ const SynthPlayer = ({
     setBpm(PATTERNS[newPattern].bpm);
     setCurrentStep(0);
     if (wasPlaying) {
-      // Small delay to let state update
       setTimeout(() => {
         startSequencer();
         setIsPlaying(true);
@@ -306,8 +381,8 @@ const SynthPlayer = ({
   };
 
   useEffect(() => {
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = isMuted ? 0 : volume;
+    if (masterGainRef.current) {
+      masterGainRef.current.gain.value = isMuted ? 0 : volume;
     }
   }, [volume, isMuted]);
 
@@ -320,7 +395,6 @@ const SynthPlayer = ({
     };
   }, [stopSequencer]);
 
-  // Restart sequencer when BPM changes while playing
   useEffect(() => {
     if (isPlaying) {
       stopSequencer();
@@ -335,6 +409,12 @@ const SynthPlayer = ({
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
+  };
+
+  // Sync delay time to BPM
+  const syncDelayToBpm = () => {
+    const quarterNote = 60 / bpm;
+    setDelayTime(quarterNote * 0.75); // Dotted eighth
   };
 
   return (
@@ -421,6 +501,122 @@ const SynthPlayer = ({
           <span className="font-mono text-sm font-bold w-8 text-right">{bpm}</span>
         </div>
       </div>
+
+      {/* Effects Toggle */}
+      <div className="mb-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-between font-mono text-[10px] uppercase tracking-wider h-8"
+          onClick={() => setShowEffects(!showEffects)}
+        >
+          <span className="flex items-center gap-2">
+            <Waves className="w-3 h-3" />
+            Effects
+          </span>
+          <span className={cn(
+            "transition-transform",
+            showEffects && "rotate-180"
+          )}>
+            ▼
+          </span>
+        </Button>
+      </div>
+
+      {/* Effects Panel */}
+      {showEffects && (
+        <div className="mb-4 p-3 bg-background/50 rounded-lg border border-border/50 space-y-4">
+          {/* Reverb */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                Reverb
+              </span>
+              <span className="font-mono text-[10px] text-logo-green">
+                {Math.round(reverbMix * 100)}%
+              </span>
+            </div>
+            <Slider
+              value={[reverbMix]}
+              min={0}
+              max={0.6}
+              step={0.01}
+              onValueChange={(v) => setReverbMix(v[0])}
+              className="w-full"
+            />
+          </div>
+
+          {/* Delay Mix */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                Delay Mix
+              </span>
+              <span className="font-mono text-[10px] text-logo-green">
+                {Math.round(delayMix * 100)}%
+              </span>
+            </div>
+            <Slider
+              value={[delayMix]}
+              min={0}
+              max={0.5}
+              step={0.01}
+              onValueChange={(v) => setDelayMix(v[0])}
+              className="w-full"
+            />
+          </div>
+
+          {/* Delay Time */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                Delay Time
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 px-2 font-mono text-[9px]"
+                  onClick={syncDelayToBpm}
+                >
+                  Sync
+                </Button>
+                <span className="font-mono text-[10px] text-logo-green w-12 text-right">
+                  {Math.round(delayTime * 1000)}ms
+                </span>
+              </div>
+            </div>
+            <Slider
+              value={[delayTime]}
+              min={0.05}
+              max={1}
+              step={0.01}
+              onValueChange={(v) => setDelayTime(v[0])}
+              className="w-full"
+            />
+          </div>
+
+          {/* Delay Feedback */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                Feedback
+              </span>
+              <span className="font-mono text-[10px] text-logo-green">
+                {Math.round(delayFeedback * 100)}%
+              </span>
+            </div>
+            <Slider
+              value={[delayFeedback]}
+              min={0}
+              max={0.85}
+              step={0.01}
+              onValueChange={(v) => setDelayFeedback(v[0])}
+              className="w-full"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="flex items-center justify-between">
