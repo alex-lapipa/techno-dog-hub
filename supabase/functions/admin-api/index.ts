@@ -1,7 +1,9 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient } from "../_shared/supabase.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+// Extended CORS headers for admin API (includes x-api-key)
+const adminCorsHeaders = {
+  ...corsHeaders,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-api-key",
 };
 
@@ -501,47 +503,42 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
       if (error) throw error;
       return { updated: true, entity: data };
     }
-  }
-
-  // DJ Artists Management
-  if (contentType === "dj-artists") {
-    const url = new URL(req.url);
-    const limit = parseInt(url.searchParams.get("limit") || "50");
-    const offset = parseInt(url.searchParams.get("offset") || "0");
-    const search = url.searchParams.get("search") || "";
-
-    if (method === "GET" && segments.length === 2) {
-      // List all DJ artists with pagination and search
-      let query = supabase
-        .from("dj_artists")
-        .select("id, rank, artist_name, real_name, nationality, years_active, subgenres, labels, top_tracks, known_for, created_at")
-        .order("rank", { ascending: true });
-
-      if (search) {
-        query = query.or(`artist_name.ilike.%${search}%,real_name.ilike.%${search}%,known_for.ilike.%${search}%`);
-      }
-
-      const { data, error, count } = await query
-        .range(offset, offset + limit - 1);
+    
+    if (method === "DELETE" && segments.length === 3) {
+      const entityId = segments[2];
+      const { error } = await supabase
+        .from("td_knowledge_entities")
+        .delete()
+        .eq("id", entityId);
       
       if (error) throw error;
+      return { deleted: true };
+    }
+  }
+  
+  if (contentType === "dj-artists") {
+    if (method === "GET") {
+      const url = new URL(req.url);
+      const limit = parseInt(url.searchParams.get("limit") || "100");
+      const search = url.searchParams.get("search") || "";
 
-      // Get total count
-      const { count: totalCount } = await supabase
+      let query = supabase
         .from("dj_artists")
-        .select("*", { count: "exact", head: true });
+        .select("*")
+        .order("rank", { ascending: true })
+        .limit(limit);
 
-      return { 
-        artists: data, 
-        count: data?.length || 0,
-        total: totalCount || 0,
-        offset,
-        limit,
-      };
+      if (search) {
+        query = query.or(`artist_name.ilike.%${search}%,real_name.ilike.%${search}%`);
+      }
+
+      const { data, error } = await query;
+      
+      if (error) throw error;
+      return { artists: data, count: data?.length || 0 };
     }
 
     if (method === "GET" && segments.length === 3) {
-      // Get specific DJ artist by ID
       const artistId = segments[2];
       const { data, error } = await supabase
         .from("dj_artists")
@@ -550,36 +547,15 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
         .maybeSingle();
       
       if (error) throw error;
-      if (!data) throw new Error("DJ artist not found");
+      if (!data) throw new Error("Artist not found");
       return { artist: data };
     }
 
     if (method === "POST") {
-      // Create new DJ artist
       const body = await req.json();
-      
-      // Validate required fields
-      if (!body.artist_name) {
-        throw new Error("artist_name is required");
-      }
-
-      const insertData = {
-        artist_name: body.artist_name,
-        real_name: body.real_name || null,
-        nationality: body.nationality || null,
-        born: body.born || null,
-        died: body.died || null,
-        years_active: body.years_active || null,
-        subgenres: body.subgenres || [],
-        labels: body.labels || [],
-        top_tracks: body.top_tracks || [],
-        known_for: body.known_for || null,
-        rank: body.rank || 9999,
-      };
-
       const { data, error } = await supabase
         .from("dj_artists")
-        .insert(insertData)
+        .insert(body)
         .select()
         .maybeSingle();
       
@@ -588,331 +564,81 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
     }
 
     if (method === "PATCH" && segments.length === 3) {
-      // Update existing DJ artist
       const artistId = segments[2];
       const body = await req.json();
       
-      const updates: Record<string, any> = {};
-      if (body.artist_name !== undefined) updates.artist_name = body.artist_name;
-      if (body.real_name !== undefined) updates.real_name = body.real_name;
-      if (body.nationality !== undefined) updates.nationality = body.nationality;
-      if (body.born !== undefined) updates.born = body.born;
-      if (body.died !== undefined) updates.died = body.died;
-      if (body.years_active !== undefined) updates.years_active = body.years_active;
-      if (body.subgenres !== undefined) updates.subgenres = body.subgenres;
-      if (body.labels !== undefined) updates.labels = body.labels;
-      if (body.top_tracks !== undefined) updates.top_tracks = body.top_tracks;
-      if (body.known_for !== undefined) updates.known_for = body.known_for;
-      if (body.rank !== undefined) updates.rank = body.rank;
-
       const { data, error } = await supabase
         .from("dj_artists")
-        .update(updates)
+        .update(body)
         .eq("id", artistId)
         .select()
         .maybeSingle();
       
       if (error) throw error;
-      if (!data) throw new Error("DJ artist not found");
       return { updated: true, artist: data };
     }
 
     if (method === "DELETE" && segments.length === 3) {
-      // Delete DJ artist
       const artistId = segments[2];
-      
-      // First check if artist exists
-      const { data: existing } = await supabase
-        .from("dj_artists")
-        .select("id, artist_name")
-        .eq("id", artistId)
-        .maybeSingle();
-      
-      if (!existing) throw new Error("DJ artist not found");
-
       const { error } = await supabase
         .from("dj_artists")
         .delete()
         .eq("id", artistId);
       
       if (error) throw error;
-      return { deleted: true, artist_name: existing.artist_name };
-    }
-
-    // Bulk operations
-    if (method === "POST" && segments[2] === "bulk") {
-      const body = await req.json();
-      const { action, artist_ids, updates } = body;
-
-      if (action === "update" && artist_ids && updates) {
-        const { data, error } = await supabase
-          .from("dj_artists")
-          .update(updates)
-          .in("id", artist_ids)
-          .select();
-        
-        if (error) throw error;
-        return { updated: true, count: data?.length || 0 };
-      }
-
-      if (action === "delete" && artist_ids) {
-        const { error } = await supabase
-          .from("dj_artists")
-          .delete()
-          .in("id", artist_ids);
-        
-        if (error) throw error;
-        return { deleted: true, count: artist_ids.length };
-      }
-
-      throw new Error("Invalid bulk action");
+      return { deleted: true };
     }
   }
 
-  // Media Assets Management
-  if (contentType === "media-assets") {
-    const url = new URL(req.url);
-    const limit = parseInt(url.searchParams.get("limit") || "50");
-    const offset = parseInt(url.searchParams.get("offset") || "0");
-    const entityType = url.searchParams.get("entity_type") || "";
-    const entityId = url.searchParams.get("entity_id") || "";
-    const finalSelected = url.searchParams.get("final_selected");
+  if (contentType === "media") {
+    if (method === "GET") {
+      const url = new URL(req.url);
+      const limit = parseInt(url.searchParams.get("limit") || "50");
+      const entityType = url.searchParams.get("entity_type") || "";
 
-    if (method === "GET" && segments.length === 2) {
-      // List media assets with filters
       let query = supabase
         .from("media_assets")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(limit);
 
       if (entityType) {
         query = query.eq("entity_type", entityType);
       }
-      if (entityId) {
-        query = query.eq("entity_id", entityId);
-      }
-      if (finalSelected !== null && finalSelected !== "") {
-        query = query.eq("final_selected", finalSelected === "true");
-      }
 
-      const { data, error } = await query.range(offset, offset + limit - 1);
+      const { data, error } = await query;
       
       if (error) throw error;
-
-      // Get total count
-      let countQuery = supabase
-        .from("media_assets")
-        .select("*", { count: "exact", head: true });
-      
-      if (entityType) countQuery = countQuery.eq("entity_type", entityType);
-      if (entityId) countQuery = countQuery.eq("entity_id", entityId);
-      
-      const { count: totalCount } = await countQuery;
-
-      return { 
-        assets: data, 
-        count: data?.length || 0,
-        total: totalCount || 0,
-        offset,
-        limit,
-      };
-    }
-
-    if (method === "GET" && segments.length === 3) {
-      // Get specific media asset
-      const assetId = segments[2];
-      const { data, error } = await supabase
-        .from("media_assets")
-        .select("*")
-        .eq("id", assetId)
-        .maybeSingle();
-      
-      if (error) throw error;
-      if (!data) throw new Error("Media asset not found");
-      return { asset: data };
-    }
-
-    if (method === "POST" && segments.length === 2) {
-      // Create new media asset
-      const body = await req.json();
-      
-      if (!body.entity_type || !body.entity_id || !body.entity_name) {
-        throw new Error("entity_type, entity_id, and entity_name are required");
-      }
-
-      const insertData = {
-        entity_type: body.entity_type,
-        entity_id: body.entity_id,
-        entity_name: body.entity_name,
-        source_url: body.source_url || null,
-        storage_url: body.storage_url || null,
-        storage_path: body.storage_path || null,
-        provider: body.provider || null,
-        license_status: body.license_status || "unknown",
-        license_name: body.license_name || null,
-        license_url: body.license_url || null,
-        copyright_risk: body.copyright_risk || "unknown",
-        alt_text: body.alt_text || null,
-        tags: body.tags || [],
-        meta: body.meta || {},
-        match_score: body.match_score || 0,
-        quality_score: body.quality_score || 0,
-        openai_verified: body.openai_verified || false,
-        final_selected: body.final_selected || false,
-        reasoning_summary: body.reasoning_summary || null,
-      };
-
-      const { data, error } = await supabase
-        .from("media_assets")
-        .insert(insertData)
-        .select()
-        .maybeSingle();
-      
-      if (error) throw error;
-      return { created: true, asset: data };
+      return { assets: data, count: data?.length || 0 };
     }
 
     if (method === "PATCH" && segments.length === 3) {
-      // Update media asset
       const assetId = segments[2];
       const body = await req.json();
       
-      const updates: Record<string, any> = {};
-      if (body.source_url !== undefined) updates.source_url = body.source_url;
-      if (body.storage_url !== undefined) updates.storage_url = body.storage_url;
-      if (body.storage_path !== undefined) updates.storage_path = body.storage_path;
-      if (body.provider !== undefined) updates.provider = body.provider;
-      if (body.license_status !== undefined) updates.license_status = body.license_status;
-      if (body.license_name !== undefined) updates.license_name = body.license_name;
-      if (body.license_url !== undefined) updates.license_url = body.license_url;
-      if (body.copyright_risk !== undefined) updates.copyright_risk = body.copyright_risk;
-      if (body.alt_text !== undefined) updates.alt_text = body.alt_text;
-      if (body.tags !== undefined) updates.tags = body.tags;
-      if (body.meta !== undefined) updates.meta = body.meta;
-      if (body.match_score !== undefined) updates.match_score = body.match_score;
-      if (body.quality_score !== undefined) updates.quality_score = body.quality_score;
-      if (body.openai_verified !== undefined) updates.openai_verified = body.openai_verified;
-      if (body.final_selected !== undefined) updates.final_selected = body.final_selected;
-      if (body.reasoning_summary !== undefined) updates.reasoning_summary = body.reasoning_summary;
-      
-      updates.updated_at = new Date().toISOString();
-
       const { data, error } = await supabase
         .from("media_assets")
-        .update(updates)
+        .update(body)
         .eq("id", assetId)
         .select()
         .maybeSingle();
       
       if (error) throw error;
-      if (!data) throw new Error("Media asset not found");
       return { updated: true, asset: data };
     }
 
     if (method === "DELETE" && segments.length === 3) {
-      // Delete media asset
       const assetId = segments[2];
-      
-      const { data: existing } = await supabase
-        .from("media_assets")
-        .select("id, entity_name, storage_path")
-        .eq("id", assetId)
-        .maybeSingle();
-      
-      if (!existing) throw new Error("Media asset not found");
-
       const { error } = await supabase
         .from("media_assets")
         .delete()
         .eq("id", assetId);
       
       if (error) throw error;
-      return { deleted: true, entity_name: existing.entity_name };
-    }
-
-    // Bulk operations
-    if (method === "POST" && segments[2] === "bulk") {
-      const body = await req.json();
-      const { action, asset_ids, updates } = body;
-
-      if (action === "update" && asset_ids && updates) {
-        updates.updated_at = new Date().toISOString();
-        const { data, error } = await supabase
-          .from("media_assets")
-          .update(updates)
-          .in("id", asset_ids)
-          .select();
-        
-        if (error) throw error;
-        return { updated: true, count: data?.length || 0 };
-      }
-
-      if (action === "delete" && asset_ids) {
-        const { error } = await supabase
-          .from("media_assets")
-          .delete()
-          .in("id", asset_ids);
-        
-        if (error) throw error;
-        return { deleted: true, count: asset_ids.length };
-      }
-
-      if (action === "select_final" && asset_ids) {
-        // Mark assets as final selected (and unmark others for same entity)
-        const { data: assets } = await supabase
-          .from("media_assets")
-          .select("entity_type, entity_id")
-          .in("id", asset_ids);
-        
-        if (assets && assets.length > 0) {
-          // Unmark all other assets for same entities
-          for (const asset of assets) {
-            await supabase
-              .from("media_assets")
-              .update({ final_selected: false, updated_at: new Date().toISOString() })
-              .eq("entity_type", asset.entity_type)
-              .eq("entity_id", asset.entity_id)
-              .not("id", "in", `(${asset_ids.join(",")})`);
-          }
-        }
-
-        // Mark selected assets
-        const { data, error } = await supabase
-          .from("media_assets")
-          .update({ final_selected: true, updated_at: new Date().toISOString() })
-          .in("id", asset_ids)
-          .select();
-        
-        if (error) throw error;
-        return { selected: true, count: data?.length || 0 };
-      }
-
-      throw new Error("Invalid bulk action");
-    }
-
-    // Get assets by entity
-    if (method === "GET" && segments[2] === "by-entity") {
-      const url = new URL(req.url);
-      const type = url.searchParams.get("type");
-      const id = url.searchParams.get("id");
-      
-      if (!type || !id) {
-        throw new Error("type and id query params are required");
-      }
-
-      const { data, error } = await supabase
-        .from("media_assets")
-        .select("*")
-        .eq("entity_type", type)
-        .eq("entity_id", id)
-        .order("final_selected", { ascending: false })
-        .order("quality_score", { ascending: false });
-      
-      if (error) throw error;
-      return { assets: data, count: data?.length || 0 };
+      return { deleted: true };
     }
   }
-
+  
   throw new Error("Unknown content endpoint");
 }
 
@@ -922,252 +648,229 @@ async function handleSystem(req: Request, supabase: any, path: string, method: s
   const systemType = segments[1];
   
   if (systemType === "health") {
-    // Get system health overview
-    const [alerts, jobs, agents] = await Promise.all([
-      supabase.from("health_alerts").select("*").is("resolved_at", null).limit(10),
-      supabase.from("media_pipeline_jobs").select("status").in("status", ["queued", "running"]),
-      supabase.from("agent_reports").select("*").eq("status", "pending").limit(10),
+    const checks = await Promise.all([
+      supabase.from("td_news_articles").select("id", { count: "exact", head: true }),
+      supabase.from("community_submissions").select("id", { count: "exact", head: true }),
+      supabase.from("dj_artists").select("id", { count: "exact", head: true }),
+      supabase.from("agent_reports").select("id", { count: "exact", head: true }).eq("status", "pending"),
     ]);
     
     return {
-      health: {
-        active_alerts: alerts.data?.length || 0,
-        pending_jobs: jobs.data?.length || 0,
-        pending_reports: agents.data?.length || 0,
-        alerts: alerts.data,
-      },
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      counts: {
+        articles: checks[0].count || 0,
+        submissions: checks[1].count || 0,
+        artists: checks[2].count || 0,
+        pending_reports: checks[3].count || 0,
+      }
     };
   }
   
   if (systemType === "analytics") {
-    // Get analytics summary
-    const now = new Date();
-    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const url = new URL(req.url);
+    const days = parseInt(url.searchParams.get("days") || "7");
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     
     const { data, error } = await supabase
       .from("analytics_events")
-      .select("event_type, event_name")
-      .gte("created_at", dayAgo.toISOString());
+      .select("event_type, event_name, created_at")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(1000);
     
     if (error) throw error;
     
-    const eventCounts: Record<string, number> = {};
-    data?.forEach((e: any) => {
-      eventCounts[e.event_name] = (eventCounts[e.event_name] || 0) + 1;
-    });
+    // Aggregate by event type
+    const byType: Record<string, number> = {};
+    for (const event of data || []) {
+      byType[event.event_type] = (byType[event.event_type] || 0) + 1;
+    }
     
-    return {
-      analytics: {
-        period: "24h",
-        total_events: data?.length || 0,
-        by_event: eventCounts,
-      },
-    };
+    return { events: data, summary: byType, days };
   }
   
   if (systemType === "api-usage") {
-    // Get API usage stats
+    const url = new URL(req.url);
+    const days = parseInt(url.searchParams.get("days") || "7");
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    
     const { data, error } = await supabase
       .from("api_usage")
-      .select("endpoint, request_count, window_start")
-      .gte("window_start", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      .select("endpoint, request_count, window_start, api_key_id")
+      .gte("window_start", since)
       .order("window_start", { ascending: false })
-      .limit(100);
+      .limit(500);
     
     if (error) throw error;
     
-    const totalRequests = data?.reduce((sum: number, r: any) => sum + r.request_count, 0) || 0;
+    // Aggregate by endpoint
+    const byEndpoint: Record<string, number> = {};
+    for (const usage of data || []) {
+      byEndpoint[usage.endpoint] = (byEndpoint[usage.endpoint] || 0) + usage.request_count;
+    }
     
-    return {
-      api_usage: {
-        period: "24h",
-        total_requests: totalRequests,
-        recent: data?.slice(0, 20),
-      },
-    };
+    return { usage: data, summary: byEndpoint, days };
   }
-  
-  if (systemType === "audit") {
-    // Get recent audit logs
-    const { data, error } = await supabase
+
+  if (systemType === "audit-log") {
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "100");
+    const actionType = url.searchParams.get("action_type") || "";
+
+    let query = supabase
       .from("admin_audit_log")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(limit);
+
+    if (actionType) {
+      query = query.eq("action_type", actionType);
+    }
+
+    const { data, error } = await query;
     
     if (error) throw error;
-    return { audit_logs: data };
+    return { logs: data, count: data?.length || 0 };
   }
 
-  if (systemType === "agents" && method === "GET") {
-    // Get agent status
-    const { data, error } = await supabase
+  if (systemType === "agent-reports") {
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "50");
+    const status = url.searchParams.get("status") || "";
+    const severity = url.searchParams.get("severity") || "";
+
+    let query = supabase
       .from("agent_reports")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(limit);
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+    if (severity) {
+      query = query.eq("severity", severity);
+    }
+
+    const { data, error } = await query;
     
     if (error) throw error;
-    return { agent_reports: data };
+    return { reports: data, count: data?.length || 0 };
   }
-
+  
   throw new Error("Unknown system endpoint");
 }
 
 // Log admin action
 async function logAdminAction(
   supabase: any,
-  adminUserId: string,
-  action: string,
+  userId: string,
+  actionType: string,
   entityType: string,
   entityId: string | null,
-  details: Record<string, any>
+  details: any,
+  req: Request
 ) {
-  await supabase.from("admin_audit_log").insert({
-    admin_user_id: adminUserId,
-    action_type: action,
-    entity_type: entityType,
-    entity_id: entityId,
-    details,
-  });
+  try {
+    await supabase.from("admin_audit_log").insert({
+      admin_user_id: userId,
+      action_type: actionType,
+      entity_type: entityType,
+      entity_id: entityId,
+      details,
+      ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+      user_agent: req.headers.get("user-agent"),
+    });
+  } catch (e) {
+    console.error("Failed to log admin action:", e);
+  }
 }
 
+// Main handler
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: adminCorsHeaders });
   }
 
-  const url = new URL(req.url);
-  const path = url.pathname.replace("/admin-api", "");
-  const method = req.method;
-
-  console.log(`[Admin API] ${method} ${path}`);
-
   try {
-    // Get API key from header
+    const supabase = createServiceClient();
+    const url = new URL(req.url);
+    const path = url.pathname.replace("/admin-api", "");
+    const method = req.method;
+
+    console.log(`Admin API: ${method} ${path}`);
+
+    // Simple health check (no auth required)
+    if (path === "/ping" || path === "/") {
+      return new Response(JSON.stringify({ status: "ok", timestamp: new Date().toISOString() }), {
+        headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate API key
     const apiKey = req.headers.get("x-api-key") || req.headers.get("authorization")?.replace("Bearer ", "");
     
     if (!apiKey) {
-      return new Response(
-        JSON.stringify({ error: "Missing API key", code: "UNAUTHORIZED" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "API key required" }), {
+        status: 401,
+        headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Create admin client
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
-    // Validate API key
     const validation = await validateAdminApiKey(apiKey, supabase);
     
     if (!validation.valid) {
-      console.error(`[Admin API] Auth failed: ${validation.error}`);
-      return new Response(
-        JSON.stringify({ error: validation.error, code: "FORBIDDEN" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 403,
+        headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log(`[Admin API] Authenticated user: ${validation.userId}`);
-
     let result: any;
-    const segments = path.split("/").filter(Boolean);
-    const resource = segments[0];
+    let entityType = "unknown";
+    let actionType = method;
 
     // Route to appropriate handler
-    switch (resource) {
-      case "users":
-        result = await handleUsers(req, supabase, path, method);
-        break;
-      case "content":
-        result = await handleContent(req, supabase, path, method);
-        break;
-      case "system":
-        result = await handleSystem(req, supabase, path, method);
-        break;
-      case "ping":
-        result = { 
-          status: "ok", 
-          timestamp: new Date().toISOString(),
-          user_id: validation.userId,
-          scopes: validation.scopes,
-        };
-        break;
-      default:
-        return new Response(
-          JSON.stringify({ 
-            error: "Unknown endpoint",
-            available_endpoints: [
-              "GET /ping - Test authentication",
-              "GET /users - List all users",
-              "GET /users/:id - Get user details",
-              "PATCH /users/:id - Update user",
-              "POST /users/roles - Grant/revoke roles",
-              "GET /content/articles - List articles (?status=&search=&limit=&offset=)",
-              "GET /content/articles/:id - Get full article",
-              "POST /content/articles - Create article",
-              "PATCH /content/articles/:id - Update article",
-              "DELETE /content/articles/:id - Delete article",
-              "POST /content/articles/publish - Publish article",
-              "POST /content/articles/unpublish - Unpublish article",
-              "POST /content/articles/archive - Archive article",
-              "POST /content/articles/bulk - Bulk publish/unpublish/archive/delete",
-              "GET /content/submissions - List submissions",
-              "PATCH /content/submissions/:id - Review submission",
-              "GET /content/entities - List entities",
-              "POST /content/entities - Create entity",
-              "PATCH /content/entities/:id - Update entity",
-              "GET /content/dj-artists - List DJ artists (?search=&limit=&offset=)",
-              "GET /content/dj-artists/:id - Get DJ artist details",
-              "POST /content/dj-artists - Create DJ artist",
-              "PATCH /content/dj-artists/:id - Update DJ artist",
-              "DELETE /content/dj-artists/:id - Delete DJ artist",
-              "POST /content/dj-artists/bulk - Bulk update/delete artists",
-              "GET /content/media-assets - List media assets (?entity_type=&entity_id=&final_selected=&limit=&offset=)",
-              "GET /content/media-assets/:id - Get media asset details",
-              "GET /content/media-assets/by-entity - Get assets by entity (?type=&id=)",
-              "POST /content/media-assets - Create media asset",
-              "PATCH /content/media-assets/:id - Update media asset",
-              "DELETE /content/media-assets/:id - Delete media asset",
-              "POST /content/media-assets/bulk - Bulk update/delete/select_final assets",
-              "GET /system/health - System health overview",
-              "GET /system/analytics - Analytics summary",
-              "GET /system/api-usage - API usage stats",
-              "GET /system/audit - Audit logs",
-              "GET /system/agents - Agent reports",
-            ]
-          }),
-          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    if (path.startsWith("/users")) {
+      entityType = "users";
+      result = await handleUsers(req, supabase, path, method);
+    } else if (path.startsWith("/content")) {
+      entityType = "content";
+      result = await handleContent(req, supabase, path, method);
+    } else if (path.startsWith("/system")) {
+      entityType = "system";
+      result = await handleSystem(req, supabase, path, method);
+    } else {
+      return new Response(JSON.stringify({ error: "Unknown endpoint" }), {
+        status: 404,
+        headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Log the action
     await logAdminAction(
       supabase,
       validation.userId!,
-      `${method} ${path}`,
-      resource,
-      segments[2] || null,
-      { scopes: validation.scopes }
+      actionType,
+      entityType,
+      null,
+      { path, result: result ? "success" : "unknown" },
+      req
     );
 
-    return new Response(
-      JSON.stringify({ success: true, data: result }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify(result), {
+      headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+    });
 
   } catch (error) {
-    console.error("[Admin API] Error:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Internal server error",
-        code: "ERROR"
-      }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    console.error("Admin API error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { ...adminCorsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

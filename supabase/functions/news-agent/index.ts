@@ -1,11 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
 
 // ============================================================
 // EDM BLACKLIST - Keywords to filter out commercial content
@@ -284,30 +280,21 @@ async function searchWithFirecrawl(query: string, firecrawlKey: string): Promise
 // ============================================================
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const openaiKey = Deno.env.get('OPENAI_API_KEY');
   const firecrawlKey = Deno.env.get('FIRECRAWL_API_KEY');
 
   if (!openaiKey) {
-    return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse('OPENAI_API_KEY not configured');
   }
 
   if (!firecrawlKey) {
-    return new Response(JSON.stringify({ error: 'FIRECRAWL_API_KEY not configured' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse('FIRECRAWL_API_KEY not configured');
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createServiceClient();
 
   // Create run record
   const { data: runRecord, error: runError } = await supabase
@@ -318,10 +305,7 @@ serve(async (req) => {
 
   if (runError) {
     console.error('Failed to create run record:', runError);
-    return new Response(JSON.stringify({ error: 'Failed to create run record' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse('Failed to create run record');
   }
 
   const runId = runRecord.id;
@@ -420,13 +404,11 @@ serve(async (req) => {
         error_log: 'No suitable underground techno stories found today'
       }).eq('id', runId);
 
-      return new Response(JSON.stringify({ 
+      return jsonResponse({ 
         success: true, 
         message: 'No suitable stories found',
         runId,
         rejected: rejected.length
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -498,78 +480,67 @@ serve(async (req) => {
       .replace('{story}', JSON.stringify({
         title: chosenStory.title,
         source: chosenStory.source,
-        url: chosenStory.url
+        underground_score: chosenStory.underground_score,
+        classification_reason: chosenStory.classification_reason
       }))
-      .replace('{content}', fullContent);
+      .replace('{content}', fullContent.substring(0, 15000));
 
     const article = await callOpenAI(writerPrompt, openaiKey);
-    
-    // Ensure author is from our list
-    if (!AUTHOR_PSEUDONYMS.includes(article.author_pseudonym)) {
-      article.author_pseudonym = getRandomAuthor();
-    }
 
     // ============================================
-    // STEP E: STORE - Save as draft
+    // STEP E: STORE - Save article to database
     // ============================================
-    console.log('Step E: Saving draft article...');
-    
-    const { data: savedArticle, error: articleError } = await supabase
+    console.log('Step E: Storing article...');
+
+    const { data: insertedArticle, error: articleError } = await supabase
       .from('td_news_articles')
       .insert({
         title: article.title,
         subtitle: article.subtitle,
         body_markdown: article.body_markdown,
-        author_pseudonym: article.author_pseudonym,
+        author_pseudonym: article.author_pseudonym || getRandomAuthor(),
+        status: 'draft',
         city_tags: article.city_tags || [],
         genre_tags: article.genre_tags || [],
         entity_tags: article.entity_tags || [],
-        source_urls: [chosenStory.url].filter(Boolean),
+        source_urls: [chosenStory.url],
         source_snapshots: sourceSnapshot ? [sourceSnapshot] : [],
-        confidence_score: article.confidence_score || 0.75,
-        status: 'draft'
+        confidence_score: article.confidence_score || 0.7,
       })
       .select()
       .single();
 
     if (articleError) {
-      throw new Error(`Failed to save article: ${articleError.message}`);
+      console.error('Failed to insert article:', articleError);
+      throw new Error('Failed to store article');
     }
 
-    console.log(`Saved draft article: ${savedArticle.id}`);
+    console.log(`Article stored with ID: ${insertedArticle.id}`);
 
     // ============================================
     // STEP F: EXTRACT ENTITIES
     // ============================================
     console.log('Step F: Extracting entities...');
-    
+
     try {
-      const entityPrompt = ENTITY_EXTRACTOR_PROMPT.replace('{article}', article.body_markdown);
-      const entityResult = await callOpenAI(entityPrompt, openaiKey);
-      
-      if (entityResult.entities && entityResult.entities.length > 0) {
-        for (const entity of entityResult.entities) {
-          // Upsert entity
-          const { data: existingEntity } = await supabase
+      const extractorPrompt = ENTITY_EXTRACTOR_PROMPT.replace('{article}', article.body_markdown);
+      const entities = await callOpenAI(extractorPrompt, openaiKey);
+
+      if (entities?.entities?.length > 0) {
+        for (const entity of entities.entities) {
+          // Check if entity already exists
+          const { data: existing } = await supabase
             .from('td_knowledge_entities')
             .select('id')
             .eq('name', entity.name)
             .eq('type', entity.type)
-            .single();
+            .maybeSingle();
 
-          let entityId: string;
+          let entityId = existing?.id;
 
-          if (existingEntity) {
-            entityId = existingEntity.id;
-            // Update with new info
-            await supabase.from('td_knowledge_entities').update({
-              description: entity.description || undefined,
-              city: entity.city || undefined,
-              country: entity.country || undefined,
-            }).eq('id', entityId);
-          } else {
-            // Insert new entity
-            const { data: newEntity } = await supabase
+          if (!entityId) {
+            // Create new entity
+            const { data: newEntity, error: entityError } = await supabase
               .from('td_knowledge_entities')
               .insert({
                 name: entity.name,
@@ -578,23 +549,25 @@ serve(async (req) => {
                 country: entity.country,
                 description: entity.description,
                 aliases: entity.aliases || [],
-                source_urls: entity.source_urls || []
+                source_urls: entity.source_urls || [],
               })
               .select()
               .single();
-            
-            entityId = newEntity?.id;
+
+            if (!entityError && newEntity) {
+              entityId = newEntity.id;
+            }
           }
 
-          // Link to article (ignore if already exists)
+          // Link entity to article
           if (entityId) {
-            await supabase.from('td_article_entities').upsert({
-              article_id: savedArticle.id,
-              entity_id: entityId
-            }, { onConflict: 'article_id,entity_id', ignoreDuplicates: true });
+            await supabase.from('td_article_entities').insert({
+              article_id: insertedArticle.id,
+              entity_id: entityId,
+            });
           }
         }
-        console.log(`Extracted ${entityResult.entities.length} entities`);
+        console.log(`Extracted ${entities.entities.length} entities`);
       }
     } catch (err) {
       console.error('Entity extraction error:', err);
@@ -602,29 +575,30 @@ serve(async (req) => {
     }
 
     // ============================================
-    // UPDATE RUN RECORD
+    // FINALIZE - Update run record
     // ============================================
     await supabase.from('td_news_agent_runs').update({
-      status: 'success',
+      status: 'completed',
       sources_checked: sourcesChecked,
-      candidates: filtered.slice(0, 20).map(c => ({ title: c.title, url: c.url, score: c.underground_score })),
-      rejected: rejected.slice(0, 50).map(r => ({ title: r.title, reason: r.reason })),
-      chosen_story: { title: chosenStory.title, url: chosenStory.url },
-      final_article_id: savedArticle.id
+      candidates: filtered.slice(0, 20),
+      rejected: rejected.slice(0, 50),
+      chosen_story: {
+        title: chosenStory.title,
+        url: chosenStory.url,
+        source: chosenStory.source,
+        underground_score: chosenStory.underground_score,
+      },
+      final_article_id: insertedArticle.id,
     }).eq('id', runId);
 
-    console.log(`News agent run ${runId} completed successfully`);
-
-    return new Response(JSON.stringify({
+    return jsonResponse({
       success: true,
       runId,
-      articleId: savedArticle.id,
+      articleId: insertedArticle.id,
       title: article.title,
       candidatesFound: allCandidates.length,
       filtered: filtered.length,
-      rejected: rejected.length
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      rejected: rejected.length,
     });
 
   } catch (error) {
@@ -633,15 +607,9 @@ serve(async (req) => {
     // Update run record with error
     await supabase.from('td_news_agent_runs').update({
       status: 'failed',
-      error_log: error instanceof Error ? error.message : 'Unknown error'
+      error_log: error instanceof Error ? error.message : 'Unknown error',
     }).eq('id', runId);
 
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error',
-      runId
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error');
   }
 });
