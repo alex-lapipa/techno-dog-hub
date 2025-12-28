@@ -186,3 +186,12 @@ verify_jwt = false
 
 [functions.referral-notification]
 verify_jwt = false
+
+[functions.content-orchestrator]
+verify_jwt = false
+
+[functions.content-researcher]
+verify_jwt = false
+
+[functions.content-validator]
+verify_jwt = false
