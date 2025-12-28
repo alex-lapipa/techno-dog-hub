@@ -12,7 +12,7 @@ const corsHeaders = {
 };
 
 interface ResearchRequest {
-  action: 'research_artist' | 'research_batch' | 'full_pipeline' | 'verify_claims' | 'audit' | 'status';
+  action: 'research_artist' | 'research_batch' | 'full_pipeline' | 'verify_claims' | 'audit' | 'status' | 'research_gear' | 'gear_batch';
   artist_id?: string;
   artist_name?: string;
   limit?: number;
@@ -382,6 +382,258 @@ If unsure, return {"confidence_level": "low", "error": "Insufficient verified in
   };
 }
 
+// GEAR RESEARCH - Zero Tolerance for hallucinations
+const GEAR_RESEARCH_PROMPT = `You are a technical expert on DJ and electronic music producer equipment.
+Your ONLY job is to provide VERIFIED equipment information - NO GUESSING.
+
+ZERO TOLERANCE POLICY:
+- ONLY include equipment you are 100% certain the artist uses/used
+- Information must be from interviews, rider leaks, studio tours, manufacturer endorsements
+- If you have ANY doubt, DO NOT include it
+- Better to return empty categories than include speculation
+- Specify the source type if known (interview, studio tour, endorsement, rider)
+
+For the electronic music artist, provide ONLY verified gear:
+
+1. **Studio Equipment**: Synths, drum machines, effects they've confirmed using
+2. **Live Setup**: Equipment confirmed used in live performances  
+3. **DJ Setup**: CDJs, mixers, turntables used for DJ sets
+4. **Rider Notes**: Any known technical requirements (only if from leaked/published riders)
+
+Return ONLY a JSON object - no explanation text:
+{
+  "confidence_level": "high|medium|low",
+  "studio": [{"item": "Roland TR-909", "source_type": "interview", "notes": "used since 1995"}],
+  "live": [{"item": "Elektron Analog Rytm", "source_type": "live_video", "notes": "main drum machine"}],
+  "dj": [{"item": "Pioneer CDJ-2000NXS2", "source_type": "rider", "notes": "standard setup"}],
+  "rider_notes": "Requires specific monitoring, etc - only if known"
+}
+
+If you're not confident about this artist's gear, return:
+{"confidence_level": "low", "error": "Insufficient verified gear information"}`;
+
+interface GearItem {
+  item: string;
+  source_type?: string;
+  notes?: string;
+}
+
+interface GearResponse {
+  confidence_level: string;
+  studio?: GearItem[];
+  live?: GearItem[];
+  dj?: GearItem[];
+  rider_notes?: string;
+  error?: string;
+}
+
+async function callLovableAIGear(prompt: string, model = 'google/gemini-2.5-flash'): Promise<{ content: string; model: string } | null> {
+  const apiKey = Deno.env.get('LOVABLE_API_KEY');
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: GEAR_RESEARCH_PROMPT },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 2000,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Gear ${model} error:`, response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return { content: data.choices?.[0]?.message?.content || '', model };
+  } catch (error) {
+    console.error(`Gear ${model} call failed:`, error);
+    return null;
+  }
+}
+
+async function callAnthropicGear(prompt: string): Promise<{ content: string; model: string } | null> {
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: GEAR_RESEARCH_PROMPT,
+        messages: [{ role: 'user', content: prompt }]
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    return { content: data.content?.[0]?.text || '', model: 'claude-sonnet-4' };
+  } catch {
+    return null;
+  }
+}
+
+function crossValidateGear(responses: Array<{ data: GearResponse; model: string }>): {
+  studio: string[];
+  live: string[];
+  dj: string[];
+  rider_notes: string | null;
+  verified_count: number;
+} {
+  const gearMap = {
+    studio: new Map<string, string[]>(),
+    live: new Map<string, string[]>(),
+    dj: new Map<string, string[]>()
+  };
+  
+  const riderNotes: string[] = [];
+
+  for (const { data, model } of responses) {
+    if (data.confidence_level === 'low' || data.error) continue;
+    
+    for (const category of ['studio', 'live', 'dj'] as const) {
+      const items = data[category] || [];
+      for (const gearItem of items) {
+        if (gearItem.item && typeof gearItem.item === 'string') {
+          const normalized = gearItem.item.toLowerCase().trim();
+          if (!gearMap[category].has(normalized)) {
+            gearMap[category].set(normalized, []);
+          }
+          gearMap[category].get(normalized)!.push(model);
+        }
+      }
+    }
+    
+    if (data.rider_notes && typeof data.rider_notes === 'string' && data.rider_notes.length > 10) {
+      riderNotes.push(data.rider_notes);
+    }
+  }
+
+  // ZERO TOLERANCE: Only accept gear confirmed by 2+ models
+  const verifiedGear = {
+    studio: [] as string[],
+    live: [] as string[],
+    dj: [] as string[],
+    rider_notes: null as string | null,
+    verified_count: 0
+  };
+
+  for (const category of ['studio', 'live', 'dj'] as const) {
+    for (const [gear, models] of gearMap[category]) {
+      const uniqueModels = [...new Set(models)];
+      if (uniqueModels.length >= 2) {
+        // Get original casing from first response
+        const original = responses.find(r => 
+          r.data[category]?.some(g => g.item.toLowerCase().trim() === gear)
+        )?.data[category]?.find(g => g.item.toLowerCase().trim() === gear)?.item || gear;
+        
+        verifiedGear[category].push(original);
+        verifiedGear.verified_count++;
+      }
+    }
+  }
+
+  // Rider notes need 2+ similar mentions
+  if (riderNotes.length >= 2) {
+    verifiedGear.rider_notes = riderNotes[0]; // Take first verified
+  }
+
+  return verifiedGear;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function researchArtistGear(artistName: string, artistId: string, supabase: any): Promise<{
+  success: boolean;
+  gear: { studio: string[]; live: string[]; dj: string[]; rider_notes: string | null };
+  models_queried: number;
+  models_responded: number;
+  items_verified: number;
+}> {
+  const prompt = `Provide ONLY verified equipment/gear information for "${artistName}" (techno/electronic music artist).
+
+Remember: ZERO TOLERANCE for speculation. Only include gear you are 100% certain they use from verified sources.
+If unsure, return {"confidence_level": "low", "error": "Insufficient verified gear information"}`;
+
+  const responses: Array<{ data: GearResponse; model: string }> = [];
+  let modelsQueried = 0;
+  let modelsResponded = 0;
+
+  const modelCalls = [
+    callLovableAIGear(prompt, 'google/gemini-2.5-flash'),
+    callAnthropicGear(prompt),
+    callLovableAIGear(prompt, 'openai/gpt-5-mini'),
+    callLovableAIGear(prompt, 'google/gemini-2.5-pro')
+  ];
+
+  modelsQueried = modelCalls.length;
+  const results = await Promise.allSettled(modelCalls);
+
+  for (const result of results) {
+    if (result.status === 'fulfilled' && result.value) {
+      const parsed = extractJSON(result.value.content) as GearResponse | null;
+      if (parsed && parsed.confidence_level !== 'low' && !parsed.error) {
+        responses.push({ data: parsed, model: result.value.model });
+        modelsResponded++;
+      }
+    }
+  }
+
+  const verifiedGear = crossValidateGear(responses);
+
+  // Store verified gear in database
+  for (const category of ['studio', 'live', 'dj'] as const) {
+    if (verifiedGear[category].length > 0) {
+      // Delete existing gear for this category
+      await supabase
+        .from('artist_gear')
+        .delete()
+        .eq('artist_id', artistId)
+        .eq('gear_category', category);
+
+      // Insert new verified gear
+      await supabase.from('artist_gear').insert({
+        artist_id: artistId,
+        gear_category: category,
+        gear_items: verifiedGear[category],
+        rider_notes: category === 'dj' ? verifiedGear.rider_notes : null,
+        source_system: 'ai-multi-model-verified'
+      });
+    }
+  }
+
+  console.log(`[Gear Research] ${artistName}: ${verifiedGear.verified_count} items verified from ${modelsResponded} models`);
+
+  return {
+    success: verifiedGear.verified_count > 0,
+    gear: {
+      studio: verifiedGear.studio,
+      live: verifiedGear.live,
+      dj: verifiedGear.dj,
+      rider_notes: verifiedGear.rider_notes
+    },
+    models_queried: modelsQueried,
+    models_responded: modelsResponded,
+    items_verified: verifiedGear.verified_count
+  };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function synthesizeRAGDocument(artistId: string, artistName: string, supabase: any): Promise<boolean> {
   const { data: claims } = await supabase
@@ -565,11 +817,92 @@ serve(async (req) => {
         });
       }
 
+      case 'research_gear': {
+        if (!artist_id) {
+          return new Response(JSON.stringify({ success: false, error: 'artist_id required' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        const { data: artist } = await supabase
+          .from('canonical_artists')
+          .select('canonical_name')
+          .eq('artist_id', artist_id)
+          .single();
+
+        if (!artist) {
+          return new Response(JSON.stringify({ success: false, error: 'Artist not found' }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        const result = await researchArtistGear(artist.canonical_name, artist_id, supabase);
+
+        return new Response(JSON.stringify({
+          artist_id,
+          artist_name: artist.canonical_name,
+          policy: 'zero-tolerance',
+          ...result
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'gear_batch': {
+        const limit = body.limit || 10;
+        
+        // Get artists without gear data
+        const { data: artists } = await supabase
+          .from('canonical_artists')
+          .select('artist_id, canonical_name')
+          .order('rank', { ascending: true, nullsFirst: false })
+          .limit(100);
+
+        if (!artists?.length) {
+          return new Response(JSON.stringify({ success: true, processed: 0, message: 'No artists found' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        // Filter to artists without gear
+        const artistsWithoutGear: typeof artists = [];
+        for (const a of artists) {
+          const { count } = await supabase
+            .from('artist_gear')
+            .select('*', { count: 'exact', head: true })
+            .eq('artist_id', a.artist_id);
+          
+          if (!count || count === 0) {
+            artistsWithoutGear.push(a);
+          }
+          if (artistsWithoutGear.length >= limit) break;
+        }
+
+        const results = [];
+        for (const artist of artistsWithoutGear) {
+          const result = await researchArtistGear(artist.canonical_name, artist.artist_id, supabase);
+          results.push({
+            artist_name: artist.canonical_name,
+            items_verified: result.items_verified,
+            success: result.success
+          });
+        }
+
+        return new Response(JSON.stringify({
+          success: true,
+          policy: 'zero-tolerance',
+          processed: results.length,
+          results
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
       default:
         return new Response(JSON.stringify({ 
           success: false, 
           error: 'Invalid action',
-          valid_actions: ['research_artist', 'full_pipeline', 'audit', 'status']
+          valid_actions: ['research_artist', 'full_pipeline', 'audit', 'status', 'research_gear', 'gear_batch']
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
