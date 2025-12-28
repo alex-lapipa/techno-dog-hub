@@ -360,6 +360,75 @@ export type Database = {
           },
         ]
       }
+      artist_claims: {
+        Row: {
+          artist_id: string
+          claim_id: string
+          claim_text: string
+          claim_type: string
+          confidence_score: number | null
+          contradicts_claim_id: string | null
+          created_at: string
+          extraction_model: string | null
+          updated_at: string
+          value_structured: Json | null
+          verification_model: string | null
+          verification_status:
+            | Database["public"]["Enums"]["claim_verification_status"]
+            | null
+          verified_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          claim_id?: string
+          claim_text: string
+          claim_type: string
+          confidence_score?: number | null
+          contradicts_claim_id?: string | null
+          created_at?: string
+          extraction_model?: string | null
+          updated_at?: string
+          value_structured?: Json | null
+          verification_model?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["claim_verification_status"]
+            | null
+          verified_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          claim_id?: string
+          claim_text?: string
+          claim_type?: string
+          confidence_score?: number | null
+          contradicts_claim_id?: string | null
+          created_at?: string
+          extraction_model?: string | null
+          updated_at?: string
+          value_structured?: Json | null
+          verification_model?: string | null
+          verification_status?:
+            | Database["public"]["Enums"]["claim_verification_status"]
+            | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_claims_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_claims_contradicts_claim_id_fkey"
+            columns: ["contradicts_claim_id"]
+            isOneToOne: false
+            referencedRelation: "artist_claims"
+            referencedColumns: ["claim_id"]
+          },
+        ]
+      }
       artist_documents: {
         Row: {
           artist_id: string
@@ -409,6 +478,103 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "artist_documents_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_enrichment_queue: {
+        Row: {
+          artist_id: string
+          attempts: number | null
+          created_at: string
+          last_attempt_at: string | null
+          last_error: string | null
+          priority: number | null
+          queue_id: string
+          reason: string | null
+          scheduled_for: string | null
+          status: string | null
+        }
+        Insert: {
+          artist_id: string
+          attempts?: number | null
+          created_at?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          priority?: number | null
+          queue_id?: string
+          reason?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Update: {
+          artist_id?: string
+          attempts?: number | null
+          created_at?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          priority?: number | null
+          queue_id?: string
+          reason?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_enrichment_queue_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_enrichment_runs: {
+        Row: {
+          artist_id: string
+          created_at: string
+          errors: Json | null
+          finished_at: string | null
+          firecrawl_urls_searched: string[] | null
+          models_used: string[] | null
+          run_id: string
+          run_type: Database["public"]["Enums"]["enrichment_run_type"] | null
+          started_at: string | null
+          stats: Json | null
+          status: Database["public"]["Enums"]["enrichment_run_status"] | null
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          errors?: Json | null
+          finished_at?: string | null
+          firecrawl_urls_searched?: string[] | null
+          models_used?: string[] | null
+          run_id?: string
+          run_type?: Database["public"]["Enums"]["enrichment_run_type"] | null
+          started_at?: string | null
+          stats?: Json | null
+          status?: Database["public"]["Enums"]["enrichment_run_status"] | null
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          errors?: Json | null
+          finished_at?: string | null
+          firecrawl_urls_searched?: string[] | null
+          models_used?: string[] | null
+          run_id?: string
+          run_type?: Database["public"]["Enums"]["enrichment_run_type"] | null
+          started_at?: string | null
+          stats?: Json | null
+          status?: Database["public"]["Enums"]["enrichment_run_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_enrichment_runs_artist_id_fkey"
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
@@ -633,6 +799,53 @@ export type Database = {
           },
         ]
       }
+      artist_raw_documents: {
+        Row: {
+          artist_id: string | null
+          content_hash: string | null
+          content_json: Json | null
+          content_markdown: string | null
+          content_text: string | null
+          created_at: string
+          domain: string | null
+          raw_doc_id: string
+          retrieved_at: string
+          url: string
+        }
+        Insert: {
+          artist_id?: string | null
+          content_hash?: string | null
+          content_json?: Json | null
+          content_markdown?: string | null
+          content_text?: string | null
+          created_at?: string
+          domain?: string | null
+          raw_doc_id?: string
+          retrieved_at?: string
+          url: string
+        }
+        Update: {
+          artist_id?: string | null
+          content_hash?: string | null
+          content_json?: Json | null
+          content_markdown?: string | null
+          content_text?: string | null
+          created_at?: string
+          domain?: string | null
+          raw_doc_id?: string
+          retrieved_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_raw_documents_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
       artist_source_map: {
         Row: {
           artist_id: string | null
@@ -690,6 +903,66 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_sources: {
+        Row: {
+          claim_id: string
+          created_at: string
+          domain: string | null
+          is_primary_source: boolean | null
+          publish_date: string | null
+          quote_snippet: string | null
+          raw_doc_id: string | null
+          retrieved_at: string
+          source_id: string
+          source_quality_score: number | null
+          title: string | null
+          url: string
+        }
+        Insert: {
+          claim_id: string
+          created_at?: string
+          domain?: string | null
+          is_primary_source?: boolean | null
+          publish_date?: string | null
+          quote_snippet?: string | null
+          raw_doc_id?: string | null
+          retrieved_at?: string
+          source_id?: string
+          source_quality_score?: number | null
+          title?: string | null
+          url: string
+        }
+        Update: {
+          claim_id?: string
+          created_at?: string
+          domain?: string | null
+          is_primary_source?: boolean | null
+          publish_date?: string | null
+          quote_snippet?: string | null
+          raw_doc_id?: string | null
+          retrieved_at?: string
+          source_id?: string
+          source_quality_score?: number | null
+          title?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_sources_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "artist_claims"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "artist_sources_raw_doc_id_fkey"
+            columns: ["raw_doc_id"]
+            isOneToOne: false
+            referencedRelation: "artist_raw_documents"
+            referencedColumns: ["raw_doc_id"]
           },
         ]
       }
@@ -1668,6 +1941,45 @@ export type Database = {
           },
         ]
       }
+      source_domain_registry: {
+        Row: {
+          category: string | null
+          created_at: string
+          display_name: string | null
+          domain: string
+          domain_id: string
+          is_blocked: boolean | null
+          is_primary_source: boolean | null
+          notes: string | null
+          quality_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          display_name?: string | null
+          domain: string
+          domain_id?: string
+          is_blocked?: boolean | null
+          is_primary_source?: boolean | null
+          notes?: string | null
+          quality_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          display_name?: string | null
+          domain?: string
+          domain_id?: string
+          is_blocked?: boolean | null
+          is_primary_source?: boolean | null
+          notes?: string | null
+          quality_score?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       supporters: {
         Row: {
           amount_cents: number
@@ -2391,6 +2703,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      claim_verification_status:
+        | "unverified"
+        | "partially_verified"
+        | "verified"
+        | "disputed"
       community_source:
         | "upload_widget"
         | "newsletter"
@@ -2398,6 +2715,13 @@ export type Database = {
         | "community_page"
         | "other"
       community_status: "pending" | "verified" | "banned"
+      enrichment_run_status:
+        | "pending"
+        | "running"
+        | "success"
+        | "failed"
+        | "partial"
+      enrichment_run_type: "scheduled" | "manual" | "backlog" | "priority"
       support_mode: "one_time" | "recurring" | "corporate"
       supporter_tier:
         | "free"
@@ -2536,6 +2860,12 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      claim_verification_status: [
+        "unverified",
+        "partially_verified",
+        "verified",
+        "disputed",
+      ],
       community_source: [
         "upload_widget",
         "newsletter",
@@ -2544,6 +2874,14 @@ export const Constants = {
         "other",
       ],
       community_status: ["pending", "verified", "banned"],
+      enrichment_run_status: [
+        "pending",
+        "running",
+        "success",
+        "failed",
+        "partial",
+      ],
+      enrichment_run_type: ["scheduled", "manual", "backlog", "priority"],
       support_mode: ["one_time", "recurring", "corporate"],
       supporter_tier: [
         "free",

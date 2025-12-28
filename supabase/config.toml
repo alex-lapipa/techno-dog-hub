@@ -213,3 +213,18 @@ verify_jwt = false
 
 [functions.contributor-contact]
 verify_jwt = false
+
+[functions.artist-research]
+verify_jwt = false
+
+[functions.artist-extraction]
+verify_jwt = false
+
+[functions.artist-verification]
+verify_jwt = false
+
+[functions.artist-synthesis]
+verify_jwt = false
+
+[functions.artist-enrichment-orchestrator]
+verify_jwt = false
