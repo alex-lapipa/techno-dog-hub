@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { BadgeDisplay } from "@/components/gamification";
+import { BadgeDisplay, ReferralLeaderboard } from "@/components/gamification";
 import { 
   Trophy, 
   Medal, 
@@ -395,6 +395,11 @@ const CommunityLeaderboard = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Referral Leaderboard */}
+          <div className="mt-8">
+            <ReferralLeaderboard limit={10} />
+          </div>
 
           <div className="mt-12 text-center">
             <p className="text-muted-foreground mb-4">
