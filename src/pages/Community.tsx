@@ -25,7 +25,10 @@ import {
   LogOut,
   User,
   BookOpen,
-  Trophy
+  Trophy,
+  Copy,
+  Share2,
+  Gift
 } from "lucide-react";
 
 const Community = () => {
@@ -45,11 +48,14 @@ const Community = () => {
     roles: string[];
     display_name: string | null;
     trust_score: number;
+    referral_code: string | null;
   } | null>(null);
+  const [justVerified, setJustVerified] = useState(false);
 
   // Check for verification callback
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
+      setJustVerified(true);
       toast({
         title: "Email Verified",
         description: "Welcome to the techno.dog community!",
@@ -64,7 +70,7 @@ const Community = () => {
       
       const { data } = await supabase
         .from("community_profiles")
-        .select("id, status, roles, display_name, trust_score")
+        .select("id, status, roles, display_name, trust_score, referral_code")
         .eq("email", user.email)
         .maybeSingle();
       
@@ -126,7 +132,19 @@ const Community = () => {
   const handleSignOut = async () => {
     await signOut();
     setProfile(null);
+    setJustVerified(false);
     navigate("/community");
+  };
+
+  const copyReferralLink = () => {
+    if (profile?.referral_code) {
+      const link = `${window.location.origin}/community?ref=${profile.referral_code}`;
+      navigator.clipboard.writeText(link);
+      toast({
+        title: "Link copied!",
+        description: "Share it with friends to earn 250 XP per verified referral",
+      });
+    }
   };
 
   return (
@@ -221,68 +239,106 @@ const Community = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Trust Score</span>
-                    <Badge variant="secondary">{profile.trust_score}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Roles</span>
-                    <div className="flex gap-1">
-                      {profile.roles.map((role) => (
-                        <Badge key={role} variant="outline" className="text-xs">
-                          {role}
-                        </Badge>
-                      ))}
+                  {/* Just Verified - Referral CTA */}
+                  {justVerified && profile.referral_code && (
+                    <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-background border border-primary/30 rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-primary">
+                        <Gift className="h-5 w-5" />
+                        <span className="font-semibold">Welcome to the community!</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Invite friends to join techno.dog and earn <span className="text-primary font-medium">250 XP</span> for each verified referral.
+                      </p>
+                      <div className="flex gap-2">
+                        <div className="flex-1 bg-background/50 border border-border rounded px-3 py-2 font-mono text-sm truncate">
+                          {`${window.location.origin}/community?ref=${profile.referral_code}`}
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={copyReferralLink}
+                          className="shrink-0"
+                        >
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => setJustVerified(false)}
+                      >
+                        Got it, show me my dashboard
+                      </Button>
                     </div>
-                  </div>
-                  
-                  {/* Referral Widget */}
-                  <div className="pt-4 border-t border-border">
-                    <ReferralWidget profileId={profile.id} compact />
-                  </div>
+                  )}
 
-                  <div className="pt-4 space-y-2">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      onClick={() => navigate("/my-submissions")}
-                    >
-                      <Camera className="h-4 w-4 mr-2" />
-                      My Submissions
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      onClick={() => navigate("/developer")}
-                    >
-                      <Key className="h-4 w-4 mr-2" />
-                      API Keys
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      onClick={() => navigate("/community/docs")}
-                    >
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Community Docs
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      onClick={() => navigate("/community/leaderboard")}
-                    >
-                      <Trophy className="h-4 w-4 mr-2" />
-                      Leaderboard
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-muted-foreground"
-                      onClick={handleSignOut}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
-                    </Button>
-                  </div>
+                  {!justVerified && (
+                    <>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Trust Score</span>
+                        <Badge variant="secondary">{profile.trust_score}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Roles</span>
+                        <div className="flex gap-1">
+                          {profile.roles.map((role) => (
+                            <Badge key={role} variant="outline" className="text-xs">
+                              {role}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Referral Widget */}
+                      <div className="pt-4 border-t border-border">
+                        <ReferralWidget profileId={profile.id} compact />
+                      </div>
+
+                      <div className="pt-4 space-y-2">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={() => navigate("/my-submissions")}
+                        >
+                          <Camera className="h-4 w-4 mr-2" />
+                          My Submissions
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={() => navigate("/developer")}
+                        >
+                          <Key className="h-4 w-4 mr-2" />
+                          API Keys
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={() => navigate("/community/docs")}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Community Docs
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start"
+                          onClick={() => navigate("/community/leaderboard")}
+                        >
+                          <Trophy className="h-4 w-4 mr-2" />
+                          Leaderboard
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start text-muted-foreground"
+                          onClick={handleSignOut}
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             ) : submitted ? (
