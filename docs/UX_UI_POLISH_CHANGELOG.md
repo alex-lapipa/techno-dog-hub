@@ -138,6 +138,15 @@ Refactored detail pages to use the new `PageLayout` component for consistent str
 - Reduced code duplication
 - Easier future maintenance
 
+### Phase 3b: Additional Detail Pages (2025-12-28)
+
+| Page | Changes |
+|------|---------|
+| CrewDetail.tsx | Replaced manual Header/Footer/PageSEO with PageLayout wrapper |
+| GearDetail.tsx | Replaced manual Header/Footer/PageSEO with PageLayout wrapper |
+
+All detail pages now use the unified PageLayout component.
+
 ---
 
 ## Future Recommendations
@@ -147,4 +156,3 @@ Refactored detail pages to use the new `PageLayout` component for consistent str
 3. **Use EmptyState** for tables/lists with no data
 4. **Consider PageHeader** for standardized page headers
 5. **Apply EmptyState** to more list views (webhooks, API keys, etc.)
-6. **Migrate remaining detail pages** (CrewDetail, GearDetail) to PageLayout

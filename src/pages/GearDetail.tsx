@@ -1,9 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
+import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 
 const GearDetail = () => {
@@ -17,20 +15,16 @@ const GearDetail = () => {
 
   if (!gearItem) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="font-mono text-muted-foreground">
-              Gear not found
-            </p>
-            <Link to="/gear" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← Back to Gear
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <PageLayout title="Gear Not Found" path={`/gear/${id}`}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="font-mono text-muted-foreground">
+            Gear not found
+          </p>
+          <Link to="/gear" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
+            ← Back to Gear
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -52,17 +46,13 @@ const GearDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO
-        title={`${gearItem.name} - ${gearItem.manufacturer} ${gearCategories[gearItem.category].en}`}
-        description={gearItem.shortDescription.en}
-        path={`/gear/${gearItem.id}`}
-        image={gearItem.image?.url}
-        structuredData={productSchema}
-      />
-      <Header />
-      <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <PageLayout
+      title={`${gearItem.name} - ${gearItem.manufacturer} ${gearCategories[gearItem.category].en}`}
+      description={gearItem.shortDescription.en}
+      path={`/gear/${gearItem.id}`}
+      structuredData={productSchema}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb Navigation */}
           <DetailBreadcrumb 
             items={[
@@ -485,10 +475,8 @@ const GearDetail = () => {
             </section>
           )}
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </PageLayout>
+    );
+  };
 
 export default GearDetail;

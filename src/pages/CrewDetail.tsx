@@ -1,9 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Quote } from "lucide-react";
 import { getCrewById, crews } from "@/data/crews";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
+import { PageLayout } from "@/components/layout";
 
 const CrewDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,18 +16,14 @@ const CrewDetail = () => {
 
   if (!crew) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="font-mono text-muted-foreground">Crew not found</p>
-            <Link to="/crews" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← Back to Crews
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <PageLayout title="Crew Not Found" path={`/crews/${id}`}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="font-mono text-muted-foreground">Crew not found</p>
+          <Link to="/crews" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
+            ← Back to Crews
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -49,11 +43,13 @@ const CrewDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO title={`${crew.name} - Techno ${typeLabels[crew.type] || crew.type}`} description={crew.description || `${crew.name} - ${crew.type} from ${crew.city}, ${crew.country}.`} path={`/crews/${crew.id}`} structuredData={crewSchema} />
-      <Header />
-      <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <PageLayout
+      title={`${crew.name} - Techno ${typeLabels[crew.type] || crew.type}`}
+      description={crew.description || `${crew.name} - ${crew.type} from ${crew.city}, ${crew.country}.`}
+      path={`/crews/${crew.id}`}
+      structuredData={crewSchema}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link to="/crews" className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-6 sm:mb-8 group">
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Crews
@@ -93,11 +89,9 @@ const CrewDetail = () => {
 
           {crew.members && crew.members.length > 0 && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3"><Users className="w-4 h-4 sm:w-5 sm:h-5" />Members</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">{crew.members.map((member, i) => (<div key={i} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors"><span className="font-mono text-xs sm:text-sm">{member}</span></div>))}</div></section>)}
 
-          {relatedCrews.length > 0 && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">Related Crews</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">{relatedCrews.map((c) => (<Link key={c.id} to={`/crews/${c.id}`} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group"><span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">{typeLabels[c.type] || c.type}</span><h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch">{c.name}</h3><p className="font-mono text-[10px] sm:text-xs text-muted-foreground mt-1">{c.city}, {c.country}</p></Link>))}</div></section>)}
-        </div>
-      </main>
-      <Footer />
-    </div>
+        {relatedCrews.length > 0 && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">Related Crews</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">{relatedCrews.map((c) => (<Link key={c.id} to={`/crews/${c.id}`} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group"><span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">{typeLabels[c.type] || c.type}</span><h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch">{c.name}</h3><p className="font-mono text-[10px] sm:text-xs text-muted-foreground mt-1">{c.city}, {c.country}</p></Link>))}</div></section>)}
+      </div>
+    </PageLayout>
   );
 };
 
