@@ -1,11 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv, getEnv } from "../_shared/supabase.ts";
 
 interface EngineStats {
   processed: number;
@@ -24,15 +20,14 @@ interface EntityToProcess {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createServiceClient();
+    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+    const supabaseKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+    const LOVABLE_API_KEY = getEnv("LOVABLE_API_KEY");
 
     const { action, batchSize = 5, entityType, entityId, entityName, dryRun = false } = await req.json();
 
@@ -84,13 +79,11 @@ serve(async (req) => {
         console.log(`Found ${entitiesToProcess.length} entities needing images`);
 
         if (dryRun) {
-          return new Response(JSON.stringify({
+          return jsonResponse({
             success: true,
             dryRun: true,
             entitiesToProcess: entitiesToProcess.slice(0, 20),
             totalMissing: entitiesToProcess.length,
-          }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
 
@@ -155,13 +148,11 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           stats,
           message: `Processed ${stats.processed} entities`,
           remaining: entitiesToProcess.length - batch.length,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -220,14 +211,12 @@ serve(async (req) => {
           .eq("final_selected", true)
           .single();
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           jobId,
           stats,
           selectedAsset,
           message: `Pipeline complete for ${entityName}`,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -257,12 +246,10 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           stats,
           message: `Enriched ${stats.enriched} assets`,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -280,7 +267,7 @@ serve(async (req) => {
         const runningCount = jobs.filter(j => j.status === "running").length;
         const failedCount = jobs.filter(j => j.status === "failed").length;
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           status: {
             totalAssets: assetsRes.count || 0,
@@ -291,8 +278,6 @@ serve(async (req) => {
             failedJobs: failedCount,
             engineReady: !!LOVABLE_API_KEY,
           },
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -339,12 +324,10 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           stats,
           message: `Verified ${stats.verified} entities`,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
@@ -391,43 +374,29 @@ serve(async (req) => {
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           stats,
           message: `Generated ${stats.generated} images`,
           remaining: missingEntities.length - batch.length,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       default:
-        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return errorResponse(`Unknown action: ${action}`, 400);
     }
   } catch (error) {
     console.error("Media Engine error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     
     if (message.includes("Rate limit") || message.includes("429")) {
-      return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait and try again." }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return errorResponse("Rate limit exceeded. Please wait and try again.", 429);
     }
     if (message.includes("402") || message.includes("credits")) {
-      return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-        status: 402,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return errorResponse("AI credits exhausted. Please add funds.", 402);
     }
     
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return errorResponse(message);
   }
 });
 
@@ -502,163 +471,142 @@ Always respond with valid JSON only, no markdown.`,
     });
 
     if (!response.ok) {
-      console.error("AI enrichment failed:", response.status);
+      console.error(`AI enrichment failed: ${response.status}`);
       return false;
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content;
+    
+    if (!content) return false;
 
-    // Parse JSON response
-    let metadata;
+    // Parse the JSON response
+    let enrichment;
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        metadata = JSON.parse(jsonMatch[0]);
+      let jsonStr = content;
+      if (content.includes("```json")) {
+        jsonStr = content.split("```json")[1].split("```")[0].trim();
+      } else if (content.includes("```")) {
+        jsonStr = content.split("```")[1].split("```")[0].trim();
       }
-    } catch {
-      console.error("Failed to parse AI response:", content);
+      enrichment = JSON.parse(jsonStr);
+    } catch (e) {
+      console.error("Failed to parse AI enrichment response:", e);
       return false;
     }
 
-    if (!metadata) return false;
-
-    // Update asset with enriched metadata
-    await supabase
+    // Update the asset with enrichment data
+    const { error } = await supabase
       .from("media_assets")
       .update({
-        alt_text: metadata.altText || asset.alt_text,
-        tags: metadata.tags ? JSON.stringify(metadata.tags) : asset.tags,
+        alt_text: enrichment.altText,
+        tags: enrichment,
         meta: {
-          ...((asset.meta as object) || {}),
-          description: metadata.description,
-          mood: metadata.mood,
-          era: metadata.era,
-          equipment: metadata.equipment,
-          setting: metadata.setting,
-          enrichedAt: new Date().toISOString(),
+          ...asset.meta,
+          ai_enrichment: enrichment,
+          enriched_at: new Date().toISOString(),
         },
+        updated_at: new Date().toISOString(),
       })
       .eq("id", asset.id);
 
-    console.log(`Enriched ${asset.entity_name} successfully`);
+    if (error) {
+      console.error("Failed to update asset:", error);
+      return false;
+    }
+
+    console.log(`Successfully enriched ${asset.entity_name}`);
     return true;
   } catch (e) {
-    console.error("Enrich asset error:", e);
+    console.error("AI enrichment error:", e);
     return false;
   }
 }
 
-// Helper: Generate image with AI when no suitable images found
-async function generateImageWithAI(
-  supabase: any,
-  supabaseUrl: string,
-  entity: EntityToProcess,
-  apiKey: string
-): Promise<boolean> {
+// Helper: Generate AI image for entity
+async function generateImageWithAI(supabase: any, supabaseUrl: string, entity: EntityToProcess, apiKey: string): Promise<boolean> {
   try {
-    console.log(`Generating AI image for ${entity.name} (${entity.type})...`);
+    console.log(`Generating AI image for ${entity.name}...`);
 
-    // Create a detailed prompt based on entity type
+    // Build a prompt based on entity type
     let prompt = "";
     switch (entity.type) {
       case "artist":
-        prompt = `Professional press photo style portrait of a techno DJ artist. Dark moody lighting, dramatic shadows, studio quality. The artist appears focused and intense, wearing dark clothing typical of underground electronic music scene. Abstract geometric shapes or light beams in background suggesting a club atmosphere. Ultra high resolution, editorial photography style. Do not include any text or logos.`;
+        prompt = `Professional portrait of a techno DJ/producer named ${entity.name}. Dark moody lighting, underground club atmosphere, studio headphones or DJ equipment visible. Artistic, editorial quality photo. No text or watermarks.`;
         break;
       case "venue":
-        prompt = `Interior of an underground techno nightclub. Industrial aesthetic with exposed concrete, metal structures. Dramatic lighting with laser beams and haze. Packed dancefloor visible in moody red and blue lighting. Professional architectural photography style. Ultra high resolution. Do not include any text or logos.`;
+        prompt = `Interior of an underground techno club called ${entity.name}. Dark atmospheric lighting, industrial aesthetics, DJ booth, smoke/haze, professional event photography style. No text or watermarks.`;
         break;
       case "festival":
-        prompt = `Massive outdoor electronic music festival at night. Huge LED stage with geometric structures, laser show cutting through fog, thousands of people dancing. Aerial view showing the scale. Professional event photography. Ultra high resolution. Do not include any text or logos.`;
+        prompt = `Outdoor techno festival stage at ${entity.name}. Large crowd, dramatic lighting, industrial stage design, night time atmosphere. Professional event photography. No text or watermarks.`;
         break;
       case "label":
-        prompt = `Abstract geometric design representing a techno record label. Minimalist shapes, dark background with neon accents. Brutalist typography influence. Clean modern aesthetic suitable for album artwork. Ultra high resolution. Do not include any readable text.`;
+        prompt = `Abstract artistic representation of a techno record label aesthetic. Minimal, industrial, dark tones, geometric shapes, vinyl records, studio equipment. No text or logos.`;
         break;
       default:
-        prompt = `Abstract techno music artwork. Dark industrial aesthetic, geometric patterns, glitch effects. Moody atmospheric lighting. Modern electronic music visual style. Ultra high resolution. Do not include any text.`;
+        prompt = `Professional photo related to techno music scene. Dark, atmospheric, underground aesthetic. No text or watermarks.`;
     }
 
-    // Call Lovable AI image generation
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        modalities: ["image", "text"],
+        model: "flux.schnell",
+        prompt,
+        n: 1,
+        size: "1024x1024",
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI image generation failed:", response.status, errorText);
+      console.error(`AI image generation failed: ${response.status}`);
       return false;
     }
 
-    const data = await response.json();
-    const imageData = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageData) {
-      console.error("No image in AI response");
+    const result = await response.json();
+    const imageUrl = result.data?.[0]?.url;
+    
+    if (!imageUrl) {
+      console.error("No image URL in response");
       return false;
     }
-
-    console.log(`Generated image for ${entity.name}, saving to database...`);
 
     // Save the generated image as a media asset
-    const { error: insertError } = await supabase.from("media_assets").insert({
-      entity_type: entity.type,
-      entity_id: entity.id,
-      entity_name: entity.name,
-      source_url: imageData, // Base64 data URL
-      storage_url: imageData,
-      provider: "ai-generated",
-      license_status: "ai-generated",
-      license_name: "AI Generated",
-      copyright_risk: "none",
-      openai_verified: true,
-      match_score: 100,
-      quality_score: 85,
-      final_selected: true,
-      alt_text: `AI-generated image for ${entity.name}`,
-      reasoning_summary: "Generated by AI as fallback when no suitable images were found from external sources.",
-      tags: JSON.stringify(["ai-generated", entity.type, "techno"]),
-      meta: {
-        generatedAt: new Date().toISOString(),
-        prompt: prompt.substring(0, 200) + "...",
-        model: "google/gemini-2.5-flash-image-preview",
-      },
-    });
+    const { error } = await supabase
+      .from("media_assets")
+      .insert({
+        entity_type: entity.type,
+        entity_id: entity.id,
+        entity_name: entity.name,
+        source_url: imageUrl,
+        storage_url: imageUrl,
+        provider: "lovable-ai",
+        license_status: "ai-generated",
+        license_name: "AI Generated",
+        alt_text: `AI-generated image of ${entity.name}`,
+        final_selected: true,
+        openai_verified: true,
+        quality_score: 70,
+        match_score: 80,
+        meta: {
+          generated: true,
+          prompt,
+          generated_at: new Date().toISOString(),
+        },
+      });
 
-    if (insertError) {
-      console.error("Failed to save generated image:", insertError);
+    if (error) {
+      console.error("Failed to save generated image:", error);
       return false;
     }
 
-    // Update pipeline job status if exists
-    await supabase
-      .from("media_pipeline_jobs")
-      .update({
-        status: "completed",
-        completed_at: new Date().toISOString(),
-        result: { aiGenerated: true },
-      })
-      .eq("entity_type", entity.type)
-      .eq("entity_id", entity.id)
-      .eq("status", "running");
-
-    console.log(`Successfully generated and saved AI image for ${entity.name}`);
+    console.log(`Successfully generated image for ${entity.name}`);
     return true;
   } catch (e) {
-    console.error("Generate image error:", e);
+    console.error("AI generation error:", e);
     return false;
   }
 }
