@@ -6,12 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// IP-based rate limiting configuration
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+// Rate limiting configuration
 const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
-
-// In-memory rate limit store (resets on function cold start)
-const ipRequestLog = new Map<string, number[]>();
+const RATE_LIMIT_ENDPOINT = 'rag-chat';
 
 // Get client IP from request headers
 function getClientIP(req: Request): string {
@@ -34,49 +31,48 @@ function getClientIP(req: Request): string {
   return 'unknown';
 }
 
-// Check and update rate limit for an IP
-function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetAt: number } {
-  const now = Date.now();
-  const windowStart = now - RATE_LIMIT_WINDOW_MS;
-  
-  // Get existing requests for this IP
-  let requests = ipRequestLog.get(ip) || [];
-  
-  // Filter out requests outside the current window
-  requests = requests.filter(timestamp => timestamp > windowStart);
-  
-  // Check if rate limit exceeded
-  if (requests.length >= RATE_LIMIT_MAX_REQUESTS) {
-    const oldestRequest = Math.min(...requests);
-    const resetAt = oldestRequest + RATE_LIMIT_WINDOW_MS;
-    return { 
-      allowed: false, 
-      remaining: 0, 
-      resetAt 
-    };
-  }
-  
-  // Add current request
-  requests.push(now);
-  ipRequestLog.set(ip, requests);
-  
-  // Cleanup old entries periodically (every 100 IPs)
-  if (ipRequestLog.size > 1000) {
-    for (const [storedIP, timestamps] of ipRequestLog.entries()) {
-      const filtered = timestamps.filter(t => t > windowStart);
-      if (filtered.length === 0) {
-        ipRequestLog.delete(storedIP);
-      } else {
-        ipRequestLog.set(storedIP, filtered);
-      }
+// Check rate limit using persistent Supabase storage
+async function checkPersistentRateLimit(
+  supabaseUrl: string,
+  supabaseKey: string,
+  ip: string
+): Promise<{ allowed: boolean; remaining: number; resetAt: Date }> {
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ip_rate_limit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      },
+      body: JSON.stringify({
+        p_ip_address: ip,
+        p_endpoint: RATE_LIMIT_ENDPOINT,
+        p_limit_per_minute: RATE_LIMIT_MAX_REQUESTS
+      })
+    });
+
+    if (!response.ok) {
+      console.error('Rate limit check error:', response.status);
+      return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
     }
+
+    const data = await response.json();
+    const result = data?.[0];
+    
+    if (!result) {
+      return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
+    }
+
+    return {
+      allowed: result.allowed,
+      remaining: result.limit_remaining,
+      resetAt: new Date(result.reset_at)
+    };
+  } catch (err) {
+    console.error('Rate limit check exception:', err);
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
   }
-  
-  return { 
-    allowed: true, 
-    remaining: RATE_LIMIT_MAX_REQUESTS - requests.length,
-    resetAt: now + RATE_LIMIT_WINDOW_MS
-  };
 }
 
 // Generate embedding using OpenAI API
@@ -141,29 +137,41 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Apply IP-based rate limiting
+  // Get Supabase credentials for rate limiting
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Apply persistent IP-based rate limiting
   const clientIP = getClientIP(req);
-  const rateLimit = checkRateLimit(clientIP);
+  const rateLimit = await checkPersistentRateLimit(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, clientIP);
   
   const rateLimitHeaders = {
     'X-RateLimit-Limit': RATE_LIMIT_MAX_REQUESTS.toString(),
     'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-    'X-RateLimit-Reset': Math.ceil(rateLimit.resetAt / 1000).toString(),
+    'X-RateLimit-Reset': Math.ceil(rateLimit.resetAt.getTime() / 1000).toString(),
   };
   
   if (!rateLimit.allowed) {
+    const retryAfter = Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000);
     console.log(`Rate limit exceeded for IP: ${clientIP}`);
     return new Response(
       JSON.stringify({ 
         error: 'Rate limit exceeded. Please wait before making more requests.',
-        retryAfter: Math.ceil((rateLimit.resetAt - Date.now()) / 1000)
+        retryAfter: Math.max(1, retryAfter)
       }), 
       { 
         status: 429, 
         headers: { 
           ...corsHeaders, 
           ...rateLimitHeaders,
-          'Retry-After': Math.ceil((rateLimit.resetAt - Date.now()) / 1000).toString(),
+          'Retry-After': Math.max(1, retryAfter).toString(),
           'Content-Type': 'application/json' 
         } 
       }
@@ -191,15 +199,9 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
-    }
-
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error('Missing required Supabase environment variables');
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

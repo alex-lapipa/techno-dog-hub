@@ -575,6 +575,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ip_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          ip_address: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_address: string
+          request_count?: number
+          window_start: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_address?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       launch_notifications: {
         Row: {
           created_at: string
@@ -1253,6 +1280,19 @@ export type Database = {
       }
     }
     Functions: {
+      check_ip_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_ip_address: string
+          p_limit_per_minute?: number
+        }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          limit_remaining: number
+          reset_at: string
+        }[]
+      }
       check_rate_limit: {
         Args: {
           p_api_key_id: string
@@ -1278,6 +1318,7 @@ export type Database = {
         }[]
       }
       cleanup_old_api_usage: { Args: never; Returns: number }
+      cleanup_old_ip_rate_limits: { Args: never; Returns: number }
       enqueue_media_job: {
         Args: {
           p_entity_id: string
