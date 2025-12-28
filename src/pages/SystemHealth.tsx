@@ -25,6 +25,7 @@ import {
   Bell,
   BellOff,
 } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
 
 interface HealthAlert {
   id: string;
@@ -361,7 +362,7 @@ const SystemHealth = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }
