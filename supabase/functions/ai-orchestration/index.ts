@@ -454,7 +454,7 @@ Check for regressions and security issues. Respond with JSON only.`;
 
 // ============ HELPER FUNCTIONS ============
 
-const AI_TIMEOUT_MS = 25000; // 25 second timeout before fallback
+const AI_TIMEOUT_MS = 45000; // 45 second timeout before fallback (edge functions have ~60s limit)
 
 async function callWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
