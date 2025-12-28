@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers, Sparkles, FlipVertical2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -53,6 +53,17 @@ const PATTERNS: Record<PatternType, PatternInfo> = {
   },
 };
 
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  color: string;
+}
+
 const SynthPlayer = ({ 
   title = "T:DOG Demo Pattern", 
   artist = "Techno Dog Sound Engine",
@@ -64,6 +75,7 @@ const SynthPlayer = ({
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
+  const particlesRef = useRef<Particle[]>([]);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
@@ -74,6 +86,8 @@ const SynthPlayer = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>("both");
+  const [showParticles, setShowParticles] = useState(true);
+  const [showMirror, setShowMirror] = useState(true);
 
   const pattern = PATTERNS[patternType];
 
@@ -85,55 +99,125 @@ const SynthPlayer = ({
     return data.publicUrl;
   };
 
-  // Draw frequency bars
-  const drawBars = useCallback((ctx: CanvasRenderingContext2D, dataArray: Uint8Array, width: number, height: number, yOffset: number, barHeight: number) => {
+  // Spawn particles based on audio intensity
+  const spawnParticles = useCallback((intensity: number, width: number, height: number) => {
+    if (!showParticles) return;
+    
+    const spawnCount = Math.floor(intensity / 50);
+    for (let i = 0; i < spawnCount; i++) {
+      if (particlesRef.current.length < 100) {
+        particlesRef.current.push({
+          x: Math.random() * width,
+          y: height,
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 3 - 1,
+          life: 1,
+          maxLife: 60 + Math.random() * 40,
+          size: 2 + Math.random() * 3,
+          color: pattern.color,
+        });
+      }
+    }
+  }, [pattern.color, showParticles]);
+
+  // Update and draw particles
+  const updateParticles = useCallback((ctx: CanvasRenderingContext2D) => {
+    if (!showParticles) return;
+    
+    particlesRef.current = particlesRef.current.filter(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.02; // gravity
+      p.life++;
+      
+      const alpha = Math.max(0, 1 - p.life / p.maxLife);
+      if (alpha <= 0) return false;
+      
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+      ctx.fill();
+      
+      // Glow effect
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 10 * alpha;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      return true;
+    });
+  }, [showParticles]);
+
+  // Draw frequency bars with mirror effect
+  const drawBars = useCallback((ctx: CanvasRenderingContext2D, dataArray: Uint8Array, width: number, height: number, yOffset: number, barHeight: number, isMirror = false) => {
     const barCount = 64;
     const barWidth = width / barCount;
     const gap = 2;
     
+    // Calculate average intensity for particles
+    let totalIntensity = 0;
+    
     for (let i = 0; i < barCount; i++) {
       const dataIndex = Math.floor(i * dataArray.length / barCount);
       const value = dataArray[dataIndex];
-      const h = (value / 255) * barHeight * 0.9;
+      totalIntensity += value;
+      const h = (value / 255) * barHeight * (isMirror ? 0.4 : 0.9);
       
       const x = i * barWidth;
-      const y = yOffset + barHeight - h;
+      const y = isMirror ? yOffset : yOffset + barHeight - h;
       
       // Create gradient for each bar
-      const gradient = ctx.createLinearGradient(x, yOffset + barHeight, x, y);
-      gradient.addColorStop(0, pattern.color);
-      gradient.addColorStop(0.5, pattern.color + 'cc');
-      gradient.addColorStop(1, pattern.color + '66');
+      const gradient = isMirror 
+        ? ctx.createLinearGradient(x, yOffset, x, yOffset + h)
+        : ctx.createLinearGradient(x, yOffset + barHeight, x, y);
+      
+      if (isMirror) {
+        gradient.addColorStop(0, pattern.color + '44');
+        gradient.addColorStop(1, pattern.color + '00');
+      } else {
+        gradient.addColorStop(0, pattern.color);
+        gradient.addColorStop(0.5, pattern.color + 'cc');
+        gradient.addColorStop(1, pattern.color + '66');
+      }
       
       ctx.fillStyle = gradient;
       ctx.fillRect(x + gap / 2, y, barWidth - gap, h);
       
-      // Add glow effect for peaks
-      if (value > 200) {
+      // Add glow effect for peaks (not on mirror)
+      if (!isMirror && value > 200) {
         ctx.shadowColor = pattern.color;
         ctx.shadowBlur = 8;
         ctx.fillRect(x + gap / 2, y, barWidth - gap, h);
         ctx.shadowBlur = 0;
       }
     }
-  }, [pattern.color]);
+    
+    // Spawn particles based on intensity
+    if (!isMirror) {
+      spawnParticles(totalIntensity / barCount, width, yOffset + barHeight);
+    }
+  }, [pattern.color, spawnParticles]);
 
-  // Draw oscilloscope waveform
-  const drawOscilloscope = useCallback((ctx: CanvasRenderingContext2D, timeDataArray: Uint8Array, width: number, height: number, yOffset: number, scopeHeight: number) => {
+  // Draw oscilloscope waveform with mirror effect
+  const drawOscilloscope = useCallback((ctx: CanvasRenderingContext2D, timeDataArray: Uint8Array, width: number, height: number, yOffset: number, scopeHeight: number, isMirror = false) => {
     const sliceWidth = width / timeDataArray.length;
     
     // Draw glow effect
     ctx.shadowColor = pattern.color;
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = isMirror ? 5 : 15;
     
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = pattern.color;
+    ctx.lineWidth = isMirror ? 1 : 2;
+    ctx.strokeStyle = isMirror ? pattern.color + '33' : pattern.color;
     ctx.beginPath();
     
     let x = 0;
     for (let i = 0; i < timeDataArray.length; i++) {
       const v = timeDataArray[i] / 128.0;
-      const y = yOffset + (v * scopeHeight / 2);
+      const centerY = yOffset + scopeHeight / 2;
+      const amplitude = isMirror ? 0.3 : 1;
+      const y = isMirror 
+        ? centerY + (1 - v) * scopeHeight / 2 * amplitude
+        : centerY + (v - 1) * scopeHeight / 2;
       
       if (i === 0) {
         ctx.moveTo(x, y);
@@ -146,32 +230,34 @@ const SynthPlayer = ({
     ctx.stroke();
     ctx.shadowBlur = 0;
     
-    // Draw thinner bright line on top
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = pattern.color + 'ff';
-    ctx.beginPath();
-    
-    x = 0;
-    for (let i = 0; i < timeDataArray.length; i++) {
-      const v = timeDataArray[i] / 128.0;
-      const y = yOffset + (v * scopeHeight / 2);
+    if (!isMirror) {
+      // Draw thinner bright line on top
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = pattern.color + 'ff';
+      ctx.beginPath();
       
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
+      x = 0;
+      for (let i = 0; i < timeDataArray.length; i++) {
+        const v = timeDataArray[i] / 128.0;
+        const y = yOffset + (v * scopeHeight / 2);
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        x += sliceWidth;
       }
-      x += sliceWidth;
+      ctx.stroke();
+      
+      // Draw center line
+      ctx.strokeStyle = pattern.color + '33';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, yOffset + scopeHeight / 2);
+      ctx.lineTo(width, yOffset + scopeHeight / 2);
+      ctx.stroke();
     }
-    ctx.stroke();
-    
-    // Draw center line
-    ctx.strokeStyle = pattern.color + '33';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, yOffset + scopeHeight / 2);
-    ctx.lineTo(width, yOffset + scopeHeight / 2);
-    ctx.stroke();
   }, [pattern.color]);
 
   // Draw waveform visualization
@@ -197,32 +283,62 @@ const SynthPlayer = ({
       const width = canvas.width;
       const height = canvas.height;
       
-      // Clear canvas with fade effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      // Clear canvas with fade effect for trails
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
       ctx.fillRect(0, 0, width, height);
       
+      // Update particles first (behind everything)
+      updateParticles(ctx);
+      
       if (visualizerMode === "bars") {
-        drawBars(ctx, frequencyData, width, height, 0, height);
+        const mainHeight = showMirror ? height * 0.7 : height;
+        const mirrorHeight = height * 0.3;
+        
+        drawBars(ctx, frequencyData, width, mainHeight, 0, mainHeight);
+        if (showMirror) {
+          drawBars(ctx, frequencyData, width, mirrorHeight, mainHeight, mirrorHeight, true);
+        }
       } else if (visualizerMode === "scope") {
-        drawOscilloscope(ctx, timeData, width, height, 0, height);
+        const mainHeight = showMirror ? height * 0.7 : height;
+        const mirrorHeight = height * 0.3;
+        
+        drawOscilloscope(ctx, timeData, width, mainHeight, 0, mainHeight);
+        if (showMirror) {
+          drawOscilloscope(ctx, timeData, width, mirrorHeight, mainHeight, mirrorHeight, true);
+        }
       } else {
         // Both mode - split canvas
-        const halfHeight = height / 2;
-        drawBars(ctx, frequencyData, width, halfHeight, halfHeight, halfHeight);
-        drawOscilloscope(ctx, timeData, width, halfHeight, 0, halfHeight);
+        const mainHeight = showMirror ? height * 0.4 : height * 0.5;
+        const mirrorHeight = height * 0.1;
+        
+        // Oscilloscope on top
+        drawOscilloscope(ctx, timeData, width, mainHeight, 0, mainHeight);
+        if (showMirror) {
+          drawOscilloscope(ctx, timeData, width, mirrorHeight, mainHeight, mirrorHeight, true);
+        }
+        
+        // Bars on bottom
+        const barsOffset = showMirror ? mainHeight + mirrorHeight : mainHeight;
+        const barsHeight = showMirror ? mainHeight : height * 0.5;
+        const barsMirrorHeight = mirrorHeight;
+        
+        drawBars(ctx, frequencyData, width, barsHeight, barsOffset, barsHeight);
+        if (showMirror) {
+          drawBars(ctx, frequencyData, width, barsMirrorHeight, barsOffset + barsHeight, barsMirrorHeight, true);
+        }
         
         // Divider line
         ctx.strokeStyle = pattern.color + '44';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(0, halfHeight);
-        ctx.lineTo(width, halfHeight);
+        ctx.moveTo(0, barsOffset);
+        ctx.lineTo(width, barsOffset);
         ctx.stroke();
       }
     };
     
     draw();
-  }, [pattern.color, visualizerMode, drawBars, drawOscilloscope]);
+  }, [pattern.color, visualizerMode, drawBars, drawOscilloscope, updateParticles, showMirror]);
 
   // Draw idle waveform (when not playing)
   const drawIdleWaveform = useCallback(() => {
@@ -482,12 +598,13 @@ const SynthPlayer = ({
 
       {/* Waveform Visualizer */}
       <div className="mb-4">
-        {/* Visualizer Mode Toggle */}
+        {/* Visualizer Controls */}
         <div className="flex items-center justify-between mb-2">
           <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
             Visualizer
           </p>
           <div className="flex gap-1">
+            {/* Mode toggles */}
             <Button
               variant="ghost"
               size="sm"
@@ -524,6 +641,35 @@ const SynthPlayer = ({
             >
               <Layers className="h-3 w-3" />
             </Button>
+            
+            {/* Separator */}
+            <div className="w-px h-4 bg-border mx-1 self-center" />
+            
+            {/* Effects toggles */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-6 w-6 p-0",
+                showParticles && "bg-logo-green/20 text-logo-green"
+              )}
+              onClick={() => setShowParticles(!showParticles)}
+              title="Particles"
+            >
+              <Sparkles className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-6 w-6 p-0",
+                showMirror && "bg-logo-green/20 text-logo-green"
+              )}
+              onClick={() => setShowMirror(!showMirror)}
+              title="Mirror Reflection"
+            >
+              <FlipVertical2 className="h-3 w-3" />
+            </Button>
           </div>
         </div>
         
@@ -531,8 +677,8 @@ const SynthPlayer = ({
           <canvas
             ref={canvasRef}
             width={400}
-            height={100}
-            className="w-full h-24"
+            height={120}
+            className="w-full h-28"
           />
           {/* Overlay gradient */}
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/30 to-transparent" />
