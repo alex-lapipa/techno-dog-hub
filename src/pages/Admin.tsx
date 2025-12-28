@@ -165,6 +165,7 @@ const AdminDashboard = () => {
     { name: "Analytics", description: "Site usage metrics", path: "/analytics", frameNumber: "T8" },
     { name: "Activity Log", description: "Admin action history", path: "/admin/activity-log", frameNumber: "T9" },
     { name: "Image Gallery", description: "Generated image management", path: "/admin/images", frameNumber: "T10" },
+    { name: "API Docs", description: "Admin API documentation", path: "/api-docs", frameNumber: "T11" },
   ];
 
   return (
