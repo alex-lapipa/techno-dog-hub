@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check, Lock, Server, Users, FileText, Image, Activity, Play, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, Check, Lock, Server, Users, FileText, Image, Activity, Play, Loader2, ChevronDown, ChevronUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -195,14 +195,30 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
       {/* API Key */}
       <div className="space-y-2">
         <Label htmlFor="apiKey" className="text-xs text-muted-foreground">API Key</Label>
-        <Input
-          id="apiKey"
-          type="password"
-          placeholder="td_live_xxxxx"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="font-mono text-sm h-9"
-        />
+        <div className="flex gap-2">
+          <Input
+            id="apiKey"
+            type="password"
+            placeholder="td_live_xxxxx"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="font-mono text-sm h-9 flex-1"
+          />
+          {apiKey && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-muted-foreground hover:text-crimson"
+              onClick={() => {
+                setApiKey("");
+                localStorage.removeItem(API_KEY_STORAGE_KEY);
+              }}
+              title="Clear saved API key"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Path Parameters */}
