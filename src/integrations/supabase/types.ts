@@ -50,6 +50,51 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_reports: {
+        Row: {
+          agent_category: string
+          agent_name: string
+          created_at: string
+          description: string | null
+          details: Json | null
+          id: string
+          report_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          status: string
+          title: string
+        }
+        Insert: {
+          agent_category: string
+          agent_name: string
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          id?: string
+          report_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          agent_category?: string
+          agent_name?: string
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          id?: string
+          report_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
