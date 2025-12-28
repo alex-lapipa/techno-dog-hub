@@ -794,6 +794,121 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_channels: {
+        Row: {
+          channel_type: string
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          email_addresses: string[] | null
+          id: string
+          is_active: boolean
+          last_notified_at: string | null
+          name: string
+          notify_categories: string[]
+          notify_on_severity: string[]
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          channel_type: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          email_addresses?: string[] | null
+          id?: string
+          is_active?: boolean
+          last_notified_at?: string | null
+          name: string
+          notify_categories?: string[]
+          notify_on_severity?: string[]
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          channel_type?: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          email_addresses?: string[] | null
+          id?: string
+          is_active?: boolean
+          last_notified_at?: string | null
+          name?: string
+          notify_categories?: string[]
+          notify_on_severity?: string[]
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      notification_logs: {
+        Row: {
+          agent_report_id: string | null
+          channel_id: string | null
+          delivery_status: string
+          error_message: string | null
+          health_alert_id: string | null
+          id: string
+          message: string | null
+          notification_type: string
+          response_code: number | null
+          sent_at: string
+          severity: string
+          title: string
+        }
+        Insert: {
+          agent_report_id?: string | null
+          channel_id?: string | null
+          delivery_status?: string
+          error_message?: string | null
+          health_alert_id?: string | null
+          id?: string
+          message?: string | null
+          notification_type: string
+          response_code?: number | null
+          sent_at?: string
+          severity: string
+          title: string
+        }
+        Update: {
+          agent_report_id?: string | null
+          channel_id?: string | null
+          delivery_status?: string
+          error_message?: string | null
+          health_alert_id?: string | null
+          id?: string
+          message?: string | null
+          notification_type?: string
+          response_code?: number | null
+          sent_at?: string
+          severity?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_agent_report_id_fkey"
+            columns: ["agent_report_id"]
+            isOneToOne: false
+            referencedRelation: "agent_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "notification_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_health_alert_id_fkey"
+            columns: ["health_alert_id"]
+            isOneToOne: false
+            referencedRelation: "health_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_webhook_events: {
         Row: {
           created_at: string
