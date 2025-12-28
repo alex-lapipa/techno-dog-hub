@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check, Lock, Server, Users, FileText, Image, Activity, Play, Loader2, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Copy, Check, Lock, Server, Users, FileText, Image, Activity, Play, Loader2, ChevronDown, ChevronUp, X, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,6 +75,7 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<{ status: number; data: any; time: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showApiKey, setShowApiKey] = useState(false);
   
   const historyCtx = useContext(HistoryContext);
 
@@ -203,15 +204,27 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
             </span>
           )}
         </div>
-        <div className="flex gap-2">
-          <Input
-            id="apiKey"
-            type="password"
-            placeholder="td_live_xxxxx"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="font-mono text-sm h-9 flex-1"
-          />
+        <div className="flex gap-1">
+          <div className="relative flex-1">
+            <Input
+              id="apiKey"
+              type={showApiKey ? "text" : "password"}
+              placeholder="td_live_xxxxx"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="font-mono text-sm h-9 pr-9"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-0 h-9 w-9 text-muted-foreground hover:text-foreground"
+              onClick={() => setShowApiKey(!showApiKey)}
+              title={showApiKey ? "Hide API key" : "Show API key"}
+            >
+              {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
           {apiKey && (
             <Button
               variant="ghost"
