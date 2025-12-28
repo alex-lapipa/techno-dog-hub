@@ -74,14 +74,14 @@ const AdminDashboard = () => {
   };
 
   const agents = [
-    { name: "Health Monitor", category: "Operations", description: "Checks edge functions, database, and API response times", status: "idle" as const, frameNumber: "01" },
-    { name: "Security Auditor", category: "Security", description: "Scans for access control issues and suspicious activity", status: "idle" as const, frameNumber: "02" },
-    { name: "Data Integrity", category: "Operations", description: "Detects orphaned records, duplicates, and missing data", status: "idle" as const, frameNumber: "03" },
-    { name: "Media Monitor", category: "Content", description: "Tracks media pipeline status and failed jobs", status: "idle" as const, frameNumber: "04" },
-    { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05" },
-    { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06" },
-    { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07" },
-    { name: "Pipeline Orchestrator", category: "Operations", description: "Coordinates multi-step review and validation tasks", status: "idle" as const, frameNumber: "08" },
+    { name: "Health Monitor", category: "Operations", description: "Checks edge functions, database, and API response times", status: "idle" as const, frameNumber: "01", functionName: "health-monitor" },
+    { name: "Security Auditor", category: "Security", description: "Scans for access control issues and suspicious activity", status: "idle" as const, frameNumber: "02", functionName: "security-auditor" },
+    { name: "Data Integrity", category: "Operations", description: "Detects orphaned records, duplicates, and missing data", status: "idle" as const, frameNumber: "03", functionName: "data-integrity" },
+    { name: "Media Monitor", category: "Content", description: "Tracks media pipeline status and failed jobs", status: "idle" as const, frameNumber: "04", functionName: "media-monitor" },
+    { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05", functionName: "submissions-triage" },
+    { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter" },
+    { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector" },
+    { name: "Pipeline Orchestrator", category: "Operations", description: "Coordinates multi-step review and validation tasks", status: "disabled" as const, frameNumber: "08" },
   ];
 
   const tools = [
