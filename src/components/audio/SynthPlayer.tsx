@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers, Sparkles, FlipVertical2 } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers, Sparkles, FlipVertical2, RefreshCw, Check, X, Cloud } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-
+import { toast } from "sonner";
 interface SynthPlayerProps {
   title?: string;
   artist?: string;
@@ -88,8 +88,56 @@ const SynthPlayer = ({
   const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>("both");
   const [showParticles, setShowParticles] = useState(true);
   const [showMirror, setShowMirror] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [availableDemos, setAvailableDemos] = useState<Record<PatternType, boolean>>({
+    warehouse: false,
+    minimal: false,
+    industrial: false,
+    acid: false,
+  });
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
   const pattern = PATTERNS[patternType];
+
+  // Check which demos are available in cloud storage
+  const syncFromCloud = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('tdog-demos')
+        .list('', { limit: 100 });
+
+      if (error) {
+        console.error('Failed to list demos:', error);
+        toast.error('Failed to sync from cloud');
+        return;
+      }
+
+      const fileNames = data?.map(f => f.name) || [];
+      const availability: Record<PatternType, boolean> = {
+        warehouse: fileNames.includes('warehouse-demo.mp3'),
+        minimal: fileNames.includes('minimal-demo.mp3'),
+        industrial: fileNames.includes('industrial-demo.mp3'),
+        acid: fileNames.includes('acid-demo.mp3'),
+      };
+
+      setAvailableDemos(availability);
+      setLastSyncTime(new Date());
+
+      const availableCount = Object.values(availability).filter(Boolean).length;
+      toast.success(`Found ${availableCount} demo${availableCount !== 1 ? 's' : ''} in cloud`);
+    } catch (err) {
+      console.error('Sync error:', err);
+      toast.error('Sync failed');
+    } finally {
+      setIsSyncing(false);
+    }
+  }, []);
+
+  // Auto-sync on mount
+  useEffect(() => {
+    syncFromCloud();
+  }, [syncFromCloud]);
 
   // Get audio URL from storage
   const getAudioUrl = (fileName: string) => {
@@ -575,25 +623,53 @@ const SynthPlayer = ({
 
       {/* Pattern Selector */}
       <div className="mb-4">
-        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
-          Select Demo
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {(Object.keys(PATTERNS) as PatternType[]).map((key) => (
-            <Button
-              key={key}
-              variant="outline"
-              size="sm"
-              className={cn(
-                "font-mono text-[10px] uppercase tracking-wider h-7 px-3",
-                patternType === key && "bg-logo-green/20 border-logo-green text-logo-green"
-              )}
-              onClick={() => changePattern(key)}
-            >
-              {PATTERNS[key].name}
-            </Button>
-          ))}
+        <div className="flex items-center justify-between mb-2">
+          <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+            Select Demo
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 font-mono text-[10px] gap-1"
+            onClick={syncFromCloud}
+            disabled={isSyncing}
+          >
+            <RefreshCw className={cn("h-3 w-3", isSyncing && "animate-spin")} />
+            <Cloud className="h-3 w-3" />
+            {isSyncing ? "Syncing..." : "Sync"}
+          </Button>
         </div>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(PATTERNS) as PatternType[]).map((key) => {
+            const isAvailable = availableDemos[key];
+            return (
+              <Button
+                key={key}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "font-mono text-[10px] uppercase tracking-wider h-7 px-3 gap-1.5",
+                  patternType === key && "bg-logo-green/20 border-logo-green text-logo-green",
+                  !isAvailable && "opacity-50"
+                )}
+                onClick={() => changePattern(key)}
+                title={isAvailable ? `Play ${PATTERNS[key].name} demo` : `${PATTERNS[key].name} demo not uploaded yet`}
+              >
+                {isAvailable ? (
+                  <Check className="h-2.5 w-2.5 text-logo-green" />
+                ) : (
+                  <X className="h-2.5 w-2.5 text-muted-foreground" />
+                )}
+                {PATTERNS[key].name}
+              </Button>
+            );
+          })}
+        </div>
+        {lastSyncTime && (
+          <p className="font-mono text-[9px] text-muted-foreground mt-2">
+            Last synced: {lastSyncTime.toLocaleTimeString()}
+          </p>
+        )}
       </div>
 
       {/* Waveform Visualizer */}
