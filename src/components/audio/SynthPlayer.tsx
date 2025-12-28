@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ interface SynthPlayerProps {
 }
 
 type PatternType = "warehouse" | "minimal" | "industrial" | "acid";
+type VisualizerMode = "bars" | "scope" | "both";
 
 interface PatternInfo {
   name: string;
@@ -72,6 +73,7 @@ const SynthPlayer = ({
   const [hasError, setHasError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>("both");
 
   const pattern = PATTERNS[patternType];
 
@@ -82,6 +84,95 @@ const SynthPlayer = ({
       .getPublicUrl(fileName);
     return data.publicUrl;
   };
+
+  // Draw frequency bars
+  const drawBars = useCallback((ctx: CanvasRenderingContext2D, dataArray: Uint8Array, width: number, height: number, yOffset: number, barHeight: number) => {
+    const barCount = 64;
+    const barWidth = width / barCount;
+    const gap = 2;
+    
+    for (let i = 0; i < barCount; i++) {
+      const dataIndex = Math.floor(i * dataArray.length / barCount);
+      const value = dataArray[dataIndex];
+      const h = (value / 255) * barHeight * 0.9;
+      
+      const x = i * barWidth;
+      const y = yOffset + barHeight - h;
+      
+      // Create gradient for each bar
+      const gradient = ctx.createLinearGradient(x, yOffset + barHeight, x, y);
+      gradient.addColorStop(0, pattern.color);
+      gradient.addColorStop(0.5, pattern.color + 'cc');
+      gradient.addColorStop(1, pattern.color + '66');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x + gap / 2, y, barWidth - gap, h);
+      
+      // Add glow effect for peaks
+      if (value > 200) {
+        ctx.shadowColor = pattern.color;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(x + gap / 2, y, barWidth - gap, h);
+        ctx.shadowBlur = 0;
+      }
+    }
+  }, [pattern.color]);
+
+  // Draw oscilloscope waveform
+  const drawOscilloscope = useCallback((ctx: CanvasRenderingContext2D, timeDataArray: Uint8Array, width: number, height: number, yOffset: number, scopeHeight: number) => {
+    const sliceWidth = width / timeDataArray.length;
+    
+    // Draw glow effect
+    ctx.shadowColor = pattern.color;
+    ctx.shadowBlur = 15;
+    
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = pattern.color;
+    ctx.beginPath();
+    
+    let x = 0;
+    for (let i = 0; i < timeDataArray.length; i++) {
+      const v = timeDataArray[i] / 128.0;
+      const y = yOffset + (v * scopeHeight / 2);
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+      x += sliceWidth;
+    }
+    
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // Draw thinner bright line on top
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = pattern.color + 'ff';
+    ctx.beginPath();
+    
+    x = 0;
+    for (let i = 0; i < timeDataArray.length; i++) {
+      const v = timeDataArray[i] / 128.0;
+      const y = yOffset + (v * scopeHeight / 2);
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+      x += sliceWidth;
+    }
+    ctx.stroke();
+    
+    // Draw center line
+    ctx.strokeStyle = pattern.color + '33';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, yOffset + scopeHeight / 2);
+    ctx.lineTo(width, yOffset + scopeHeight / 2);
+    ctx.stroke();
+  }, [pattern.color]);
 
   // Draw waveform visualization
   const drawWaveform = useCallback(() => {
@@ -94,62 +185,44 @@ const SynthPlayer = ({
     if (!ctx) return;
 
     const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const frequencyData = new Uint8Array(bufferLength);
+    const timeData = new Uint8Array(analyser.fftSize);
     
     const draw = () => {
       animationRef.current = requestAnimationFrame(draw);
       
-      analyser.getByteFrequencyData(dataArray);
+      analyser.getByteFrequencyData(frequencyData);
+      analyser.getByteTimeDomainData(timeData);
       
       const width = canvas.width;
       const height = canvas.height;
       
       // Clear canvas with fade effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.fillRect(0, 0, width, height);
       
-      // Draw frequency bars
-      const barCount = 64;
-      const barWidth = width / barCount;
-      const gap = 2;
-      
-      for (let i = 0; i < barCount; i++) {
-        const dataIndex = Math.floor(i * bufferLength / barCount);
-        const value = dataArray[dataIndex];
-        const barHeight = (value / 255) * height * 0.9;
+      if (visualizerMode === "bars") {
+        drawBars(ctx, frequencyData, width, height, 0, height);
+      } else if (visualizerMode === "scope") {
+        drawOscilloscope(ctx, timeData, width, height, 0, height);
+      } else {
+        // Both mode - split canvas
+        const halfHeight = height / 2;
+        drawBars(ctx, frequencyData, width, halfHeight, halfHeight, halfHeight);
+        drawOscilloscope(ctx, timeData, width, halfHeight, 0, halfHeight);
         
-        const x = i * barWidth;
-        const y = height - barHeight;
-        
-        // Create gradient for each bar
-        const gradient = ctx.createLinearGradient(x, height, x, y);
-        gradient.addColorStop(0, pattern.color);
-        gradient.addColorStop(0.5, pattern.color + 'cc');
-        gradient.addColorStop(1, pattern.color + '66');
-        
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x + gap / 2, y, barWidth - gap, barHeight);
-        
-        // Add glow effect for peaks
-        if (value > 200) {
-          ctx.shadowColor = pattern.color;
-          ctx.shadowBlur = 10;
-          ctx.fillRect(x + gap / 2, y, barWidth - gap, barHeight);
-          ctx.shadowBlur = 0;
-        }
+        // Divider line
+        ctx.strokeStyle = pattern.color + '44';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, halfHeight);
+        ctx.lineTo(width, halfHeight);
+        ctx.stroke();
       }
-      
-      // Draw center line
-      ctx.strokeStyle = pattern.color + '33';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, height / 2);
-      ctx.lineTo(width, height / 2);
-      ctx.stroke();
     };
     
     draw();
-  }, [pattern.color]);
+  }, [pattern.color, visualizerMode, drawBars, drawOscilloscope]);
 
   // Draw idle waveform (when not playing)
   const drawIdleWaveform = useCallback(() => {
@@ -162,31 +235,57 @@ const SynthPlayer = ({
     const width = canvas.width;
     const height = canvas.height;
     
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
     ctx.fillRect(0, 0, width, height);
     
-    // Draw static bars
-    const barCount = 64;
-    const barWidth = width / barCount;
-    const gap = 2;
-    
-    for (let i = 0; i < barCount; i++) {
-      const barHeight = 4 + Math.sin(i * 0.3) * 3;
-      const x = i * barWidth;
-      const y = height - barHeight - 2;
+    if (visualizerMode === "bars" || visualizerMode === "both") {
+      // Draw static bars
+      const barCount = 64;
+      const barWidth = width / barCount;
+      const gap = 2;
+      const barAreaHeight = visualizerMode === "both" ? height / 2 : height;
+      const yOffset = visualizerMode === "both" ? height / 2 : 0;
       
-      ctx.fillStyle = pattern.color + '44';
-      ctx.fillRect(x + gap / 2, y, barWidth - gap, barHeight);
+      for (let i = 0; i < barCount; i++) {
+        const barHeight = 4 + Math.sin(i * 0.3) * 3;
+        const x = i * barWidth;
+        const y = yOffset + barAreaHeight - barHeight - 2;
+        
+        ctx.fillStyle = pattern.color + '44';
+        ctx.fillRect(x + gap / 2, y, barWidth - gap, barHeight);
+      }
     }
     
-    // Draw center line
-    ctx.strokeStyle = pattern.color + '22';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, height / 2);
-    ctx.lineTo(width, height / 2);
-    ctx.stroke();
-  }, [pattern.color]);
+    if (visualizerMode === "scope" || visualizerMode === "both") {
+      // Draw static oscilloscope line
+      const scopeHeight = visualizerMode === "both" ? height / 2 : height;
+      const yCenter = visualizerMode === "both" ? scopeHeight / 2 : height / 2;
+      
+      ctx.strokeStyle = pattern.color + '44';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      
+      for (let x = 0; x < width; x++) {
+        const y = yCenter + Math.sin(x * 0.05) * 3;
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+    }
+    
+    if (visualizerMode === "both") {
+      // Divider line
+      ctx.strokeStyle = pattern.color + '22';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.stroke();
+    }
+  }, [pattern.color, visualizerMode]);
 
   // Stop animation
   const stopAnimation = useCallback(() => {
@@ -283,12 +382,12 @@ const SynthPlayer = ({
     }
   }, [isPlaying, drawWaveform, stopAnimation, drawIdleWaveform]);
 
-  // Redraw idle when pattern changes
+  // Redraw idle when pattern or mode changes
   useEffect(() => {
     if (!isPlaying) {
       drawIdleWaveform();
     }
-  }, [pattern.color, isPlaying, drawIdleWaveform]);
+  }, [pattern.color, isPlaying, drawIdleWaveform, visualizerMode]);
 
   const togglePlay = async () => {
     if (!audioRef.current || hasError) return;
@@ -382,15 +481,62 @@ const SynthPlayer = ({
       </div>
 
       {/* Waveform Visualizer */}
-      <div className="mb-4 relative rounded overflow-hidden bg-background/80">
-        <canvas
-          ref={canvasRef}
-          width={400}
-          height={80}
-          className="w-full h-20"
-        />
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/50 to-transparent" />
+      <div className="mb-4">
+        {/* Visualizer Mode Toggle */}
+        <div className="flex items-center justify-between mb-2">
+          <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+            Visualizer
+          </p>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-6 w-6 p-0",
+                visualizerMode === "bars" && "bg-logo-green/20 text-logo-green"
+              )}
+              onClick={() => setVisualizerMode("bars")}
+              title="Frequency Bars"
+            >
+              <BarChart3 className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-6 w-6 p-0",
+                visualizerMode === "scope" && "bg-logo-green/20 text-logo-green"
+              )}
+              onClick={() => setVisualizerMode("scope")}
+              title="Oscilloscope"
+            >
+              <Activity className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-6 w-6 p-0",
+                visualizerMode === "both" && "bg-logo-green/20 text-logo-green"
+              )}
+              onClick={() => setVisualizerMode("both")}
+              title="Both"
+            >
+              <Layers className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="relative rounded overflow-hidden bg-background/80">
+          <canvas
+            ref={canvasRef}
+            width={400}
+            height={100}
+            className="w-full h-24"
+          />
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-background/30 to-transparent" />
+        </div>
       </div>
 
       {/* Pattern Info */}
