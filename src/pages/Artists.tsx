@@ -50,7 +50,7 @@ const ArtistsPage = () => {
         structuredData={itemListSchema}
       />
       <Header />
-      <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
+      <main className="pt-16 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
             <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">

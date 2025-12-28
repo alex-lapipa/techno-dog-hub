@@ -106,7 +106,7 @@ const TechnopediaPage = () => {
       />
       <Header />
       
-      <main className="pt-20 sm:pt-24 pb-16 sm:pb-24">
+      <main className="pt-16 pb-16 sm:pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Hero */}

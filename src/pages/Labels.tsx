@@ -32,21 +32,21 @@ const LabelsPage = () => {
         structuredData={itemListSchema}
       />
       <Header />
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="mb-12 space-y-4">
-            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
+      <main className="pt-16 pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4 py-8 md:py-12 border-b border-border">
+            <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
               // Archive
             </div>
-            <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
+            <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
               Labels
             </h1>
-            <p className="font-mono text-sm text-muted-foreground max-w-2xl">
+            <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
               The imprints that define the underground. Quality over quantity.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 py-8">
             {labels.map((label) => (
               <Link
                 key={label.id}
