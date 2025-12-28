@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
+import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 
 const GearPage = () => {
   const { trackClick, trackSearch } = useAnalytics();
@@ -66,6 +67,7 @@ const GearPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <GlitchSVGFilter />
       <PageSEO
         title="Techno Gear & Equipment"
         description="The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses."
@@ -137,17 +139,20 @@ const GearPage = () => {
                 to={`/gear/${item.id}`}
                 className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
               >
-                {/* Gear Image or Icon placeholder */}
-                <div className="aspect-[4/3] relative overflow-hidden bg-card/30 flex items-center justify-center">
+                {/* Gear Image with VHS Filter */}
+                <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
                   {item.image ? (
-                    <img 
+                    <GlitchImage 
                       src={item.image.url} 
                       alt={item.name}
-                      className="w-full h-full object-contain p-3 sm:p-4"
-                      loading="lazy"
+                      className="w-full h-full"
+                      frameNumber={String(filteredGear.indexOf(item) + 1).padStart(2, '0')}
+                      size="thumbnail"
                     />
                   ) : (
-                    <Sliders className="w-12 h-12 text-muted-foreground/20" />
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Sliders className="w-12 h-12 text-muted-foreground/20" />
+                    </div>
                   )}
                 </div>
                 
