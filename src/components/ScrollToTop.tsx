@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
 
-  useEffect(() => {
-    // If there's a hash, let the browser handle smooth scrolling to the anchor
+  // Use useLayoutEffect for synchronous scroll before paint
+  useLayoutEffect(() => {
+    // If there's a hash, handle anchor scrolling with delay
     if (hash) {
       const element = document.querySelector(hash);
       if (element) {
-        // Small delay to ensure the page has rendered
         setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -17,8 +17,20 @@ const ScrollToTop = () => {
       return;
     }
     
-    // Otherwise scroll to top instantly (not smooth, to avoid jarring effect on page change)
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Scroll to top immediately and synchronously
+    window.scrollTo(0, 0);
+  }, [pathname, hash]);
+
+  // Backup effect to ensure scroll happens after lazy content loads
+  useEffect(() => {
+    if (!hash) {
+      // Double-check scroll position after React's paint cycle
+      requestAnimationFrame(() => {
+        if (window.scrollY !== 0) {
+          window.scrollTo(0, 0);
+        }
+      });
+    }
   }, [pathname, hash]);
 
   return null;
