@@ -283,13 +283,18 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     return acc;
   }, {} as Record<string, string[] | string>);
 
+  // Parse location - use city if present, otherwise parse from country
+  const location = canonical.city 
+    ? { city: canonical.city, country: canonical.country || 'Unknown', region: canonical.region || 'Unknown' }
+    : parseLocation(canonical.country);
+
   return {
     id: canonical.slug,
     name: canonical.canonical_name,
     realName: canonical.real_name || undefined,
-    city: canonical.city || 'Unknown',
-    country: canonical.country || 'Unknown',
-    region: canonical.region || 'Unknown',
+    city: location.city,
+    country: location.country,
+    region: location.region,
     active: canonical.active_years || 'Unknown',
     tags: primaryProfile.tags || primaryProfile.subgenres || [],
     bio: primaryProfile.bio_long || primaryProfile.bio_short || '',

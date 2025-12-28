@@ -78,13 +78,98 @@ function scoreVideo(video: any, artistName: string): number {
   return score;
 }
 
+// Use OpenAI to verify videos are actually by the correct artist
+async function verifyVideosWithAI(videos: any[], artistName: string): Promise<any[]> {
+  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+  
+  if (!OPENAI_API_KEY || videos.length === 0) {
+    console.log('Skipping AI verification - no API key or no videos');
+    return videos.map(v => ({ ...v, aiVerified: false }));
+  }
+
+  try {
+    const videoList = videos.map((v, i) => 
+      `${i + 1}. Title: "${v.title}" | Channel: "${v.channelTitle}"`
+    ).join('\n');
+
+    const prompt = `You are verifying YouTube videos for a techno music database.
+
+Artist we're searching for: "${artistName}"
+
+Videos found:
+${videoList}
+
+For each video, determine if it is ACTUALLY a DJ set, live performance, or music video by "${artistName}" (the techno/electronic music artist).
+
+IMPORTANT considerations:
+- The artist name must clearly refer to the DJ/producer, not someone else with a similar name
+- "${artistName}" may appear as a guest, collaborator, or b2b partner - these are valid
+- Compilations or mixes ABOUT the artist are valid
+- Reaction videos, tutorials, or unrelated content should be rejected
+- If the title mentions "${artistName}" performing at a venue/festival, it's likely valid
+- Consider common aliases or project names the artist may use
+
+Return a JSON array with the video numbers that are VALID for this artist.
+Example response: {"valid": [1, 2, 4]}
+
+Only return the JSON, no explanation.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are a techno music expert helping verify video content. Only respond with valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 200
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', response.status);
+      return videos.map(v => ({ ...v, aiVerified: false }));
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Parse JSON response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Could not parse OpenAI response:', content);
+      return videos.map(v => ({ ...v, aiVerified: false }));
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    const validIndices = new Set(result.valid || []);
+
+    console.log(`AI verification for ${artistName}: ${validIndices.size}/${videos.length} valid`);
+
+    // Mark verified videos
+    return videos.map((v, i) => ({
+      ...v,
+      aiVerified: validIndices.has(i + 1)
+    }));
+
+  } catch (error) {
+    console.error('AI verification error:', error);
+    return videos.map(v => ({ ...v, aiVerified: false }));
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
-    const { artistName, maxResults = 6, forceRefresh = false } = await req.json();
+    const { artistName, maxResults = 6, forceRefresh = false, skipAIVerification = false } = await req.json();
     
     if (!artistName) {
       return errorResponse('Artist name is required', 400);
@@ -184,7 +269,22 @@ serve(async (req) => {
 
     // Sort by relevance score and take top results
     allVideos.sort((a, b) => b.score - a.score);
-    const videos = allVideos.slice(0, maxResults).map(({ score, ...video }) => video);
+    let videos = allVideos.slice(0, maxResults + 4).map(({ score, ...video }) => video);
+
+    // AI Verification step - filter out wrong videos
+    if (!skipAIVerification && videos.length > 0) {
+      console.log(`Running AI verification for ${artistName} on ${videos.length} videos`);
+      const verifiedVideos = await verifyVideosWithAI(videos, artistName);
+      
+      // Filter to only AI-verified videos, keep up to maxResults
+      const confirmed = verifiedVideos.filter(v => v.aiVerified);
+      const unconfirmed = verifiedVideos.filter(v => !v.aiVerified);
+      
+      // Prioritize AI-verified, but include some unverified if needed
+      videos = [...confirmed, ...unconfirmed].slice(0, maxResults);
+      
+      console.log(`After AI verification: ${confirmed.length} verified, ${unconfirmed.length} unverified`);
+    }
 
     console.log(`Found ${allVideos.length} matching videos, returning ${videos.length} for ${artistName}`);
 
@@ -210,7 +310,8 @@ serve(async (req) => {
     return jsonResponse({ 
       videos, 
       cached: false,
-      totalMatched: allVideos.length 
+      totalMatched: allVideos.length,
+      aiVerified: !skipAIVerification
     });
 
   } catch (error) {
