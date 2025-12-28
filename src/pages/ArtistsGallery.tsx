@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Grid3X3, LayoutGrid, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
@@ -6,21 +6,14 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import FilmFrame from "@/components/FilmFrame";
 import { Button } from "@/components/ui/button";
-import { loadArtistsSummary, ArtistSummary } from "@/data/artists-loader";
+import { useArtists } from "@/hooks/useData";
 
 const ArtistsGallery = () => {
-  const [artists, setArtists] = useState<ArtistSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: allArtists = [], isLoading: loading } = useArtists();
   const [gridSize, setGridSize] = useState<'small' | 'large'>('large');
 
-  useEffect(() => {
-    loadArtistsSummary().then(data => {
-      // Filter to only artists with photos for the gallery
-      const withPhotos = data.filter(a => a.photoUrl);
-      setArtists(withPhotos);
-      setLoading(false);
-    });
-  }, []);
+  // Filter to only artists with photos for the gallery
+  const artists = allArtists.filter(a => a.photoUrl);
 
   const gridClasses = gridSize === 'small' 
     ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'

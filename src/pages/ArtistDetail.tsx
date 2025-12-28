@@ -1,15 +1,17 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
-import { getArtistById, artists } from "@/data/artists";
+import { useArtist, useArtists } from "@/hooks/useData";
 import { PageLayout } from "@/components/layout";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const artist = id ? getArtistById(id) : null;
+  const { data: artist, isLoading } = useArtist(id);
+  const { data: allArtists = [] } = useArtists();
 
   const personSchema = artist ? {
     "@context": "https://schema.org",
@@ -49,9 +51,26 @@ const ArtistDetail = () => {
   } : null;
 
   // Find prev/next artists for navigation
-  const currentIndex = artists.findIndex(a => a.id === id);
-  const prevArtist = currentIndex > 0 ? artists[currentIndex - 1] : null;
-  const nextArtist = currentIndex < artists.length - 1 ? artists[currentIndex + 1] : null;
+  const currentIndex = allArtists.findIndex(a => a.id === id);
+  const prevArtist = currentIndex > 0 ? allArtists[currentIndex - 1] : null;
+  const nextArtist = currentIndex < allArtists.length - 1 ? allArtists[currentIndex + 1] : null;
+
+  if (isLoading) {
+    return (
+      <PageLayout title="Loading..." path={`/artists/${id}`}>
+        <div className="container mx-auto px-4 md:px-8 py-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            <Skeleton className="aspect-square" />
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!artist) {
     return (
@@ -72,7 +91,7 @@ const ArtistDetail = () => {
   }
 
   // Get related artists (same region or shared tags)
-  const relatedArtists = artists
+  const relatedArtists = allArtists
     .filter(a => 
       a.id !== artist.id && 
       (a.region === artist.region || a.tags.some(t => artist.tags.includes(t)))
@@ -126,7 +145,7 @@ const ArtistDetail = () => {
               )}
 
               <span className="font-mono text-xs text-muted-foreground px-2">
-                {currentIndex + 1}/{artists.length}
+                {currentIndex + 1}/{allArtists.length}
               </span>
 
               {nextArtist ? (

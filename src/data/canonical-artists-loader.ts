@@ -95,6 +95,56 @@ export interface CanonicalArtistSummary {
   subgenres: string[];
   labels: string[];
   knownFor: string | null;
+  realName: string | null;
+}
+
+// Parse location from country field (handles "Detroit, Michigan, United States" format)
+function parseLocation(country: string | null): { city: string; country: string; region: string } {
+  if (!country) return { city: 'Unknown', country: 'Unknown', region: 'Unknown' };
+  
+  const location = country.toLowerCase();
+  
+  // Handle specific patterns
+  if (location.includes('detroit') || location.includes('american (detroit)')) {
+    return { city: 'Detroit', country: 'USA', region: 'North America' };
+  }
+  if (location.includes('berlin')) {
+    return { city: 'Berlin', country: 'Germany', region: 'Europe' };
+  }
+  if (location.includes('british') || location.includes('uk')) {
+    if (location.includes('birmingham')) return { city: 'Birmingham', country: 'UK', region: 'Europe' };
+    if (location.includes('london')) return { city: 'London', country: 'UK', region: 'Europe' };
+    return { city: 'UK', country: 'UK', region: 'Europe' };
+  }
+  if (location.includes('german')) {
+    return { city: 'Germany', country: 'Germany', region: 'Europe' };
+  }
+  if (location.includes('spanish') || location.includes('spain')) {
+    return { city: 'Spain', country: 'Spain', region: 'Europe' };
+  }
+  if (location.includes('dutch') || location.includes('netherlands')) {
+    return { city: 'Netherlands', country: 'Netherlands', region: 'Europe' };
+  }
+  if (location.includes('italian') || location.includes('italy')) {
+    return { city: 'Italy', country: 'Italy', region: 'Europe' };
+  }
+  if (location.includes('french') || location.includes('france')) {
+    return { city: 'France', country: 'France', region: 'Europe' };
+  }
+  if (location.includes('georgian') || location.includes('tbilisi')) {
+    return { city: 'Tbilisi', country: 'Georgia', region: 'Europe' };
+  }
+  if (location.includes('japanese') || location.includes('japan') || location.includes('tokyo')) {
+    return { city: 'Tokyo', country: 'Japan', region: 'Asia' };
+  }
+  if (location.includes('american') || location.includes('chicago')) {
+    if (location.includes('chicago')) return { city: 'Chicago', country: 'USA', region: 'North America' };
+    if (location.includes('new york')) return { city: 'New York', country: 'USA', region: 'North America' };
+    return { city: 'USA', country: 'USA', region: 'North America' };
+  }
+  
+  // Default: use the country field as-is
+  return { city: country, country: country, region: 'Unknown' };
 }
 
 /**
@@ -111,6 +161,7 @@ export async function loadCanonicalArtistsSummary(): Promise<CanonicalArtistSumm
       country,
       region,
       rank,
+      real_name,
       artist_profiles (
         tags,
         subgenres,
@@ -142,14 +193,20 @@ export async function loadCanonicalArtistsSummary(): Promise<CanonicalArtistSumm
     const assets = artist.artist_assets || [];
     const primaryAsset = assets.find((a: any) => a.is_primary) || assets[0];
 
+    // Parse location - use city if present, otherwise parse from country
+    const location = artist.city 
+      ? { city: artist.city, country: artist.country || 'Unknown', region: artist.region || 'Unknown' }
+      : parseLocation(artist.country);
+
     return {
       artist_id: artist.artist_id,
       slug: artist.slug,
       name: artist.canonical_name,
-      city: artist.city,
-      country: artist.country,
-      region: artist.region,
+      city: location.city,
+      country: location.country,
+      region: location.region,
       rank: artist.rank,
+      realName: artist.real_name,
       tags: primaryProfile.tags || [],
       photoUrl: primaryAsset?.url || null,
       photoSource: primaryAsset?.source_name || null,
@@ -271,6 +328,7 @@ export function canonicalSummaryToLegacy(summary: CanonicalArtistSummary): {
   labels?: string[];
   subgenres?: string[];
   knownFor?: string;
+  realName?: string;
 } {
   return {
     id: summary.slug,
@@ -285,6 +343,7 @@ export function canonicalSummaryToLegacy(summary: CanonicalArtistSummary): {
     labels: summary.labels,
     subgenres: summary.subgenres,
     knownFor: summary.knownFor || undefined,
+    realName: summary.realName || undefined,
   };
 }
 
