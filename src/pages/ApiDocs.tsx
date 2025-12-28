@@ -194,7 +194,15 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
 
       {/* API Key */}
       <div className="space-y-2">
-        <Label htmlFor="apiKey" className="text-xs text-muted-foreground">API Key</Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="apiKey" className="text-xs text-muted-foreground">API Key</Label>
+          {apiKey && (
+            <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+              <Check className="h-2.5 w-2.5" />
+              Saved
+            </span>
+          )}
+        </div>
         <div className="flex gap-2">
           <Input
             id="apiKey"
