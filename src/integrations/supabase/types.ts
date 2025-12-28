@@ -1018,6 +1018,12 @@ export type Database = {
           created_at: string | null
           is_active: boolean | null
           needs_review: boolean | null
+          photo_source: string | null
+          photo_tags: string[] | null
+          photo_url: string | null
+          photo_verification_models: string[] | null
+          photo_verified: boolean | null
+          photo_verified_at: string | null
           primary_genre: string | null
           rank: number | null
           real_name: string | null
@@ -1035,6 +1041,12 @@ export type Database = {
           created_at?: string | null
           is_active?: boolean | null
           needs_review?: boolean | null
+          photo_source?: string | null
+          photo_tags?: string[] | null
+          photo_url?: string | null
+          photo_verification_models?: string[] | null
+          photo_verified?: boolean | null
+          photo_verified_at?: string | null
           primary_genre?: string | null
           rank?: number | null
           real_name?: string | null
@@ -1052,6 +1064,12 @@ export type Database = {
           created_at?: string | null
           is_active?: boolean | null
           needs_review?: boolean | null
+          photo_source?: string | null
+          photo_tags?: string[] | null
+          photo_url?: string | null
+          photo_verification_models?: string[] | null
+          photo_verified?: boolean | null
+          photo_verified_at?: string | null
           primary_genre?: string | null
           rank?: number | null
           real_name?: string | null

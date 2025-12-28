@@ -231,3 +231,6 @@ verify_jwt = false
 
 [functions.ai-artist-research]
 verify_jwt = false
+
+[functions.artist-photo-pipeline]
+verify_jwt = false
