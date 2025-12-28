@@ -165,3 +165,6 @@ verify_jwt = false
 
 [functions.api-guardian]
 verify_jwt = false
+
+[functions.admin-api]
+verify_jwt = false
