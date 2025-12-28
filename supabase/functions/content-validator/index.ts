@@ -28,7 +28,7 @@ async function queryAnthropic(prompt: string, apiKey: string): Promise<string> {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 2048,
       messages: [{ role: "user", content: prompt }],
     }),
@@ -50,9 +50,9 @@ async function queryOpenAI(prompt: string, apiKey: string): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: "gpt-5-mini-2025-08-07",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 2048,
+      max_completion_tokens: 2048,
     }),
   });
 

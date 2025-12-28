@@ -122,7 +122,7 @@ Only return the JSON array, no other text.`;
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-5",
           max_tokens: 8192,
           messages: [{ role: "user", content: analysisPrompt }],
         }),
@@ -192,7 +192,57 @@ Only return the JSON array, no other text.`;
       // Full orchestration: research -> validate -> report
       const results: AuditResult[] = [];
       
-      for (const entity of entities.slice(0, 5)) { // Process 5 at a time to avoid timeouts
+      // Fetch entities if not provided
+      let entitiesToProcess = entities || [];
+      
+      if (entitiesToProcess.length === 0) {
+        // Get high-priority artists from the latest audit report or fetch directly
+        const { data: latestReport } = await supabase
+          .from('agent_reports')
+          .select('details')
+          .eq('agent_name', 'content-orchestrator')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (latestReport?.details?.results) {
+          // Get first 5 high-priority entities from the audit
+          entitiesToProcess = (latestReport.details.results as any[])
+            .filter((r: any) => r.priority === 'high')
+            .slice(0, 5)
+            .map((r: any) => ({
+              id: r.entityId,
+              name: r.entityName,
+              type: r.entityType,
+              currentData: {},
+              suggestedSearchQueries: r.suggestedSearchQueries,
+            }));
+        } else {
+          // Fallback: fetch from database
+          const { data: artists } = await supabase
+            .from('dj_artists')
+            .select('*')
+            .limit(5);
+          
+          if (artists) {
+            entitiesToProcess = artists.map((a: any) => ({
+              id: a.id.toString(),
+              name: a.artist_name,
+              type: 'artist',
+              currentData: {
+                realName: a.real_name,
+                nationality: a.nationality,
+                knownFor: a.known_for,
+                labels: a.labels,
+              },
+            }));
+          }
+        }
+      }
+      
+      console.log(`[Orchestrator] Processing ${entitiesToProcess.length} entities for full orchestration`);
+      
+      for (const entity of entitiesToProcess.slice(0, 5)) { // Process 5 at a time to avoid timeouts
         console.log(`[Orchestrator] Processing: ${entity.name} (${entity.type})`);
         
         // Step 1: Research via Firecrawl
