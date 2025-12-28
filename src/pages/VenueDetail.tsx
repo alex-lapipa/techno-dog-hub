@@ -5,6 +5,7 @@ import { PageLayout } from "@/components/layout";
 import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
+import YouTubeVideos from "@/components/YouTubeVideos";
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -261,6 +262,9 @@ const VenueDetail = () => {
               </div>
             </section>
           )}
+
+          {/* YouTube Videos */}
+          <YouTubeVideos artistName={`${venue.name} ${venue.city}`} />
 
           {/* Historic Lineups */}
           {venue.historicLineups && venue.historicLineups.length > 0 && (
