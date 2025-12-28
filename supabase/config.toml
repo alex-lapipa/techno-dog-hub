@@ -195,3 +195,6 @@ verify_jwt = false
 
 [functions.content-validator]
 verify_jwt = false
+
+[functions.batch-content-processor]
+verify_jwt = false
