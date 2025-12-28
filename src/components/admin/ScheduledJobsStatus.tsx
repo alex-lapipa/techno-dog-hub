@@ -84,6 +84,13 @@ const extractJobInfo = (command: string, jobname: string): { name: string; descr
     "media-scheduler": "Process media pipeline queue",
     "scheduled-content-sync": "Sync content from external sources",
     "news-agent": "Generate news articles",
+    "health-monitor": "System & API health checks",
+    "security-auditor": "Security vulnerability scanning",
+    "data-integrity": "Duplicate & orphan detection",
+    "media-monitor": "Media pipeline status tracking",
+    "submissions-triage": "Community submission screening",
+    "analytics-reporter": "Usage insights & trends",
+    "knowledge-gap-detector": "Missing content identification",
   };
 
   return {
@@ -105,15 +112,15 @@ const ScheduledJobsStatus = () => {
         const { data, error: fetchError } = await supabase.rpc("get_cron_jobs" as never);
 
         if (fetchError) {
-          // If RPC doesn't exist, show placeholder with known jobs
+          // If RPC doesn't exist, show known agent jobs
           setJobs([
-            {
-              name: "System Health Monitor",
-              schedule: "*/5 * * * *",
-              active: true,
-              description: "Health checks with email/webhook notifications",
-              nextRun: getNextRun("*/5 * * * *"),
-            },
+            { name: "Health Monitor", schedule: "0 */2 * * *", active: true, description: "System & API health checks", nextRun: "Every 2h" },
+            { name: "Security Auditor", schedule: "0 3 * * *", active: true, description: "Security vulnerability scanning", nextRun: "Daily 03:00" },
+            { name: "Data Integrity", schedule: "0 4 * * *", active: true, description: "Duplicate & orphan detection", nextRun: "Daily 04:00" },
+            { name: "Media Monitor", schedule: "0 */6 * * *", active: true, description: "Media pipeline status tracking", nextRun: "Every 6h" },
+            { name: "Submissions Triage", schedule: "0 */4 * * *", active: true, description: "Community submission screening", nextRun: "Every 4h" },
+            { name: "Analytics Reporter", schedule: "0 6 * * 1", active: true, description: "Usage insights & trends", nextRun: "Mon 06:00" },
+            { name: "Knowledge Gap", schedule: "0 7 * * 1", active: true, description: "Missing content identification", nextRun: "Mon 07:00" },
           ]);
           setError(null);
           return;
@@ -134,15 +141,15 @@ const ScheduledJobsStatus = () => {
         setJobs(displayJobs);
       } catch (e) {
         console.error("Failed to fetch cron jobs:", e);
-        // Fallback to showing the known scheduled job
+        // Fallback to known agent jobs
         setJobs([
-          {
-            name: "System Health Monitor",
-            schedule: "*/5 * * * *",
-            active: true,
-            description: "Health checks with email/webhook notifications",
-            nextRun: getNextRun("*/5 * * * *"),
-          },
+          { name: "Health Monitor", schedule: "0 */2 * * *", active: true, description: "System & API health checks", nextRun: "Every 2h" },
+          { name: "Security Auditor", schedule: "0 3 * * *", active: true, description: "Security vulnerability scanning", nextRun: "Daily 03:00" },
+          { name: "Data Integrity", schedule: "0 4 * * *", active: true, description: "Duplicate & orphan detection", nextRun: "Daily 04:00" },
+          { name: "Media Monitor", schedule: "0 */6 * * *", active: true, description: "Media pipeline status tracking", nextRun: "Every 6h" },
+          { name: "Submissions Triage", schedule: "0 */4 * * *", active: true, description: "Community submission screening", nextRun: "Every 4h" },
+          { name: "Analytics Reporter", schedule: "0 6 * * 1", active: true, description: "Usage insights & trends", nextRun: "Mon 06:00" },
+          { name: "Knowledge Gap", schedule: "0 7 * * 1", active: true, description: "Missing content identification", nextRun: "Mon 07:00" },
         ]);
       } finally {
         setLoading(false);

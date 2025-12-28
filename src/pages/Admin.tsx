@@ -12,6 +12,7 @@ import AgentCard from "@/components/admin/AgentCard";
 import ToolCard from "@/components/admin/ToolCard";
 import AgentReportsList from "@/components/admin/AgentReportsList";
 import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
+import ScheduledJobsStatus from "@/components/admin/ScheduledJobsStatus";
 
 const AdminLoginForm = () => {
   const [password, setPassword] = useState("");
@@ -140,9 +141,10 @@ const AdminDashboard = () => {
       </section>
 
       {/* Status Panels */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <AgentReportsList />
         <RealtimeActivityFeed />
+        <ScheduledJobsStatus />
       </section>
     </div>
   );
