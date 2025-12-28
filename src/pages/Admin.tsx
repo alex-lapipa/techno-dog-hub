@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail } from "lucide-react";
+import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import AgentCard from "@/components/admin/AgentCard";
@@ -19,20 +20,28 @@ import AgentHealthSummary from "@/components/admin/AgentHealthSummary";
 import { LeaderboardWidget } from "@/components/gamification";
 
 const AdminLoginForm = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAdminAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const success = await login(password);
-    if (success) {
-      toast({ title: "Access granted", description: "Welcome back." });
+    
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      toast({ 
+        title: "Access denied", 
+        description: error.message || "Invalid credentials.", 
+        variant: "destructive" 
+      });
     } else {
-      toast({ title: "Access denied", description: "Invalid password.", variant: "destructive" });
+      toast({ title: "Signed in", description: "Checking admin access..." });
     }
+    
     setPassword("");
     setLoading(false);
   };
@@ -53,13 +62,59 @@ const AdminLoginForm = () => {
             </div>
           </div>
           <h2 className="font-mono text-xl uppercase tracking-tight text-center mb-2">Control Room</h2>
-          <p className="font-mono text-xs text-muted-foreground text-center mb-6">Enter password to continue</p>
+          <p className="font-mono text-xs text-muted-foreground text-center mb-6">Sign in with admin credentials</p>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="font-mono text-center tracking-widest" autoFocus />
-            <Button type="submit" variant="brutalist" className="w-full font-mono uppercase tracking-wider" disabled={loading || !password}>
-              {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying...</> : "Enter"}
+            <Input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              placeholder="Email" 
+              className="font-mono" 
+              autoComplete="email"
+            />
+            <Input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              placeholder="Password" 
+              className="font-mono" 
+              autoComplete="current-password"
+            />
+            <Button type="submit" variant="brutalist" className="w-full font-mono uppercase tracking-wider" disabled={loading || !email || !password}>
+              {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying...</> : "Sign In"}
             </Button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AccessDenied = () => {
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({ title: "Signed out" });
+  };
+
+  return (
+    <div className="max-w-md mx-auto text-center">
+      <div className="relative bg-zinc-800 p-1">
+        <div className="mx-2 border border-crimson/20 p-8" style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}>
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 border border-crimson/50 bg-crimson/10 flex items-center justify-center">
+              <ShieldAlert className="w-8 h-8 text-crimson" />
+            </div>
+          </div>
+          <h2 className="font-mono text-xl uppercase tracking-tight mb-2">Access Denied</h2>
+          <p className="font-mono text-xs text-muted-foreground mb-6">
+            Your account does not have admin privileges.
+          </p>
+          <Button onClick={handleSignOut} variant="outline" className="font-mono text-xs uppercase tracking-wider">
+            Sign Out
+          </Button>
         </div>
       </div>
     </div>
@@ -76,7 +131,7 @@ interface AgentRunState {
 }
 
 const AdminDashboard = () => {
-  const { logout } = useAdminAuth();
+  const { logout, userEmail } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -200,6 +255,9 @@ const AdminDashboard = () => {
         <div>
           <div className="font-mono text-[10px] text-crimson uppercase tracking-[0.3em] mb-2">// techno.dog</div>
           <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight">Control Room</h1>
+          {userEmail && (
+            <p className="font-mono text-xs text-muted-foreground mt-1">{userEmail}</p>
+          )}
         </div>
         <Button variant="outline" onClick={handleLogout} className="font-mono text-xs uppercase tracking-wider">
           <LogOut className="w-4 h-4 mr-2" />End Session
@@ -334,6 +392,7 @@ const AdminDashboard = () => {
 
 const Admin = () => {
   const { isAdmin, loading } = useAdminAuth();
+  const { user } = useAuth();
 
   if (loading) {
     return (
@@ -343,6 +402,19 @@ const Admin = () => {
     );
   }
 
+  // Determine what to show
+  let content;
+  if (!user) {
+    // Not logged in - show login form
+    content = <AdminLoginForm />;
+  } else if (!isAdmin) {
+    // Logged in but not admin - show access denied
+    content = <AccessDenied />;
+  } else {
+    // Admin - show dashboard
+    content = <AdminDashboard />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO title="Control Room" description="techno.dog administration" path="/admin" />
@@ -350,7 +422,7 @@ const Admin = () => {
       <main className="pt-24 lg:pt-16">
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
-            {isAdmin ? <AdminDashboard /> : <AdminLoginForm />}
+            {content}
           </div>
         </section>
       </main>

@@ -1,59 +1,64 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient } from "../_shared/supabase.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+/**
+ * Admin Auth Edge Function
+ * 
+ * This function validates admin access by checking the user_roles table.
+ * It no longer uses password-based authentication.
+ * 
+ * Actions:
+ * - verify: Check if the authenticated user has admin role
+ */
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const { password } = await req.json();
-
-    if (!password) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Password required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const supabase = createServiceClient();
+    
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return errorResponse('Authorization header required', 401);
     }
 
-    const adminPassword = Deno.env.get('ADMIN_PASSWORD');
-
-    if (!adminPassword) {
-      console.error('ADMIN_PASSWORD not configured');
-      return new Response(
-        JSON.stringify({ success: false, error: 'Server configuration error' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Extract the JWT token
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT and get the user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return errorResponse('Invalid or expired token', 401);
     }
 
-    if (password === adminPassword) {
-      // Generate a session token (simple hash for session validation)
-      const encoder = new TextEncoder();
-      const data = encoder.encode(`${adminPassword}-${Date.now()}-${Math.random()}`);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const sessionToken = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // Check if user has admin role
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
 
-      return new Response(
-        JSON.stringify({ success: true, sessionToken }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (roleError) {
+      console.error('Role check error:', roleError);
+      return errorResponse('Failed to verify admin status', 500);
     }
 
-    return new Response(
-      JSON.stringify({ success: false, error: 'Invalid password' }),
-      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    const isAdmin = !!roleData;
+
+    return jsonResponse({
+      success: true,
+      isAdmin,
+      userId: user.id,
+      email: user.email,
+    });
+
   } catch (error) {
     console.error('Admin auth error:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: 'Server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse('Server error', 500);
   }
 });

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -45,6 +46,7 @@ interface PipelineResult {
 
 const MediaEngine = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
@@ -193,11 +195,8 @@ const MediaEngine = () => {
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Access denied</p>
-      </div>
-    );
+    navigate("/admin");
+    return null;
   }
 
   const enrichmentRate = status ? Math.round((status.enrichedAssets / Math.max(status.selectedAssets, 1)) * 100) : 0;
