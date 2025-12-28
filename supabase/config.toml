@@ -141,3 +141,24 @@ verify_jwt = false
 
 [functions.tdog-upload]
 verify_jwt = false
+
+[functions.health-monitor]
+verify_jwt = false
+
+[functions.data-integrity]
+verify_jwt = false
+
+[functions.security-auditor]
+verify_jwt = false
+
+[functions.media-monitor]
+verify_jwt = false
+
+[functions.submissions-triage]
+verify_jwt = false
+
+[functions.analytics-reporter]
+verify_jwt = false
+
+[functions.knowledge-gap-detector]
+verify_jwt = false
