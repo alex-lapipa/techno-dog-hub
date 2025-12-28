@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { BadgeDisplay } from "@/components/gamification";
 import { 
   Trophy, 
   Medal, 
@@ -18,11 +19,29 @@ import {
   Camera,
   FileText,
   ArrowLeft,
-  Calendar
+  Calendar,
+  Sparkles
 } from "lucide-react";
 import { subDays, subMonths, startOfDay } from "date-fns";
 
 type TimeFilter = "all" | "weekly" | "monthly";
+
+interface LevelData {
+  level_number: number;
+  name: string;
+  icon: string;
+  color: string;
+}
+
+interface UserBadgeData {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  rarity: string;
+}
 
 interface LeaderboardEntry {
   id: string;
@@ -33,6 +52,10 @@ interface LeaderboardEntry {
   approved_count: number;
   city: string | null;
   country: string | null;
+  total_points: number;
+  current_level: number;
+  level?: LevelData;
+  badges: UserBadgeData[];
 }
 
 const CommunityLeaderboard = () => {
@@ -63,15 +86,40 @@ const CommunityLeaderboard = () => {
       try {
         const dateFilter = getDateFilter(timeFilter);
 
+        // Load profiles with gamification data
         const { data: profiles, error: profilesError } = await supabase
           .from("community_profiles")
-          .select("id, display_name, email, trust_score, roles, city, country")
+          .select("id, display_name, email, trust_score, roles, city, country, total_points, current_level")
           .eq("status", "verified")
           .gt("trust_score", 0)
-          .order("trust_score", { ascending: false })
+          .order("total_points", { ascending: false })
           .limit(50);
 
         if (profilesError) throw profilesError;
+
+        // Load levels
+        const { data: levels } = await supabase
+          .from("contributor_levels")
+          .select("*")
+          .order("level_number");
+
+        const levelMap = new Map(levels?.map(l => [l.level_number, l]));
+
+        // Load user badges
+        const profileIds = profiles?.map(p => p.id) || [];
+        const { data: userBadges } = await supabase
+          .from("user_badges")
+          .select("profile_id, badges(*)")
+          .in("profile_id", profileIds);
+
+        const badgesByProfile = new Map<string, UserBadgeData[]>();
+        userBadges?.forEach(ub => {
+          if (ub.badges) {
+            const existing = badgesByProfile.get(ub.profile_id) || [];
+            existing.push(ub.badges as unknown as UserBadgeData);
+            badgesByProfile.set(ub.profile_id, existing);
+          }
+        });
 
         let submissionsQuery = supabase
           .from("community_submissions")
@@ -95,13 +143,16 @@ const CommunityLeaderboard = () => {
 
         const leaderboardData: LeaderboardEntry[] = (profiles || []).map((profile) => ({
           ...profile,
+          total_points: profile.total_points ?? 0,
+          current_level: profile.current_level ?? 1,
           approved_count: submissionCounts[profile.email] || 0,
+          level: levelMap.get(profile.current_level ?? 1),
+          badges: badgesByProfile.get(profile.id) || [],
         }));
 
         leaderboardData.sort((a, b) => {
-          const scoreA = a.trust_score * 2 + a.approved_count;
-          const scoreB = b.trust_score * 2 + b.approved_count;
-          return scoreB - scoreA;
+          // Sort by total points primarily
+          return b.total_points - a.total_points;
         });
 
         const filteredData = dateFilter 
@@ -115,7 +166,7 @@ const CommunityLeaderboard = () => {
             ? filteredData.filter(e => e.approved_count > 0).length 
             : profiles?.length || 0,
           totalApproved: submissions?.length || 0,
-          topScore: profiles?.[0]?.trust_score || 0,
+          topScore: profiles?.[0]?.total_points || 0,
         });
       } catch (err) {
         console.error("Error loading leaderboard:", err);
