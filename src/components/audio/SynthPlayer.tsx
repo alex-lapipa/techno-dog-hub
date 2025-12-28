@@ -10,7 +10,53 @@ interface SynthPlayerProps {
   className?: string;
 }
 
-type OscillatorType = "sine" | "square" | "sawtooth" | "triangle";
+type PatternType = "warehouse" | "minimal" | "industrial" | "acid";
+
+interface DrumPattern {
+  name: string;
+  kick: number[];
+  hihat: number[];
+  snare: number[];
+  bass: number[];
+  bassNotes?: number[];
+  bpm: number;
+}
+
+const PATTERNS: Record<PatternType, DrumPattern> = {
+  warehouse: {
+    name: "Warehouse",
+    kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    hihat: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+    snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    bass: [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+    bpm: 130,
+  },
+  minimal: {
+    name: "Minimal",
+    kick: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    hihat: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    bass: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    bpm: 122,
+  },
+  industrial: {
+    name: "Industrial",
+    kick: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    snare: [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
+    bass: [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1],
+    bpm: 140,
+  },
+  acid: {
+    name: "Acid",
+    kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+    hihat: [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+    snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    bass: [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0],
+    bassNotes: [55, 0, 82, 0, 0, 55, 0, 73, 55, 0, 82, 0, 0, 98, 82, 0],
+    bpm: 135,
+  },
+};
 
 const SynthPlayer = ({ 
   title = "T:DOG Demo Pattern", 
@@ -24,18 +70,11 @@ const SynthPlayer = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
-  const [bpm, setBpm] = useState(130);
+  const [patternType, setPatternType] = useState<PatternType>("warehouse");
+  const [bpm, setBpm] = useState(PATTERNS.warehouse.bpm);
   const [currentStep, setCurrentStep] = useState(0);
-  const [waveform, setWaveform] = useState<number[]>(Array(32).fill(0));
 
-  // Kick drum pattern (4/4)
-  const kickPattern = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
-  // Hi-hat pattern (offbeat)
-  const hihatPattern = [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0];
-  // Snare/clap pattern
-  const snarePattern = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
-  // Bass pattern
-  const bassPattern = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0];
+  const pattern = PATTERNS[patternType];
 
   const initAudio = useCallback(() => {
     if (!audioContextRef.current) {
@@ -47,7 +86,7 @@ const SynthPlayer = ({
     return audioContextRef.current;
   }, [volume, isMuted]);
 
-  const playKick = useCallback((time: number) => {
+  const playKick = useCallback((time: number, hard = false) => {
     const ctx = audioContextRef.current;
     const gain = gainNodeRef.current;
     if (!ctx || !gain) return;
@@ -56,11 +95,11 @@ const SynthPlayer = ({
     const oscGain = ctx.createGain();
     
     osc.type = "sine";
-    osc.frequency.setValueAtTime(150, time);
-    osc.frequency.exponentialRampToValueAtTime(40, time + 0.1);
+    osc.frequency.setValueAtTime(hard ? 180 : 150, time);
+    osc.frequency.exponentialRampToValueAtTime(hard ? 30 : 40, time + 0.1);
     
-    oscGain.gain.setValueAtTime(0.8, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+    oscGain.gain.setValueAtTime(hard ? 1 : 0.8, time);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, time + (hard ? 0.2 : 0.3));
     
     osc.connect(oscGain);
     oscGain.connect(gain);
@@ -69,12 +108,13 @@ const SynthPlayer = ({
     osc.stop(time + 0.3);
   }, []);
 
-  const playHihat = useCallback((time: number) => {
+  const playHihat = useCallback((time: number, open = false) => {
     const ctx = audioContextRef.current;
     const gain = gainNodeRef.current;
     if (!ctx || !gain) return;
 
-    const bufferSize = ctx.sampleRate * 0.05;
+    const duration = open ? 0.1 : 0.05;
+    const bufferSize = ctx.sampleRate * duration;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     
@@ -87,26 +127,28 @@ const SynthPlayer = ({
     
     const filter = ctx.createBiquadFilter();
     filter.type = "highpass";
-    filter.frequency.value = 7000;
+    filter.frequency.value = patternType === "industrial" ? 5000 : 7000;
     
     const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.15, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
+    oscGain.gain.setValueAtTime(patternType === "industrial" ? 0.2 : 0.15, time);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, time + duration);
     
     noise.connect(filter);
     filter.connect(oscGain);
     oscGain.connect(gain);
     
     noise.start(time);
-  }, []);
+  }, [patternType]);
 
   const playSnare = useCallback((time: number) => {
     const ctx = audioContextRef.current;
     const gain = gainNodeRef.current;
     if (!ctx || !gain) return;
 
+    const isIndustrial = patternType === "industrial";
+    
     // Noise component
-    const bufferSize = ctx.sampleRate * 0.15;
+    const bufferSize = ctx.sampleRate * (isIndustrial ? 0.2 : 0.15);
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     
@@ -119,10 +161,10 @@ const SynthPlayer = ({
     
     const noiseFilter = ctx.createBiquadFilter();
     noiseFilter.type = "bandpass";
-    noiseFilter.frequency.value = 3000;
+    noiseFilter.frequency.value = isIndustrial ? 2000 : 3000;
     
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.3, time);
+    noiseGain.gain.setValueAtTime(isIndustrial ? 0.5 : 0.3, time);
     noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
     
     noise.connect(noiseFilter);
@@ -136,10 +178,10 @@ const SynthPlayer = ({
     const oscGain = ctx.createGain();
     
     osc.type = "triangle";
-    osc.frequency.setValueAtTime(200, time);
+    osc.frequency.setValueAtTime(isIndustrial ? 250 : 200, time);
     osc.frequency.exponentialRampToValueAtTime(100, time + 0.05);
     
-    oscGain.gain.setValueAtTime(0.4, time);
+    oscGain.gain.setValueAtTime(isIndustrial ? 0.6 : 0.4, time);
     oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
     
     osc.connect(oscGain);
@@ -147,25 +189,36 @@ const SynthPlayer = ({
     
     osc.start(time);
     osc.stop(time + 0.1);
-  }, []);
+  }, [patternType]);
 
-  const playBass = useCallback((time: number) => {
+  const playBass = useCallback((time: number, note = 55) => {
     const ctx = audioContextRef.current;
     const gain = gainNodeRef.current;
     if (!ctx || !gain) return;
 
+    const isAcid = patternType === "acid";
+    
     const osc = ctx.createOscillator();
     const oscGain = ctx.createGain();
     
-    osc.type = "sawtooth" as OscillatorType;
-    osc.frequency.setValueAtTime(55, time); // A1
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(note, time);
     
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.setValueAtTime(400, time);
-    filter.frequency.exponentialRampToValueAtTime(100, time + 0.15);
     
-    oscGain.gain.setValueAtTime(0.25, time);
+    if (isAcid) {
+      // Acid-style resonant filter sweep
+      filter.Q.value = 15;
+      filter.frequency.setValueAtTime(200, time);
+      filter.frequency.exponentialRampToValueAtTime(1500, time + 0.05);
+      filter.frequency.exponentialRampToValueAtTime(200, time + 0.2);
+    } else {
+      filter.frequency.setValueAtTime(400, time);
+      filter.frequency.exponentialRampToValueAtTime(100, time + 0.15);
+    }
+    
+    oscGain.gain.setValueAtTime(isAcid ? 0.35 : 0.25, time);
     oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
     
     osc.connect(filter);
@@ -173,8 +226,8 @@ const SynthPlayer = ({
     oscGain.connect(gain);
     
     osc.start(time);
-    osc.stop(time + 0.2);
-  }, []);
+    osc.stop(time + 0.25);
+  }, [patternType]);
 
   const startSequencer = useCallback(() => {
     const ctx = initAudio();
@@ -183,25 +236,25 @@ const SynthPlayer = ({
     }
 
     let step = 0;
-    const stepDuration = (60 / bpm) / 4; // 16th notes
+    const stepDuration = (60 / bpm) / 4;
 
     const scheduleStep = () => {
       const time = ctx.currentTime + 0.05;
+      const currentPattern = PATTERNS[patternType];
       
-      if (kickPattern[step % 16]) playKick(time);
-      if (hihatPattern[step % 16]) playHihat(time);
-      if (snarePattern[step % 16]) playSnare(time);
-      if (bassPattern[step % 16]) playBass(time);
-
-      // Update waveform visualization
-      setWaveform(prev => {
-        const newWave = [...prev];
-        newWave[step % 32] = kickPattern[step % 16] ? 1 : 
-                            snarePattern[step % 16] ? 0.7 : 
-                            bassPattern[step % 16] ? 0.5 : 
-                            hihatPattern[step % 16] ? 0.3 : 0.1;
-        return newWave;
-      });
+      if (currentPattern.kick[step % 16]) {
+        playKick(time, patternType === "industrial");
+      }
+      if (currentPattern.hihat[step % 16]) {
+        playHihat(time);
+      }
+      if (currentPattern.snare[step % 16]) {
+        playSnare(time);
+      }
+      if (currentPattern.bass[step % 16]) {
+        const note = currentPattern.bassNotes?.[step % 16] || 55;
+        playBass(time, note);
+      }
 
       setCurrentStep(step % 16);
       step++;
@@ -210,7 +263,7 @@ const SynthPlayer = ({
     };
 
     scheduleStep();
-  }, [bpm, initAudio, playKick, playHihat, playSnare, playBass]);
+  }, [bpm, patternType, initAudio, playKick, playHihat, playSnare, playBass]);
 
   const stopSequencer = useCallback(() => {
     if (sequencerRef.current) {
@@ -233,7 +286,23 @@ const SynthPlayer = ({
     stopSequencer();
     setIsPlaying(false);
     setCurrentStep(0);
-    setWaveform(Array(32).fill(0));
+  };
+
+  const changePattern = (newPattern: PatternType) => {
+    const wasPlaying = isPlaying;
+    if (wasPlaying) {
+      stopSequencer();
+    }
+    setPatternType(newPattern);
+    setBpm(PATTERNS[newPattern].bpm);
+    setCurrentStep(0);
+    if (wasPlaying) {
+      // Small delay to let state update
+      setTimeout(() => {
+        startSequencer();
+        setIsPlaying(true);
+      }, 50);
+    }
   };
 
   useEffect(() => {
@@ -250,6 +319,14 @@ const SynthPlayer = ({
       }
     };
   }, [stopSequencer]);
+
+  // Restart sequencer when BPM changes while playing
+  useEffect(() => {
+    if (isPlaying) {
+      stopSequencer();
+      startSequencer();
+    }
+  }, [bpm]);
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
@@ -271,15 +348,38 @@ const SynthPlayer = ({
         <p className="font-mono text-xs text-muted-foreground truncate">{artist}</p>
       </div>
 
+      {/* Pattern Selector */}
+      <div className="mb-4">
+        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+          Pattern
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(PATTERNS) as PatternType[]).map((key) => (
+            <Button
+              key={key}
+              variant="outline"
+              size="sm"
+              className={cn(
+                "font-mono text-[10px] uppercase tracking-wider h-7 px-3",
+                patternType === key && "bg-logo-green/20 border-logo-green text-logo-green"
+              )}
+              onClick={() => changePattern(key)}
+            >
+              {PATTERNS[key].name}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       {/* Step Sequencer Visualization */}
       <div className="relative h-16 mb-4 bg-background/50 rounded overflow-hidden">
         <div className="absolute inset-0 flex items-end justify-around px-1 py-2">
           {Array.from({ length: 16 }).map((_, i) => {
             const isActive = i === currentStep && isPlaying;
-            const hasKick = kickPattern[i];
-            const hasSnare = snarePattern[i];
-            const hasHihat = hihatPattern[i];
-            const hasBass = bassPattern[i];
+            const hasKick = pattern.kick[i];
+            const hasSnare = pattern.snare[i];
+            const hasHihat = pattern.hihat[i];
+            const hasBass = pattern.bass[i];
             
             let height = 20;
             let color = "bg-muted-foreground/20";
@@ -295,7 +395,7 @@ const SynthPlayer = ({
                 className={cn(
                   "w-[5%] rounded-sm transition-all duration-75",
                   color,
-                  isActive && "ring-1 ring-white"
+                  isActive && "ring-2 ring-white ring-offset-1 ring-offset-background"
                 )}
                 style={{ height: `${height}%` }}
               />
@@ -316,7 +416,6 @@ const SynthPlayer = ({
             max={160}
             step={1}
             onValueChange={(v) => setBpm(v[0])}
-            disabled={isPlaying}
             className="w-24"
           />
           <span className="font-mono text-sm font-bold w-8 text-right">{bpm}</span>
