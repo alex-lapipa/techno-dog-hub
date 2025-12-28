@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import PageSEO from "@/components/PageSEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,8 +12,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RequestHistory, HistoryEntry } from "@/components/api-docs/RequestHistory";
 
 const BASE_URL = "https://bshyeweljerupobpmmes.supabase.co/functions/v1/admin-api";
+
+// Context for history management
+const HistoryContext = createContext<{
+  addToHistory: (entry: Omit<HistoryEntry, "id" | "timestamp">) => void;
+} | null>(null);
+
+const useHistory = () => {
+  const ctx = useContext(HistoryContext);
+  if (!ctx) throw new Error("useHistory must be used within HistoryContext");
+  return ctx;
+};
 
 const CodeBlock = ({ code, language = "bash" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -56,6 +68,8 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<{ status: number; data: any; time: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const historyCtx = useContext(HistoryContext);
 
   // Extract path parameters like :id from path
   const pathParamNames = path.match(/:(\w+)/g)?.map(p => p.slice(1)) || [];
@@ -126,11 +140,30 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
       const endTime = performance.now();
       const data = await res.json();
 
+      const responseTime = Math.round(endTime - startTime);
       setResponse({
         status: res.status,
         data,
-        time: Math.round(endTime - startTime),
+        time: responseTime,
       });
+
+      // Add to history
+      if (historyCtx) {
+        const bodyData: Record<string, any> = {};
+        Object.entries(bodyParams).forEach(([key, value]) => {
+          if (value) {
+            try { bodyData[key] = JSON.parse(value); } catch { bodyData[key] = value; }
+          }
+        });
+        historyCtx.addToHistory({
+          method,
+          url,
+          status: res.status,
+          time: responseTime,
+          requestBody: Object.keys(bodyData).length > 0 ? bodyData : undefined,
+          responseData: data,
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Request failed");
     } finally {
@@ -396,9 +429,21 @@ const EndpointCard = ({
 
 const ApiDocs = () => {
   const baseUrl = BASE_URL;
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+
+  const addToHistory = (entry: Omit<HistoryEntry, "id" | "timestamp">) => {
+    const newEntry: HistoryEntry = {
+      ...entry,
+      id: crypto.randomUUID(),
+      timestamp: new Date(),
+    };
+    setHistory(prev => [newEntry, ...prev].slice(0, 50)); // Keep last 50
+  };
+
+  const clearHistory = () => setHistory([]);
 
   return (
-    <>
+    <HistoryContext.Provider value={{ addToHistory }}>
       <PageSEO
         title="Admin API Documentation | Techno Dog"
         description="Complete API documentation for the Techno Dog Admin API. Manage users, content, articles, DJ artists, and system settings."
@@ -408,13 +453,16 @@ const ApiDocs = () => {
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
         
-        <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Admin API Documentation</h1>
-            <p className="text-muted-foreground">
-              RESTful API for managing Techno Dog content, users, and system settings. Use the "Try It" button to test endpoints live.
-            </p>
-          </div>
+        <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+            {/* Main Content */}
+            <div>
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">Admin API Documentation</h1>
+                <p className="text-muted-foreground">
+                  RESTful API for managing Techno Dog content, users, and system settings. Use the "Try It" button to test endpoints live.
+                </p>
+              </div>
 
           {/* Authentication Section */}
           <Card className="bg-card/50 border-border/50 mb-8">
@@ -974,11 +1022,20 @@ const ApiDocs = () => {
               />
             </CardContent>
           </Card>
+            </div>
+
+            {/* History Sidebar */}
+            <div className="hidden lg:block">
+              <div className="sticky top-4">
+                <RequestHistory history={history} onClear={clearHistory} />
+              </div>
+            </div>
+          </div>
         </main>
 
         <Footer />
       </div>
-    </>
+    </HistoryContext.Provider>
   );
 };
 
