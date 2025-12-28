@@ -42,6 +42,14 @@ interface LeaderboardEntry {
   total_points: number;
 }
 
+async function generateUnsubscribeToken(profileId: string): Promise<string> {
+  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "default-secret";
+  const data = new TextEncoder().encode(profileId + secret);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.slice(0, 8).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -127,6 +135,10 @@ const handler = async (req: Request): Promise<Response> => {
         // Get level info
         const levelInfo = levelsMap.get(user.current_level);
 
+        // Generate unsubscribe URL with token
+        const unsubscribeToken = await generateUnsubscribeToken(user.id);
+        const unsubscribeUrl = `${supabaseUrl}/functions/v1/email-unsubscribe?id=${user.id}&token=${unsubscribeToken}`;
+
         // Generate email HTML
         const emailHtml = generateDigestEmail({
           user,
@@ -137,6 +149,7 @@ const handler = async (req: Request): Promise<Response> => {
           totalUsers: leaderboard?.length || 0,
           upcomingEvents: upcomingEvents as XPEvent[] || [],
           levelInfo,
+          unsubscribeUrl,
         });
 
         const { error: emailError } = await resend.emails.send({
@@ -194,6 +207,7 @@ interface DigestEmailParams {
   totalUsers: number;
   upcomingEvents: XPEvent[];
   levelInfo: { name: string; icon: string; color: string } | undefined;
+  unsubscribeUrl: string;
 }
 
 function generateDigestEmail(params: DigestEmailParams): string {
@@ -206,13 +220,12 @@ function generateDigestEmail(params: DigestEmailParams): string {
     totalUsers,
     upcomingEvents,
     levelInfo,
+    unsubscribeUrl,
   } = params;
 
   const displayName = user.display_name || "Techno Enthusiast";
   const streakEmoji = user.current_streak >= 7 ? "🔥" : user.current_streak >= 3 ? "⚡" : "✨";
   const positionEmoji = leaderboardPosition <= 3 ? "🏆" : leaderboardPosition <= 10 ? "🥇" : "📊";
-
-  // Format recent activity
   const recentActivityHtml = weeklyActivity.slice(0, 5).map(a => `
     <tr>
       <td style="padding: 8px 0; border-bottom: 1px solid #333;">
@@ -352,7 +365,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
             <td style="text-align: center; padding-top: 32px; border-top: 1px solid #333; margin-top: 32px;">
               <p style="color: #737373; font-size: 12px; margin: 0;">
                 You're receiving this because you opted in to weekly digests.<br>
-                <a href="#" style="color: #8b5cf6;">Unsubscribe</a> | <a href="#" style="color: #8b5cf6;">View Profile</a>
+                <a href="${unsubscribeUrl}" style="color: #8b5cf6;">Unsubscribe</a> | <a href="https://techno.dog/community/profile" style="color: #8b5cf6;">View Profile</a>
               </p>
               <p style="color: #525252; font-size: 12px; margin-top: 16px;">
                 © ${new Date().getFullYear()} Techno Dog. All rights reserved.

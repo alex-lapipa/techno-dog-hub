@@ -180,3 +180,6 @@ verify_jwt = false
 
 [functions.design-guidelines]
 verify_jwt = false
+
+[functions.email-unsubscribe]
+verify_jwt = false
