@@ -90,6 +90,7 @@ const AdminDashboard = () => {
   };
 
   const agents = [
+    { name: "API Guardian", category: "Operations", description: "Monitors developer API health, keys, rate limits, and RAG content", status: "idle" as const, frameNumber: "00", functionName: "api-guardian" },
     { name: "Health Monitor", category: "Operations", description: "Checks edge functions, database, and API response times", status: "idle" as const, frameNumber: "01", functionName: "health-monitor" },
     { name: "Security Auditor", category: "Security", description: "Scans for access control issues and suspicious activity", status: "idle" as const, frameNumber: "02", functionName: "security-auditor" },
     { name: "Data Integrity", category: "Operations", description: "Detects orphaned records, duplicates, and missing data", status: "idle" as const, frameNumber: "03", functionName: "data-integrity" },
@@ -97,10 +98,9 @@ const AdminDashboard = () => {
     { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05", functionName: "submissions-triage" },
     { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter" },
     { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector" },
-    { name: "Pipeline Orchestrator", category: "Operations", description: "Coordinates multi-step review and validation tasks", status: "disabled" as const, frameNumber: "08" },
   ];
 
-  const runnableAgents = agents.filter(a => a.functionName && a.status !== 'disabled');
+  const runnableAgents = agents.filter(a => a.functionName);
 
   const runAllAgents = async () => {
     setIsRunningAll(true);
