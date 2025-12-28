@@ -254,11 +254,54 @@ export type Database = {
           },
         ]
       }
+      badges: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          points_value: number
+          rarity: string
+          slug: string
+          unlock_criteria: Json
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description: string
+          icon: string
+          id?: string
+          is_active?: boolean
+          name: string
+          points_value?: number
+          rarity?: string
+          slug: string
+          unlock_criteria?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          points_value?: number
+          rarity?: string
+          slug?: string
+          unlock_criteria?: Json
+        }
+        Relationships: []
+      }
       community_profiles: {
         Row: {
           city: string | null
           country: string | null
           created_at: string
+          current_level: number
           display_name: string | null
           email: string
           email_verified_at: string | null
@@ -269,6 +312,7 @@ export type Database = {
           roles: string[]
           source: Database["public"]["Enums"]["community_source"]
           status: Database["public"]["Enums"]["community_status"]
+          total_points: number
           trust_score: number
           updated_at: string
           user_id: string | null
@@ -277,6 +321,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          current_level?: number
           display_name?: string | null
           email: string
           email_verified_at?: string | null
@@ -287,6 +332,7 @@ export type Database = {
           roles?: string[]
           source?: Database["public"]["Enums"]["community_source"]
           status?: Database["public"]["Enums"]["community_status"]
+          total_points?: number
           trust_score?: number
           updated_at?: string
           user_id?: string | null
@@ -295,6 +341,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          current_level?: number
           display_name?: string | null
           email?: string
           email_verified_at?: string | null
@@ -305,6 +352,7 @@ export type Database = {
           roles?: string[]
           source?: Database["public"]["Enums"]["community_source"]
           status?: Database["public"]["Enums"]["community_status"]
+          total_points?: number
           trust_score?: number
           updated_at?: string
           user_id?: string | null
@@ -428,6 +476,39 @@ export type Database = {
           status?: string
           updated_at?: string
           verified_data?: Json | null
+        }
+        Relationships: []
+      }
+      contributor_levels: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string
+          id: number
+          level_number: number
+          min_points: number
+          name: string
+          perks: string[] | null
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: number
+          level_number: number
+          min_points: number
+          name: string
+          perks?: string[] | null
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: number
+          level_number?: number
+          min_points?: number
+          name?: string
+          perks?: string[] | null
         }
         Relationships: []
       }
@@ -939,6 +1020,54 @@ export type Database = {
         }
         Relationships: []
       }
+      point_transactions: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string | null
+          id: string
+          points: number
+          profile_id: string
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points: number
+          profile_id: string
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          points?: number
+          profile_id?: string
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "point_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "point_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_community_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1196,6 +1325,52 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          awarded_reason: string | null
+          badge_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          awarded_reason?: string | null
+          badge_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          awarded_at?: string
+          awarded_reason?: string | null
+          badge_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_community_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1440,6 +1615,25 @@ export type Database = {
       }
     }
     Functions: {
+      award_badge: {
+        Args: { p_badge_slug: string; p_profile_id: string; p_reason?: string }
+        Returns: boolean
+      }
+      award_points: {
+        Args: {
+          p_action_type: string
+          p_description?: string
+          p_points: number
+          p_profile_id: string
+          p_reference_id?: string
+          p_reference_type?: string
+        }
+        Returns: {
+          level_up: boolean
+          new_level: number
+          new_total: number
+        }[]
+      }
       check_ip_rate_limit: {
         Args: {
           p_endpoint: string
