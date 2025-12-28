@@ -36,6 +36,7 @@ import {
   Settings,
   ChevronRight,
 } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
 
 interface PipelineStep {
   step: string;
@@ -196,7 +197,7 @@ const AdminControlCenter = () => {
   if (authLoading || (!isAdmin && !authLoading)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }

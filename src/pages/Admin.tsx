@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import AgentCard from "@/components/admin/AgentCard";
@@ -397,7 +398,7 @@ const Admin = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }

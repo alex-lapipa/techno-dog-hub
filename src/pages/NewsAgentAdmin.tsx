@@ -20,6 +20,7 @@ import {
   Eye,
   Send
 } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 interface AgentRun {
   id: string;
@@ -153,7 +154,7 @@ const NewsAgentAdmin = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }

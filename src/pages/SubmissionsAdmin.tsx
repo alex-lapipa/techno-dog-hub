@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, X, Clock, CheckCircle, XCircle, AlertCircle, Loader2, Copy, Edit, Eye, FileText, Image, Music, ExternalLink, ArrowLeft, Mail } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -349,7 +351,7 @@ const SubmissionsAdmin = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }
@@ -430,15 +432,12 @@ const SubmissionsAdmin = () => {
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-8">
             {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
+              <LoadingState message="Loading submissions..." />
             ) : !submissions || submissions.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="font-mono text-sm text-muted-foreground">
-                  No submissions found.
-                </p>
-              </div>
+              <EmptyState
+                title="No submissions found"
+                description={statusFilter === "pending" ? "All caught up! No pending submissions to review." : "No submissions match the current filter."}
+              />
             ) : (
               <div className="space-y-4">
                 {submissions.map((submission) => (

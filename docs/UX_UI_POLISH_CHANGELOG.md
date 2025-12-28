@@ -83,6 +83,29 @@ Components follow the existing design system patterns:
 
 ---
 
+## Phase 2: Admin Dashboard Polish (2025-12-28)
+
+Applied `LoadingState` and `ErrorState` components to admin pages for consistent feedback:
+
+### Pages Updated
+| Page | Change |
+|------|--------|
+| Admin.tsx | LoadingState for auth loading |
+| AdminControlCenter.tsx | LoadingState for auth loading |
+| SubmissionsAdmin.tsx | LoadingState for auth + data, EmptyState for no submissions |
+| BadgeAdmin.tsx | LoadingState for auth + data loading |
+| SystemHealth.tsx | LoadingState for auth loading |
+| NewsAgentAdmin.tsx | LoadingState for auth loading |
+| DJArtistsAdmin.tsx | LoadingState for auth loading |
+
+### Import Pattern
+```tsx
+import { LoadingState } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
+```
+
+---
+
 ## Testing Checklist
 
 - [x] Homepage loads correctly
@@ -92,6 +115,8 @@ Components follow the existing design system patterns:
 - [x] All links functional
 - [x] Forms submit correctly
 - [x] Admin pages accessible (with auth)
+- [x] Loading states display consistently
+- [x] Empty states show actionable messages
 
 ---
 
@@ -101,3 +126,4 @@ Components follow the existing design system patterns:
 2. **Use LoadingState/ErrorState** in data-fetching components
 3. **Use EmptyState** for tables/lists with no data
 4. **Consider PageHeader** for standardized page headers
+5. **Apply EmptyState** to more list views (webhooks, API keys, etc.)

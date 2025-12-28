@@ -19,6 +19,7 @@ import {
   Award, Plus, Edit2, Gift, Users, TrendingUp, Trophy, 
   Loader2, ArrowLeft, Search, Star, Zap, Target, Crown
 } from "lucide-react";
+import { LoadingState } from "@/components/ui/loading-state";
 
 interface BadgeData {
   id: string;
@@ -363,7 +364,7 @@ const BadgeAdmin = () => {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <LoadingState message="Loading badges..." />
       </div>
     );
   }

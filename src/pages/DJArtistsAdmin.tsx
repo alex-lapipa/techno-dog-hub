@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Upload, Search, Database, Loader2 } from 'lucide-react';
+import { LoadingState } from '@/components/ui/loading-state';
 
 const DJArtistsAdmin = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
@@ -79,7 +80,7 @@ const DJArtistsAdmin = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+        <LoadingState message="Authenticating..." />
       </div>
     );
   }
