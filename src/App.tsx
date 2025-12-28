@@ -42,6 +42,7 @@ const NewsArchive = lazy(() => import("./pages/NewsArchive"));
 const DJArtistsAdmin = lazy(() => import("./pages/DJArtistsAdmin"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Developer = lazy(() => import("./pages/Developer"));
+const ApiDocs = lazy(() => import("./pages/ApiDocs"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration"));
 const MediaAdmin = lazy(() => import("./pages/MediaAdmin"));
 const AdminAudit = lazy(() => import("./pages/AdminAudit"));
@@ -152,7 +153,7 @@ const App = () => (
                   {/* Developers (merged docs + API) */}
                   <Route path="/developer" element={<Developer />} />
                   <Route path="/docs" element={<Developer />} />
-                  <Route path="/docs" element={<Developer />} />
+                  <Route path="/api-docs" element={<ApiDocs />} />
                   
                   {/* Analytics (Admin only) */}
                   <Route path="/analytics" element={<Analytics />} />
