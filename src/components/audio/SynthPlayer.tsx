@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, RotateCcw, Waves } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SynthPlayerProps {
   title?: string;
@@ -12,49 +13,37 @@ interface SynthPlayerProps {
 
 type PatternType = "warehouse" | "minimal" | "industrial" | "acid";
 
-interface DrumPattern {
+interface PatternInfo {
   name: string;
-  kick: number[];
-  hihat: number[];
-  snare: number[];
-  bass: number[];
-  bassNotes?: number[];
   bpm: number;
+  description: string;
+  fileName: string;
 }
 
-const PATTERNS: Record<PatternType, DrumPattern> = {
+const PATTERNS: Record<PatternType, PatternInfo> = {
   warehouse: {
     name: "Warehouse",
-    kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-    hihat: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    bass: [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0],
     bpm: 130,
+    description: "Classic four-on-the-floor with driving bass",
+    fileName: "warehouse-demo.mp3",
   },
   minimal: {
     name: "Minimal",
-    kick: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    hihat: [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    snare: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    bass: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     bpm: 122,
+    description: "Sparse, hypnotic groove",
+    fileName: "minimal-demo.mp3",
   },
   industrial: {
     name: "Industrial",
-    kick: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    snare: [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
-    bass: [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1],
     bpm: 140,
+    description: "Hard-hitting metallic textures",
+    fileName: "industrial-demo.mp3",
   },
   acid: {
     name: "Acid",
-    kick: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-    hihat: [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
-    snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    bass: [1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0],
-    bassNotes: [55, 0, 82, 0, 0, 55, 0, 73, 55, 0, 82, 0, 0, 98, 82, 0],
     bpm: 135,
+    description: "303-style squelchy basslines",
+    fileName: "acid-demo.mp3",
   },
 };
 
@@ -63,358 +52,91 @@ const SynthPlayer = ({
   artist = "Techno Dog Sound Engine",
   className 
 }: SynthPlayerProps) => {
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const masterGainRef = useRef<GainNode | null>(null);
-  const masterFilterRef = useRef<BiquadFilterNode | null>(null);
-  const dryGainRef = useRef<GainNode | null>(null);
-  const reverbGainRef = useRef<GainNode | null>(null);
-  const delayGainRef = useRef<GainNode | null>(null);
-  const delayNodeRef = useRef<DelayNode | null>(null);
-  const feedbackGainRef = useRef<GainNode | null>(null);
-  const convolverRef = useRef<ConvolverNode | null>(null);
-  const sequencerRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const [patternType, setPatternType] = useState<PatternType>("warehouse");
-  const [bpm, setBpm] = useState(PATTERNS.warehouse.bpm);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [reverbMix, setReverbMix] = useState(0.2);
-  const [delayMix, setDelayMix] = useState(0.15);
-  const [delayTime, setDelayTime] = useState(0.375); // 3/16 note at 120bpm
-  const [delayFeedback, setDelayFeedback] = useState(0.4);
-  const [filterCutoff, setFilterCutoff] = useState(8000);
-  const [filterResonance, setFilterResonance] = useState(1);
-  const [showEffects, setShowEffects] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   const pattern = PATTERNS[patternType];
 
-  // Create impulse response for reverb
-  const createImpulseResponse = useCallback((ctx: AudioContext, duration: number, decay: number) => {
-    const sampleRate = ctx.sampleRate;
-    const length = sampleRate * duration;
-    const impulse = ctx.createBuffer(2, length, sampleRate);
-    
-    for (let channel = 0; channel < 2; channel++) {
-      const channelData = impulse.getChannelData(channel);
-      for (let i = 0; i < length; i++) {
-        channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-      }
-    }
-    return impulse;
-  }, []);
+  // Get audio URL from storage
+  const getAudioUrl = (fileName: string) => {
+    const { data } = supabase.storage
+      .from('tdog-demos')
+      .getPublicUrl(fileName);
+    return data.publicUrl;
+  };
 
-  const initAudio = useCallback(() => {
-    if (!audioContextRef.current) {
-      const ctx = new AudioContext();
-      audioContextRef.current = ctx;
-      
-      // Master output
-      masterGainRef.current = ctx.createGain();
-      masterGainRef.current.gain.value = isMuted ? 0 : volume;
-      masterGainRef.current.connect(ctx.destination);
-      
-      // Master filter (before output)
-      masterFilterRef.current = ctx.createBiquadFilter();
-      masterFilterRef.current.type = "lowpass";
-      masterFilterRef.current.frequency.value = filterCutoff;
-      masterFilterRef.current.Q.value = filterResonance;
-      masterFilterRef.current.connect(masterGainRef.current);
-      
-      // Dry signal path
-      dryGainRef.current = ctx.createGain();
-      dryGainRef.current.gain.value = 1 - reverbMix - delayMix;
-      dryGainRef.current.connect(masterFilterRef.current);
-      
-      // Reverb path
-      convolverRef.current = ctx.createConvolver();
-      convolverRef.current.buffer = createImpulseResponse(ctx, 2.5, 3);
-      reverbGainRef.current = ctx.createGain();
-      reverbGainRef.current.gain.value = reverbMix;
-      convolverRef.current.connect(reverbGainRef.current);
-      reverbGainRef.current.connect(masterFilterRef.current);
-      
-      // Delay path
-      delayNodeRef.current = ctx.createDelay(2);
-      delayNodeRef.current.delayTime.value = delayTime;
-      feedbackGainRef.current = ctx.createGain();
-      feedbackGainRef.current.gain.value = delayFeedback;
-      delayGainRef.current = ctx.createGain();
-      delayGainRef.current.gain.value = delayMix;
-      
-      // Delay feedback loop
-      delayNodeRef.current.connect(feedbackGainRef.current);
-      feedbackGainRef.current.connect(delayNodeRef.current);
-      delayNodeRef.current.connect(delayGainRef.current);
-      delayGainRef.current.connect(masterFilterRef.current);
-    }
-    return audioContextRef.current;
-  }, [volume, isMuted, reverbMix, delayMix, delayTime, delayFeedback, filterCutoff, filterResonance, createImpulseResponse]);
-
-  // Update effect parameters in real-time
+  // Load audio when pattern changes
   useEffect(() => {
-    if (dryGainRef.current) {
-      dryGainRef.current.gain.value = Math.max(0, 1 - reverbMix - delayMix);
-    }
-    if (reverbGainRef.current) {
-      reverbGainRef.current.gain.value = reverbMix;
-    }
-    if (delayGainRef.current) {
-      delayGainRef.current.gain.value = delayMix;
-    }
-    if (delayNodeRef.current) {
-      delayNodeRef.current.delayTime.value = delayTime;
-    }
-    if (feedbackGainRef.current) {
-      feedbackGainRef.current.gain.value = delayFeedback;
-    }
-    if (masterFilterRef.current) {
-      masterFilterRef.current.frequency.value = filterCutoff;
-      masterFilterRef.current.Q.value = filterResonance;
-    }
-  }, [reverbMix, delayMix, delayTime, delayFeedback, filterCutoff, filterResonance]);
-
-  const connectToEffects = useCallback((source: AudioNode) => {
-    if (dryGainRef.current) source.connect(dryGainRef.current);
-    if (convolverRef.current) source.connect(convolverRef.current);
-    if (delayNodeRef.current) source.connect(delayNodeRef.current);
-  }, []);
-
-  const playKick = useCallback((time: number, hard = false) => {
-    const ctx = audioContextRef.current;
-    if (!ctx) return;
-
-    const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
+    const audioUrl = getAudioUrl(pattern.fileName);
     
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(hard ? 180 : 150, time);
-    osc.frequency.exponentialRampToValueAtTime(hard ? 30 : 40, time + 0.1);
-    
-    oscGain.gain.setValueAtTime(hard ? 1 : 0.8, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + (hard ? 0.2 : 0.3));
-    
-    osc.connect(oscGain);
-    connectToEffects(oscGain);
-    
-    osc.start(time);
-    osc.stop(time + 0.3);
-  }, [connectToEffects]);
-
-  const playHihat = useCallback((time: number) => {
-    const ctx = audioContextRef.current;
-    if (!ctx) return;
-
-    const duration = 0.05;
-    const bufferSize = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.1));
-    }
-    
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    
-    const filter = ctx.createBiquadFilter();
-    filter.type = "highpass";
-    filter.frequency.value = patternType === "industrial" ? 5000 : 7000;
-    
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(patternType === "industrial" ? 0.2 : 0.15, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + duration);
-    
-    noise.connect(filter);
-    filter.connect(oscGain);
-    connectToEffects(oscGain);
-    
-    noise.start(time);
-  }, [patternType, connectToEffects]);
-
-  const playSnare = useCallback((time: number) => {
-    const ctx = audioContextRef.current;
-    if (!ctx) return;
-
-    const isIndustrial = patternType === "industrial";
-    
-    // Noise component
-    const bufferSize = ctx.sampleRate * (isIndustrial ? 0.2 : 0.15);
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
-    }
-    
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = "bandpass";
-    noiseFilter.frequency.value = isIndustrial ? 2000 : 3000;
-    
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(isIndustrial ? 0.5 : 0.3, time);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
-    
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    connectToEffects(noiseGain);
-    
-    noise.start(time);
-
-    // Tone component
-    const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
-    
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(isIndustrial ? 250 : 200, time);
-    osc.frequency.exponentialRampToValueAtTime(100, time + 0.05);
-    
-    oscGain.gain.setValueAtTime(isIndustrial ? 0.6 : 0.4, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
-    
-    osc.connect(oscGain);
-    connectToEffects(oscGain);
-    
-    osc.start(time);
-    osc.stop(time + 0.1);
-  }, [patternType, connectToEffects]);
-
-  const playBass = useCallback((time: number, note = 55) => {
-    const ctx = audioContextRef.current;
-    if (!ctx) return;
-
-    const isAcid = patternType === "acid";
-    
-    const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
-    
-    osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(note, time);
-    
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    
-    if (isAcid) {
-      filter.Q.value = 15;
-      filter.frequency.setValueAtTime(200, time);
-      filter.frequency.exponentialRampToValueAtTime(1500, time + 0.05);
-      filter.frequency.exponentialRampToValueAtTime(200, time + 0.2);
-    } else {
-      filter.frequency.setValueAtTime(400, time);
-      filter.frequency.exponentialRampToValueAtTime(100, time + 0.15);
-    }
-    
-    oscGain.gain.setValueAtTime(isAcid ? 0.35 : 0.25, time);
-    oscGain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-    
-    osc.connect(filter);
-    filter.connect(oscGain);
-    connectToEffects(oscGain);
-    
-    osc.start(time);
-    osc.stop(time + 0.25);
-  }, [patternType, connectToEffects]);
-
-  const startSequencer = useCallback(() => {
-    const ctx = initAudio();
-    if (ctx.state === "suspended") {
-      ctx.resume();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
     }
 
-    let step = 0;
-    const stepDuration = (60 / bpm) / 4;
+    const audio = new Audio(audioUrl);
+    audio.loop = true;
+    audio.volume = isMuted ? 0 : volume;
+    audioRef.current = audio;
 
-    const scheduleStep = () => {
-      const time = ctx.currentTime + 0.05;
-      const currentPattern = PATTERNS[patternType];
-      
-      if (currentPattern.kick[step % 16]) {
-        playKick(time, patternType === "industrial");
-      }
-      if (currentPattern.hihat[step % 16]) {
-        playHihat(time);
-      }
-      if (currentPattern.snare[step % 16]) {
-        playSnare(time);
-      }
-      if (currentPattern.bass[step % 16]) {
-        const note = currentPattern.bassNotes?.[step % 16] || 55;
-        playBass(time, note);
-      }
+    setIsLoading(true);
+    setHasError(false);
 
-      setCurrentStep(step % 16);
-      step++;
+    audio.addEventListener('canplaythrough', () => {
+      setIsLoading(false);
+      setDuration(audio.duration);
+    });
 
-      sequencerRef.current = window.setTimeout(scheduleStep, stepDuration * 1000);
+    audio.addEventListener('error', () => {
+      setIsLoading(false);
+      setHasError(true);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      setCurrentTime(audio.currentTime);
+    });
+
+    return () => {
+      audio.pause();
+      audio.src = '';
     };
+  }, [patternType]);
 
-    scheduleStep();
-  }, [bpm, patternType, initAudio, playKick, playHihat, playSnare, playBass]);
-
-  const stopSequencer = useCallback(() => {
-    if (sequencerRef.current) {
-      clearTimeout(sequencerRef.current);
-      sequencerRef.current = null;
-    }
-    setCurrentStep(0);
-  }, []);
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      stopSequencer();
-    } else {
-      startSequencer();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const reset = () => {
-    stopSequencer();
-    setIsPlaying(false);
-    setCurrentStep(0);
-  };
-
-  const changePattern = (newPattern: PatternType) => {
-    const wasPlaying = isPlaying;
-    if (wasPlaying) {
-      stopSequencer();
-    }
-    setPatternType(newPattern);
-    setBpm(PATTERNS[newPattern].bpm);
-    setCurrentStep(0);
-    if (wasPlaying) {
-      setTimeout(() => {
-        startSequencer();
-        setIsPlaying(true);
-      }, 50);
-    }
-  };
-
+  // Update volume
   useEffect(() => {
-    if (masterGainRef.current) {
-      masterGainRef.current.gain.value = isMuted ? 0 : volume;
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
     }
   }, [volume, isMuted]);
 
-  useEffect(() => {
-    return () => {
-      stopSequencer();
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
-    };
-  }, [stopSequencer]);
+  const togglePlay = async () => {
+    if (!audioRef.current || hasError) return;
 
-  useEffect(() => {
     if (isPlaying) {
-      stopSequencer();
-      startSequencer();
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Playback failed:', error);
+        setHasError(true);
+      }
     }
-  }, [bpm]);
+  };
+
+  const changePattern = (newPattern: PatternType) => {
+    setPatternType(newPattern);
+  };
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
@@ -425,11 +147,21 @@ const SynthPlayer = ({
     setIsMuted(!isMuted);
   };
 
-  // Sync delay time to BPM
-  const syncDelayToBpm = () => {
-    const quarterNote = 60 / bpm;
-    setDelayTime(quarterNote * 0.75); // Dotted eighth
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
 
   return (
     <div className={cn(
@@ -445,7 +177,7 @@ const SynthPlayer = ({
       {/* Pattern Selector */}
       <div className="mb-4">
         <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
-          Pattern
+          Select Demo
         </p>
         <div className="flex flex-wrap gap-2">
           {(Object.keys(PATTERNS) as PatternType[]).map((key) => (
@@ -465,217 +197,51 @@ const SynthPlayer = ({
         </div>
       </div>
 
-      {/* Step Sequencer Visualization */}
-      <div className="relative h-16 mb-4 bg-background/50 rounded overflow-hidden">
-        <div className="absolute inset-0 flex items-end justify-around px-1 py-2">
-          {Array.from({ length: 16 }).map((_, i) => {
-            const isActive = i === currentStep && isPlaying;
-            const hasKick = pattern.kick[i];
-            const hasSnare = pattern.snare[i];
-            const hasHihat = pattern.hihat[i];
-            const hasBass = pattern.bass[i];
-            
-            let height = 20;
-            let color = "bg-muted-foreground/20";
-            
-            if (hasKick) { height = 100; color = "bg-logo-green"; }
-            else if (hasSnare) { height = 70; color = "bg-primary"; }
-            else if (hasBass) { height = 50; color = "bg-logo-green/60"; }
-            else if (hasHihat) { height = 30; color = "bg-muted-foreground/50"; }
-            
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "w-[5%] rounded-sm transition-all duration-75",
-                  color,
-                  isActive && "ring-2 ring-white ring-offset-1 ring-offset-background"
-                )}
-                style={{ height: `${height}%` }}
-              />
-            );
-          })}
+      {/* Pattern Info */}
+      <div className="mb-4 p-3 bg-background/50 rounded border border-border/50">
+        <div className="flex items-center justify-between mb-1">
+          <span className="font-mono text-xs font-medium">{pattern.name}</span>
+          <span className="font-mono text-[10px] text-logo-green">{pattern.bpm} BPM</span>
         </div>
+        <p className="font-mono text-[10px] text-muted-foreground">
+          {pattern.description}
+        </p>
       </div>
 
-      {/* BPM Display */}
-      <div className="flex items-center justify-between mb-4 px-1">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-          BPM
-        </span>
-        <div className="flex items-center gap-2">
-          <Slider
-            value={[bpm]}
-            min={100}
-            max={160}
-            step={1}
-            onValueChange={(v) => setBpm(v[0])}
-            className="w-24"
-          />
-          <span className="font-mono text-sm font-bold w-8 text-right">{bpm}</span>
+      {/* Progress Bar */}
+      {duration > 0 && (
+        <div className="mb-4">
+          <div className="h-1 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-logo-green transition-all duration-100"
+              style={{ width: `${(currentTime / duration) * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="font-mono text-[9px] text-muted-foreground">
+              {formatTime(currentTime)}
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground">
+              {formatTime(duration)}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Effects Toggle */}
-      <div className="mb-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-between font-mono text-[10px] uppercase tracking-wider h-8"
-          onClick={() => setShowEffects(!showEffects)}
-        >
-          <span className="flex items-center gap-2">
-            <Waves className="w-3 h-3" />
-            Effects
+      {/* Status */}
+      {isLoading && (
+        <div className="mb-4 text-center">
+          <span className="font-mono text-[10px] text-muted-foreground animate-pulse">
+            Loading demo...
           </span>
-          <span className={cn(
-            "transition-transform",
-            showEffects && "rotate-180"
-          )}>
-            ▼
+        </div>
+      )}
+
+      {hasError && (
+        <div className="mb-4 text-center">
+          <span className="font-mono text-[10px] text-destructive">
+            Demo not available yet
           </span>
-        </Button>
-      </div>
-
-      {/* Effects Panel */}
-      {showEffects && (
-        <div className="mb-4 p-3 bg-background/50 rounded-lg border border-border/50 space-y-4">
-          {/* Filter Section */}
-          <div className="pb-3 border-b border-border/30">
-            <p className="font-mono text-[9px] text-primary uppercase tracking-wider mb-3">
-              Filter
-            </p>
-            
-            {/* Filter Cutoff */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                  Cutoff
-                </span>
-                <span className="font-mono text-[10px] text-logo-green">
-                  {filterCutoff >= 1000 ? `${(filterCutoff / 1000).toFixed(1)}kHz` : `${filterCutoff}Hz`}
-                </span>
-              </div>
-              <Slider
-                value={[filterCutoff]}
-                min={100}
-                max={12000}
-                step={50}
-                onValueChange={(v) => setFilterCutoff(v[0])}
-                className="w-full"
-              />
-            </div>
-
-            {/* Filter Resonance */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                  Resonance
-                </span>
-                <span className="font-mono text-[10px] text-logo-green">
-                  {filterResonance.toFixed(1)}
-                </span>
-              </div>
-              <Slider
-                value={[filterResonance]}
-                min={0.5}
-                max={20}
-                step={0.5}
-                onValueChange={(v) => setFilterResonance(v[0])}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          {/* Reverb */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                Reverb
-              </span>
-              <span className="font-mono text-[10px] text-logo-green">
-                {Math.round(reverbMix * 100)}%
-              </span>
-            </div>
-            <Slider
-              value={[reverbMix]}
-              min={0}
-              max={0.6}
-              step={0.01}
-              onValueChange={(v) => setReverbMix(v[0])}
-              className="w-full"
-            />
-          </div>
-
-          {/* Delay Mix */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                Delay Mix
-              </span>
-              <span className="font-mono text-[10px] text-logo-green">
-                {Math.round(delayMix * 100)}%
-              </span>
-            </div>
-            <Slider
-              value={[delayMix]}
-              min={0}
-              max={0.5}
-              step={0.01}
-              onValueChange={(v) => setDelayMix(v[0])}
-              className="w-full"
-            />
-          </div>
-
-          {/* Delay Time */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                Delay Time
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-5 px-2 font-mono text-[9px]"
-                  onClick={syncDelayToBpm}
-                >
-                  Sync
-                </Button>
-                <span className="font-mono text-[10px] text-logo-green w-12 text-right">
-                  {Math.round(delayTime * 1000)}ms
-                </span>
-              </div>
-            </div>
-            <Slider
-              value={[delayTime]}
-              min={0.05}
-              max={1}
-              step={0.01}
-              onValueChange={(v) => setDelayTime(v[0])}
-              className="w-full"
-            />
-          </div>
-
-          {/* Delay Feedback */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                Feedback
-              </span>
-              <span className="font-mono text-[10px] text-logo-green">
-                {Math.round(delayFeedback * 100)}%
-              </span>
-            </div>
-            <Slider
-              value={[delayFeedback]}
-              min={0}
-              max={0.85}
-              step={0.01}
-              onValueChange={(v) => setDelayFeedback(v[0])}
-              className="w-full"
-            />
-          </div>
         </div>
       )}
 
@@ -688,24 +254,17 @@ const SynthPlayer = ({
             size="icon"
             className={cn(
               "h-10 w-10 rounded-full border-logo-green/50",
-              isPlaying && "bg-logo-green/20 border-logo-green"
+              isPlaying && "bg-logo-green/20 border-logo-green",
+              (isLoading || hasError) && "opacity-50 cursor-not-allowed"
             )}
             onClick={togglePlay}
+            disabled={isLoading || hasError}
           >
             {isPlaying ? (
               <Pause className="h-4 w-4" />
             ) : (
               <Play className="h-4 w-4 ml-0.5" />
             )}
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={reset}
-          >
-            <RotateCcw className="h-4 w-4" />
           </Button>
         </div>
 
@@ -733,24 +292,11 @@ const SynthPlayer = ({
         </div>
       </div>
 
-      {/* Pattern Labels */}
-      <div className="mt-4 pt-4 border-t border-border/50 grid grid-cols-4 gap-2 text-center">
-        <div className="font-mono text-[9px] text-muted-foreground uppercase">
-          <span className="inline-block w-2 h-2 rounded-full bg-logo-green mr-1" />
-          Kick
-        </div>
-        <div className="font-mono text-[9px] text-muted-foreground uppercase">
-          <span className="inline-block w-2 h-2 rounded-full bg-primary mr-1" />
-          Snare
-        </div>
-        <div className="font-mono text-[9px] text-muted-foreground uppercase">
-          <span className="inline-block w-2 h-2 rounded-full bg-logo-green/60 mr-1" />
-          Bass
-        </div>
-        <div className="font-mono text-[9px] text-muted-foreground uppercase">
-          <span className="inline-block w-2 h-2 rounded-full bg-muted-foreground/50 mr-1" />
-          Hi-hat
-        </div>
+      {/* Footer Note */}
+      <div className="mt-4 pt-3 border-t border-border/50 text-center">
+        <p className="font-mono text-[9px] text-muted-foreground">
+          Pre-recorded demos created with T:DOG Sound Engine
+        </p>
       </div>
     </div>
   );
