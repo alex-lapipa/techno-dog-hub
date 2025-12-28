@@ -1163,6 +1163,39 @@ export type Database = {
         }
         Relationships: []
       }
+      public_community_profiles: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          interests: string[] | null
+          roles: string[] | null
+          status: Database["public"]["Enums"]["community_status"] | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          interests?: string[] | null
+          roles?: string[] | null
+          status?: Database["public"]["Enums"]["community_status"] | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          interests?: string[] | null
+          roles?: string[] | null
+          status?: Database["public"]["Enums"]["community_status"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_rate_limit: {

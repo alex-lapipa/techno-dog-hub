@@ -74,6 +74,16 @@ serve(async (req) => {
     if (!query || typeof query !== 'string') {
       throw new Error('Query is required');
     }
+    
+    // Security: Limit query length to prevent resource exhaustion
+    if (query.length > 2000) {
+      return new Response(JSON.stringify({ error: 'Query exceeds maximum length of 2000 characters' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    const sanitizedQuery = query.trim().slice(0, 2000);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
@@ -105,8 +115,8 @@ serve(async (req) => {
     }> | null = null;
 
     // Generate embedding for vector searches using OpenAI
-    console.log('Generating embedding for query:', query);
-    const queryEmbedding = OPENAI_API_KEY ? await generateEmbedding(query, OPENAI_API_KEY) : null;
+    console.log('Generating embedding for query:', sanitizedQuery);
+    const queryEmbedding = OPENAI_API_KEY ? await generateEmbedding(sanitizedQuery, OPENAI_API_KEY) : null;
 
     // Search DJ artists using vector similarity
     if (queryEmbedding) {
@@ -144,9 +154,9 @@ serve(async (req) => {
 
     // Fallback to full-text search for documents if vector search didn't work
     if (!documents || documents.length === 0) {
-      console.log('Falling back to full-text search for:', query);
+      console.log('Falling back to full-text search for:', sanitizedQuery);
       
-      const searchTerms = query
+      const searchTerms = sanitizedQuery
         .toLowerCase()
         .replace(/[¿?¡!.,;:]/g, '')
         .split(' ')
@@ -235,7 +245,7 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: query }
+          { role: 'user', content: sanitizedQuery }
         ],
         stream: stream,
         max_tokens: 1024
