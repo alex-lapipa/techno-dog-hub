@@ -58,6 +58,7 @@ const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
 const ActivityLog = lazy(() => import("./pages/ActivityLog"));
 const NotificationChannels = lazy(() => import("./pages/NotificationChannels"));
 const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
+const ArtistMigrationAdmin = lazy(() => import("./pages/ArtistMigrationAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -168,6 +169,7 @@ const App = () => (
                     
                     {/* Analytics (Admin only) */}
                     <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/admin/artist-migration" element={<ArtistMigrationAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />

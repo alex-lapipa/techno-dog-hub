@@ -198,3 +198,18 @@ verify_jwt = false
 
 [functions.batch-content-processor]
 verify_jwt = false
+
+[functions.artist-migration]
+verify_jwt = false
+
+[functions.artist-embedding-sync]
+verify_jwt = false
+
+[functions.youtube-cache-refresh]
+verify_jwt = false
+
+[functions.youtube-verify]
+verify_jwt = false
+
+[functions.contributor-contact]
+verify_jwt = false
