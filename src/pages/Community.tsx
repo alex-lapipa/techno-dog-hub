@@ -89,12 +89,16 @@ const Community = () => {
     setLoading(true);
 
     try {
+      // Check for referral code in URL
+      const refCode = searchParams.get("ref");
+      
       const { data, error } = await supabase.functions.invoke("community-signup", {
         body: {
           email,
           source: "community_page",
           newsletter_opt_in: newsletterOptIn,
           display_name: displayName || undefined,
+          referral_code: refCode || undefined,
         },
       });
 

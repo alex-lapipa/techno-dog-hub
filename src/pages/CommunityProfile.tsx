@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
-import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase, StreakCard, MilestoneProgress } from "@/components/gamification";
+import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase, StreakCard, MilestoneProgress, ReferralWidget } from "@/components/gamification";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -254,6 +254,9 @@ const CommunityProfile = () => {
 
               {/* Badge Showcase */}
               <BadgeShowcase profileId={profileId!} />
+
+              {/* Referral Widget - only show to owner */}
+              {isOwner && <ReferralWidget profileId={profileId!} />}
 
               {/* Points History - only show to owner */}
               {isOwner && <PointsHistory profileId={profileId!} />}
