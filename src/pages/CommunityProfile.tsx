@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
-import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase, StreakCard } from "@/components/gamification";
+import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase, StreakCard, MilestoneProgress } from "@/components/gamification";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -227,6 +227,11 @@ const CommunityProfile = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Milestone Progress */}
+                <div className="pt-4 border-t border-border">
+                  <MilestoneProgress totalPoints={gamification.totalPoints} compact />
+                </div>
 
                 {/* Badges Preview */}
                 {gamification.badges.length > 0 && (
