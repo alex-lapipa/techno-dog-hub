@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { ReferralWidget } from "@/components/gamification";
 import { 
   Mail, 
   CheckCircle2, 
@@ -39,6 +40,7 @@ const Community = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [profile, setProfile] = useState<{
+    id: string;
     status: string;
     roles: string[];
     display_name: string | null;
@@ -62,7 +64,7 @@ const Community = () => {
       
       const { data } = await supabase
         .from("community_profiles")
-        .select("status, roles, display_name, trust_score")
+        .select("id, status, roles, display_name, trust_score")
         .eq("email", user.email)
         .maybeSingle();
       
@@ -234,6 +236,11 @@ const Community = () => {
                     </div>
                   </div>
                   
+                  {/* Referral Widget */}
+                  <div className="pt-4 border-t border-border">
+                    <ReferralWidget profileId={profile.id} compact />
+                  </div>
+
                   <div className="pt-4 space-y-2">
                     <Button 
                       variant="outline" 
