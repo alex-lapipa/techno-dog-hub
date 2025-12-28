@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { Play, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface AgentCardProps {
   name: string;
@@ -7,20 +11,24 @@ interface AgentCardProps {
   status: 'active' | 'idle' | 'error' | 'disabled';
   lastRun?: string;
   pendingReports?: number;
-  onClick?: () => void;
   frameNumber?: string;
+  functionName?: string;
 }
 
 const AgentCard = ({
   name,
   category,
   description,
-  status,
+  status: initialStatus,
   lastRun,
   pendingReports = 0,
-  onClick,
-  frameNumber = '01'
+  frameNumber = '01',
+  functionName
 }: AgentCardProps) => {
+  const [isRunning, setIsRunning] = useState(false);
+  const [runStatus, setRunStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const { toast } = useToast();
+
   const statusColors = {
     active: 'bg-logo-green/20 border-logo-green/50 text-logo-green',
     idle: 'bg-muted/50 border-border text-muted-foreground',
@@ -35,13 +43,52 @@ const AgentCard = ({
     disabled: 'OFF'
   };
 
+  const currentStatus = isRunning ? 'active' : initialStatus;
+
+  const handleRun = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!functionName || isRunning) return;
+
+    setIsRunning(true);
+    setRunStatus('idle');
+
+    try {
+      const { data, error } = await supabase.functions.invoke(functionName, {
+        body: { manual: true }
+      });
+
+      if (error) throw error;
+
+      setRunStatus('success');
+      toast({
+        title: `${name} completed`,
+        description: data?.message || 'Agent ran successfully'
+      });
+
+      // Reset success indicator after 3 seconds
+      setTimeout(() => setRunStatus('idle'), 3000);
+    } catch (error) {
+      console.error(`Failed to run ${name}:`, error);
+      setRunStatus('error');
+      toast({
+        title: `${name} failed`,
+        description: 'Check logs for details',
+        variant: 'destructive'
+      });
+
+      // Reset error indicator after 3 seconds
+      setTimeout(() => setRunStatus('idle'), 3000);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
         "group relative w-full text-left bg-zinc-800 p-1 transition-all duration-300",
         "hover:scale-[1.02]",
-        status === 'disabled' && "opacity-50 cursor-not-allowed"
+        initialStatus === 'disabled' && "opacity-50"
       )}
     >
       {/* Sprocket holes left */}
@@ -62,7 +109,8 @@ const AgentCard = ({
       <div 
         className={cn(
           "relative mx-2 p-4 border border-crimson/20 transition-all duration-500",
-          "group-hover:border-crimson/60 group-hover:shadow-[0_0_30px_hsl(var(--crimson)/0.3)]"
+          "group-hover:border-crimson/60 group-hover:shadow-[0_0_30px_hsl(var(--crimson)/0.3)]",
+          isRunning && "border-logo-green/60 shadow-[0_0_30px_hsl(var(--logo-green)/0.3)]"
         )}
         style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}
       >
@@ -84,10 +132,13 @@ const AgentCard = ({
 
         {/* Status indicator */}
         <div className={cn(
-          "absolute top-2 right-2 px-2 py-0.5 border text-[9px] font-mono uppercase tracking-wider",
-          statusColors[status]
+          "absolute top-2 right-2 px-2 py-0.5 border text-[9px] font-mono uppercase tracking-wider flex items-center gap-1",
+          statusColors[currentStatus]
         )}>
-          {statusLabels[status]}
+          {isRunning && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
+          {runStatus === 'success' && <CheckCircle className="w-2.5 h-2.5" />}
+          {runStatus === 'error' && <AlertCircle className="w-2.5 h-2.5" />}
+          {isRunning ? 'RUNNING' : statusLabels[initialStatus]}
         </div>
 
         {/* Content */}
@@ -102,25 +153,54 @@ const AgentCard = ({
             {description}
           </p>
 
-          {/* Footer stats */}
+          {/* Footer with Run button */}
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-crimson/20">
-            {lastRun && (
-              <span className="font-mono text-[10px] text-muted-foreground">
-                Last: {lastRun}
-              </span>
-            )}
-            {pendingReports > 0 && (
-              <span className="px-2 py-0.5 bg-crimson/20 border border-crimson/50 font-mono text-[10px] text-crimson">
-                {pendingReports} pending
-              </span>
+            <div className="flex items-center gap-2">
+              {lastRun && (
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  Last: {lastRun}
+                </span>
+              )}
+              {pendingReports > 0 && (
+                <span className="px-2 py-0.5 bg-crimson/20 border border-crimson/50 font-mono text-[10px] text-crimson">
+                  {pendingReports}
+                </span>
+              )}
+            </div>
+            
+            {functionName && (
+              <button
+                onClick={handleRun}
+                disabled={isRunning || initialStatus === 'disabled'}
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 border font-mono text-[10px] uppercase tracking-wider transition-all",
+                  "hover:bg-logo-green/20 hover:border-logo-green/60 hover:text-logo-green",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  isRunning 
+                    ? "border-logo-green/60 text-logo-green bg-logo-green/10" 
+                    : "border-border text-muted-foreground"
+                )}
+              >
+                {isRunning ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Play className="w-3 h-3" />
+                )}
+                {isRunning ? 'Running' : 'Run'}
+              </button>
             )}
           </div>
         </div>
 
         {/* Hover glow */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-crimson/30 via-crimson/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className={cn(
+          "absolute inset-0 pointer-events-none bg-gradient-to-t via-transparent to-transparent opacity-0 transition-opacity duration-500",
+          isRunning 
+            ? "from-logo-green/30 via-logo-green/10 opacity-100" 
+            : "from-crimson/30 via-crimson/10 group-hover:opacity-100"
+        )} />
       </div>
-    </button>
+    </div>
   );
 };
 
