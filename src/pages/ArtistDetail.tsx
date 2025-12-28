@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { getArtistById, artists } from "@/data/artists";
 import { PageLayout } from "@/components/layout";
-import FilmFrame from "@/components/FilmFrame";
+import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
@@ -152,14 +152,14 @@ const ArtistDetail = () => {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Artist Photo - Film Frame */}
             <div className="relative">
+              <GlitchSVGFilter />
               {artist.image ? (
                 <div className="relative">
-                  <FilmFrame
+                  <GlitchImage
                     src={artist.image.url}
                     alt={artist.name}
                     frameNumber={String(currentIndex + 1).padStart(2, '0')}
-                    aspectRatio="square"
-                    size="lg"
+                    className="aspect-square"
                   />
                   {/* Attribution overlay */}
                   <div className="absolute top-6 right-6 z-30 bg-background/90 backdrop-blur-sm border border-crimson/30 px-2 py-1 text-xs font-mono">
