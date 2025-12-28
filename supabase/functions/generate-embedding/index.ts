@@ -17,13 +17,23 @@ serve(async (req) => {
     if (!text || typeof text !== 'string') {
       throw new Error('Text is required');
     }
+    
+    // Security: Limit text length to prevent resource exhaustion
+    if (text.length > 10000) {
+      return new Response(JSON.stringify({ error: 'Text exceeds maximum length of 10000 characters' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    const sanitizedText = text.trim().slice(0, 10000);
 
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    console.log('Generating embedding for text of length:', text.length);
+    console.log('Generating embedding for text of length:', sanitizedText.length);
 
     const response = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
@@ -33,7 +43,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
-        input: text,
+        input: sanitizedText,
         dimensions: 768
       }),
     });
