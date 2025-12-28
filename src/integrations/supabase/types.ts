@@ -302,11 +302,14 @@ export type Database = {
           country: string | null
           created_at: string
           current_level: number
+          current_streak: number
           display_name: string | null
           email: string
           email_verified_at: string | null
           id: string
           interests: string[] | null
+          last_activity_date: string | null
+          longest_streak: number
           newsletter_opt_in: boolean
           newsletter_opt_in_at: string | null
           roles: string[]
@@ -322,11 +325,14 @@ export type Database = {
           country?: string | null
           created_at?: string
           current_level?: number
+          current_streak?: number
           display_name?: string | null
           email: string
           email_verified_at?: string | null
           id?: string
           interests?: string[] | null
+          last_activity_date?: string | null
+          longest_streak?: number
           newsletter_opt_in?: boolean
           newsletter_opt_in_at?: string | null
           roles?: string[]
@@ -342,11 +348,14 @@ export type Database = {
           country?: string | null
           created_at?: string
           current_level?: number
+          current_streak?: number
           display_name?: string | null
           email?: string
           email_verified_at?: string | null
           id?: string
           interests?: string[] | null
+          last_activity_date?: string | null
+          longest_streak?: number
           newsletter_opt_in?: boolean
           newsletter_opt_in_at?: string | null
           roles?: string[]
@@ -1729,6 +1738,14 @@ export type Database = {
           subgenres: string[]
           top_tracks: string[]
           years_active: string
+        }[]
+      }
+      update_activity_streak: {
+        Args: { p_profile_id: string }
+        Returns: {
+          current_streak: number
+          longest_streak: number
+          streak_increased: boolean
         }[]
       }
     }
