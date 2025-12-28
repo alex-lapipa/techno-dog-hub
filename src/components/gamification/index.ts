@@ -6,3 +6,4 @@ export { LeaderboardWidget } from "./LeaderboardWidget";
 export { StreakDisplay, StreakCard } from "./StreakDisplay";
 export { XPMultiplierBanner } from "./XPMultiplierBanner";
 export { MilestoneProgress } from "./MilestoneProgress";
+export { ReferralWidget } from "./ReferralWidget";

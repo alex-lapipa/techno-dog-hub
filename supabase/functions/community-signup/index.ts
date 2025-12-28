@@ -12,6 +12,7 @@ interface SignupRequest {
   newsletter_opt_in?: boolean;
   display_name?: string;
   redirect_path?: string; // Allow custom redirect path after verification
+  referral_code?: string; // Referral code from inviter
 }
 
 // Simple in-memory rate limiting (per function instance)
@@ -47,7 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { email, source = "community_page", newsletter_opt_in = false, display_name, redirect_path }: SignupRequest = await req.json();
+    const { email, source = "community_page", newsletter_opt_in = false, display_name, redirect_path, referral_code }: SignupRequest = await req.json();
 
     if (!email || !email.includes("@")) {
       return new Response(
@@ -120,6 +121,35 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       console.log(`[community-signup] Created pending profile for: ${normalizedEmail}`);
+
+      // Handle referral tracking if referral_code provided
+      if (referral_code) {
+        // Find the referrer's profile by referral code
+        const { data: referrerProfile } = await supabase
+          .from("community_profiles")
+          .select("id")
+          .eq("referral_code", referral_code.toUpperCase())
+          .single();
+
+        if (referrerProfile) {
+          // Create referral record
+          const { error: refError } = await supabase
+            .from("referrals")
+            .insert({
+              referrer_id: referrerProfile.id,
+              referred_email: normalizedEmail,
+              referral_code_used: referral_code.toUpperCase(),
+              status: "pending",
+            });
+
+          if (refError) {
+            console.error("[community-signup] Referral tracking error:", refError);
+            // Don't fail the signup if referral tracking fails
+          } else {
+            console.log(`[community-signup] Referral tracked: ${referral_code} -> ${normalizedEmail}`);
+          }
+        }
+      }
     }
 
     // Log email event
