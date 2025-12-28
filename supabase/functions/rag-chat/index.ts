@@ -6,6 +6,79 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// IP-based rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
+
+// In-memory rate limit store (resets on function cold start)
+const ipRequestLog = new Map<string, number[]>();
+
+// Get client IP from request headers
+function getClientIP(req: Request): string {
+  // Check common proxy headers
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    return forwardedFor.split(',')[0].trim();
+  }
+  
+  const realIP = req.headers.get('x-real-ip');
+  if (realIP) {
+    return realIP.trim();
+  }
+  
+  const cfConnectingIP = req.headers.get('cf-connecting-ip');
+  if (cfConnectingIP) {
+    return cfConnectingIP.trim();
+  }
+  
+  return 'unknown';
+}
+
+// Check and update rate limit for an IP
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetAt: number } {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  
+  // Get existing requests for this IP
+  let requests = ipRequestLog.get(ip) || [];
+  
+  // Filter out requests outside the current window
+  requests = requests.filter(timestamp => timestamp > windowStart);
+  
+  // Check if rate limit exceeded
+  if (requests.length >= RATE_LIMIT_MAX_REQUESTS) {
+    const oldestRequest = Math.min(...requests);
+    const resetAt = oldestRequest + RATE_LIMIT_WINDOW_MS;
+    return { 
+      allowed: false, 
+      remaining: 0, 
+      resetAt 
+    };
+  }
+  
+  // Add current request
+  requests.push(now);
+  ipRequestLog.set(ip, requests);
+  
+  // Cleanup old entries periodically (every 100 IPs)
+  if (ipRequestLog.size > 1000) {
+    for (const [storedIP, timestamps] of ipRequestLog.entries()) {
+      const filtered = timestamps.filter(t => t > windowStart);
+      if (filtered.length === 0) {
+        ipRequestLog.delete(storedIP);
+      } else {
+        ipRequestLog.set(storedIP, filtered);
+      }
+    }
+  }
+  
+  return { 
+    allowed: true, 
+    remaining: RATE_LIMIT_MAX_REQUESTS - requests.length,
+    resetAt: now + RATE_LIMIT_WINDOW_MS
+  };
+}
+
 // Generate embedding using OpenAI API
 async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
@@ -67,6 +140,37 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Apply IP-based rate limiting
+  const clientIP = getClientIP(req);
+  const rateLimit = checkRateLimit(clientIP);
+  
+  const rateLimitHeaders = {
+    'X-RateLimit-Limit': RATE_LIMIT_MAX_REQUESTS.toString(),
+    'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+    'X-RateLimit-Reset': Math.ceil(rateLimit.resetAt / 1000).toString(),
+  };
+  
+  if (!rateLimit.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Rate limit exceeded. Please wait before making more requests.',
+        retryAfter: Math.ceil((rateLimit.resetAt - Date.now()) / 1000)
+      }), 
+      { 
+        status: 429, 
+        headers: { 
+          ...corsHeaders, 
+          ...rateLimitHeaders,
+          'Retry-After': Math.ceil((rateLimit.resetAt - Date.now()) / 1000).toString(),
+          'Content-Type': 'application/json' 
+        } 
+      }
+    );
+  }
+  
+  console.log(`Request from IP: ${clientIP}, remaining: ${rateLimit.remaining}`);
 
   try {
     const { query, stream = true } = await req.json();
