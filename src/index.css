@@ -221,6 +221,22 @@
     animation: float-slow 8s ease-in-out infinite;
   }
 
+  /* Fade-in animation for virtualized lists */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out forwards;
+  }
+
   .logo-glow {
     transition: filter 0.3s ease;
   }
