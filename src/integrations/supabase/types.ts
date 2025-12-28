@@ -1107,6 +1107,7 @@ export type Database = {
       referrals: {
         Row: {
           created_at: string
+          email_notification_sent_at: string | null
           id: string
           referral_code_used: string
           referred_email: string
@@ -1119,6 +1120,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_notification_sent_at?: string | null
           id?: string
           referral_code_used: string
           referred_email: string
@@ -1131,6 +1133,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_notification_sent_at?: string | null
           id?: string
           referral_code_used?: string
           referred_email?: string

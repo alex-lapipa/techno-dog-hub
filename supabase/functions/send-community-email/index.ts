@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-type EmailType = "verification" | "newsletter_optin" | "api_key_created" | "api_key_revoked";
+type EmailType = "verification" | "newsletter_optin" | "api_key_created" | "api_key_revoked" | "referral_verified";
 
 interface EmailRequest {
   type: EmailType;
@@ -178,6 +178,41 @@ function apiKeyRevokedEmail(
   `);
 }
 
+function referralVerifiedEmail(
+  referrerName: string,
+  referredEmail: string,
+  xpEarned: number,
+  email: string,
+  profileUrl: string
+): string {
+  return baseTemplate(`
+    <h1 style="${styles.h1}">Your Referral Earned You XP!</h1>
+    <p style="${styles.text}">
+      Great news! A friend you referred has just become a verified contributor on techno.dog.
+    </p>
+    <div style="${styles.keyDetails}">
+      <p style="${styles.detailLabel}">Referred Friend</p>
+      <p style="${styles.detailValue}">${referredEmail}</p>
+      <p style="${styles.detailLabel}">XP Earned</p>
+      <p style="${styles.codeBlock}">+${xpEarned} XP</p>
+    </div>
+    <div style="${styles.infoBox}">
+      <p style="${styles.infoText}">
+        🎉 Keep sharing your referral link to earn more XP and climb the leaderboard! Each verified referral earns you 250 XP.
+      </p>
+    </div>
+    <div style="${styles.buttonContainer}">
+      <a href="${profileUrl}" style="${styles.button}">View Your Profile</a>
+    </div>
+    <p style="${styles.textMuted}">
+      Share your referral link with fellow techno enthusiasts to earn more rewards.
+    </p>
+    <hr style="${styles.hr}">
+    <p style="${styles.footer}">This notification was sent to ${email}</p>
+    <p style="${styles.footerBrand}">techno.dog — Global Techno Knowledge Base</p>
+  `);
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -243,6 +278,18 @@ const handler = async (req: Request): Promise<Response> => {
           to,
           `${baseUrl}/developer`,
           data.revokedAt as string
+        );
+        break;
+      }
+
+      case "referral_verified": {
+        subject = "🎉 Your referral earned you 250 XP on techno.dog!";
+        html = referralVerifiedEmail(
+          data.referrerName as string || "Contributor",
+          data.referredEmail as string,
+          250,
+          to,
+          `${baseUrl}/community/profile`
         );
         break;
       }
