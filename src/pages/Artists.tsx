@@ -106,9 +106,11 @@ const ArtistsPage = () => {
                         onMouseEnter={() => prefetchArtist(artist.id)}
                         data-index={virtualRow.index}
                         ref={rowVirtualizer.measureElement}
-                        className="group absolute left-0 right-0 border-b border-border py-4 sm:py-6 hover:bg-card transition-colors px-2 sm:px-4"
+                        className="group absolute left-0 right-0 border-b border-border py-4 sm:py-6 hover:bg-card transition-colors px-2 sm:px-4 animate-fade-in opacity-0"
                         style={{
                           transform: `translateY(${virtualRow.start}px)`,
+                          animationDelay: `${Math.min(virtualRow.index * 50, 500)}ms`,
+                          animationFillMode: 'forwards',
                         }}
                       >
                         <div className="flex items-center gap-3 sm:gap-4">

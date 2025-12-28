@@ -105,9 +105,11 @@ const VenuesPage = () => {
                       key={rowIndex}
                       data-index={virtualRow.index}
                       ref={rowVirtualizer.measureElement}
-                      className="absolute left-0 right-0 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pb-4 sm:pb-6"
+                      className="absolute left-0 right-0 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pb-4 sm:pb-6 animate-fade-in opacity-0"
                       style={{
                         transform: `translateY(${virtualRow.start}px)`,
+                        animationDelay: `${Math.min(virtualRow.index * 75, 600)}ms`,
+                        animationFillMode: 'forwards',
                       }}
                     >
                       {venue1 && (
