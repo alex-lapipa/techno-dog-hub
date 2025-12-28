@@ -65,6 +65,7 @@ const SynthPlayer = ({
 }: SynthPlayerProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
+  const masterFilterRef = useRef<BiquadFilterNode | null>(null);
   const dryGainRef = useRef<GainNode | null>(null);
   const reverbGainRef = useRef<GainNode | null>(null);
   const delayGainRef = useRef<GainNode | null>(null);
@@ -83,6 +84,8 @@ const SynthPlayer = ({
   const [delayMix, setDelayMix] = useState(0.15);
   const [delayTime, setDelayTime] = useState(0.375); // 3/16 note at 120bpm
   const [delayFeedback, setDelayFeedback] = useState(0.4);
+  const [filterCutoff, setFilterCutoff] = useState(8000);
+  const [filterResonance, setFilterResonance] = useState(1);
   const [showEffects, setShowEffects] = useState(false);
 
   const pattern = PATTERNS[patternType];
@@ -112,10 +115,17 @@ const SynthPlayer = ({
       masterGainRef.current.gain.value = isMuted ? 0 : volume;
       masterGainRef.current.connect(ctx.destination);
       
+      // Master filter (before output)
+      masterFilterRef.current = ctx.createBiquadFilter();
+      masterFilterRef.current.type = "lowpass";
+      masterFilterRef.current.frequency.value = filterCutoff;
+      masterFilterRef.current.Q.value = filterResonance;
+      masterFilterRef.current.connect(masterGainRef.current);
+      
       // Dry signal path
       dryGainRef.current = ctx.createGain();
       dryGainRef.current.gain.value = 1 - reverbMix - delayMix;
-      dryGainRef.current.connect(masterGainRef.current);
+      dryGainRef.current.connect(masterFilterRef.current);
       
       // Reverb path
       convolverRef.current = ctx.createConvolver();
@@ -123,7 +133,7 @@ const SynthPlayer = ({
       reverbGainRef.current = ctx.createGain();
       reverbGainRef.current.gain.value = reverbMix;
       convolverRef.current.connect(reverbGainRef.current);
-      reverbGainRef.current.connect(masterGainRef.current);
+      reverbGainRef.current.connect(masterFilterRef.current);
       
       // Delay path
       delayNodeRef.current = ctx.createDelay(2);
@@ -137,10 +147,10 @@ const SynthPlayer = ({
       delayNodeRef.current.connect(feedbackGainRef.current);
       feedbackGainRef.current.connect(delayNodeRef.current);
       delayNodeRef.current.connect(delayGainRef.current);
-      delayGainRef.current.connect(masterGainRef.current);
+      delayGainRef.current.connect(masterFilterRef.current);
     }
     return audioContextRef.current;
-  }, [volume, isMuted, reverbMix, delayMix, delayTime, delayFeedback, createImpulseResponse]);
+  }, [volume, isMuted, reverbMix, delayMix, delayTime, delayFeedback, filterCutoff, filterResonance, createImpulseResponse]);
 
   // Update effect parameters in real-time
   useEffect(() => {
@@ -159,7 +169,11 @@ const SynthPlayer = ({
     if (feedbackGainRef.current) {
       feedbackGainRef.current.gain.value = delayFeedback;
     }
-  }, [reverbMix, delayMix, delayTime, delayFeedback]);
+    if (masterFilterRef.current) {
+      masterFilterRef.current.frequency.value = filterCutoff;
+      masterFilterRef.current.Q.value = filterResonance;
+    }
+  }, [reverbMix, delayMix, delayTime, delayFeedback, filterCutoff, filterResonance]);
 
   const connectToEffects = useCallback((source: AudioNode) => {
     if (dryGainRef.current) source.connect(dryGainRef.current);
@@ -526,6 +540,53 @@ const SynthPlayer = ({
       {/* Effects Panel */}
       {showEffects && (
         <div className="mb-4 p-3 bg-background/50 rounded-lg border border-border/50 space-y-4">
+          {/* Filter Section */}
+          <div className="pb-3 border-b border-border/30">
+            <p className="font-mono text-[9px] text-primary uppercase tracking-wider mb-3">
+              Filter
+            </p>
+            
+            {/* Filter Cutoff */}
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                  Cutoff
+                </span>
+                <span className="font-mono text-[10px] text-logo-green">
+                  {filterCutoff >= 1000 ? `${(filterCutoff / 1000).toFixed(1)}kHz` : `${filterCutoff}Hz`}
+                </span>
+              </div>
+              <Slider
+                value={[filterCutoff]}
+                min={100}
+                max={12000}
+                step={50}
+                onValueChange={(v) => setFilterCutoff(v[0])}
+                className="w-full"
+              />
+            </div>
+
+            {/* Filter Resonance */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                  Resonance
+                </span>
+                <span className="font-mono text-[10px] text-logo-green">
+                  {filterResonance.toFixed(1)}
+                </span>
+              </div>
+              <Slider
+                value={[filterResonance]}
+                min={0.5}
+                max={20}
+                step={0.5}
+                onValueChange={(v) => setFilterResonance(v[0])}
+                className="w-full"
+              />
+            </div>
+          </div>
+
           {/* Reverb */}
           <div>
             <div className="flex items-center justify-between mb-2">
