@@ -7,7 +7,9 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, Loader2 } from "lucide-react";
+import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
 import AgentCard from "@/components/admin/AgentCard";
 import ToolCard from "@/components/admin/ToolCard";
 import AgentReportsList from "@/components/admin/AgentReportsList";
@@ -62,10 +64,23 @@ const AdminLoginForm = () => {
   );
 };
 
+type AgentRunStatus = 'pending' | 'running' | 'success' | 'error';
+
+interface AgentRunState {
+  name: string;
+  functionName: string;
+  status: AgentRunStatus;
+  error?: string;
+}
+
 const AdminDashboard = () => {
   const { logout } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const [isRunningAll, setIsRunningAll] = useState(false);
+  const [agentRunStates, setAgentRunStates] = useState<AgentRunState[]>([]);
+  const [currentAgentIndex, setCurrentAgentIndex] = useState(-1);
 
   const handleLogout = () => {
     logout();
@@ -83,6 +98,60 @@ const AdminDashboard = () => {
     { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector" },
     { name: "Pipeline Orchestrator", category: "Operations", description: "Coordinates multi-step review and validation tasks", status: "disabled" as const, frameNumber: "08" },
   ];
+
+  const runnableAgents = agents.filter(a => a.functionName && a.status !== 'disabled');
+
+  const runAllAgents = async () => {
+    setIsRunningAll(true);
+    
+    const initialStates: AgentRunState[] = runnableAgents.map(a => ({
+      name: a.name,
+      functionName: a.functionName!,
+      status: 'pending' as AgentRunStatus
+    }));
+    setAgentRunStates(initialStates);
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 0; i < runnableAgents.length; i++) {
+      const agent = runnableAgents[i];
+      setCurrentAgentIndex(i);
+      
+      setAgentRunStates(prev => prev.map((s, idx) => 
+        idx === i ? { ...s, status: 'running' } : s
+      ));
+      
+      try {
+        const { error } = await supabase.functions.invoke(agent.functionName!);
+        
+        if (error) throw error;
+        
+        setAgentRunStates(prev => prev.map((s, idx) => 
+          idx === i ? { ...s, status: 'success' } : s
+        ));
+        successCount++;
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+        setAgentRunStates(prev => prev.map((s, idx) => 
+          idx === i ? { ...s, status: 'error', error: errorMsg } : s
+        ));
+        errorCount++;
+      }
+    }
+    
+    setCurrentAgentIndex(-1);
+    setIsRunningAll(false);
+    
+    toast({
+      title: "All agents completed",
+      description: `${successCount} succeeded, ${errorCount} failed`,
+      variant: errorCount > 0 ? "destructive" : "default"
+    });
+  };
+
+  const completedCount = agentRunStates.filter(s => s.status === 'success' || s.status === 'error').length;
+  const progressPercent = agentRunStates.length > 0 ? (completedCount / agentRunStates.length) * 100 : 0;
 
   const tools = [
     { name: "System Status", description: "Real-time status of all services", path: "/admin/health", frameNumber: "T1" },
@@ -117,7 +186,72 @@ const AdminDashboard = () => {
             <span className="font-mono text-[10px] text-crimson uppercase tracking-widest">Automated Agents</span>
           </div>
           <div className="flex-1 h-px bg-crimson/20" />
+          <Button
+            variant="brutalist"
+            size="sm"
+            onClick={runAllAgents}
+            disabled={isRunningAll}
+            className="font-mono text-xs uppercase tracking-wider"
+          >
+            {isRunningAll ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                Running...
+              </>
+            ) : (
+              <>
+                <Play className="w-3 h-3 mr-2" />
+                Run All
+              </>
+            )}
+          </Button>
         </div>
+        
+        {/* Progress Panel */}
+        {agentRunStates.length > 0 && (
+          <div className="mb-6 p-4 bg-zinc-900/50 border border-border">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
+                Progress: {completedCount}/{agentRunStates.length}
+              </span>
+              {!isRunningAll && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setAgentRunStates([])}
+                  className="font-mono text-[10px] text-muted-foreground hover:text-foreground"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+            <Progress value={progressPercent} className="h-2 mb-4" />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+              {agentRunStates.map((state, idx) => (
+                <div
+                  key={state.name}
+                  className={`p-2 border text-center ${
+                    state.status === 'running' ? 'border-amber-500/50 bg-amber-500/10' :
+                    state.status === 'success' ? 'border-logo-green/50 bg-logo-green/10' :
+                    state.status === 'error' ? 'border-crimson/50 bg-crimson/10' :
+                    'border-border bg-background/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center mb-1">
+                    {state.status === 'running' && <Loader2 className="w-3 h-3 text-amber-500 animate-spin" />}
+                    {state.status === 'success' && <CheckCircle2 className="w-3 h-3 text-logo-green" />}
+                    {state.status === 'error' && <XCircle className="w-3 h-3 text-crimson" />}
+                    {state.status === 'pending' && <AlertCircle className="w-3 h-3 text-muted-foreground" />}
+                  </div>
+                  <div className="font-mono text-[9px] text-muted-foreground truncate" title={state.name}>
+                    {state.name.split(' ')[0]}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {agents.map((agent) => (
             <AgentCard key={agent.name} {...agent} />
