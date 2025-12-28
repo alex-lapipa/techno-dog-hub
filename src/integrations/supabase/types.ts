@@ -200,6 +200,13 @@ export type Database = {
             referencedRelation: "api_keys"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "api_usage_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       community_profiles: {
@@ -1160,6 +1167,54 @@ export type Database = {
           trust_score: number | null
           updated_at: string | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      api_keys_safe: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string | null
+          last_used_at: string | null
+          name: string | null
+          prefix: string | null
+          rate_limit_per_day: number | null
+          rate_limit_per_minute: number | null
+          scopes: string[] | null
+          status: string | null
+          total_requests: number | null
+          usage_notification_sent_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string | null
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          scopes?: string[] | null
+          status?: string | null
+          total_requests?: number | null
+          usage_notification_sent_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string | null
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          scopes?: string[] | null
+          status?: string | null
+          total_requests?: number | null
+          usage_notification_sent_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
