@@ -55,6 +55,22 @@ const SoundMachine = () => {
                   hardware drum machines but enhanced with modern AI capabilities.
                 </p>
 
+                {/* Collaborative Project Info */}
+                <div className="p-4 rounded-lg bg-logo-green/5 border border-logo-green/20">
+                  <h3 className="font-mono text-sm font-medium mb-2 flex items-center gap-2 text-logo-green">
+                    <span className="inline-block w-2 h-2 rounded-full bg-logo-green" />
+                    Open Collaborative Project
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                    The Techno Dog Sound Engine is a <span className="text-foreground font-medium">collaborative project launched in January 2026</span> that 
+                    aims to build a powerful techno-focused instrument, <span className="text-foreground font-medium">free to use for the community</span>.
+                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    If you have skills and would like to contribute to this project, please get in touch. 
+                    We really need community support to make this happen. Thank you.
+                  </p>
+                </div>
+
                 {/* Live Demo */}
                 <div>
                   <h3 className="font-mono text-sm font-medium mb-3 flex items-center gap-2">
