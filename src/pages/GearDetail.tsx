@@ -4,6 +4,7 @@ import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
 import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import GearYouTubeVideos from "@/components/GearYouTubeVideos";
+import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 
 const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -116,26 +117,50 @@ const GearDetail = () => {
           </div>
 
           {/* Hero Section - Responsive Grid */}
+          <GlitchSVGFilter />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12">
-            {/* Gear Image with Attribution or Placeholder */}
-            <div className="relative">
-              <a 
-                href={gearItem.image?.sourceUrl || gearItem.officialUrl || '#'}
-                target={gearItem.image?.sourceUrl || gearItem.officialUrl ? '_blank' : undefined}
-                rel="noopener noreferrer"
-                className={`aspect-square sm:aspect-[4/3] lg:aspect-square relative overflow-hidden border border-border bg-card/30 group flex items-center justify-center block ${(gearItem.image?.sourceUrl || gearItem.officialUrl) ? 'cursor-pointer' : 'cursor-default'}`}
-              >
-                {gearItem.image ? (
-                  <>
-                    <img 
-                      src={gearItem.image.url} 
-                      alt={gearItem.name}
-                      className="w-full h-full object-contain p-4 sm:p-6"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
-                  </>
-                ) : (
+            {/* Gear Image with VHS Film Filter */}
+            <div className="relative group">
+              {gearItem.image ? (
+                <a 
+                  href={gearItem.image.sourceUrl || gearItem.officialUrl || '#'}
+                  target={gearItem.image.sourceUrl || gearItem.officialUrl ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <GlitchImage
+                    src={gearItem.image.url}
+                    alt={gearItem.name}
+                    frameNumber={String(currentIndex + 1).padStart(2, '0')}
+                    className="w-full"
+                  />
+                  
+                  {/* Source indicator overlay */}
+                  <div className="absolute top-6 right-6 z-30 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="bg-background/90 border border-crimson/30 px-2 sm:px-3 py-1 flex items-center gap-2">
+                      <ExternalLink className="w-3 h-3 text-crimson" />
+                      <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+                        {gearItem.image.sourceName}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Tags overlay */}
+                  <div className="absolute bottom-6 left-6 right-6 z-30">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {gearItem.tags.slice(0, 5).map(tag => (
+                        <span
+                          key={tag}
+                          className="font-mono text-[10px] sm:text-xs bg-background/90 border border-crimson/30 px-1.5 sm:px-2 py-0.5 sm:py-1 text-muted-foreground"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </a>
+              ) : (
+                <div className="aspect-square relative overflow-hidden border border-border bg-card/30 flex items-center justify-center">
                   <div className="text-center p-8">
                     <Sliders className="w-20 h-20 sm:w-28 sm:h-28 mx-auto mb-6 text-muted-foreground/30" />
                     <h2 className="font-mono text-lg sm:text-xl uppercase tracking-tight mb-2 text-muted-foreground">
@@ -145,34 +170,21 @@ const GearDetail = () => {
                       {gearItem.manufacturer} • {gearItem.releaseYear}
                     </p>
                   </div>
-                )}
-                
-                {/* Source indicator */}
-                {(gearItem.image?.sourceUrl || gearItem.officialUrl) && (
-                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-background/90 border border-border px-2 sm:px-3 py-1 flex items-center gap-2">
-                      <ExternalLink className="w-3 h-3" />
-                      <span className="font-mono text-[10px] sm:text-xs hidden sm:inline">
-                        {gearItem.image ? gearItem.image.sourceName : 'View Official'}
-                      </span>
+                  {/* Tags for no-image state */}
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                      {gearItem.tags.slice(0, 5).map(tag => (
+                        <span
+                          key={tag}
+                          className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                )}
-                
-                {/* Tags */}
-                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4">
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {gearItem.tags.slice(0, 5).map(tag => (
-                      <span
-                        key={tag}
-                        className="font-mono text-[10px] sm:text-xs bg-background/90 border border-border px-1.5 sm:px-2 py-0.5 sm:py-1"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                 </div>
-              </a>
+              )}
               
               {/* Image Attribution */}
               {gearItem.image && (
