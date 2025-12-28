@@ -135,12 +135,16 @@ const FestivalsPage = () => {
                 </div>
               ))
             ) : (
-              featured.map((festival) => (
+              featured.map((festival, index) => (
                 <Link
                   key={festival.id}
                   to={`/festivals/${festival.id}`}
                   onMouseEnter={() => prefetchFestival(festival.id)}
-                  className="group block border border-border p-6 hover:bg-card transition-colors"
+                  className="group block border border-border p-6 hover:bg-card transition-colors animate-fade-in opacity-0"
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    animationFillMode: 'forwards',
+                  }}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
@@ -227,9 +231,11 @@ const FestivalsPage = () => {
                           onMouseEnter={() => prefetchFestival(festival.id)}
                           data-index={virtualRow.index}
                           ref={rowVirtualizer.measureElement}
-                          className="group absolute left-0 right-0 flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4"
+                          className="group absolute left-0 right-0 flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4 animate-fade-in opacity-0"
                           style={{
                             transform: `translateY(${virtualRow.start}px)`,
+                            animationDelay: `${Math.min(virtualRow.index * 50, 500)}ms`,
+                            animationFillMode: 'forwards',
                           }}
                         >
                           <div className="flex items-center gap-6">
