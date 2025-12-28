@@ -1,32 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getEnv, getRequiredEnv } from "../_shared/supabase.ts";
 
 // Rate limiting configuration
-const RATE_LIMIT_MAX_REQUESTS = 10; // Max 10 requests per minute per IP
+const RATE_LIMIT_MAX_REQUESTS = 10;
 const RATE_LIMIT_ENDPOINT = 'rag-chat';
 
 // Get client IP from request headers
 function getClientIP(req: Request): string {
-  // Check common proxy headers
   const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    return forwardedFor.split(',')[0].trim();
-  }
+  if (forwardedFor) return forwardedFor.split(',')[0].trim();
   
   const realIP = req.headers.get('x-real-ip');
-  if (realIP) {
-    return realIP.trim();
-  }
+  if (realIP) return realIP.trim();
   
   const cfConnectingIP = req.headers.get('cf-connecting-ip');
-  if (cfConnectingIP) {
-    return cfConnectingIP.trim();
-  }
+  if (cfConnectingIP) return cfConnectingIP.trim();
   
   return 'unknown';
 }
@@ -133,37 +122,27 @@ function formatArtistContext(artist: {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
-  // Get Supabase credentials for rate limiting
-  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-  const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const SUPABASE_URL = getRequiredEnv('SUPABASE_URL');
+  const SUPABASE_SERVICE_ROLE_KEY = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY');
 
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    return new Response(JSON.stringify({ error: 'Server configuration error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  // Check for admin bypass - admins skip rate limiting
+  // Check for admin bypass
   let isAdmin = false;
   const authHeader = req.headers.get('Authorization');
   
   if (authHeader?.startsWith('Bearer ')) {
     try {
-      // Check if user is authenticated and is an admin
       const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/has_role`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
+          'apikey': getEnv('SUPABASE_ANON_KEY', ''),
           'Authorization': authHeader
         },
         body: JSON.stringify({
-          _user_id: null, // Will use auth.uid() in the function
+          _user_id: null,
           _role: 'admin'
         })
       });
@@ -171,17 +150,14 @@ serve(async (req) => {
       if (response.ok) {
         const result = await response.json();
         isAdmin = result === true;
-        if (isAdmin) {
-          console.log('Admin user detected - bypassing rate limit');
-        }
+        if (isAdmin) console.log('Admin user detected - bypassing rate limit');
       }
     } catch (err) {
       console.error('Admin check failed:', err);
-      // Continue with rate limiting if admin check fails
     }
   }
 
-  // Apply persistent IP-based rate limiting (skip for admins)
+  // Apply persistent IP-based rate limiting
   const clientIP = getClientIP(req);
   let rateLimit = { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
   
@@ -224,24 +200,16 @@ serve(async (req) => {
       throw new Error('Query is required');
     }
     
-    // Security: Limit query length to prevent resource exhaustion
     if (query.length > 2000) {
-      return new Response(JSON.stringify({ error: 'Query exceeds maximum length of 2000 characters' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('Query exceeds maximum length of 2000 characters', 400);
     }
     
     const sanitizedQuery = query.trim().slice(0, 2000);
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = getRequiredEnv('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = getEnv('OPENAI_API_KEY');
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
-    }
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createServiceClient();
 
     let documents: Array<{ title: string; content: string; source?: string; similarity?: number }> | null = null;
     let artists: Array<{
@@ -257,7 +225,7 @@ serve(async (req) => {
       similarity: number;
     }> | null = null;
 
-    // Generate embedding for vector searches using OpenAI
+    // Generate embedding for vector searches
     console.log('Generating embedding for query:', sanitizedQuery);
     const queryEmbedding = OPENAI_API_KEY ? await generateEmbedding(sanitizedQuery, OPENAI_API_KEY) : null;
 
@@ -295,7 +263,7 @@ serve(async (req) => {
       }
     }
 
-    // Fallback to full-text search for documents if vector search didn't work
+    // Fallback to full-text search
     if (!documents || documents.length === 0) {
       console.log('Falling back to full-text search for:', sanitizedQuery);
       
@@ -318,7 +286,7 @@ serve(async (req) => {
       }
     }
 
-    // Final fallback: get recent documents
+    // Final fallback
     if (!documents || documents.length === 0) {
       console.log('Using fallback: fetching recent documents');
       const { data: fallbackDocs } = await supabase
@@ -332,13 +300,12 @@ serve(async (req) => {
 
     console.log(`Total documents for context: ${documents?.length || 0}, artists: ${artists?.length || 0}`);
 
-    // Build context from retrieved artists
+    // Build context
     let artistContext = '';
     if (artists && artists.length > 0) {
       artistContext = '## DJ ARTISTS DATABASE:\n\n' + artists.map(formatArtistContext).join('\n\n---\n\n');
     }
 
-    // Build context from retrieved documents
     let documentContext = '';
     const usedDocs = documents || [];
     
@@ -350,10 +317,8 @@ serve(async (req) => {
         .join('\n\n---\n\n');
     }
 
-    // Combine contexts
     const combinedContext = [artistContext, documentContext].filter(Boolean).join('\n\n');
 
-    // Create the RAG prompt - techno-focused based on the knowledge base
     const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene from Detroit to Berlin to Tokyo. 
 
 IMPORTANT: You MUST always respond in English, regardless of the language of the user's question. All responses must be in English only.
@@ -377,7 +342,6 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
 
     console.log('Calling Lovable AI with model: google/gemini-2.5-flash');
 
-    // Generate response with Lovable AI
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -400,22 +364,15 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
       console.error('Lovable AI error:', aiResponse.status, errText);
       
       if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return errorResponse('Rate limit exceeded. Please try again later.', 429);
       }
       if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return errorResponse('AI credits exhausted. Please add credits to continue.', 402);
       }
       throw new Error(`AI API request failed: ${errText}`);
     }
 
     if (stream) {
-      // Create a new stream that prepends artist metadata
       const artistMeta = artists?.map(a => ({
         name: a.artist_name,
         rank: a.rank,
@@ -428,13 +385,10 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
       const metaEncoder = new TextEncoder();
       const metaBytes = metaEncoder.encode(metaEvent);
       
-      // Combine metadata with AI response stream
       const combinedStream = new ReadableStream({
         async start(controller) {
-          // Send metadata first
           controller.enqueue(metaBytes);
           
-          // Then pipe the AI response
           const reader = aiResponse.body!.getReader();
           try {
             while (true) {
@@ -453,20 +407,15 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
       });
     } else {
       const data = await aiResponse.json();
-      return new Response(JSON.stringify({
+      return jsonResponse({
         answer: data.choices?.[0]?.message?.content,
         sources: usedDocs.map((d) => ({ title: d.title, source: d.source })),
         artists: artists?.map(a => ({ name: a.artist_name, rank: a.rank })) || []
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
   } catch (error: unknown) {
     console.error('Error in rag-chat:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(message);
   }
 });

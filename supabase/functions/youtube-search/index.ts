@@ -1,31 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { artistName, maxResults = 6 } = await req.json();
     
     if (!artistName) {
-      return new Response(
-        JSON.stringify({ error: 'Artist name is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('Artist name is required', 400);
     }
 
-    // Initialize Supabase client with service role for cache operations
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createServiceClient();
 
     // Check cache first
     const normalizedName = artistName.toLowerCase().trim();
@@ -39,10 +28,7 @@ serve(async (req) => {
       const expiresAt = new Date(cachedResult.expires_at);
       if (expiresAt > new Date()) {
         console.log(`Cache hit for ${artistName}`);
-        return new Response(
-          JSON.stringify({ videos: cachedResult.videos, cached: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return jsonResponse({ videos: cachedResult.videos, cached: true });
       } else {
         console.log(`Cache expired for ${artistName}`);
       }
@@ -53,10 +39,7 @@ serve(async (req) => {
     const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY');
     if (!YOUTUBE_API_KEY) {
       console.error('YOUTUBE_API_KEY is not configured');
-      return new Response(
-        JSON.stringify({ error: 'YouTube API key not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('YouTube API key not configured', 500);
     }
 
     // Search for techno DJ sets and live performances
@@ -118,16 +101,10 @@ serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({ videos, cached: false }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse({ videos, cached: false });
 
   } catch (error) {
     console.error('Error in youtube-search function:', error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error');
   }
 });

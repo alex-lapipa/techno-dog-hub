@@ -1,12 +1,9 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, createAnonClient, getRequiredEnv, getEnv } from "../_shared/supabase.ts";
 
 declare const EdgeRuntime: {
   waitUntil: (promise: Promise<unknown>) => void;
-};
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface HealthCheck {
@@ -410,16 +407,14 @@ async function resolveHealthAlerts(
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+    const anonKey = getRequiredEnv("SUPABASE_ANON_KEY");
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createServiceClient();
 
     // Check if notifications should be sent (query param)
     const url = new URL(req.url);
@@ -491,22 +486,14 @@ Deno.serve(async (req: Request) => {
       apiEndpoints: apiEndpointResults,
     };
 
-    return new Response(JSON.stringify(health), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse(health);
   } catch (e: unknown) {
     const error = e as Error;
     console.error("Health check error:", error);
-    return new Response(
-      JSON.stringify({
-        overall: "down",
-        timestamp: new Date().toISOString(),
-        error: error.message,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return jsonResponse({
+      overall: "down",
+      timestamp: new Date().toISOString(),
+      error: error.message,
+    }, 500);
   }
 });

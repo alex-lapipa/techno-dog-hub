@@ -1,11 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
 
 // Generate embedding using OpenAI
 async function generateEmbedding(text: string, openaiKey: string): Promise<number[]> {
@@ -32,31 +28,22 @@ async function generateEmbedding(text: string, openaiKey: string): Promise<numbe
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const openaiKey = Deno.env.get('OPENAI_API_KEY');
 
   if (!openaiKey) {
-    return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse('OPENAI_API_KEY not configured', 500);
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createServiceClient();
 
   try {
     const { query, matchCount = 5, threshold = 0.5 } = await req.json();
 
     if (!query || typeof query !== 'string') {
-      return new Response(JSON.stringify({ error: 'query string required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('query string required', 400);
     }
 
     console.log(`Searching for: "${query}"`);
@@ -78,22 +65,15 @@ serve(async (req) => {
 
     console.log(`Found ${data?.length || 0} matching artists`);
 
-    return new Response(JSON.stringify({
+    return jsonResponse({
       success: true,
       query,
       results: data || [],
       count: data?.length || 0,
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Search error:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(error instanceof Error ? error.message : 'Unknown error');
   }
 });

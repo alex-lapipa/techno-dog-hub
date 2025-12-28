@@ -1,37 +1,27 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { getRequiredEnv } from "../_shared/supabase.ts";
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { text } = await req.json();
     
     if (!text || typeof text !== 'string') {
-      throw new Error('Text is required');
+      return errorResponse('Text is required', 400);
     }
     
     // Security: Limit text length to prevent resource exhaustion
     if (text.length > 10000) {
-      return new Response(JSON.stringify({ error: 'Text exceeds maximum length of 10000 characters' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('Text exceeds maximum length of 10000 characters', 400);
     }
     
     const sanitizedText = text.trim().slice(0, 10000);
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured');
-    }
+    const OPENAI_API_KEY = getRequiredEnv('OPENAI_API_KEY');
 
     console.log('Generating embedding for text of length:', sanitizedText.length);
 
@@ -53,10 +43,7 @@ serve(async (req) => {
       console.error('OpenAI Embedding API error:', response.status, errorText);
       
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return errorResponse('Rate limit exceeded', 429);
       }
       
       throw new Error(`Embedding generation failed: ${errorText}`);
@@ -71,15 +58,10 @@ serve(async (req) => {
 
     console.log('Generated embedding with', embedding.length, 'dimensions');
 
-    return new Response(JSON.stringify({ embedding }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ embedding });
   } catch (error: unknown) {
     console.error('Error in generate-embedding:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(message);
   }
 });
