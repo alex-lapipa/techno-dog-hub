@@ -160,9 +160,9 @@ async function synthesizeArtist(
     throw new Error(`Artist not found: ${artistId}`);
   }
   
-  // Get verified claims
-  const statuses = ['verified'];
-  if (includePartial) statuses.push('partially_verified');
+  // Get claims - verified first, then unverified if includePartial
+  const statuses = ['verified', 'partially_verified'];
+  if (includePartial) statuses.push('unverified');
   
   const { data: claims } = await supabase
     .from('artist_claims')
@@ -172,11 +172,13 @@ async function synthesizeArtist(
       claim_text,
       value_structured,
       confidence_score,
+      verification_status,
       artist_sources(url, domain)
     `)
     .eq('artist_id', artistId)
     .in('verification_status', statuses)
-    .order('confidence_score', { ascending: false });
+    .order('confidence_score', { ascending: false })
+    .limit(100); // Limit to avoid token overflow
   
   if (!claims?.length) {
     // Return basic profile from canonical data
