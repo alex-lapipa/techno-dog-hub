@@ -4,6 +4,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Radio, Waves, Zap, Code, Music, Sliders, Users, TestTube, FileText, Rocket } from "lucide-react";
 import tdogStudioPreview from "@/assets/tdog-studio-preview.png";
+import ContributorContactForm from "@/components/ContributorContactForm";
 
 const SoundMachine = () => {
   return (
@@ -265,6 +266,9 @@ const SoundMachine = () => {
                     Built in public. Free to use. Open forever.
                   </p>
                 </div>
+
+                {/* Contributor Contact Form */}
+                <ContributorContactForm />
 
                 {/* Features */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
