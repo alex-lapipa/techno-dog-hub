@@ -1,6 +1,7 @@
 // AI-Powered Artist Research - Multi-Model Knowledge Generation
-// Uses Lovable AI, Anthropic, and OpenAI to generate verified artist knowledge
-// No Firecrawl dependency - pure AI knowledge synthesis
+// ZERO TOLERANCE HALLUCINATION POLICY
+// Uses Lovable AI, Anthropic, and OpenAI with strict cross-validation
+// Only facts confirmed by 2+ models are accepted
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
@@ -11,7 +12,7 @@ const corsHeaders = {
 };
 
 interface ResearchRequest {
-  action: 'research_artist' | 'research_batch' | 'generate_claims' | 'full_pipeline' | 'status';
+  action: 'research_artist' | 'research_batch' | 'full_pipeline' | 'verify_claims' | 'audit' | 'status';
   artist_id?: string;
   artist_name?: string;
   limit?: number;
@@ -22,55 +23,56 @@ interface ClaimResult {
   claim_text: string;
   value_structured?: Record<string, unknown>;
   confidence_score: number;
-  source_model: string;
+  source_models: string[];
+  model_agreement: number;
 }
 
-const CLAIM_TYPES = [
-  'bio_fact', 'birthplace', 'birth_date', 'real_name',
-  'release', 'album', 'track', 'remix',
-  'label', 'label_founder',
-  'genre', 'subgenre', 'style',
-  'influence', 'influenced_by',
-  'collaborator', 'collaboration',
-  'award', 'achievement', 'milestone',
-  'touring', 'residency', 'festival',
-  'equipment', 'gear', 'technique',
-  'education', 'career_start',
-  'alias', 'side_project',
-  'quote', 'philosophy'
-];
+// STRICT RESEARCH PROMPT - Zero tolerance for speculation
+const RESEARCH_PROMPT = `You are a meticulous electronic music archivist. Your ONLY job is to provide VERIFIED FACTS.
 
-const RESEARCH_PROMPT = `You are an expert electronic music historian and journalist specializing in techno, house, and underground electronic music.
+ZERO TOLERANCE POLICY:
+- ONLY include information you are 100% certain about
+- If you have ANY doubt, DO NOT include it
+- Better to return less data than include speculation
+- No guessing dates, locations, or relationships
+- Cross-reference your knowledge carefully
 
-Research and provide comprehensive, FACTUAL information about the artist. Focus on:
+For the techno/electronic artist, provide ONLY verified facts:
 
-1. **Biography**: Real name, birth year/date, birthplace, nationality
-2. **Career**: When they started, breakthrough moment, key career phases
-3. **Discography**: Notable albums, EPs, singles with release years and labels
-4. **Labels**: Labels they've released on, labels they founded/run
-5. **Style**: Musical style, subgenres, production techniques, signature sound
-6. **Influences**: Artists who influenced them, artists they've influenced
-7. **Collaborations**: Key collaborators, side projects, aliases
-8. **Achievements**: Awards, milestones, residencies, notable festival appearances
-9. **Equipment**: Known gear, instruments, production setup
-10. **Philosophy**: Artistic philosophy, notable quotes about music
+1. **Real Name**: Only if publicly confirmed
+2. **Birth Year**: Only if publicly documented (not estimated)
+3. **Birthplace**: City and country, only if confirmed
+4. **Labels**: Only labels where they DEFINITELY released music
+5. **Key Releases**: Only albums/EPs you're certain about with correct years
+6. **Collaborators**: Only confirmed collaborations
+7. **Style**: Their actual musical style description
 
-CRITICAL RULES:
-- Only include VERIFIED, FACTUAL information you are confident about
-- If uncertain about something, don't include it
-- Include specific dates, names, and details where known
-- Focus on electronic/techno music context
-- Do NOT confuse with other artists with similar names
-- Be specific about the underground techno/electronic music scene
+CRITICAL DISAMBIGUATION:
+- Ensure you have the correct artist - many have similar names
+- This is about TECHNO/ELECTRONIC music artists
+- Double-check before including any fact
 
-Return a comprehensive JSON object with structured data.`;
+Return ONLY a JSON object - no explanation text:
+{
+  "confidence_level": "high|medium|low",
+  "artist_name": "confirmed name",
+  "real_name": "only if certain",
+  "birth_year": "only if certain",
+  "birthplace": "only if certain", 
+  "nationality": "only if certain",
+  "labels": ["confirmed labels only"],
+  "notable_releases": [{"title": "name", "year": 2000, "label": "label"}],
+  "style_description": "factual style description",
+  "collaborators": ["confirmed only"],
+  "aliases": ["confirmed only"]
+}
+
+If you're not confident about this artist, return:
+{"confidence_level": "low", "error": "Insufficient verified information"}`;
 
 async function callLovableAI(prompt: string, model = 'google/gemini-2.5-flash'): Promise<{ content: string; model: string } | null> {
   const apiKey = Deno.env.get('LOVABLE_API_KEY');
-  if (!apiKey) {
-    console.error('LOVABLE_API_KEY not configured');
-    return null;
-  }
+  if (!apiKey) return null;
 
   try {
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -85,33 +87,27 @@ async function callLovableAI(prompt: string, model = 'google/gemini-2.5-flash'):
           { role: 'system', content: RESEARCH_PROMPT },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.3,
-        max_tokens: 4000,
+        temperature: 0.1,
+        max_tokens: 3000,
       }),
     });
 
     if (!response.ok) {
-      console.error('Lovable AI error:', response.status, await response.text());
+      console.error(`${model} error:`, response.status);
       return null;
     }
 
     const data = await response.json();
-    return {
-      content: data.choices?.[0]?.message?.content || '',
-      model
-    };
+    return { content: data.choices?.[0]?.message?.content || '', model };
   } catch (error) {
-    console.error('Lovable AI call failed:', error);
+    console.error(`${model} call failed:`, error);
     return null;
   }
 }
 
 async function callAnthropic(prompt: string): Promise<{ content: string; model: string } | null> {
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
-  if (!apiKey) {
-    console.log('ANTHROPIC_API_KEY not configured, skipping');
-    return null;
-  }
+  if (!apiKey) return null;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -123,357 +119,315 @@ async function callAnthropic(prompt: string): Promise<{ content: string; model: 
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
+        max_tokens: 3000,
         system: RESEARCH_PROMPT,
         messages: [{ role: 'user', content: prompt }]
       }),
     });
 
-    if (!response.ok) {
-      console.error('Anthropic error:', response.status);
-      return null;
-    }
-
+    if (!response.ok) return null;
     const data = await response.json();
-    return {
-      content: data.content?.[0]?.text || '',
-      model: 'claude-sonnet-4-20250514'
-    };
-  } catch (error) {
-    console.error('Anthropic call failed:', error);
-    return null;
-  }
-}
-
-async function callOpenAI(prompt: string): Promise<{ content: string; model: string } | null> {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!apiKey) {
-    console.log('OPENAI_API_KEY not configured, skipping');
-    return null;
-  }
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: RESEARCH_PROMPT },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 4000,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('OpenAI error:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    return {
-      content: data.choices?.[0]?.message?.content || '',
-      model: 'gpt-4o'
-    };
-  } catch (error) {
-    console.error('OpenAI call failed:', error);
+    return { content: data.content?.[0]?.text || '', model: 'claude-sonnet-4' };
+  } catch {
     return null;
   }
 }
 
 function extractJSON(text: string): Record<string, unknown> | null {
   try {
-    // Try direct parse
     return JSON.parse(text);
   } catch {
-    // Try to extract from markdown code block
     const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
     if (jsonMatch) {
-      try {
-        return JSON.parse(jsonMatch[1]);
-      } catch {
-        // Continue to next attempt
-      }
+      try { return JSON.parse(jsonMatch[1]); } catch { /* continue */ }
     }
-    // Try to find JSON object in text
     const objMatch = text.match(/\{[\s\S]*\}/);
     if (objMatch) {
-      try {
-        return JSON.parse(objMatch[0]);
-      } catch {
-        // Continue
-      }
+      try { return JSON.parse(objMatch[0]); } catch { /* continue */ }
     }
     return null;
   }
 }
 
-function extractClaimsFromResearch(research: Record<string, unknown>, sourceModel: string): ClaimResult[] {
+// Cross-validate facts between model responses
+function crossValidateFacts(responses: Array<{ data: Record<string, unknown>; model: string }>): ClaimResult[] {
   const claims: ClaimResult[] = [];
+  const factMap = new Map<string, { value: unknown; models: string[]; type: string }>();
   
-  // Helper to add claim
-  const addClaim = (type: string, text: string, structured?: Record<string, unknown>, confidence = 0.8) => {
-    if (text && text.length > 5) {
-      claims.push({
-        claim_type: type,
-        claim_text: text.slice(0, 500),
-        value_structured: structured,
-        confidence_score: confidence,
-        source_model: sourceModel
-      });
+  for (const { data, model } of responses) {
+    if (data.confidence_level === 'low' || data.error) continue;
+    
+    if (data.real_name && typeof data.real_name === 'string') {
+      const key = `real_name:${data.real_name.toLowerCase().trim()}`;
+      if (!factMap.has(key)) factMap.set(key, { value: data.real_name, models: [], type: 'real_name' });
+      factMap.get(key)!.models.push(model);
     }
-  };
-  
-  // Extract biography claims
-  if (research.real_name) addClaim('real_name', `Real name is ${research.real_name}`, { real_name: research.real_name }, 0.9);
-  if (research.birth_year) addClaim('birth_date', `Born in ${research.birth_year}`, { year: research.birth_year }, 0.85);
-  if (research.birthplace) addClaim('birthplace', `Born in ${research.birthplace}`, { location: research.birthplace }, 0.85);
-  if (research.nationality) addClaim('bio_fact', `Nationality: ${research.nationality}`, { nationality: research.nationality }, 0.9);
-  
-  // Career facts
-  if (research.career_start) addClaim('career_start', `Career began ${research.career_start}`, { year: research.career_start }, 0.8);
-  if (research.breakthrough) addClaim('milestone', `${research.breakthrough}`, undefined, 0.75);
-  
-  // Labels
-  const labels = research.labels as string[] || [];
-  labels.forEach((label: string) => {
-    addClaim('label', `Released music on ${label}`, { label_name: label }, 0.85);
-  });
-  
-  if (research.founded_labels) {
-    const founded = research.founded_labels as string[] || [];
-    founded.forEach((label: string) => {
-      addClaim('label_founder', `Founded/co-founded ${label}`, { label_name: label }, 0.9);
-    });
+    
+    if (data.birth_year) {
+      const year = String(data.birth_year).replace(/[^0-9]/g, '').slice(0, 4);
+      if (year.length === 4) {
+        const key = `birth_year:${year}`;
+        if (!factMap.has(key)) factMap.set(key, { value: year, models: [], type: 'birth_date' });
+        factMap.get(key)!.models.push(model);
+      }
+    }
+    
+    if (data.birthplace && typeof data.birthplace === 'string') {
+      const normalized = data.birthplace.toLowerCase().trim();
+      const key = `birthplace:${normalized}`;
+      if (!factMap.has(key)) factMap.set(key, { value: data.birthplace, models: [], type: 'birthplace' });
+      factMap.get(key)!.models.push(model);
+    }
+    
+    if (data.nationality && typeof data.nationality === 'string') {
+      const normalized = data.nationality.toLowerCase().trim();
+      const key = `nationality:${normalized}`;
+      if (!factMap.has(key)) factMap.set(key, { value: data.nationality, models: [], type: 'bio_fact' });
+      factMap.get(key)!.models.push(model);
+    }
+    
+    const labels = data.labels as string[] || [];
+    for (const label of labels) {
+      if (typeof label === 'string' && label.length > 1) {
+        const normalized = label.toLowerCase().trim();
+        const key = `label:${normalized}`;
+        if (!factMap.has(key)) factMap.set(key, { value: label, models: [], type: 'label' });
+        factMap.get(key)!.models.push(model);
+      }
+    }
+    
+    const aliases = data.aliases as string[] || [];
+    for (const alias of aliases) {
+      if (typeof alias === 'string' && alias.length > 1) {
+        const normalized = alias.toLowerCase().trim();
+        const key = `alias:${normalized}`;
+        if (!factMap.has(key)) factMap.set(key, { value: alias, models: [], type: 'alias' });
+        factMap.get(key)!.models.push(model);
+      }
+    }
+    
+    const collabs = data.collaborators as string[] || [];
+    for (const collab of collabs) {
+      if (typeof collab === 'string' && collab.length > 1) {
+        const normalized = collab.toLowerCase().trim();
+        const key = `collaborator:${normalized}`;
+        if (!factMap.has(key)) factMap.set(key, { value: collab, models: [], type: 'collaborator' });
+        factMap.get(key)!.models.push(model);
+      }
+    }
+    
+    const releases = data.notable_releases as Array<Record<string, unknown>> || [];
+    for (const release of releases) {
+      if (release.title && release.year) {
+        const key = `release:${String(release.title).toLowerCase()}:${release.year}`;
+        if (!factMap.has(key)) factMap.set(key, { value: release, models: [], type: 'album' });
+        factMap.get(key)!.models.push(model);
+      }
+    }
+    
+    if (data.style_description && typeof data.style_description === 'string') {
+      const key = `style:general`;
+      if (!factMap.has(key)) factMap.set(key, { value: data.style_description, models: [], type: 'style' });
+      factMap.get(key)!.models.push(model);
+    }
   }
   
-  // Discography
-  const albums = research.notable_albums as Array<Record<string, unknown>> || research.albums as Array<Record<string, unknown>> || [];
-  albums.forEach((album: Record<string, unknown>) => {
-    const name = album.name || album.title;
-    const year = album.year;
-    const label = album.label;
-    if (name) {
-      addClaim('album', `Released album "${name}"${year ? ` (${year})` : ''}${label ? ` on ${label}` : ''}`, 
-        { title: name, year, label }, 0.85);
+  // ZERO TOLERANCE: Only accept facts confirmed by 2+ models
+  for (const [, fact] of factMap) {
+    const uniqueModels = [...new Set(fact.models)];
+    
+    if (uniqueModels.length >= 2) {
+      const confidence = Math.min(0.95, 0.7 + (uniqueModels.length * 0.1));
+      
+      let claimText = '';
+      let valueStructured: Record<string, unknown> = {};
+      
+      switch (fact.type) {
+        case 'real_name':
+          claimText = `Real name is ${fact.value}`;
+          valueStructured = { real_name: fact.value };
+          break;
+        case 'birth_date':
+          claimText = `Born in ${fact.value}`;
+          valueStructured = { year: fact.value };
+          break;
+        case 'birthplace':
+          claimText = `Born in ${fact.value}`;
+          valueStructured = { location: fact.value };
+          break;
+        case 'bio_fact':
+          claimText = `Nationality: ${fact.value}`;
+          valueStructured = { nationality: fact.value };
+          break;
+        case 'label':
+          claimText = `Released music on ${fact.value}`;
+          valueStructured = { label_name: fact.value };
+          break;
+        case 'alias':
+          claimText = `Also known as ${fact.value}`;
+          valueStructured = { alias: fact.value };
+          break;
+        case 'collaborator':
+          claimText = `Collaborated with ${fact.value}`;
+          valueStructured = { artist: fact.value };
+          break;
+        case 'album':
+          const rel = fact.value as Record<string, unknown>;
+          claimText = `Released "${rel.title}"${rel.year ? ` (${rel.year})` : ''}${rel.label ? ` on ${rel.label}` : ''}`;
+          valueStructured = rel;
+          break;
+        case 'style':
+          claimText = `Musical style: ${fact.value}`;
+          valueStructured = { style: fact.value };
+          break;
+      }
+      
+      if (claimText) {
+        claims.push({
+          claim_type: fact.type,
+          claim_text: claimText,
+          value_structured: valueStructured,
+          confidence_score: confidence,
+          source_models: uniqueModels,
+          model_agreement: uniqueModels.length
+        });
+      }
     }
-  });
-  
-  // Style and genre
-  if (research.style) addClaim('style', `Musical style: ${research.style}`, { style: research.style }, 0.8);
-  const subgenres = research.subgenres as string[] || [];
-  subgenres.forEach((sg: string) => {
-    addClaim('subgenre', `Associated with ${sg}`, { subgenre: sg }, 0.8);
-  });
-  
-  // Influences
-  const influences = research.influences as string[] || research.influenced_by as string[] || [];
-  influences.forEach((inf: string) => {
-    addClaim('influenced_by', `Influenced by ${inf}`, { artist: inf }, 0.75);
-  });
-  
-  // Collaborations
-  const collabs = research.collaborators as string[] || research.collaborations as string[] || [];
-  collabs.forEach((collab: string) => {
-    addClaim('collaborator', `Collaborated with ${collab}`, { artist: collab }, 0.8);
-  });
-  
-  // Aliases
-  const aliases = research.aliases as string[] || research.side_projects as string[] || [];
-  aliases.forEach((alias: string) => {
-    addClaim('alias', `Also known as ${alias}`, { alias }, 0.85);
-  });
-  
-  // Equipment
-  const gear = research.equipment as string[] || research.gear as string[] || [];
-  gear.forEach((g: string) => {
-    addClaim('equipment', `Uses ${g}`, { equipment: g }, 0.7);
-  });
-  
-  // Achievements
-  const achievements = research.achievements as string[] || research.milestones as string[] || [];
-  achievements.forEach((ach: string) => {
-    addClaim('achievement', ach, undefined, 0.75);
-  });
-  
-  // Philosophy/quotes
-  const quotes = research.notable_quotes as string[] || research.philosophy as string[] || [];
-  quotes.forEach((quote: string) => {
-    addClaim('quote', quote, undefined, 0.7);
-  });
-  
-  // Bio summary
-  if (research.bio_summary) addClaim('bio_fact', String(research.bio_summary).slice(0, 500), undefined, 0.8);
+  }
   
   return claims;
 }
 
-async function researchArtist(artistName: string, artistId: string, supabase: any): Promise<{
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function researchArtistStrict(artistName: string, artistId: string, supabase: any): Promise<{
   success: boolean;
   claims: ClaimResult[];
-  models_used: string[];
-  raw_responses: number;
+  models_queried: number;
+  models_responded: number;
+  verification_level: string;
 }> {
-  const prompt = `Research the electronic music artist "${artistName}" (techno/electronic music producer/DJ).
+  const prompt = `Provide ONLY verified facts about "${artistName}" (techno/electronic music artist).
 
-Provide comprehensive factual information in this JSON structure:
-{
-  "artist_name": "confirmed artist name",
-  "real_name": "their real name if known",
-  "birth_year": "year born",
-  "birthplace": "city, country",
-  "nationality": "nationality",
-  "career_start": "year or description",
-  "breakthrough": "breakthrough moment/release",
-  "labels": ["label1", "label2"],
-  "founded_labels": ["labels they founded"],
-  "notable_albums": [{"name": "album", "year": 2020, "label": "label"}],
-  "style": "musical style description",
-  "subgenres": ["techno", "industrial"],
-  "influences": ["artist1", "artist2"],
-  "influenced": ["artists they influenced"],
-  "collaborators": ["collaborator1"],
-  "aliases": ["alias1", "side_project1"],
-  "equipment": ["gear item1"],
-  "achievements": ["achievement1"],
-  "notable_quotes": ["quote about music/art"],
-  "bio_summary": "2-3 sentence biography"
-}
+Remember: ZERO TOLERANCE for speculation. Only include facts you are 100% certain about.
+If unsure, return {"confidence_level": "low", "error": "Insufficient verified information"}`;
 
-IMPORTANT: Only include verified facts. This is ${artistName} the TECHNO/ELECTRONIC music artist.`;
+  const responses: Array<{ data: Record<string, unknown>; model: string }> = [];
+  let modelsQueried = 0;
+  let modelsResponded = 0;
 
-  const allClaims: ClaimResult[] = [];
-  const modelsUsed: string[] = [];
-  let rawResponses = 0;
-
-  // Call multiple AI models in parallel
-  const [geminiResult, claudeResult, gptResult] = await Promise.allSettled([
+  const modelCalls = [
     callLovableAI(prompt, 'google/gemini-2.5-flash'),
     callAnthropic(prompt),
-    callLovableAI(prompt, 'openai/gpt-5-mini')
-  ]);
+    callLovableAI(prompt, 'openai/gpt-5-mini'),
+    callLovableAI(prompt, 'google/gemini-2.5-pro')
+  ];
 
-  // Process Gemini result
-  if (geminiResult.status === 'fulfilled' && geminiResult.value) {
-    const parsed = extractJSON(geminiResult.value.content);
-    if (parsed) {
-      const claims = extractClaimsFromResearch(parsed, 'gemini-2.5-flash');
-      allClaims.push(...claims);
-      modelsUsed.push('gemini-2.5-flash');
-      rawResponses++;
-      
-      // Store raw response
-      await supabase.from('artist_raw_documents').insert({
-        artist_id: artistId,
-        url: `ai://gemini/${artistName.toLowerCase().replace(/\s+/g, '-')}`,
-        domain: 'ai.gemini',
-        content_json: parsed,
-        content_text: geminiResult.value.content
-      });
+  modelsQueried = modelCalls.length;
+  const results = await Promise.allSettled(modelCalls);
+
+  for (const result of results) {
+    if (result.status === 'fulfilled' && result.value) {
+      const parsed = extractJSON(result.value.content);
+      if (parsed && parsed.confidence_level !== 'low' && !parsed.error) {
+        responses.push({ data: parsed, model: result.value.model });
+        modelsResponded++;
+        
+        try {
+          await supabase.from('artist_raw_documents').insert({
+            artist_id: artistId,
+            url: `ai-verified://${result.value.model}/${artistName.toLowerCase().replace(/\s+/g, '-')}/${Date.now()}`,
+            domain: `ai.${result.value.model.split('/').pop()}`,
+            content_json: parsed,
+            content_text: result.value.content
+          });
+        } catch (e) {
+          console.error('Raw doc insert error:', e);
+        }
+      }
     }
   }
 
-  // Process Claude result
-  if (claudeResult.status === 'fulfilled' && claudeResult.value) {
-    const parsed = extractJSON(claudeResult.value.content);
-    if (parsed) {
-      const claims = extractClaimsFromResearch(parsed, 'claude-sonnet-4');
-      allClaims.push(...claims);
-      modelsUsed.push('claude-sonnet-4');
-      rawResponses++;
-      
-      await supabase.from('artist_raw_documents').insert({
-        artist_id: artistId,
-        url: `ai://claude/${artistName.toLowerCase().replace(/\s+/g, '-')}`,
-        domain: 'ai.claude',
-        content_json: parsed,
-        content_text: claudeResult.value.content
-      });
-    }
+  const verifiedClaims = crossValidateFacts(responses);
+
+  let verificationLevel = 'unverified';
+  if (modelsResponded >= 3 && verifiedClaims.length > 0) {
+    verificationLevel = 'verified';
+  } else if (modelsResponded >= 2 && verifiedClaims.length > 0) {
+    verificationLevel = 'partially_verified';
   }
 
-  // Process GPT result
-  if (gptResult.status === 'fulfilled' && gptResult.value) {
-    const parsed = extractJSON(gptResult.value.content);
-    if (parsed) {
-      const claims = extractClaimsFromResearch(parsed, 'gpt-5-mini');
-      allClaims.push(...claims);
-      modelsUsed.push('gpt-5-mini');
-      rawResponses++;
-      
-      await supabase.from('artist_raw_documents').insert({
+  for (const claim of verifiedClaims) {
+    try {
+      await supabase.from('artist_claims').insert({
         artist_id: artistId,
-        url: `ai://openai/${artistName.toLowerCase().replace(/\s+/g, '-')}`,
-        domain: 'ai.openai',
-        content_json: parsed,
-        content_text: gptResult.value.content
+        claim_type: claim.claim_type,
+        claim_text: claim.claim_text,
+        value_structured: claim.value_structured,
+        confidence_score: claim.confidence_score,
+        verification_status: verificationLevel,
+        extraction_model: claim.source_models.join(','),
+        verification_model: `multi-model-${claim.model_agreement}`
       });
+    } catch (err) {
+      console.error('Claim insert error:', err);
     }
-  }
-
-  // Deduplicate and merge claims with confidence boosting for agreement
-  const mergedClaims = mergeClaims(allClaims);
-
-  // Store claims in database
-  for (const claim of mergedClaims) {
-    await supabase.from('artist_claims').insert({
-      artist_id: artistId,
-      claim_type: claim.claim_type,
-      claim_text: claim.claim_text,
-      value_structured: claim.value_structured,
-      confidence_score: claim.confidence_score,
-      verification_status: claim.confidence_score >= 0.85 ? 'verified' : 
-                          claim.confidence_score >= 0.7 ? 'partially_verified' : 'unverified',
-      extraction_model: claim.source_model
-    });
   }
 
   return {
-    success: modelsUsed.length > 0,
-    claims: mergedClaims,
-    models_used: modelsUsed,
-    raw_responses: rawResponses
+    success: verifiedClaims.length > 0,
+    claims: verifiedClaims,
+    models_queried: modelsQueried,
+    models_responded: modelsResponded,
+    verification_level: verificationLevel
   };
 }
 
-function mergeClaims(claims: ClaimResult[]): ClaimResult[] {
-  const claimMap = new Map<string, ClaimResult[]>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function synthesizeRAGDocument(artistId: string, artistName: string, supabase: any): Promise<boolean> {
+  const { data: claims } = await supabase
+    .from('artist_claims')
+    .select('claim_text, claim_type, confidence_score, verification_status')
+    .eq('artist_id', artistId)
+    .in('verification_status', ['verified', 'partially_verified'])
+    .gte('confidence_score', 0.75)
+    .order('confidence_score', { ascending: false })
+    .limit(50);
+
+  if (!claims?.length) {
+    console.log(`No verified claims for ${artistName}`);
+    return false;
+  }
+
+  const claimsArray = claims as Array<{ claim_type: string; claim_text: string }>;
+  const synthesisPrompt = `Create a factual artist profile for ${artistName} using ONLY these verified facts:
+
+${claimsArray.map(c => `- [${c.claim_type}] ${c.claim_text}`).join('\n')}
+
+Write a well-structured, encyclopedic document. Do not add any information not in the facts above.`;
+
+  const synthesis = await callLovableAI(synthesisPrompt, 'google/gemini-2.5-flash');
   
-  // Group similar claims
-  claims.forEach(claim => {
-    const key = `${claim.claim_type}:${claim.claim_text.toLowerCase().slice(0, 50)}`;
-    if (!claimMap.has(key)) {
-      claimMap.set(key, []);
-    }
-    claimMap.get(key)!.push(claim);
-  });
-  
-  // Merge and boost confidence for multi-model agreement
-  const merged: ClaimResult[] = [];
-  claimMap.forEach((group) => {
-    const best = group.reduce((a, b) => 
-      a.confidence_score > b.confidence_score ? a : b
-    );
-    
-    // Boost confidence if multiple models agree
-    const modelCount = new Set(group.map(c => c.source_model)).size;
-    if (modelCount >= 2) {
-      best.confidence_score = Math.min(0.95, best.confidence_score + 0.1);
-    }
-    if (modelCount >= 3) {
-      best.confidence_score = Math.min(0.98, best.confidence_score + 0.05);
-    }
-    
-    best.source_model = group.map(c => c.source_model).join(',');
-    merged.push(best);
-  });
-  
-  return merged;
+  if (synthesis) {
+    await supabase
+      .from('artist_documents')
+      .delete()
+      .eq('artist_id', artistId)
+      .eq('document_type', 'rag_synthesis');
+
+    await supabase.from('artist_documents').insert({
+      artist_id: artistId,
+      document_type: 'rag_synthesis',
+      title: `${artistName} - Verified Artist Profile`,
+      content: synthesis.content,
+      metadata: {
+        claims_used: claimsArray.length,
+        generated_at: new Date().toISOString(),
+        verification_policy: 'zero-tolerance'
+      }
+    });
+    return true;
+  }
+  return false;
 }
 
 serve(async (req) => {
@@ -487,20 +441,18 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body: ResearchRequest = await req.json();
-    const { action, artist_id, artist_name, limit = 5 } = body;
+    const { action, artist_id } = body;
 
-    console.log(`AI Artist Research - Action: ${action}`);
+    console.log(`[Zero-Tolerance Research] Action: ${action}`);
 
     switch (action) {
       case 'research_artist': {
         if (!artist_id) {
           return new Response(JSON.stringify({ success: false, error: 'artist_id required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
 
-        // Get artist name from canonical_artists
         const { data: artist } = await supabase
           .from('canonical_artists')
           .select('canonical_name')
@@ -509,53 +461,17 @@ serve(async (req) => {
 
         if (!artist) {
           return new Response(JSON.stringify({ success: false, error: 'Artist not found' }), {
-            status: 404,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
 
-        const result = await researchArtist(artist.canonical_name, artist_id, supabase);
+        const result = await researchArtistStrict(artist.canonical_name, artist_id, supabase);
 
         return new Response(JSON.stringify({
           artist_id,
           artist_name: artist.canonical_name,
+          policy: 'zero-tolerance',
           ...result
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      case 'research_batch': {
-        // Get artists without claims
-        const { data: artists } = await supabase
-          .from('canonical_artists')
-          .select('artist_id, canonical_name')
-          .order('rank', { ascending: true })
-          .limit(limit);
-
-        // Filter to those without claims
-        const results = [];
-        for (const artist of artists || []) {
-          const { count } = await supabase
-            .from('artist_claims')
-            .select('*', { count: 'exact', head: true })
-            .eq('artist_id', artist.artist_id);
-
-          if (count === 0) {
-            console.log(`Researching: ${artist.canonical_name}`);
-            const result = await researchArtist(artist.canonical_name, artist.artist_id, supabase);
-            results.push({
-              artist_id: artist.artist_id,
-              artist_name: artist.canonical_name,
-              ...result
-            });
-          }
-        }
-
-        return new Response(JSON.stringify({
-          success: true,
-          processed: results.length,
-          results
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -564,12 +480,10 @@ serve(async (req) => {
       case 'full_pipeline': {
         if (!artist_id) {
           return new Response(JSON.stringify({ success: false, error: 'artist_id required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
 
-        // Get artist
         const { data: artist } = await supabase
           .from('canonical_artists')
           .select('canonical_name')
@@ -578,46 +492,40 @@ serve(async (req) => {
 
         if (!artist) {
           return new Response(JSON.stringify({ success: false, error: 'Artist not found' }), {
-            status: 404,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
 
-        // Step 1: Research
-        console.log(`[Pipeline] Researching ${artist.canonical_name}...`);
-        const research = await researchArtist(artist.canonical_name, artist_id, supabase);
+        const research = await researchArtistStrict(artist.canonical_name, artist_id, supabase);
+        const ragGenerated = await synthesizeRAGDocument(artist_id, artist.canonical_name, supabase);
 
-        // Step 2: Synthesize RAG document
-        console.log(`[Pipeline] Synthesizing RAG doc...`);
-        const synthesisPrompt = `Based on these verified claims about ${artist.canonical_name}, write a comprehensive artist profile suitable for a techno music encyclopedia:
+        return new Response(JSON.stringify({
+          artist_id,
+          artist_name: artist.canonical_name,
+          policy: 'zero-tolerance',
+          research,
+          rag_generated: ragGenerated
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
 
-${research.claims.map(c => `- ${c.claim_text}`).join('\n')}
+      case 'audit': {
+        // Delete unverified and low-confidence claims
+        await supabase
+          .from('artist_claims')
+          .delete()
+          .or('confidence_score.lt.0.65,verification_status.eq.unverified');
 
-Write a well-structured document with sections for Biography, Discography, Musical Style, and Legacy. Use factual, encyclopedic tone.`;
-
-        const synthesis = await callLovableAI(synthesisPrompt, 'google/gemini-2.5-flash');
-        
-        if (synthesis) {
-          // Store RAG document
-          await supabase.from('artist_documents').insert({
-            artist_id,
-            document_type: 'rag_synthesis',
-            title: `${artist.canonical_name} - Artist Profile`,
-            content: synthesis.content,
-            metadata: {
-              models_used: research.models_used,
-              claims_count: research.claims.length,
-              generated_at: new Date().toISOString()
-            }
-          });
-        }
+        const { count: remainingClaims } = await supabase
+          .from('artist_claims')
+          .select('*', { count: 'exact', head: true });
 
         return new Response(JSON.stringify({
           success: true,
-          artist_id,
-          artist_name: artist.canonical_name,
-          research,
-          synthesis_generated: !!synthesis
+          action: 'audit',
+          remaining_claims: remainingClaims,
+          policy: 'zero-tolerance'
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -628,32 +536,29 @@ Write a well-structured document with sections for Biography, Discography, Music
           .from('canonical_artists')
           .select('*', { count: 'exact', head: true });
 
-        const { count: artistsWithClaims } = await supabase
-          .from('artist_claims')
-          .select('artist_id', { count: 'exact', head: true });
-
         const { count: totalClaims } = await supabase
           .from('artist_claims')
           .select('*', { count: 'exact', head: true });
+
+        const { count: verifiedClaims } = await supabase
+          .from('artist_claims')
+          .select('*', { count: 'exact', head: true })
+          .in('verification_status', ['verified', 'partially_verified']);
 
         const { count: ragDocs } = await supabase
           .from('artist_documents')
           .select('*', { count: 'exact', head: true })
           .eq('document_type', 'rag_synthesis');
 
-        const { count: aiDocs } = await supabase
-          .from('artist_raw_documents')
-          .select('*', { count: 'exact', head: true })
-          .like('domain', 'ai.%');
-
         return new Response(JSON.stringify({
           success: true,
+          policy: 'zero-tolerance',
           stats: {
             total_artists: totalArtists,
-            artists_with_claims: artistsWithClaims,
             total_claims: totalClaims,
+            verified_claims: verifiedClaims,
             rag_documents: ragDocs,
-            ai_generated_docs: aiDocs
+            verification_rate: totalClaims ? ((verifiedClaims || 0) / (totalClaims || 1) * 100).toFixed(1) + '%' : '0%'
           }
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -664,7 +569,7 @@ Write a well-structured document with sections for Biography, Discography, Music
         return new Response(JSON.stringify({ 
           success: false, 
           error: 'Invalid action',
-          valid_actions: ['research_artist', 'research_batch', 'full_pipeline', 'status']
+          valid_actions: ['research_artist', 'full_pipeline', 'audit', 'status']
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -672,7 +577,7 @@ Write a well-structured document with sections for Biography, Discography, Music
     }
 
   } catch (error) {
-    console.error('AI Artist Research error:', error);
+    console.error('Zero-Tolerance Research error:', error);
     return new Response(JSON.stringify({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
