@@ -1,31 +1,18 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, MapPin } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { loadVenuesSummary, loadVenueById } from "@/data/venues-loader";
+import { useVenues, usePrefetchVenue } from "@/hooks/useData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 const VenuesPage = () => {
-  const queryClient = useQueryClient();
   const parentRef = useRef<HTMLDivElement>(null);
   
-  const prefetchVenue = useCallback((id: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ['venue', id],
-      queryFn: () => loadVenueById(id),
-      staleTime: 1000 * 60 * 10,
-    });
-  }, [queryClient]);
-
-  const { data: venues = [], isLoading } = useQuery({
-    queryKey: ['venues-summary'],
-    queryFn: loadVenuesSummary,
-    staleTime: 1000 * 60 * 10,
-  });
+  const prefetchVenue = usePrefetchVenue();
+  const { data: venues = [], isLoading } = useVenues();
 
   // For grid layout, virtualize rows (2 items per row on larger screens)
   const rowCount = Math.ceil(venues.length / 2);

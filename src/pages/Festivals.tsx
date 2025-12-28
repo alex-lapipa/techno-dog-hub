@@ -1,34 +1,21 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { loadFestivalsSummary, loadFestivalById } from "@/data/festivals-loader";
+import { useFestivals, usePrefetchFestival } from "@/hooks/useData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useCallback, useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState } from "react";
 
 const FestivalsPage = () => {
-  const queryClient = useQueryClient();
   const directoryRef = useRef<HTMLDivElement>(null);
   
-  const prefetchFestival = useCallback((id: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ['festival', id],
-      queryFn: () => loadFestivalById(id),
-      staleTime: 1000 * 60 * 10,
-    });
-  }, [queryClient]);
-
+  const prefetchFestival = usePrefetchFestival();
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
 
-  const { data: festivals = [], isLoading } = useQuery({
-    queryKey: ['festivals-summary'],
-    queryFn: loadFestivalsSummary,
-    staleTime: 1000 * 60 * 10,
-  });
+  const { data: festivals = [], isLoading } = useFestivals();
 
   // Get unique countries sorted alphabetically
   const countries = useMemo(() => {
