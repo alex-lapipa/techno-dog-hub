@@ -270,7 +270,7 @@ async function generateRagDocs(
       // Generate embedding
       const embedding = await generateEmbedding(chunk);
       
-      // Store document chunk
+      // Store document chunk (chunk_id is auto-generated, don't include it)
       const { error } = await supabase
         .from('artist_documents')
         .insert({
@@ -278,7 +278,6 @@ async function generateRagDocs(
           document_type: doc.type,
           title: doc.title,
           content: chunk,
-          chunk_id: chunkId,
           chunk_index: i,
           embedding: embedding ? `[${embedding.join(',')}]` : null,
           source_system: 'enrichment_pipeline',
