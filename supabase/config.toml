@@ -138,3 +138,6 @@ verify_jwt = false
 
 [functions.launch-notification-email]
 verify_jwt = false
+
+[functions.tdog-upload]
+verify_jwt = false
