@@ -428,6 +428,250 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
     }
   }
 
+  // Media Assets Management
+  if (contentType === "media-assets") {
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "50");
+    const offset = parseInt(url.searchParams.get("offset") || "0");
+    const entityType = url.searchParams.get("entity_type") || "";
+    const entityId = url.searchParams.get("entity_id") || "";
+    const finalSelected = url.searchParams.get("final_selected");
+
+    if (method === "GET" && segments.length === 2) {
+      // List media assets with filters
+      let query = supabase
+        .from("media_assets")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (entityType) {
+        query = query.eq("entity_type", entityType);
+      }
+      if (entityId) {
+        query = query.eq("entity_id", entityId);
+      }
+      if (finalSelected !== null && finalSelected !== "") {
+        query = query.eq("final_selected", finalSelected === "true");
+      }
+
+      const { data, error } = await query.range(offset, offset + limit - 1);
+      
+      if (error) throw error;
+
+      // Get total count
+      let countQuery = supabase
+        .from("media_assets")
+        .select("*", { count: "exact", head: true });
+      
+      if (entityType) countQuery = countQuery.eq("entity_type", entityType);
+      if (entityId) countQuery = countQuery.eq("entity_id", entityId);
+      
+      const { count: totalCount } = await countQuery;
+
+      return { 
+        assets: data, 
+        count: data?.length || 0,
+        total: totalCount || 0,
+        offset,
+        limit,
+      };
+    }
+
+    if (method === "GET" && segments.length === 3) {
+      // Get specific media asset
+      const assetId = segments[2];
+      const { data, error } = await supabase
+        .from("media_assets")
+        .select("*")
+        .eq("id", assetId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Media asset not found");
+      return { asset: data };
+    }
+
+    if (method === "POST" && segments.length === 2) {
+      // Create new media asset
+      const body = await req.json();
+      
+      if (!body.entity_type || !body.entity_id || !body.entity_name) {
+        throw new Error("entity_type, entity_id, and entity_name are required");
+      }
+
+      const insertData = {
+        entity_type: body.entity_type,
+        entity_id: body.entity_id,
+        entity_name: body.entity_name,
+        source_url: body.source_url || null,
+        storage_url: body.storage_url || null,
+        storage_path: body.storage_path || null,
+        provider: body.provider || null,
+        license_status: body.license_status || "unknown",
+        license_name: body.license_name || null,
+        license_url: body.license_url || null,
+        copyright_risk: body.copyright_risk || "unknown",
+        alt_text: body.alt_text || null,
+        tags: body.tags || [],
+        meta: body.meta || {},
+        match_score: body.match_score || 0,
+        quality_score: body.quality_score || 0,
+        openai_verified: body.openai_verified || false,
+        final_selected: body.final_selected || false,
+        reasoning_summary: body.reasoning_summary || null,
+      };
+
+      const { data, error } = await supabase
+        .from("media_assets")
+        .insert(insertData)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      return { created: true, asset: data };
+    }
+
+    if (method === "PATCH" && segments.length === 3) {
+      // Update media asset
+      const assetId = segments[2];
+      const body = await req.json();
+      
+      const updates: Record<string, any> = {};
+      if (body.source_url !== undefined) updates.source_url = body.source_url;
+      if (body.storage_url !== undefined) updates.storage_url = body.storage_url;
+      if (body.storage_path !== undefined) updates.storage_path = body.storage_path;
+      if (body.provider !== undefined) updates.provider = body.provider;
+      if (body.license_status !== undefined) updates.license_status = body.license_status;
+      if (body.license_name !== undefined) updates.license_name = body.license_name;
+      if (body.license_url !== undefined) updates.license_url = body.license_url;
+      if (body.copyright_risk !== undefined) updates.copyright_risk = body.copyright_risk;
+      if (body.alt_text !== undefined) updates.alt_text = body.alt_text;
+      if (body.tags !== undefined) updates.tags = body.tags;
+      if (body.meta !== undefined) updates.meta = body.meta;
+      if (body.match_score !== undefined) updates.match_score = body.match_score;
+      if (body.quality_score !== undefined) updates.quality_score = body.quality_score;
+      if (body.openai_verified !== undefined) updates.openai_verified = body.openai_verified;
+      if (body.final_selected !== undefined) updates.final_selected = body.final_selected;
+      if (body.reasoning_summary !== undefined) updates.reasoning_summary = body.reasoning_summary;
+      
+      updates.updated_at = new Date().toISOString();
+
+      const { data, error } = await supabase
+        .from("media_assets")
+        .update(updates)
+        .eq("id", assetId)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Media asset not found");
+      return { updated: true, asset: data };
+    }
+
+    if (method === "DELETE" && segments.length === 3) {
+      // Delete media asset
+      const assetId = segments[2];
+      
+      const { data: existing } = await supabase
+        .from("media_assets")
+        .select("id, entity_name, storage_path")
+        .eq("id", assetId)
+        .maybeSingle();
+      
+      if (!existing) throw new Error("Media asset not found");
+
+      const { error } = await supabase
+        .from("media_assets")
+        .delete()
+        .eq("id", assetId);
+      
+      if (error) throw error;
+      return { deleted: true, entity_name: existing.entity_name };
+    }
+
+    // Bulk operations
+    if (method === "POST" && segments[2] === "bulk") {
+      const body = await req.json();
+      const { action, asset_ids, updates } = body;
+
+      if (action === "update" && asset_ids && updates) {
+        updates.updated_at = new Date().toISOString();
+        const { data, error } = await supabase
+          .from("media_assets")
+          .update(updates)
+          .in("id", asset_ids)
+          .select();
+        
+        if (error) throw error;
+        return { updated: true, count: data?.length || 0 };
+      }
+
+      if (action === "delete" && asset_ids) {
+        const { error } = await supabase
+          .from("media_assets")
+          .delete()
+          .in("id", asset_ids);
+        
+        if (error) throw error;
+        return { deleted: true, count: asset_ids.length };
+      }
+
+      if (action === "select_final" && asset_ids) {
+        // Mark assets as final selected (and unmark others for same entity)
+        const { data: assets } = await supabase
+          .from("media_assets")
+          .select("entity_type, entity_id")
+          .in("id", asset_ids);
+        
+        if (assets && assets.length > 0) {
+          // Unmark all other assets for same entities
+          for (const asset of assets) {
+            await supabase
+              .from("media_assets")
+              .update({ final_selected: false, updated_at: new Date().toISOString() })
+              .eq("entity_type", asset.entity_type)
+              .eq("entity_id", asset.entity_id)
+              .not("id", "in", `(${asset_ids.join(",")})`);
+          }
+        }
+
+        // Mark selected assets
+        const { data, error } = await supabase
+          .from("media_assets")
+          .update({ final_selected: true, updated_at: new Date().toISOString() })
+          .in("id", asset_ids)
+          .select();
+        
+        if (error) throw error;
+        return { selected: true, count: data?.length || 0 };
+      }
+
+      throw new Error("Invalid bulk action");
+    }
+
+    // Get assets by entity
+    if (method === "GET" && segments[2] === "by-entity") {
+      const url = new URL(req.url);
+      const type = url.searchParams.get("type");
+      const id = url.searchParams.get("id");
+      
+      if (!type || !id) {
+        throw new Error("type and id query params are required");
+      }
+
+      const { data, error } = await supabase
+        .from("media_assets")
+        .select("*")
+        .eq("entity_type", type)
+        .eq("entity_id", id)
+        .order("final_selected", { ascending: false })
+        .order("quality_score", { ascending: false });
+      
+      if (error) throw error;
+      return { assets: data, count: data?.length || 0 };
+    }
+  }
+
   throw new Error("Unknown content endpoint");
 }
 
@@ -630,12 +874,19 @@ Deno.serve(async (req) => {
               "GET /content/entities - List entities",
               "POST /content/entities - Create entity",
               "PATCH /content/entities/:id - Update entity",
-              "GET /content/dj-artists - List DJ artists (supports ?search=&limit=&offset=)",
+              "GET /content/dj-artists - List DJ artists (?search=&limit=&offset=)",
               "GET /content/dj-artists/:id - Get DJ artist details",
               "POST /content/dj-artists - Create DJ artist",
               "PATCH /content/dj-artists/:id - Update DJ artist",
               "DELETE /content/dj-artists/:id - Delete DJ artist",
               "POST /content/dj-artists/bulk - Bulk update/delete artists",
+              "GET /content/media-assets - List media assets (?entity_type=&entity_id=&final_selected=&limit=&offset=)",
+              "GET /content/media-assets/:id - Get media asset details",
+              "GET /content/media-assets/by-entity - Get assets by entity (?type=&id=)",
+              "POST /content/media-assets - Create media asset",
+              "PATCH /content/media-assets/:id - Update media asset",
+              "DELETE /content/media-assets/:id - Delete media asset",
+              "POST /content/media-assets/bulk - Bulk update/delete/select_final assets",
               "GET /system/health - System health overview",
               "GET /system/analytics - Analytics summary",
               "GET /system/api-usage - API usage stats",
