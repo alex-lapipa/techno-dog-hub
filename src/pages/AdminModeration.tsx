@@ -168,7 +168,11 @@ const AdminModeration = () => {
         : `The submission has been ${newStatus}`;
 
       if (gamificationResult) {
-        toastDescription += ` (+${gamificationResult.pointsAwarded} XP)`;
+        if (gamificationResult.multiplier > 1) {
+          toastDescription += ` (+${gamificationResult.pointsAwarded} XP with ${gamificationResult.multiplier}x ${gamificationResult.multiplierName || 'bonus'}!)`;
+        } else {
+          toastDescription += ` (+${gamificationResult.pointsAwarded} XP)`;
+        }
         if (gamificationResult.levelUp) {
           toastDescription += ` 🎉 Level up to ${gamificationResult.newLevel}!`;
         }

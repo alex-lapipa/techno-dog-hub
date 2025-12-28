@@ -1496,6 +1496,48 @@ export type Database = {
         }
         Relationships: []
       }
+      xp_multiplier_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_at: string
+          event_type: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          multiplier: number
+          name: string
+          start_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_at: string
+          event_type?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          multiplier?: number
+          name: string
+          start_at: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_at?: string
+          event_type?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          multiplier?: number
+          name?: string
+          start_at?: string
+        }
+        Relationships: []
+      }
       youtube_cache: {
         Row: {
           artist_name: string
@@ -1690,6 +1732,15 @@ export type Database = {
           p_priority?: number
         }
         Returns: string
+      }
+      get_current_xp_multiplier: {
+        Args: never
+        Returns: {
+          ends_at: string
+          event_icon: string
+          event_name: string
+          multiplier: number
+        }[]
       }
       get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
       grant_admin_role: { Args: { target_user_id: string }; Returns: boolean }

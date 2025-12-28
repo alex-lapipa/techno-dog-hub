@@ -30,6 +30,9 @@ const BADGE_THRESHOLDS: Record<string, { slug: string; count: number }[]> = {
 
 interface AwardResult {
   pointsAwarded: number;
+  basePoints: number;
+  multiplier: number;
+  multiplierName?: string;
   newTotal: number;
   newLevel: number;
   levelUp: boolean;
@@ -39,6 +42,36 @@ interface AwardResult {
     longestStreak: number;
     streakIncreased: boolean;
   };
+}
+
+interface MultiplierInfo {
+  multiplier: number;
+  event_name: string | null;
+  event_icon: string | null;
+  ends_at: string | null;
+}
+
+/**
+ * Get the current active XP multiplier
+ */
+export async function getCurrentMultiplier(): Promise<MultiplierInfo> {
+  try {
+    const { data, error } = await supabase.rpc("get_current_xp_multiplier");
+    
+    if (error || !data || data.length === 0) {
+      return { multiplier: 1, event_name: null, event_icon: null, ends_at: null };
+    }
+    
+    return {
+      multiplier: Number(data[0].multiplier),
+      event_name: data[0].event_name,
+      event_icon: data[0].event_icon,
+      ends_at: data[0].ends_at,
+    };
+  } catch (err) {
+    console.error("Failed to get multiplier:", err);
+    return { multiplier: 1, event_name: null, event_icon: null, ends_at: null };
+  }
 }
 
 /**
@@ -62,16 +95,22 @@ export async function awardPointsForSubmission(
       return null;
     }
 
-    // Determine points based on submission type
+    // Determine base points based on submission type
     const actionType = submissionType || "correction";
-    const points = POINT_VALUES[actionType] || POINT_VALUES.correction;
+    const basePoints = POINT_VALUES[actionType] || POINT_VALUES.correction;
+
+    // Get current multiplier
+    const multiplierInfo = await getCurrentMultiplier();
+    const finalPoints = Math.round(basePoints * multiplierInfo.multiplier);
 
     // Award points using RPC
     const { data: pointResult, error: pointError } = await supabase.rpc("award_points", {
       p_profile_id: profile.id,
-      p_points: points,
+      p_points: finalPoints,
       p_action_type: actionType,
-      p_description: `Approved submission: ${actionType.replace(/_/g, " ")}`,
+      p_description: multiplierInfo.multiplier > 1 
+        ? `Approved submission: ${actionType.replace(/_/g, " ")} (${multiplierInfo.multiplier}x ${multiplierInfo.event_name})`
+        : `Approved submission: ${actionType.replace(/_/g, " ")}`,
       p_reference_id: submissionId,
       p_reference_type: "submission",
     });
@@ -82,8 +121,11 @@ export async function awardPointsForSubmission(
     }
 
     const result: AwardResult = {
-      pointsAwarded: points,
-      newTotal: pointResult?.[0]?.new_total || profile.total_points + points,
+      pointsAwarded: finalPoints,
+      basePoints: basePoints,
+      multiplier: multiplierInfo.multiplier,
+      multiplierName: multiplierInfo.event_name || undefined,
+      newTotal: pointResult?.[0]?.new_total || profile.total_points + finalPoints,
       newLevel: pointResult?.[0]?.new_level || profile.current_level,
       levelUp: pointResult?.[0]?.level_up || false,
       badgesAwarded: [],
