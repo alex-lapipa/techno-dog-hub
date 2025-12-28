@@ -7,7 +7,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import AgentCard from "@/components/admin/AgentCard";
@@ -83,6 +83,7 @@ const AdminDashboard = () => {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const [agentRunStates, setAgentRunStates] = useState<AgentRunState[]>([]);
   const [currentAgentIndex, setCurrentAgentIndex] = useState(-1);
+  const [sendingDigest, setSendingDigest] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -152,6 +153,26 @@ const AdminDashboard = () => {
     });
   };
 
+  const sendWeeklyDigest = async () => {
+    setSendingDigest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('weekly-digest');
+      if (error) throw error;
+      toast({
+        title: "Weekly digest sent",
+        description: `${data?.emailsSent || 0} emails sent successfully`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to send digest",
+        description: err instanceof Error ? err.message : "Unknown error",
+        variant: "destructive"
+      });
+    } finally {
+      setSendingDigest(false);
+    }
+  };
+
   const completedCount = agentRunStates.filter(s => s.status === 'success' || s.status === 'error').length;
   const progressPercent = agentRunStates.length > 0 ? (completedCount / agentRunStates.length) * 100 : 0;
 
@@ -169,6 +190,7 @@ const AdminDashboard = () => {
     { name: "API Docs", description: "Admin API documentation", path: "/api-docs", frameNumber: "T11" },
     { name: "Badge Admin", description: "Manage gamification badges", path: "/admin/badges", frameNumber: "T12" },
     { name: "XP Events", description: "Manage XP multiplier events", path: "/admin/xp-events", frameNumber: "T13" },
+    { name: "Notifications", description: "Manage alert channels", path: "/admin/notifications", frameNumber: "T14" },
   ];
 
   return (
@@ -207,6 +229,25 @@ const AdminDashboard = () => {
               <>
                 <Play className="w-3 h-3 mr-2" />
                 Run All
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={sendWeeklyDigest}
+            disabled={sendingDigest}
+            className="font-mono text-xs uppercase tracking-wider"
+          >
+            {sendingDigest ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Mail className="w-3 h-3 mr-2" />
+                Send Digest
               </>
             )}
           </Button>
