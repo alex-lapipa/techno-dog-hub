@@ -1,9 +1,9 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
-import AudioPlayer from "@/components/audio/AudioPlayer";
+import SynthPlayer from "@/components/audio/SynthPlayer";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Radio, Waves, Zap, Headphones } from "lucide-react";
+import { ExternalLink, Radio, Waves, Zap } from "lucide-react";
 
 const SoundMachine = () => {
   return (
@@ -28,35 +28,6 @@ const SoundMachine = () => {
           </div>
 
           <div className="space-y-8">
-            {/* Audio Player Section */}
-            <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
-              <div className="border-b border-border p-4 bg-card/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/50 flex items-center justify-center">
-                    <Headphones className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="font-mono text-lg font-bold tracking-tight">
-                      Audio Player
-                    </h2>
-                    <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                      Embedded Playback Component
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <AudioPlayer 
-                  title="Demo Track"
-                  artist="Techno Dog Audio Lab"
-                />
-                <p className="mt-4 text-xs text-muted-foreground font-mono">
-                  Load your own audio files or connect to streaming sources. Player supports MP3, WAV, and OGG formats.
-                </p>
-              </div>
-            </div>
-
             {/* T-DOG Sound Engine Card */}
             <div className="border border-border bg-card/30 rounded-lg overflow-hidden">
               {/* Header */}
@@ -83,6 +54,15 @@ const SoundMachine = () => {
                   AI-powered rhythm machine built for creating dark, warehouse techno patterns. Inspired by classic 
                   hardware drum machines but enhanced with modern AI capabilities.
                 </p>
+
+                {/* Live Demo */}
+                <div>
+                  <h3 className="font-mono text-sm font-medium mb-3 flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 rounded-full bg-logo-green animate-pulse" />
+                    Live Demo
+                  </h3>
+                  <SynthPlayer />
+                </div>
 
                 {/* Features */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -119,7 +99,7 @@ const SoundMachine = () => {
                     </Button>
                   </a>
                   <p className="mt-3 font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider">
-                    tdog.studio — Standalone Web Application
+                    tdog.studio — Full-Featured Web Application
                   </p>
                 </div>
               </div>
