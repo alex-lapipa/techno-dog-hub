@@ -152,41 +152,282 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
   const contentType = segments[1]; // articles, submissions, entities, dj-artists
   
   if (contentType === "articles") {
-    if (method === "GET") {
-      const { data, error } = await supabase
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "50");
+    const offset = parseInt(url.searchParams.get("offset") || "0");
+    const status = url.searchParams.get("status") || "";
+    const search = url.searchParams.get("search") || "";
+
+    // List all articles with filters
+    if (method === "GET" && segments.length === 2) {
+      let query = supabase
         .from("td_news_articles")
-        .select("id, title, status, author_pseudonym, created_at, published_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
+        .select("id, title, subtitle, status, author_pseudonym, city_tags, genre_tags, entity_tags, confidence_score, created_at, updated_at, published_at")
+        .order("created_at", { ascending: false });
+
+      if (status) {
+        query = query.eq("status", status);
+      }
+      if (search) {
+        query = query.or(`title.ilike.%${search}%,subtitle.ilike.%${search}%,body_markdown.ilike.%${search}%`);
+      }
+
+      const { data, error } = await query.range(offset, offset + limit - 1);
       
       if (error) throw error;
-      return { articles: data };
+
+      // Get counts by status
+      const [totalRes, draftRes, publishedRes, archivedRes] = await Promise.all([
+        supabase.from("td_news_articles").select("*", { count: "exact", head: true }),
+        supabase.from("td_news_articles").select("*", { count: "exact", head: true }).eq("status", "draft"),
+        supabase.from("td_news_articles").select("*", { count: "exact", head: true }).eq("status", "published"),
+        supabase.from("td_news_articles").select("*", { count: "exact", head: true }).eq("status", "archived"),
+      ]);
+
+      return { 
+        articles: data, 
+        count: data?.length || 0,
+        total: totalRes.count || 0,
+        stats: {
+          draft: draftRes.count || 0,
+          published: publishedRes.count || 0,
+          archived: archivedRes.count || 0,
+        },
+        offset,
+        limit,
+      };
+    }
+
+    // Get single article with full content
+    if (method === "GET" && segments.length === 3) {
+      const articleId = segments[2];
+      const { data, error } = await supabase
+        .from("td_news_articles")
+        .select("*")
+        .eq("id", articleId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Article not found");
+      return { article: data };
+    }
+
+    // Create new article
+    if (method === "POST" && segments.length === 2) {
+      const body = await req.json();
+      
+      if (!body.title || !body.body_markdown) {
+        throw new Error("title and body_markdown are required");
+      }
+
+      const insertData = {
+        title: body.title,
+        subtitle: body.subtitle || null,
+        body_markdown: body.body_markdown,
+        author_pseudonym: body.author_pseudonym || "TechnoDog Editorial",
+        status: body.status || "draft",
+        city_tags: body.city_tags || [],
+        genre_tags: body.genre_tags || [],
+        entity_tags: body.entity_tags || [],
+        source_urls: body.source_urls || [],
+        source_snapshots: body.source_snapshots || [],
+        confidence_score: body.confidence_score || 0,
+        published_at: body.status === "published" ? new Date().toISOString() : null,
+      };
+
+      const { data, error } = await supabase
+        .from("td_news_articles")
+        .insert(insertData)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      return { created: true, article: data };
     }
     
+    // Update article
     if (method === "PATCH" && segments.length === 3) {
       const articleId = segments[2];
       const body = await req.json();
       
+      const updates: Record<string, any> = { updated_at: new Date().toISOString() };
+      if (body.title !== undefined) updates.title = body.title;
+      if (body.subtitle !== undefined) updates.subtitle = body.subtitle;
+      if (body.body_markdown !== undefined) updates.body_markdown = body.body_markdown;
+      if (body.author_pseudonym !== undefined) updates.author_pseudonym = body.author_pseudonym;
+      if (body.status !== undefined) updates.status = body.status;
+      if (body.city_tags !== undefined) updates.city_tags = body.city_tags;
+      if (body.genre_tags !== undefined) updates.genre_tags = body.genre_tags;
+      if (body.entity_tags !== undefined) updates.entity_tags = body.entity_tags;
+      if (body.source_urls !== undefined) updates.source_urls = body.source_urls;
+      if (body.source_snapshots !== undefined) updates.source_snapshots = body.source_snapshots;
+      if (body.confidence_score !== undefined) updates.confidence_score = body.confidence_score;
+      
       const { data, error } = await supabase
         .from("td_news_articles")
-        .update(body)
+        .update(updates)
         .eq("id", articleId)
         .select()
         .maybeSingle();
       
       if (error) throw error;
+      if (!data) throw new Error("Article not found");
       return { updated: true, article: data };
     }
     
+    // Delete article
     if (method === "DELETE" && segments.length === 3) {
       const articleId = segments[2];
+      
+      const { data: existing } = await supabase
+        .from("td_news_articles")
+        .select("id, title")
+        .eq("id", articleId)
+        .maybeSingle();
+      
+      if (!existing) throw new Error("Article not found");
+
       const { error } = await supabase
         .from("td_news_articles")
         .delete()
         .eq("id", articleId);
       
       if (error) throw error;
-      return { deleted: true };
+      return { deleted: true, title: existing.title };
+    }
+
+    // Publish article
+    if (method === "POST" && segments[2] === "publish") {
+      const body = await req.json();
+      const articleId = body.article_id;
+      
+      if (!articleId) throw new Error("article_id is required");
+
+      const { data, error } = await supabase
+        .from("td_news_articles")
+        .update({ 
+          status: "published", 
+          published_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", articleId)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Article not found");
+      return { published: true, article: data };
+    }
+
+    // Unpublish article (revert to draft)
+    if (method === "POST" && segments[2] === "unpublish") {
+      const body = await req.json();
+      const articleId = body.article_id;
+      
+      if (!articleId) throw new Error("article_id is required");
+
+      const { data, error } = await supabase
+        .from("td_news_articles")
+        .update({ 
+          status: "draft", 
+          published_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", articleId)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Article not found");
+      return { unpublished: true, article: data };
+    }
+
+    // Archive article
+    if (method === "POST" && segments[2] === "archive") {
+      const body = await req.json();
+      const articleId = body.article_id;
+      
+      if (!articleId) throw new Error("article_id is required");
+
+      const { data, error } = await supabase
+        .from("td_news_articles")
+        .update({ 
+          status: "archived", 
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", articleId)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("Article not found");
+      return { archived: true, article: data };
+    }
+
+    // Bulk operations
+    if (method === "POST" && segments[2] === "bulk") {
+      const body = await req.json();
+      const { action, article_ids } = body;
+
+      if (!article_ids || !Array.isArray(article_ids) || article_ids.length === 0) {
+        throw new Error("article_ids array is required");
+      }
+
+      if (action === "publish") {
+        const { data, error } = await supabase
+          .from("td_news_articles")
+          .update({ 
+            status: "published", 
+            published_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .in("id", article_ids)
+          .select();
+        
+        if (error) throw error;
+        return { published: true, count: data?.length || 0 };
+      }
+
+      if (action === "unpublish") {
+        const { data, error } = await supabase
+          .from("td_news_articles")
+          .update({ 
+            status: "draft", 
+            published_at: null,
+            updated_at: new Date().toISOString(),
+          })
+          .in("id", article_ids)
+          .select();
+        
+        if (error) throw error;
+        return { unpublished: true, count: data?.length || 0 };
+      }
+
+      if (action === "archive") {
+        const { data, error } = await supabase
+          .from("td_news_articles")
+          .update({ 
+            status: "archived", 
+            updated_at: new Date().toISOString(),
+          })
+          .in("id", article_ids)
+          .select();
+        
+        if (error) throw error;
+        return { archived: true, count: data?.length || 0 };
+      }
+
+      if (action === "delete") {
+        const { error } = await supabase
+          .from("td_news_articles")
+          .delete()
+          .in("id", article_ids);
+        
+        if (error) throw error;
+        return { deleted: true, count: article_ids.length };
+      }
+
+      throw new Error("Invalid bulk action. Use: publish, unpublish, archive, delete");
     }
   }
   
@@ -866,9 +1107,15 @@ Deno.serve(async (req) => {
               "GET /users/:id - Get user details",
               "PATCH /users/:id - Update user",
               "POST /users/roles - Grant/revoke roles",
-              "GET /content/articles - List articles",
+              "GET /content/articles - List articles (?status=&search=&limit=&offset=)",
+              "GET /content/articles/:id - Get full article",
+              "POST /content/articles - Create article",
               "PATCH /content/articles/:id - Update article",
               "DELETE /content/articles/:id - Delete article",
+              "POST /content/articles/publish - Publish article",
+              "POST /content/articles/unpublish - Unpublish article",
+              "POST /content/articles/archive - Archive article",
+              "POST /content/articles/bulk - Bulk publish/unpublish/archive/delete",
               "GET /content/submissions - List submissions",
               "PATCH /content/submissions/:id - Review submission",
               "GET /content/entities - List entities",
