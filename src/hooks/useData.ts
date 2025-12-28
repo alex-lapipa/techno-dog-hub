@@ -1,9 +1,9 @@
 // Centralized React Query hooks for data fetching
-// Replaces direct imports from static data files with async loading
+// Uses canonical database as primary source with verified RAG data
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { loadArtistsSummary, loadArtistById, type ArtistSummary } from "@/data/artists-loader";
+import { loadArtistsSummaryUnified, loadArtistByIdUnified } from "@/data/canonical-artists-loader";
 import { loadVenuesSummary, loadVenueById, type VenueSummary } from "@/data/venues-loader";
 import { loadFestivalsSummary, loadFestivalById, type FestivalSummary } from "@/data/festivals-loader";
 
@@ -11,13 +11,13 @@ import { loadFestivalsSummary, loadFestivalById, type FestivalSummary } from "@/
 const STALE_TIME = 1000 * 60 * 10;
 
 // ============================================================
-// ARTISTS HOOKS
+// ARTISTS HOOKS - Uses Canonical Database
 // ============================================================
 
 export function useArtists() {
   return useQuery({
     queryKey: ['artists-summary'],
-    queryFn: loadArtistsSummary,
+    queryFn: loadArtistsSummaryUnified,
     staleTime: STALE_TIME,
   });
 }
@@ -25,7 +25,7 @@ export function useArtists() {
 export function useArtist(id: string | undefined) {
   return useQuery({
     queryKey: ['artist', id],
-    queryFn: () => loadArtistById(id!),
+    queryFn: () => loadArtistByIdUnified(id!),
     staleTime: STALE_TIME,
     enabled: !!id,
   });
@@ -37,7 +37,7 @@ export function usePrefetchArtist() {
   return useCallback((id: string) => {
     queryClient.prefetchQuery({
       queryKey: ['artist', id],
-      queryFn: () => loadArtistById(id),
+      queryFn: () => loadArtistByIdUnified(id),
       staleTime: STALE_TIME,
     });
   }, [queryClient]);
@@ -113,6 +113,6 @@ export function usePrefetchFestival() {
 // RE-EXPORTS FOR CONVENIENCE
 // ============================================================
 
-export type { ArtistSummary } from "@/data/artists-loader";
+export type { CanonicalArtistSummary as ArtistSummary } from "@/data/canonical-artists-loader";
 export type { VenueSummary } from "@/data/venues-loader";
 export type { FestivalSummary } from "@/data/festivals-loader";

@@ -37,22 +37,51 @@ const DailySpotlight = () => {
         const today = new Date();
         const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
         
-        // Fetch total artist count
+        // Fetch from canonical_artists with profiles
         const { count } = await supabase
-          .from('dj_artists')
+          .from('canonical_artists')
           .select('*', { count: 'exact', head: true });
         
         if (count && count > 0) {
           // Select artist based on date seed
           const artistIndex = dateSeed % count;
           const { data: artistData } = await supabase
-            .from('dj_artists')
-            .select('id, artist_name, rank, known_for, nationality, labels, subgenres')
+            .from('canonical_artists')
+            .select(`
+              artist_id,
+              canonical_name,
+              rank,
+              city,
+              country,
+              artist_profiles (
+                known_for,
+                labels,
+                subgenres,
+                source_priority
+              )
+            `)
+            .order('rank', { ascending: true, nullsFirst: false })
             .range(artistIndex, artistIndex)
             .single();
           
           if (artistData) {
-            setArtist(artistData);
+            // Get highest priority profile
+            const profiles = artistData.artist_profiles || [];
+            const primaryProfile = (profiles as any[]).sort((a: any, b: any) => 
+              (b.source_priority || 0) - (a.source_priority || 0)
+            )[0] || {};
+            
+            setArtist({
+              id: 0, // Not used for canonical
+              artist_name: artistData.canonical_name,
+              rank: artistData.rank || 0,
+              known_for: primaryProfile.known_for || null,
+              nationality: artistData.city && artistData.country 
+                ? `${artistData.city}, ${artistData.country}` 
+                : artistData.country,
+              labels: primaryProfile.labels || null,
+              subgenres: primaryProfile.subgenres || null,
+            });
           }
         }
 

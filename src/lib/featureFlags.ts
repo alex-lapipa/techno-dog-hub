@@ -28,14 +28,14 @@ export interface FeatureFlags {
   AUTO_GENERATE_ARTIST_DOCS: boolean;
 }
 
-// Default flags - legacy mode by default
+// Default flags - canonical mode by default (database populated with verified data)
 const DEFAULT_FLAGS: FeatureFlags = {
-  USE_CANONICAL_ARTISTS_READ: false,
-  USE_CANONICAL_ARTISTS_WRITE: false,
-  CANONICAL_ONLY_MODE: false,
-  USE_UNIFIED_VECTOR_STORE: false,
+  USE_CANONICAL_ARTISTS_READ: true,
+  USE_CANONICAL_ARTISTS_WRITE: true,
+  CANONICAL_ONLY_MODE: true,
+  USE_UNIFIED_VECTOR_STORE: true,
   SHOW_MERGE_REVIEW_UI: false,
-  AUTO_GENERATE_ARTIST_DOCS: false,
+  AUTO_GENERATE_ARTIST_DOCS: true,
 };
 
 // Get current feature flags
