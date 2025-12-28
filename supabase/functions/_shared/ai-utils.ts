@@ -29,6 +29,7 @@ export async function generateEmbedding(
       body: JSON.stringify({
         model: OPENAI_EMBEDDING_MODEL,
         input: truncatedText,
+        dimensions: OPENAI_EMBEDDING_DIMENSIONS,
       }),
     });
 
