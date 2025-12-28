@@ -312,6 +312,7 @@ export type Database = {
           longest_streak: number
           newsletter_opt_in: boolean
           newsletter_opt_in_at: string | null
+          referral_code: string | null
           roles: string[]
           source: Database["public"]["Enums"]["community_source"]
           status: Database["public"]["Enums"]["community_status"]
@@ -335,6 +336,7 @@ export type Database = {
           longest_streak?: number
           newsletter_opt_in?: boolean
           newsletter_opt_in_at?: string | null
+          referral_code?: string | null
           roles?: string[]
           source?: Database["public"]["Enums"]["community_source"]
           status?: Database["public"]["Enums"]["community_status"]
@@ -358,6 +360,7 @@ export type Database = {
           longest_streak?: number
           newsletter_opt_in?: boolean
           newsletter_opt_in_at?: string | null
+          referral_code?: string | null
           roles?: string[]
           source?: Database["public"]["Enums"]["community_source"]
           status?: Database["public"]["Enums"]["community_status"]
@@ -1101,6 +1104,74 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code_used: string
+          referred_email: string
+          referred_profile_id: string | null
+          referrer_id: string
+          status: string
+          verified_at: string | null
+          xp_awarded: boolean
+          xp_awarded_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code_used: string
+          referred_email: string
+          referred_profile_id?: string | null
+          referrer_id: string
+          status?: string
+          verified_at?: string | null
+          xp_awarded?: boolean
+          xp_awarded_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code_used?: string
+          referred_email?: string
+          referred_profile_id?: string | null
+          referrer_id?: string
+          status?: string
+          verified_at?: string | null
+          xp_awarded?: boolean
+          xp_awarded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_profile_id_fkey"
+            columns: ["referred_profile_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_profile_id_fkey"
+            columns: ["referred_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "community_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "public_community_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supporters: {
         Row: {
           amount_cents: number
@@ -1712,6 +1783,10 @@ export type Database = {
           reset_at: string
         }[]
       }
+      check_referral_badges: {
+        Args: { p_profile_id: string }
+        Returns: undefined
+      }
       claim_next_media_job: {
         Args: never
         Returns: {
@@ -1733,6 +1808,7 @@ export type Database = {
         }
         Returns: string
       }
+      generate_referral_code: { Args: never; Returns: string }
       get_current_xp_multiplier: {
         Args: never
         Returns: {
