@@ -50,6 +50,7 @@ const MediaEngine = lazy(() => import("./pages/MediaEngine"));
 const UserRoleManagement = lazy(() => import("./pages/UserRoleManagement"));
 const AdminControlCenter = lazy(() => import("./pages/AdminControlCenter"));
 const BadgeAdmin = lazy(() => import("./pages/BadgeAdmin"));
+const XPEventsAdmin = lazy(() => import("./pages/XPEventsAdmin"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const Support = lazy(() => import("./pages/Support"));
 const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
@@ -124,6 +125,7 @@ const App = () => (
                   <Route path="/admin/notifications" element={<NotificationChannels />} />
                   <Route path="/admin/knowledge" element={<KnowledgeAdmin />} />
                   <Route path="/admin/badges" element={<BadgeAdmin />} />
+                  <Route path="/admin/xp-events" element={<XPEventsAdmin />} />
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
                   <Route path="/festivals/:id" element={<FestivalDetail />} />
