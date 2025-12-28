@@ -53,6 +53,8 @@ const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const Support = lazy(() => import("./pages/Support"));
 const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
 const ActivityLog = lazy(() => import("./pages/ActivityLog"));
+const NotificationChannels = lazy(() => import("./pages/NotificationChannels"));
+const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -117,6 +119,8 @@ const App = () => (
                   <Route path="/admin/health" element={<SystemHealth />} />
                   <Route path="/admin/images" element={<AIImageGallery />} />
                   <Route path="/admin/activity-log" element={<ActivityLog />} />
+                  <Route path="/admin/notifications" element={<NotificationChannels />} />
+                  <Route path="/admin/knowledge" element={<KnowledgeAdmin />} />
                   {/* Festivals */}
                   <Route path="/festivals" element={<Festivals />} />
                   <Route path="/festivals/:id" element={<FestivalDetail />} />
