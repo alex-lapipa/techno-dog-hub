@@ -80,7 +80,7 @@ export default function ArtistEnrichmentAdmin() {
   };
 
   return (
-    <PageLayout title="Artist Enrichment Engine" subtitle="Firecrawl + AI Knowledge Expansion">
+    <PageLayout title="Artist Enrichment Engine" path="/admin/artist-enrichment" description="Firecrawl + AI Knowledge Expansion">
       <div className="space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
