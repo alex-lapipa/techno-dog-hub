@@ -168,3 +168,15 @@ verify_jwt = false
 
 [functions.admin-api]
 verify_jwt = false
+
+[functions.weekly-digest]
+verify_jwt = false
+
+[functions.alert-dispatcher]
+verify_jwt = false
+
+[functions.knowledge-ingest]
+verify_jwt = false
+
+[functions.design-guidelines]
+verify_jwt = false
