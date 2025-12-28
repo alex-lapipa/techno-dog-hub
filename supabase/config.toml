@@ -162,3 +162,6 @@ verify_jwt = false
 
 [functions.knowledge-gap-detector]
 verify_jwt = false
+
+[functions.api-guardian]
+verify_jwt = false
