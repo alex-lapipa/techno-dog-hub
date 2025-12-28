@@ -19,6 +19,7 @@ import {
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { awardPointsForSubmission } from "@/lib/gamification";
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -33,7 +34,9 @@ import {
   ThumbsUp,
   ThumbsDown,
   AlertTriangle,
-  User
+  User,
+  Sparkles,
+  Trophy
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -139,14 +142,14 @@ const AdminModeration = () => {
 
       if (error) throw error;
 
-      // If approved and has entity, potentially increase trust score
+      // Award points and check badges on approval
+      let gamificationResult = null;
       if (action === "approve" && selectedSubmission.email) {
-        await supabase
-          .from("community_profiles")
-          .update({ 
-            trust_score: supabase.rpc ? 1 : 1 // Would use RPC for increment
-          })
-          .eq("email", selectedSubmission.email);
+        gamificationResult = await awardPointsForSubmission(
+          selectedSubmission.email,
+          selectedSubmission.submission_type,
+          selectedSubmission.id
+        );
       }
 
       // Send email notification if email exists
@@ -159,11 +162,24 @@ const AdminModeration = () => {
         );
       }
 
+      // Build toast message with gamification info
+      let toastDescription = selectedSubmission.email 
+        ? `The submission has been ${newStatus} and the user was notified`
+        : `The submission has been ${newStatus}`;
+
+      if (gamificationResult) {
+        toastDescription += ` (+${gamificationResult.pointsAwarded} XP)`;
+        if (gamificationResult.levelUp) {
+          toastDescription += ` 🎉 Level up to ${gamificationResult.newLevel}!`;
+        }
+        if (gamificationResult.badgesAwarded.length > 0) {
+          toastDescription += ` 🏆 Badges: ${gamificationResult.badgesAwarded.join(", ")}`;
+        }
+      }
+
       toast({
         title: action === "approve" ? "Submission approved" : "Submission rejected",
-        description: selectedSubmission.email 
-          ? `The submission has been ${newStatus} and the user was notified`
-          : `The submission has been ${newStatus}`,
+        description: toastDescription,
       });
 
       setSelectedSubmission(null);
