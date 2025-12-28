@@ -353,6 +353,13 @@ export default function Developer() {
     <div className="space-y-6">
       {/* Quick links */}
       <div className="p-4 border border-border bg-card rounded-lg flex flex-wrap items-center gap-4">
+        <Link 
+          to="/api-docs"
+          className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:underline"
+        >
+          <Code className="w-4 h-4" />
+          Admin API Documentation
+        </Link>
         <a 
           href="/project-documentation.txt" 
           download 
