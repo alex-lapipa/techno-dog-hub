@@ -270,23 +270,6 @@ const SoundMachine = () => {
                 {/* Contributor Contact Form */}
                 <ContributorContactForm />
 
-                {/* Features */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50 border border-border/50">
-                    <Waves className="w-5 h-5 text-logo-green mt-0.5 shrink-0" />
-                    <div>
-                      <h3 className="font-mono text-sm font-medium mb-1">Pattern Generation</h3>
-                      <p className="text-xs text-muted-foreground">AI-assisted beat patterns optimized for driving, hypnotic techno.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50 border border-border/50">
-                    <Zap className="w-5 h-5 text-logo-green mt-0.5 shrink-0" />
-                    <div>
-                      <h3 className="font-mono text-sm font-medium mb-1">Real-Time Synthesis</h3>
-                      <p className="text-xs text-muted-foreground">Web Audio API-powered synthesis engine with low latency performance.</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
