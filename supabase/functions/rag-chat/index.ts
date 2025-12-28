@@ -148,13 +148,50 @@ serve(async (req) => {
     });
   }
 
-  // Apply persistent IP-based rate limiting
+  // Check for admin bypass - admins skip rate limiting
+  let isAdmin = false;
+  const authHeader = req.headers.get('Authorization');
+  
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      // Check if user is authenticated and is an admin
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/has_role`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({
+          _user_id: null, // Will use auth.uid() in the function
+          _role: 'admin'
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        isAdmin = result === true;
+        if (isAdmin) {
+          console.log('Admin user detected - bypassing rate limit');
+        }
+      }
+    } catch (err) {
+      console.error('Admin check failed:', err);
+      // Continue with rate limiting if admin check fails
+    }
+  }
+
+  // Apply persistent IP-based rate limiting (skip for admins)
   const clientIP = getClientIP(req);
-  const rateLimit = await checkPersistentRateLimit(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, clientIP);
+  let rateLimit = { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
+  
+  if (!isAdmin) {
+    rateLimit = await checkPersistentRateLimit(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, clientIP);
+  }
   
   const rateLimitHeaders = {
-    'X-RateLimit-Limit': RATE_LIMIT_MAX_REQUESTS.toString(),
-    'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+    'X-RateLimit-Limit': isAdmin ? 'unlimited' : RATE_LIMIT_MAX_REQUESTS.toString(),
+    'X-RateLimit-Remaining': isAdmin ? 'unlimited' : rateLimit.remaining.toString(),
     'X-RateLimit-Reset': Math.ceil(rateLimit.resetAt.getTime() / 1000).toString(),
   };
   
@@ -178,7 +215,7 @@ serve(async (req) => {
     );
   }
   
-  console.log(`Request from IP: ${clientIP}, remaining: ${rateLimit.remaining}`);
+  console.log(`Request from IP: ${clientIP}, admin: ${isAdmin}, remaining: ${isAdmin ? 'unlimited' : rateLimit.remaining}`);
 
   try {
     const { query, stream = true } = await req.json();
