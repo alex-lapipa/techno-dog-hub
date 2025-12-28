@@ -149,7 +149,7 @@ async function handleUsers(req: Request, supabase: any, path: string, method: st
 // Content Management Endpoints
 async function handleContent(req: Request, supabase: any, path: string, method: string) {
   const segments = path.split("/").filter(Boolean);
-  const contentType = segments[1]; // articles, submissions, entities
+  const contentType = segments[1]; // articles, submissions, entities, dj-artists
   
   if (contentType === "articles") {
     if (method === "GET") {
@@ -259,6 +259,172 @@ async function handleContent(req: Request, supabase: any, path: string, method: 
       
       if (error) throw error;
       return { updated: true, entity: data };
+    }
+  }
+
+  // DJ Artists Management
+  if (contentType === "dj-artists") {
+    const url = new URL(req.url);
+    const limit = parseInt(url.searchParams.get("limit") || "50");
+    const offset = parseInt(url.searchParams.get("offset") || "0");
+    const search = url.searchParams.get("search") || "";
+
+    if (method === "GET" && segments.length === 2) {
+      // List all DJ artists with pagination and search
+      let query = supabase
+        .from("dj_artists")
+        .select("id, rank, artist_name, real_name, nationality, years_active, subgenres, labels, top_tracks, known_for, created_at")
+        .order("rank", { ascending: true });
+
+      if (search) {
+        query = query.or(`artist_name.ilike.%${search}%,real_name.ilike.%${search}%,known_for.ilike.%${search}%`);
+      }
+
+      const { data, error, count } = await query
+        .range(offset, offset + limit - 1);
+      
+      if (error) throw error;
+
+      // Get total count
+      const { count: totalCount } = await supabase
+        .from("dj_artists")
+        .select("*", { count: "exact", head: true });
+
+      return { 
+        artists: data, 
+        count: data?.length || 0,
+        total: totalCount || 0,
+        offset,
+        limit,
+      };
+    }
+
+    if (method === "GET" && segments.length === 3) {
+      // Get specific DJ artist by ID
+      const artistId = segments[2];
+      const { data, error } = await supabase
+        .from("dj_artists")
+        .select("*")
+        .eq("id", artistId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("DJ artist not found");
+      return { artist: data };
+    }
+
+    if (method === "POST") {
+      // Create new DJ artist
+      const body = await req.json();
+      
+      // Validate required fields
+      if (!body.artist_name) {
+        throw new Error("artist_name is required");
+      }
+
+      const insertData = {
+        artist_name: body.artist_name,
+        real_name: body.real_name || null,
+        nationality: body.nationality || null,
+        born: body.born || null,
+        died: body.died || null,
+        years_active: body.years_active || null,
+        subgenres: body.subgenres || [],
+        labels: body.labels || [],
+        top_tracks: body.top_tracks || [],
+        known_for: body.known_for || null,
+        rank: body.rank || 9999,
+      };
+
+      const { data, error } = await supabase
+        .from("dj_artists")
+        .insert(insertData)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      return { created: true, artist: data };
+    }
+
+    if (method === "PATCH" && segments.length === 3) {
+      // Update existing DJ artist
+      const artistId = segments[2];
+      const body = await req.json();
+      
+      const updates: Record<string, any> = {};
+      if (body.artist_name !== undefined) updates.artist_name = body.artist_name;
+      if (body.real_name !== undefined) updates.real_name = body.real_name;
+      if (body.nationality !== undefined) updates.nationality = body.nationality;
+      if (body.born !== undefined) updates.born = body.born;
+      if (body.died !== undefined) updates.died = body.died;
+      if (body.years_active !== undefined) updates.years_active = body.years_active;
+      if (body.subgenres !== undefined) updates.subgenres = body.subgenres;
+      if (body.labels !== undefined) updates.labels = body.labels;
+      if (body.top_tracks !== undefined) updates.top_tracks = body.top_tracks;
+      if (body.known_for !== undefined) updates.known_for = body.known_for;
+      if (body.rank !== undefined) updates.rank = body.rank;
+
+      const { data, error } = await supabase
+        .from("dj_artists")
+        .update(updates)
+        .eq("id", artistId)
+        .select()
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (!data) throw new Error("DJ artist not found");
+      return { updated: true, artist: data };
+    }
+
+    if (method === "DELETE" && segments.length === 3) {
+      // Delete DJ artist
+      const artistId = segments[2];
+      
+      // First check if artist exists
+      const { data: existing } = await supabase
+        .from("dj_artists")
+        .select("id, artist_name")
+        .eq("id", artistId)
+        .maybeSingle();
+      
+      if (!existing) throw new Error("DJ artist not found");
+
+      const { error } = await supabase
+        .from("dj_artists")
+        .delete()
+        .eq("id", artistId);
+      
+      if (error) throw error;
+      return { deleted: true, artist_name: existing.artist_name };
+    }
+
+    // Bulk operations
+    if (method === "POST" && segments[2] === "bulk") {
+      const body = await req.json();
+      const { action, artist_ids, updates } = body;
+
+      if (action === "update" && artist_ids && updates) {
+        const { data, error } = await supabase
+          .from("dj_artists")
+          .update(updates)
+          .in("id", artist_ids)
+          .select();
+        
+        if (error) throw error;
+        return { updated: true, count: data?.length || 0 };
+      }
+
+      if (action === "delete" && artist_ids) {
+        const { error } = await supabase
+          .from("dj_artists")
+          .delete()
+          .in("id", artist_ids);
+        
+        if (error) throw error;
+        return { deleted: true, count: artist_ids.length };
+      }
+
+      throw new Error("Invalid bulk action");
     }
   }
 
@@ -464,6 +630,12 @@ Deno.serve(async (req) => {
               "GET /content/entities - List entities",
               "POST /content/entities - Create entity",
               "PATCH /content/entities/:id - Update entity",
+              "GET /content/dj-artists - List DJ artists (supports ?search=&limit=&offset=)",
+              "GET /content/dj-artists/:id - Get DJ artist details",
+              "POST /content/dj-artists - Create DJ artist",
+              "PATCH /content/dj-artists/:id - Update DJ artist",
+              "DELETE /content/dj-artists/:id - Delete DJ artist",
+              "POST /content/dj-artists/bulk - Bulk update/delete artists",
               "GET /system/health - System health overview",
               "GET /system/analytics - Analytics summary",
               "GET /system/api-usage - API usage stats",
