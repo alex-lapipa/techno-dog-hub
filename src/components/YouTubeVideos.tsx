@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Youtube, Play, ExternalLink, Loader2 } from "lucide-react";
+import { Youtube, Play, ExternalLink, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Video {
   id: string;
@@ -9,6 +10,7 @@ interface Video {
   thumbnail: string;
   channelTitle: string;
   publishedAt: string;
+  aiVerified?: boolean;
 }
 
 interface YouTubeVideosProps {
@@ -20,6 +22,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [aiVerified, setAiVerified] = useState(false);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -44,6 +47,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
         }
 
         setVideos(data?.videos || []);
+        setAiVerified(data?.aiVerified || false);
       } catch (err) {
         console.error('Error fetching videos:', err);
         setError(err instanceof Error ? err.message : 'Failed to load videos');
@@ -67,7 +71,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
         <div className="flex items-center justify-center py-12">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           <span className="ml-3 font-mono text-sm text-muted-foreground">
-            Loading videos...
+            Loading and verifying videos...
           </span>
         </div>
       </section>
@@ -78,12 +82,31 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
     return null; // Silently hide if no videos or error
   }
 
+  const verifiedCount = videos.filter(v => v.aiVerified).length;
+
   return (
     <section className="mb-12 border-t border-border pt-8">
-      <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
-        <Youtube className="w-5 h-5 text-red-500" />
-        DJ Sets & Live Performances
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="font-mono text-xl uppercase tracking-wide flex items-center gap-3">
+          <Youtube className="w-5 h-5 text-red-500" />
+          DJ Sets & Live Performances
+        </h2>
+        {aiVerified && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground border border-border px-2 py-1">
+                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                  AI Verified ({verifiedCount}/{videos.length})
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-mono text-xs">Videos verified by AI to be from this artist</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
 
       {/* Embedded Player */}
       {selectedVideo && (
@@ -111,11 +134,44 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
         {videos.map((video) => (
           <div
             key={video.id}
-            className={`border border-border hover:bg-card transition-colors group cursor-pointer ${
+            className={`border border-border hover:bg-card transition-colors group cursor-pointer relative ${
               selectedVideo === video.id ? 'ring-2 ring-primary' : ''
             }`}
             onClick={() => setSelectedVideo(video.id)}
           >
+            {/* Verification Badge */}
+            {aiVerified && (
+              <div className="absolute top-2 left-2 z-10">
+                {video.aiVerified ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="bg-green-500/90 text-white px-1.5 py-0.5 rounded-sm">
+                          <CheckCircle2 className="w-3 h-3" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-mono text-xs">AI verified: Confirmed {artistName} content</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="bg-yellow-500/90 text-white px-1.5 py-0.5 rounded-sm">
+                          <AlertCircle className="w-3 h-3" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-mono text-xs">Unverified: May not be from this artist</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            )}
+
             {/* Thumbnail */}
             <div className="relative aspect-video overflow-hidden">
               <img
