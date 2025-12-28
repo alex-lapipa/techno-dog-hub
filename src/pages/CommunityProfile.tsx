@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/useGamification";
-import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase } from "@/components/gamification";
+import { BadgeDisplay, LevelProgress, PointsHistory, BadgeShowcase, StreakCard } from "@/components/gamification";
 import { 
   ArrowLeft, 
   MapPin, 
@@ -35,6 +35,9 @@ interface ProfileData {
   total_points: number;
   current_level: number;
   trust_score: number;
+  current_streak: number;
+  longest_streak: number;
+  last_activity_date: string | null;
 }
 
 const CommunityProfile = () => {
@@ -237,6 +240,13 @@ const CommunityProfile = () => {
 
             {/* Main Content */}
             <div className="md:col-span-2 space-y-6">
+              {/* Streak Card */}
+              <StreakCard
+                currentStreak={profile.current_streak}
+                longestStreak={profile.longest_streak}
+                lastActivityDate={profile.last_activity_date}
+              />
+
               {/* Badge Showcase */}
               <BadgeShowcase profileId={profileId!} />
 

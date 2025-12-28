@@ -172,6 +172,9 @@ const AdminModeration = () => {
         if (gamificationResult.levelUp) {
           toastDescription += ` 🎉 Level up to ${gamificationResult.newLevel}!`;
         }
+        if (gamificationResult.streakInfo?.streakIncreased) {
+          toastDescription += ` 🔥 ${gamificationResult.streakInfo.currentStreak} day streak!`;
+        }
         if (gamificationResult.badgesAwarded.length > 0) {
           toastDescription += ` 🏆 Badges: ${gamificationResult.badgesAwarded.join(", ")}`;
         }

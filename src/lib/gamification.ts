@@ -34,6 +34,11 @@ interface AwardResult {
   newLevel: number;
   levelUp: boolean;
   badgesAwarded: string[];
+  streakInfo?: {
+    currentStreak: number;
+    longestStreak: number;
+    streakIncreased: boolean;
+  };
 }
 
 /**
@@ -103,6 +108,16 @@ export async function awardPointsForSubmission(
       result.badgesAwarded.push("verified");
     }
 
+    // Update activity streak
+    const streakResult = await updateStreak(profile.id);
+    if (streakResult) {
+      result.streakInfo = streakResult;
+      
+      // Check for streak badges
+      const streakBadges = await checkStreakBadges(profile.id, streakResult.currentStreak);
+      result.badgesAwarded.push(...streakBadges);
+    }
+
     return result;
   } catch (err) {
     console.error("Gamification error:", err);
@@ -161,6 +176,62 @@ async function tryAwardBadge(profileId: string, badgeSlug: string): Promise<bool
   }
 
   return data === true;
+}
+
+/**
+ * Update activity streak for a profile
+ */
+async function updateStreak(profileId: string): Promise<{
+  currentStreak: number;
+  longestStreak: number;
+  streakIncreased: boolean;
+} | null> {
+  try {
+    const { data, error } = await supabase.rpc("update_activity_streak", {
+      p_profile_id: profileId,
+    });
+
+    if (error) {
+      console.error("Failed to update streak:", error);
+      return null;
+    }
+
+    if (data && data.length > 0) {
+      return {
+        currentStreak: data[0].current_streak,
+        longestStreak: data[0].longest_streak,
+        streakIncreased: data[0].streak_increased,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.error("Streak update error:", err);
+    return null;
+  }
+}
+
+/**
+ * Check and award streak-based badges
+ */
+async function checkStreakBadges(profileId: string, currentStreak: number): Promise<string[]> {
+  const awarded: string[] = [];
+  
+  const streakThresholds = [
+    { streak: 1, slug: "first-streak" },
+    { streak: 7, slug: "week-streak" },
+    { streak: 30, slug: "month-streak" },
+    { streak: 100, slug: "century-streak" },
+  ];
+
+  for (const threshold of streakThresholds) {
+    if (currentStreak >= threshold.streak) {
+      if (await tryAwardBadge(profileId, threshold.slug)) {
+        awarded.push(threshold.slug);
+      }
+    }
+  }
+
+  return awarded;
 }
 
 /**

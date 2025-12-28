@@ -3,3 +3,4 @@ export { LevelProgress } from "./LevelProgress";
 export { PointsHistory } from "./PointsHistory";
 export { BadgeShowcase } from "./BadgeShowcase";
 export { LeaderboardWidget } from "./LeaderboardWidget";
+export { StreakDisplay, StreakCard } from "./StreakDisplay";
