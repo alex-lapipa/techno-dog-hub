@@ -35,8 +35,10 @@ import {
   Eye,
   Settings,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import { LoadingState } from "@/components/ui/loading-state";
+import { ContentAuditPanel } from "@/components/admin/ContentAuditPanel";
 
 interface PipelineStep {
   step: string;
@@ -307,12 +309,18 @@ const AdminControlCenter = () => {
             </div>
 
             <Tabs defaultValue="pipeline" className="space-y-6">
-              <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+              <TabsList className="grid grid-cols-5 w-full max-w-3xl">
                 <TabsTrigger value="pipeline"><Zap className="w-4 h-4 mr-2" />Pipeline</TabsTrigger>
+                <TabsTrigger value="audit"><Search className="w-4 h-4 mr-2" />Content Audit</TabsTrigger>
                 <TabsTrigger value="results"><Eye className="w-4 h-4 mr-2" />Results</TabsTrigger>
                 <TabsTrigger value="history"><History className="w-4 h-4 mr-2" />History</TabsTrigger>
                 <TabsTrigger value="monitoring"><Bell className="w-4 h-4 mr-2" />Monitoring</TabsTrigger>
               </TabsList>
+
+              {/* Content Audit Tab */}
+              <TabsContent value="audit">
+                <ContentAuditPanel />
+              </TabsContent>
 
               {/* Pipeline Tab */}
               <TabsContent value="pipeline" className="space-y-6">
