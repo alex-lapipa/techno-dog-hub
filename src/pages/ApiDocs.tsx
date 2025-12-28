@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import PageSEO from "@/components/PageSEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -60,8 +60,15 @@ interface TryItPanelProps {
   body?: { name: string; type: string; description: string; required?: boolean }[];
 }
 
+const API_KEY_STORAGE_KEY = "technodog_api_key";
+
 const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(API_KEY_STORAGE_KEY) || "";
+    }
+    return "";
+  });
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
   const [bodyParams, setBodyParams] = useState<Record<string, string>>({});
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
@@ -70,6 +77,13 @@ const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
   const [error, setError] = useState<string | null>(null);
   
   const historyCtx = useContext(HistoryContext);
+
+  // Persist API key to localStorage
+  useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
+    }
+  }, [apiKey]);
 
   // Extract path parameters like :id from path
   const pathParamNames = path.match(/:(\w+)/g)?.map(p => p.slice(1)) || [];
