@@ -1,34 +1,21 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Film } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
-import { loadArtistsSummary, loadArtistById, type ArtistSummary } from "@/data/artists-loader";
+import { useArtists, usePrefetchArtist, type ArtistSummary } from "@/hooks/useData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 
 const ArtistsPage = () => {
-  const queryClient = useQueryClient();
   const parentRef = useRef<HTMLDivElement>(null);
   useScrollDepth({ pageName: 'artists' });
   
-  const prefetchArtist = useCallback((id: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ['artist', id],
-      queryFn: () => loadArtistById(id),
-      staleTime: 1000 * 60 * 10,
-    });
-  }, [queryClient]);
-
-  const { data: artists = [], isLoading } = useQuery({
-    queryKey: ['artists-summary'],
-    queryFn: loadArtistsSummary,
-    staleTime: 1000 * 60 * 10,
-  });
+  const prefetchArtist = usePrefetchArtist();
+  const { data: artists = [], isLoading } = useArtists();
 
   const rowVirtualizer = useVirtualizer({
     count: artists.length,
