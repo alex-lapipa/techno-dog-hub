@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -58,6 +58,7 @@ const EVENT_TYPES = [
 
 const XPEventsAdmin = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [events, setEvents] = useState<XPEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,15 +209,8 @@ const XPEventsAdmin = () => {
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-12 pt-24 text-center">
-          <p className="text-muted-foreground">Access denied</p>
-        </main>
-        <Footer />
-      </div>
-    );
+    navigate("/admin");
+    return null;
   }
 
   return (

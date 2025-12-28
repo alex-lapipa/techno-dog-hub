@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -32,6 +33,7 @@ const CATEGORY_OPTIONS = ['operations', 'security', 'content', 'data'];
 
 export default function NotificationChannels() {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const navigate = useNavigate();
   const [channels, setChannels] = useState<NotificationChannel[]>([]);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState<string | null>(null);
@@ -184,15 +186,8 @@ export default function NotificationChannels() {
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container py-16 text-center">
-          <p className="text-muted-foreground">Access denied. Admin only.</p>
-        </div>
-        <Footer />
-      </div>
-    );
+    navigate("/admin");
+    return null;
   }
 
   return (

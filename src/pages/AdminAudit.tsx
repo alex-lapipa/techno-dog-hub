@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -47,6 +48,7 @@ interface AuditResult {
 
 const AdminAudit = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
 
@@ -124,11 +126,8 @@ const AdminAudit = () => {
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Access denied</p>
-      </div>
-    );
+    navigate("/admin");
+    return null;
   }
 
   return (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useActivityLog } from "@/hooks/useActivityLog";
@@ -465,8 +466,10 @@ const MediaAdmin = () => {
     return <Badge variant="outline" className={colors[status]}>{status}</Badge>;
   };
 
+  const navigate = useNavigate();
+  
   if (authLoading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
-  if (!isAdmin) return <div className="min-h-screen bg-background flex items-center justify-center">Access denied</div>;
+  if (!isAdmin) { navigate("/admin"); return null; }
 
   return (
     <div className="min-h-screen bg-background">

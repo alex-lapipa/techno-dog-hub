@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -26,6 +27,7 @@ interface Stats {
 
 export default function KnowledgeAdmin() {
   const { isAdmin, loading: authLoading } = useAdminAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats | null>(null);
   const [suggestedTopics, setSuggestedTopics] = useState<SuggestedTopic[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<Set<string>>(new Set());
@@ -166,15 +168,8 @@ export default function KnowledgeAdmin() {
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container py-16 text-center">
-          <p className="text-muted-foreground">Access denied. Admin only.</p>
-        </div>
-        <Footer />
-      </div>
-    );
+    navigate("/admin");
+    return null;
   }
 
   return (
