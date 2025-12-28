@@ -75,7 +75,7 @@ const FestivalsPage = () => {
         structuredData={itemListSchema}
       />
       <Header />
-      <main className="pt-24 lg:pt-16 pb-16">
+      <main className="pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
           <div className="mb-8 space-y-4">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">

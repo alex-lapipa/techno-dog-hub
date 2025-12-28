@@ -71,7 +71,7 @@ const NewsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main className="pt-24 lg:pt-16 pb-16">
+      <main className="pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">
           {/* Hero with Featured Article */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">

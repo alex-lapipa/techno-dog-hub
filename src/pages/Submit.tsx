@@ -16,7 +16,7 @@ const Submit = () => {
       />
       <Header />
 
-      <main className="pt-24 lg:pt-16">
+      <main className="pt-16">
         {/* Header */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
