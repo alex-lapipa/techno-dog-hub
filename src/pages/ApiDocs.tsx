@@ -6,8 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Check, ExternalLink, Lock, Server, Users, FileText, Image, Activity } from "lucide-react";
+import { Copy, Check, Lock, Server, Users, FileText, Image, Activity, Play, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
+const BASE_URL = "https://bshyeweljerupobpmmes.supabase.co/functions/v1/admin-api";
 
 const CodeBlock = ({ code, language = "bash" }: { code: string; language?: string }) => {
   const [copied, setCopied] = useState(false);
@@ -35,6 +41,253 @@ const CodeBlock = ({ code, language = "bash" }: { code: string; language?: strin
   );
 };
 
+interface TryItPanelProps {
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  path: string;
+  params?: { name: string; type: string; description: string; required?: boolean }[];
+  body?: { name: string; type: string; description: string; required?: boolean }[];
+}
+
+const TryItPanel = ({ method, path, params, body }: TryItPanelProps) => {
+  const [apiKey, setApiKey] = useState("");
+  const [queryParams, setQueryParams] = useState<Record<string, string>>({});
+  const [bodyParams, setBodyParams] = useState<Record<string, string>>({});
+  const [pathParams, setPathParams] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState<{ status: number; data: any; time: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Extract path parameters like :id from path
+  const pathParamNames = path.match(/:(\w+)/g)?.map(p => p.slice(1)) || [];
+
+  const buildUrl = () => {
+    let url = `${BASE_URL}${path}`;
+    
+    // Replace path parameters
+    pathParamNames.forEach(param => {
+      if (pathParams[param]) {
+        url = url.replace(`:${param}`, pathParams[param]);
+      }
+    });
+    
+    // Add query parameters
+    const queryString = Object.entries(queryParams)
+      .filter(([_, value]) => value)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join("&");
+    
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+    
+    return url;
+  };
+
+  const handleSubmit = async () => {
+    if (!apiKey) {
+      setError("API key is required");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setResponse(null);
+
+    const startTime = performance.now();
+
+    try {
+      const url = buildUrl();
+      const options: RequestInit = {
+        method,
+        headers: {
+          "x-api-key": apiKey,
+          "Content-Type": "application/json",
+        },
+      };
+
+      if (method !== "GET" && body && body.length > 0) {
+        const bodyData: Record<string, any> = {};
+        Object.entries(bodyParams).forEach(([key, value]) => {
+          if (value) {
+            // Try to parse as JSON for arrays/objects
+            try {
+              bodyData[key] = JSON.parse(value);
+            } catch {
+              bodyData[key] = value;
+            }
+          }
+        });
+        if (Object.keys(bodyData).length > 0) {
+          options.body = JSON.stringify(bodyData);
+        }
+      }
+
+      const res = await fetch(url, options);
+      const endTime = performance.now();
+      const data = await res.json();
+
+      setResponse({
+        status: res.status,
+        data,
+        time: Math.round(endTime - startTime),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 p-4 bg-muted/30 border border-border rounded-lg space-y-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+        <Play className="h-4 w-4" />
+        Try It
+      </div>
+
+      {/* API Key */}
+      <div className="space-y-2">
+        <Label htmlFor="apiKey" className="text-xs text-muted-foreground">API Key</Label>
+        <Input
+          id="apiKey"
+          type="password"
+          placeholder="td_live_xxxxx"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="font-mono text-sm h-9"
+        />
+      </div>
+
+      {/* Path Parameters */}
+      {pathParamNames.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Path Parameters</Label>
+          <div className="grid gap-2">
+            {pathParamNames.map((param) => (
+              <div key={param} className="flex items-center gap-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded min-w-[60px]">{param}</code>
+                <Input
+                  placeholder={`Enter ${param}`}
+                  value={pathParams[param] || ""}
+                  onChange={(e) => setPathParams({ ...pathParams, [param]: e.target.value })}
+                  className="font-mono text-sm h-8 flex-1"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Query Parameters */}
+      {params && params.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Query Parameters</Label>
+          <div className="grid gap-2">
+            {params.map((param) => (
+              <div key={param.name} className="flex items-center gap-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded min-w-[80px]">
+                  {param.name}
+                  {param.required && <span className="text-crimson ml-1">*</span>}
+                </code>
+                <Input
+                  placeholder={param.description}
+                  value={queryParams[param.name] || ""}
+                  onChange={(e) => setQueryParams({ ...queryParams, [param.name]: e.target.value })}
+                  className="font-mono text-sm h-8 flex-1"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Body Parameters */}
+      {body && body.length > 0 && method !== "GET" && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Request Body</Label>
+          <div className="grid gap-2">
+            {body.map((field) => (
+              <div key={field.name} className="flex items-start gap-2">
+                <code className="text-xs bg-muted px-1.5 py-0.5 rounded min-w-[100px] mt-2">
+                  {field.name}
+                  {field.required && <span className="text-crimson ml-1">*</span>}
+                </code>
+                {field.type.includes("[]") || field.type === "object" ? (
+                  <Textarea
+                    placeholder={`${field.description} (JSON format)`}
+                    value={bodyParams[field.name] || ""}
+                    onChange={(e) => setBodyParams({ ...bodyParams, [field.name]: e.target.value })}
+                    className="font-mono text-sm flex-1 min-h-[60px]"
+                  />
+                ) : (
+                  <Input
+                    placeholder={field.description}
+                    value={bodyParams[field.name] || ""}
+                    onChange={(e) => setBodyParams({ ...bodyParams, [field.name]: e.target.value })}
+                    className="font-mono text-sm h-8 flex-1"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Submit Button */}
+      <Button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="w-full font-mono text-xs uppercase tracking-wider"
+        variant="brutalist"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Sending...
+          </>
+        ) : (
+          <>
+            <Play className="h-4 w-4 mr-2" />
+            Send Request
+          </>
+        )}
+      </Button>
+
+      {/* Error */}
+      {error && (
+        <div className="p-3 bg-crimson/10 border border-crimson/30 rounded text-sm text-crimson font-mono">
+          {error}
+        </div>
+      )}
+
+      {/* Response */}
+      {response && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <Badge
+              className={`font-mono text-xs ${
+                response.status >= 200 && response.status < 300
+                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                  : response.status >= 400
+                  ? "bg-crimson/20 text-crimson border-crimson/30"
+                  : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+              }`}
+            >
+              {response.status}
+            </Badge>
+            <span className="text-xs text-muted-foreground font-mono">{response.time}ms</span>
+          </div>
+          <pre className="bg-background/50 border border-border rounded-lg p-4 overflow-x-auto text-xs font-mono max-h-[300px] overflow-y-auto">
+            <code className="text-foreground/90">
+              {JSON.stringify(response.data, null, 2)}
+            </code>
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const EndpointCard = ({ 
   method, 
   path, 
@@ -52,6 +305,8 @@ const EndpointCard = ({
   response?: string;
   example?: string;
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const methodColors = {
     GET: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     POST: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -62,11 +317,22 @@ const EndpointCard = ({
   return (
     <Card className="bg-card/50 border-border/50 mb-4">
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Badge className={`${methodColors[method]} font-mono text-xs px-2 py-0.5`}>
-            {method}
-          </Badge>
-          <code className="text-sm font-mono text-foreground/90">{path}</code>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Badge className={`${methodColors[method]} font-mono text-xs px-2 py-0.5`}>
+              {method}
+            </Badge>
+            <code className="text-sm font-mono text-foreground/90">{path}</code>
+          </div>
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm" className="font-mono text-xs gap-1.5 h-7">
+                <Play className="h-3 w-3" />
+                Try It
+                {isOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              </Button>
+            </CollapsibleTrigger>
+          </Collapsible>
         </div>
         <CardDescription className="mt-2">{description}</CardDescription>
       </CardHeader>
@@ -103,6 +369,13 @@ const EndpointCard = ({
           </div>
         )}
 
+        {/* Try It Panel */}
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleContent>
+            <TryItPanel method={method} path={path} params={params} body={body} />
+          </CollapsibleContent>
+        </Collapsible>
+
         {example && (
           <div>
             <h4 className="text-sm font-medium text-foreground/80 mb-2">Example</h4>
@@ -122,7 +395,7 @@ const EndpointCard = ({
 };
 
 const ApiDocs = () => {
-  const baseUrl = "https://bshyeweljerupobpmmes.supabase.co/functions/v1/admin-api";
+  const baseUrl = BASE_URL;
 
   return (
     <>
@@ -139,7 +412,7 @@ const ApiDocs = () => {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Admin API Documentation</h1>
             <p className="text-muted-foreground">
-              RESTful API for managing Techno Dog content, users, and system settings.
+              RESTful API for managing Techno Dog content, users, and system settings. Use the "Try It" button to test endpoints live.
             </p>
           </div>
 
@@ -329,10 +602,8 @@ const ApiDocs = () => {
                     { name: "body_markdown", type: "string", description: "Article content in markdown", required: true },
                     { name: "author_pseudonym", type: "string", description: "Author name", required: true },
                     { name: "subtitle", type: "string", description: "Article subtitle" },
-                    { name: "city_tags", type: "string[]", description: "City tags" },
-                    { name: "genre_tags", type: "string[]", description: "Genre tags" },
-                    { name: "entity_tags", type: "string[]", description: "Entity tags" },
-                    { name: "source_urls", type: "string[]", description: "Source URLs" },
+                    { name: "city_tags", type: "string[]", description: "City tags (JSON array)" },
+                    { name: "genre_tags", type: "string[]", description: "Genre tags (JSON array)" },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/articles" \\
   -H "x-api-key: td_live_xxxxx" \\
@@ -340,9 +611,7 @@ const ApiDocs = () => {
   -d '{
     "title": "New Techno Event",
     "body_markdown": "# Event Details\\n...",
-    "author_pseudonym": "Underground Reporter",
-    "city_tags": ["Berlin"],
-    "genre_tags": ["techno"]
+    "author_pseudonym": "Underground Reporter"
   }'`}
                 />
 
@@ -378,20 +647,20 @@ const ApiDocs = () => {
                   description="Bulk operations on multiple articles."
                   body={[
                     { name: "action", type: "string", description: "publish, unpublish, archive, or delete", required: true },
-                    { name: "article_ids", type: "string[]", description: "Array of article IDs", required: true },
+                    { name: "article_ids", type: "string[]", description: "Array of article IDs (JSON array)", required: true },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/articles/bulk" \\
   -H "x-api-key: td_live_xxxxx" \\
   -H "Content-Type: application/json" \\
   -d '{
     "action": "publish",
-    "article_ids": ["uuid-1", "uuid-2", "uuid-3"]
+    "article_ids": ["uuid-1", "uuid-2"]
   }'`}
                   response={`{
   "success": true,
   "data": {
     "published": true,
-    "count": 3
+    "count": 2
   }
 }`}
                 />
@@ -431,12 +700,8 @@ const ApiDocs = () => {
         "id": 1,
         "rank": 1,
         "artist_name": "Jeff Mills",
-        "real_name": "Jeffrey Mills",
         "nationality": "USA",
-        "years_active": "1984–present",
-        "subgenres": ["Detroit techno"],
-        "labels": ["Axis", "Tresor"],
-        "known_for": "The Wizard"
+        "subgenres": ["Detroit techno"]
       }
     ],
     "count": 50,
@@ -464,11 +729,8 @@ const ApiDocs = () => {
                     { name: "rank", type: "number", description: "Ranking position", required: true },
                     { name: "real_name", type: "string", description: "Real name" },
                     { name: "nationality", type: "string", description: "Country of origin" },
-                    { name: "years_active", type: "string", description: "Active years range" },
-                    { name: "subgenres", type: "string[]", description: "Music subgenres" },
-                    { name: "labels", type: "string[]", description: "Associated labels" },
-                    { name: "top_tracks", type: "string[]", description: "Notable tracks" },
-                    { name: "known_for", type: "string", description: "What they're known for" },
+                    { name: "subgenres", type: "string[]", description: "Music subgenres (JSON array)" },
+                    { name: "labels", type: "string[]", description: "Associated labels (JSON array)" },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/dj-artists" \\
   -H "x-api-key: td_live_xxxxx" \\
@@ -476,9 +738,7 @@ const ApiDocs = () => {
   -d '{
     "artist_name": "New Artist",
     "rank": 101,
-    "nationality": "Germany",
-    "subgenres": ["industrial techno"],
-    "labels": ["Mord", "PoleGroup"]
+    "nationality": "Germany"
   }'`}
                 />
 
@@ -488,14 +748,13 @@ const ApiDocs = () => {
                   description="Update an existing DJ artist."
                   body={[
                     { name: "artist_name", type: "string", description: "Artist stage name" },
-                    { name: "rank", type: "number", description: "Ranking position" },
-                    { name: "subgenres", type: "string[]", description: "Music subgenres" },
-                    { name: "labels", type: "string[]", description: "Associated labels" },
+                    { name: "nationality", type: "string", description: "Country of origin" },
+                    { name: "subgenres", type: "string[]", description: "Music subgenres (JSON array)" },
                   ]}
                   example={`curl -X PATCH "${baseUrl}/content/dj-artists/1" \\
   -H "x-api-key: td_live_xxxxx" \\
   -H "Content-Type: application/json" \\
-  -d '{"subgenres": ["detroit techno", "minimal"]}'`}
+  -d '{"nationality": "USA"}'`}
                 />
 
                 <EndpointCard
@@ -504,17 +763,13 @@ const ApiDocs = () => {
                   description="Bulk operations on multiple DJ artists."
                   body={[
                     { name: "action", type: "string", description: "update or delete", required: true },
-                    { name: "artist_ids", type: "number[]", description: "Array of artist IDs", required: true },
+                    { name: "artist_ids", type: "number[]", description: "Array of artist IDs (JSON array)", required: true },
                     { name: "updates", type: "object", description: "Fields to update (for update action)" },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/dj-artists/bulk" \\
   -H "x-api-key: td_live_xxxxx" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "action": "update",
-    "artist_ids": [1, 2, 3],
-    "updates": {"nationality": "Updated"}
-  }'`}
+  -d '{"action": "delete", "artist_ids": [101, 102]}'`}
                 />
 
                 <EndpointCard
@@ -571,12 +826,7 @@ const ApiDocs = () => {
                     { name: "entity_id", type: "string", description: "Entity ID", required: true },
                     { name: "entity_name", type: "string", description: "Entity display name", required: true },
                     { name: "source_url", type: "string", description: "Original source URL" },
-                    { name: "storage_url", type: "string", description: "Storage URL" },
-                    { name: "provider", type: "string", description: "Image provider" },
-                    { name: "license_status", type: "string", description: "License status" },
                     { name: "alt_text", type: "string", description: "Alt text for accessibility" },
-                    { name: "match_score", type: "number", description: "AI match score (0-100)" },
-                    { name: "quality_score", type: "number", description: "Quality score (0-100)" },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/media-assets" \\
   -H "x-api-key: td_live_xxxxx" \\
@@ -584,10 +834,7 @@ const ApiDocs = () => {
   -d '{
     "entity_type": "artist",
     "entity_id": "jeff-mills",
-    "entity_name": "Jeff Mills",
-    "source_url": "https://example.com/image.jpg",
-    "license_status": "verified",
-    "alt_text": "Jeff Mills performing"
+    "entity_name": "Jeff Mills"
   }'`}
                 />
 
@@ -597,23 +844,12 @@ const ApiDocs = () => {
                   description="Bulk operations on media assets."
                   body={[
                     { name: "action", type: "string", description: "update, delete, or select_final", required: true },
-                    { name: "asset_ids", type: "string[]", description: "Array of asset IDs", required: true },
-                    { name: "updates", type: "object", description: "Fields to update (for update action)" },
+                    { name: "asset_ids", type: "string[]", description: "Array of asset IDs (JSON array)", required: true },
                   ]}
                   example={`curl -X POST "${baseUrl}/content/media-assets/bulk" \\
   -H "x-api-key: td_live_xxxxx" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "action": "select_final",
-    "asset_ids": ["asset-uuid-1"]
-  }'`}
-                  response={`{
-  "success": true,
-  "data": {
-    "selected": true,
-    "count": 1
-  }
-}`}
+  -d '{"action": "select_final", "asset_ids": ["uuid-1"]}'`}
                 />
 
                 <EndpointCard
@@ -661,8 +897,7 @@ const ApiDocs = () => {
     "health": {
       "active_alerts": 0,
       "pending_jobs": 5,
-      "pending_reports": 2,
-      "alerts": []
+      "pending_reports": 2
     }
   }
 }`}
@@ -682,8 +917,7 @@ const ApiDocs = () => {
       "total_events": 1523,
       "by_event": {
         "page_view": 1200,
-        "click": 300,
-        "scroll_depth": 23
+        "click": 300
       }
     }
   }
@@ -696,16 +930,6 @@ const ApiDocs = () => {
                   method="GET"
                   path="/system/api-usage"
                   description="Get API usage statistics for the last 24 hours."
-                  response={`{
-  "success": true,
-  "data": {
-    "api_usage": {
-      "period": "24h",
-      "total_requests": 5432,
-      "recent": [...]
-    }
-  }
-}`}
                   example={`curl -X GET "${baseUrl}/system/api-usage" \\
   -H "x-api-key: td_live_xxxxx"`}
                 />
@@ -714,21 +938,6 @@ const ApiDocs = () => {
                   method="GET"
                   path="/system/audit"
                   description="Get recent admin audit logs."
-                  response={`{
-  "success": true,
-  "data": {
-    "audit_logs": [
-      {
-        "id": "uuid",
-        "admin_user_id": "uuid",
-        "action_type": "POST /content/articles/publish",
-        "entity_type": "content",
-        "entity_id": "article-uuid",
-        "created_at": "2025-01-01T00:00:00Z"
-      }
-    ]
-  }
-}`}
                   example={`curl -X GET "${baseUrl}/system/audit" \\
   -H "x-api-key: td_live_xxxxx"`}
                 />
