@@ -1,9 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { getVenueById, venues } from "@/data/venues";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
+import { PageLayout } from "@/components/layout";
 import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
@@ -48,30 +46,20 @@ const VenueDetail = () => {
   };
 
   if (!venue) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {venue && (
-        <PageSEO
-          title={`${venue.name} - Techno Venue in ${venue.city}`}
-          description={venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}.`}
-          path={`/venues/${venue.id}`}
-          image={venue.image?.url}
-          structuredData={placeSchema}
-        />
-      )}
-      <Header />
-        <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="font-mono text-muted-foreground">
-              Venue not found
-            </p>
-            <Link to="/venues" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← Back to Venues
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
+    return (
+      <PageLayout
+        title="Venue Not Found"
+        path={`/venues/${id}`}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="font-mono text-muted-foreground">
+            Venue not found
+          </p>
+          <Link to="/venues" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
+            ← Back to Venues
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -84,20 +72,23 @@ const VenueDetail = () => {
     .slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb Navigation */}
-          <DetailBreadcrumb 
-            items={[
-              { label: 'Venues', href: '/venues' },
-              { label: venue.name }
-            ]} 
-          />
+    <PageLayout
+      title={`${venue.name} - Techno Venue in ${venue.city}`}
+      description={venue.atmosphere || `${venue.name} - ${venue.type} venue in ${venue.city}, ${venue.country}.`}
+      path={`/venues/${venue.id}`}
+      structuredData={placeSchema}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumb Navigation */}
+        <DetailBreadcrumb 
+          items={[
+            { label: 'Venues', href: '/venues' },
+            { label: venue.name }
+          ]} 
+        />
 
-          {/* Navigation Row */}
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
+        {/* Navigation Row */}
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
             {/* Back Link */}
             <Link 
               to="/venues" 
@@ -339,10 +330,8 @@ const VenueDetail = () => {
             </section>
           )}
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </PageLayout>
+    );
+  };
 
 export default VenueDetail;
