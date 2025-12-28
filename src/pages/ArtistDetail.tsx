@@ -1,9 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { getArtistById, artists } from "@/data/artists";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
+import { PageLayout } from "@/components/layout";
 import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
@@ -57,20 +55,19 @@ const ArtistDetail = () => {
 
   if (!artist) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 md:px-8">
-            <p className="font-mono text-muted-foreground">
-              Artist not found
-            </p>
-            <Link to="/artists" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
-              ← Back to Artists
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <PageLayout
+        title="Artist Not Found"
+        path={`/artists/${id}`}
+      >
+        <div className="container mx-auto px-4 md:px-8 py-16">
+          <p className="font-mono text-muted-foreground">
+            Artist not found
+          </p>
+          <Link to="/artists" className="font-mono text-xs text-primary hover:underline mt-4 inline-block">
+            ← Back to Artists
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -83,18 +80,13 @@ const ArtistDetail = () => {
     .slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO
-        title={`${artist.name} - Techno Artist`}
-        description={artist.bio.slice(0, 155) + '...'}
-        path={`/artists/${artist.id}`}
-        image={artist.image?.url}
-        type="profile"
-        structuredData={personSchema}
-      />
-      <Header />
-      <main className="pt-24 pb-16">
-        <article className="container mx-auto px-4 md:px-8">
+    <PageLayout
+      title={`${artist.name} - Techno Artist`}
+      description={artist.bio.slice(0, 155) + '...'}
+      path={`/artists/${artist.id}`}
+      structuredData={personSchema}
+    >
+      <article className="container mx-auto px-4 md:px-8 py-8">
           {/* Breadcrumb Navigation */}
           <DetailBreadcrumb 
             items={[
@@ -521,14 +513,12 @@ const ArtistDetail = () => {
                 to="/mad/timeline"
                 className="font-mono text-xs border border-border px-4 py-2 hover:bg-card transition-colors"
               >
-                → Timeline
-              </Link>
-            </div>
-          </section>
-        </article>
-      </main>
-      <Footer />
-    </div>
+              → Timeline
+            </Link>
+          </div>
+        </section>
+      </article>
+    </PageLayout>
   );
 };
 

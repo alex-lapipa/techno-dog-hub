@@ -2,10 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Calendar, MapPin, ExternalLink, ChevronLeft, ChevronRight, Music } from "lucide-react";
 import { festivals, getFestivalById } from "@/data/festivals";
 import { Button } from "@/components/ui/button";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
-import FilmFrame from "@/components/FilmFrame";
+import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 
@@ -93,19 +90,18 @@ const FestivalDetail = () => {
 
   if (!festival) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main className="pt-24 pb-16">
-          <div className="container mx-auto px-4 md:px-8 text-center">
-            <h1 className="font-mono text-4xl uppercase tracking-tight mb-4">404</h1>
-            <p className="font-mono text-muted-foreground mb-8">Festival not found</p>
-            <Link to="/festivals">
-              <Button variant="brutalist">Back to festivals</Button>
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <PageLayout
+        title="Festival Not Found"
+        path={`/festivals/${id}`}
+      >
+        <div className="container mx-auto px-4 md:px-8 py-16 text-center">
+          <h1 className="font-mono text-4xl uppercase tracking-tight mb-4">404</h1>
+          <p className="font-mono text-muted-foreground mb-8">Festival not found</p>
+          <Link to="/festivals">
+            <Button variant="brutalist">Back to festivals</Button>
+          </Link>
+        </div>
+      </PageLayout>
     );
   }
 
@@ -115,17 +111,14 @@ const FestivalDetail = () => {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO
-        title={`${festival.name} - Techno Festival in ${festival.city}, ${festival.country}`}
-        description={festival.description || `${festival.name} is a ${festival.type} techno festival in ${festival.city}, ${festival.country}. Established ${festival.founded}. Capacity: ${festival.capacity?.toLocaleString() || 'TBA'}.`}
-        path={`/festivals/${festival.id}`}
-        structuredData={eventSchema}
-      />
-      <Header />
-      <main className="pt-24 lg:pt-16 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
-          <DetailBreadcrumb items={[{ label: 'Festivals', href: '/festivals' }, { label: festival.name }]} />
+    <PageLayout
+      title={`${festival.name} - Techno Festival in ${festival.city}, ${festival.country}`}
+      description={festival.description || `${festival.name} is a ${festival.type} techno festival in ${festival.city}, ${festival.country}. Established ${festival.founded}. Capacity: ${festival.capacity?.toLocaleString() || 'TBA'}.`}
+      path={`/festivals/${festival.id}`}
+      structuredData={eventSchema}
+    >
+      <div className="container mx-auto px-4 md:px-8 py-8">
+        <DetailBreadcrumb items={[{ label: 'Festivals', href: '/festivals' }, { label: festival.name }]} />
           <div className="flex items-center justify-between mb-8">
             <Link to="/festivals" className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors group">
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -375,10 +368,8 @@ const FestivalDetail = () => {
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+      </PageLayout>
+    );
+  };
 
 export default FestivalDetail;
