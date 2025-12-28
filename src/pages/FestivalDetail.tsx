@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
+import YouTubeVideos from "@/components/YouTubeVideos";
 
 const FestivalDetail = () => {
   const { id } = useParams();
@@ -296,6 +297,9 @@ const FestivalDetail = () => {
                 </Button>
               </div>
             </div>
+
+            {/* YouTube Videos */}
+            <YouTubeVideos artistName={`${festival.name} festival`} />
 
             {/* Right Column - Details */}
             <div className="space-y-6">
