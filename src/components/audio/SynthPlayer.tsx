@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers, Sparkles, FlipVertical2, RefreshCw, Check, X, Cloud } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, BarChart3, Activity, Layers, Sparkles, FlipVertical2, RefreshCw, Check, X, Cloud, Upload, Loader2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 interface SynthPlayerProps {
   title?: string;
   artist?: string;
@@ -69,6 +77,7 @@ const SynthPlayer = ({
   artist = "Techno Dog Sound Engine",
   className 
 }: SynthPlayerProps) => {
+  const { user, isAdmin } = useAuth();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -76,6 +85,7 @@ const SynthPlayer = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
@@ -96,6 +106,11 @@ const SynthPlayer = ({
     acid: false,
   });
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  
+  // Admin upload state
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadPattern, setUploadPattern] = useState<PatternType>("warehouse");
+  const [dragOver, setDragOver] = useState(false);
 
   const pattern = PATTERNS[patternType];
 
@@ -132,6 +147,82 @@ const SynthPlayer = ({
     } finally {
       setIsSyncing(false);
     }
+  }, []);
+
+  // Handle admin file upload
+  const handleUpload = useCallback(async (file: File) => {
+    if (!isAdmin) {
+      toast.error('Admin access required');
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Use MP3, WAV, OGG, or WebM');
+      return;
+    }
+
+    // Validate file size (50MB max)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('File too large. Maximum 50MB');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileName = `${uploadPattern}-demo.mp3`;
+      
+      const { error } = await supabase.storage
+        .from('tdog-demos')
+        .upload(fileName, file, {
+          contentType: file.type,
+          upsert: true,
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        toast.error(`Upload failed: ${error.message}`);
+        return;
+      }
+
+      toast.success(`${PATTERNS[uploadPattern].name} demo uploaded successfully`);
+      
+      // Refresh availability
+      await syncFromCloud();
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  }, [isAdmin, uploadPattern, syncFromCloud]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleUpload(file);
+    }
+    // Reset input
+    if (e.target) e.target.value = '';
+  }, [handleUpload]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleUpload(file);
+    }
+  }, [handleUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(false);
   }, []);
 
   // Auto-sync on mount
@@ -672,7 +763,79 @@ const SynthPlayer = ({
         )}
       </div>
 
-      {/* Waveform Visualizer */}
+      {/* Admin Upload Section */}
+      {isAdmin && (
+        <div className="mb-4 p-3 border border-dashed border-logo-green/30 rounded-lg bg-logo-green/5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] text-logo-green uppercase tracking-wider flex items-center gap-1.5">
+              <Upload className="h-3 w-3" />
+              Admin Upload
+            </p>
+          </div>
+          
+          <div className="flex gap-2 items-center mb-3">
+            <Select
+              value={uploadPattern}
+              onValueChange={(value) => setUploadPattern(value as PatternType)}
+            >
+              <SelectTrigger className="h-8 w-32 font-mono text-[10px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(PATTERNS) as PatternType[]).map((key) => (
+                  <SelectItem key={key} value={key} className="font-mono text-xs">
+                    {PATTERNS[key].name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/webm"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 font-mono text-[10px] gap-1.5"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Upload className="h-3 w-3" />
+              )}
+              {isUploading ? "Uploading..." : "Select File"}
+            </Button>
+          </div>
+          
+          {/* Drop zone */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={cn(
+              "border border-dashed rounded-md p-4 text-center transition-colors",
+              dragOver 
+                ? "border-logo-green bg-logo-green/10" 
+                : "border-border/50 hover:border-border"
+            )}
+          >
+            <p className="font-mono text-[10px] text-muted-foreground">
+              {dragOver ? "Drop to upload" : "Or drag & drop audio file here"}
+            </p>
+            <p className="font-mono text-[9px] text-muted-foreground/60 mt-1">
+              MP3, WAV, OGG, WebM • Max 50MB
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mb-4">
         {/* Visualizer Controls */}
         <div className="flex items-center justify-between mb-2">
