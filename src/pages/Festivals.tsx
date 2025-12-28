@@ -232,7 +232,6 @@ const FestivalsPage = () => {
                             transform: `translateY(${virtualRow.start}px)`,
                           }}
                         >
-                        >
                           <div className="flex items-center gap-6">
                             <span className="font-mono text-xs text-muted-foreground w-8">
                               {String(virtualRow.index + 1).padStart(2, "0")}

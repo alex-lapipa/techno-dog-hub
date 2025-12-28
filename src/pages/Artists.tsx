@@ -111,7 +111,6 @@ const ArtistsPage = () => {
                           transform: `translateY(${virtualRow.start}px)`,
                         }}
                       >
-                      >
                         <div className="flex items-center gap-3 sm:gap-4">
                           {/* Artist Photo */}
                           <div className="w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 bg-muted border border-border overflow-hidden">

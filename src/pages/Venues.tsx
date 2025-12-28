@@ -110,7 +110,6 @@ const VenuesPage = () => {
                         transform: `translateY(${virtualRow.start}px)`,
                       }}
                     >
-                    >
                       {venue1 && (
                         <Link
                           to={`/venues/${venue1.id}`}
