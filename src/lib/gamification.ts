@@ -150,6 +150,10 @@ export async function awardPointsForSubmission(
       result.badgesAwarded.push("verified");
     }
 
+    // Check milestone badges based on new total
+    const milestoneBadges = await checkMilestoneBadges(profile.id, result.newTotal);
+    result.badgesAwarded.push(...milestoneBadges);
+
     // Update activity streak
     const streakResult = await updateStreak(profile.id);
     if (streakResult) {
@@ -269,6 +273,34 @@ async function checkStreakBadges(profileId: string, currentStreak: number): Prom
     if (currentStreak >= threshold.streak) {
       if (await tryAwardBadge(profileId, threshold.slug)) {
         awarded.push(threshold.slug);
+      }
+    }
+  }
+
+  return awarded;
+}
+
+/**
+ * Check and award milestone badges based on total points
+ */
+async function checkMilestoneBadges(profileId: string, totalPoints: number): Promise<string[]> {
+  const awarded: string[] = [];
+  
+  const milestones = [
+    { points: 100, slug: "milestone-100" },
+    { points: 500, slug: "milestone-500" },
+    { points: 1000, slug: "milestone-1000" },
+    { points: 2500, slug: "milestone-2500" },
+    { points: 5000, slug: "milestone-5000" },
+    { points: 10000, slug: "milestone-10000" },
+    { points: 25000, slug: "milestone-25000" },
+    { points: 50000, slug: "milestone-50000" },
+  ];
+
+  for (const milestone of milestones) {
+    if (totalPoints >= milestone.points) {
+      if (await tryAwardBadge(profileId, milestone.slug)) {
+        awarded.push(milestone.slug);
       }
     }
   }
