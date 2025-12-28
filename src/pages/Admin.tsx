@@ -7,10 +7,11 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, FileText, Users, BarChart3, Newspaper, Loader2, Settings, Shield, Image, Brain, Zap, Crown, Bot, Activity, Palette, ClipboardList } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Lock, LogOut, Loader2 } from "lucide-react";
+import AgentCard from "@/components/admin/AgentCard";
+import ToolCard from "@/components/admin/ToolCard";
+import AgentReportsList from "@/components/admin/AgentReportsList";
 import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
-import ScheduledJobsStatus from "@/components/admin/ScheduledJobsStatus";
 
 const AdminLoginForm = () => {
   const [password, setPassword] = useState("");
@@ -21,67 +22,40 @@ const AdminLoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     const success = await login(password);
-
     if (success) {
-      toast({
-        title: "Welcome back",
-        description: "Admin access granted.",
-      });
+      toast({ title: "Access granted", description: "Welcome back." });
     } else {
-      toast({
-        title: "Access denied",
-        description: "Invalid password.",
-        variant: "destructive",
-      });
+      toast({ title: "Access denied", description: "Invalid password.", variant: "destructive" });
     }
-
     setPassword("");
     setLoading(false);
   };
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="border border-border bg-card p-8">
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 border border-logo-green/50 bg-logo-green/10 flex items-center justify-center">
-            <Lock className="w-8 h-8 text-logo-green" />
-          </div>
+      <div className="relative bg-zinc-800 p-1">
+        <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-3">
+          {[...Array(4)].map((_, i) => <div key={i} className="w-1.5 h-2 bg-background/80 rounded-sm mx-auto" />)}
         </div>
-
-        <h2 className="font-mono text-xl uppercase tracking-tight text-center mb-2">
-          Admin Access
-        </h2>
-        <p className="font-mono text-xs text-muted-foreground text-center mb-6">
-          Enter the admin password to continue
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="font-mono text-center tracking-widest"
-            autoFocus
-          />
-          <Button
-            type="submit"
-            variant="brutalist"
-            className="w-full font-mono uppercase tracking-wider"
-            disabled={loading || !password}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Enter"
-            )}
-          </Button>
-        </form>
+        <div className="absolute right-0 top-0 bottom-0 w-2 flex flex-col justify-around py-3">
+          {[...Array(4)].map((_, i) => <div key={i} className="w-1.5 h-2 bg-background/80 rounded-sm mx-auto" />)}
+        </div>
+        <div className="mx-2 border border-crimson/20 p-8" style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)' }}>
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 border border-crimson/50 bg-crimson/10 flex items-center justify-center">
+              <Lock className="w-8 h-8 text-crimson" />
+            </div>
+          </div>
+          <h2 className="font-mono text-xl uppercase tracking-tight text-center mb-2">Control Room</h2>
+          <p className="font-mono text-xs text-muted-foreground text-center mb-6">Enter password to continue</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="font-mono text-center tracking-widest" autoFocus />
+            <Button type="submit" variant="brutalist" className="w-full font-mono uppercase tracking-wider" disabled={loading || !password}>
+              {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying...</> : "Enter"}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -94,203 +68,82 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     logout();
-    toast({
-      title: "Logged out",
-      description: "Admin session ended.",
-    });
+    toast({ title: "Session ended" });
     navigate("/");
   };
 
-  const adminTools = [
-    {
-      title: "AI Control Center",
-      description: "Claude + GPT orchestration: Review → Implement → Validate",
-      icon: Bot,
-      path: "/admin/control-center",
-      count: null,
-      highlight: true,
-    },
-    {
-      title: "System Health",
-      description: "Real-time status of edge functions, DB, and APIs",
-      icon: Activity,
-      path: "/admin/health",
-      count: null,
-      highlight: true,
-    },
-    {
-      title: "User & Role Management",
-      description: "Manage users, grant/revoke admin roles",
-      icon: Crown,
-      path: "/admin/users",
-      count: null,
-    },
-    {
-      title: "Media Engine",
-      description: "Auto Fetch → Verify → Curate → Enrich pipeline",
-      icon: Zap,
-      path: "/admin/media-engine",
-      count: null,
-    },
-    {
-      title: "AI Image Gallery",
-      description: "Preview and manage all AI-generated images",
-      icon: Palette,
-      path: "/admin/images",
-      count: null,
-    },
-    {
-      title: "AI Admin Audit",
-      description: "AI-powered analysis of tools, gaps, and recommendations",
-      icon: Brain,
-      path: "/admin/audit",
-      count: null,
-    },
-    {
-      title: "Activity Log",
-      description: "Track all admin actions for audit purposes",
-      icon: ClipboardList,
-      path: "/admin/activity-log",
-      count: null,
-    },
-    {
-      title: "Content Moderation",
-      description: "Review photos and corrections from the community",
-      icon: Shield,
-      path: "/admin/moderation",
-      count: null,
-    },
-    {
-      title: "Community Submissions",
-      description: "Full submission management with editing",
-      icon: FileText,
-      path: "/admin/submissions",
-      count: null,
-    },
-    {
-      title: "Media Curator",
-      description: "Photo retrieval, verification, and management",
-      icon: Image,
-      path: "/admin/media",
-      count: null,
-    },
-    {
-      title: "DJ Artists Database",
-      description: "Manage and upload DJ artist data",
-      icon: Users,
-      path: "/admin/dj-artists",
-      count: null,
-    },
-    {
-      title: "News Agent",
-      description: "AI news generation and article management",
-      icon: Newspaper,
-      path: "/admin/news-agent",
-      count: null,
-    },
-    {
-      title: "Analytics",
-      description: "Site usage and performance metrics",
-      icon: BarChart3,
-      path: "/analytics",
-      count: null,
-    },
+  const agents = [
+    { name: "Health Monitor", category: "Operations", description: "Checks edge functions, database, and API response times", status: "idle" as const, frameNumber: "01" },
+    { name: "Security Auditor", category: "Security", description: "Scans for access control issues and suspicious activity", status: "idle" as const, frameNumber: "02" },
+    { name: "Data Integrity", category: "Operations", description: "Detects orphaned records, duplicates, and missing data", status: "idle" as const, frameNumber: "03" },
+    { name: "Media Monitor", category: "Content", description: "Tracks media pipeline status and failed jobs", status: "idle" as const, frameNumber: "04" },
+    { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05" },
+    { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06" },
+    { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07" },
+    { name: "Pipeline Orchestrator", category: "Operations", description: "Coordinates multi-step review and validation tasks", status: "idle" as const, frameNumber: "08" },
+  ];
+
+  const tools = [
+    { name: "System Status", description: "Real-time status of all services", path: "/admin/health", frameNumber: "T1" },
+    { name: "User Management", description: "Manage users and permissions", path: "/admin/users", frameNumber: "T2" },
+    { name: "Media Engine", description: "Photo acquisition pipeline", path: "/admin/media-engine", frameNumber: "T3" },
+    { name: "Content Moderation", description: "Review community submissions", path: "/admin/moderation", frameNumber: "T4" },
+    { name: "Submissions", description: "Full submission management", path: "/admin/submissions", frameNumber: "T5" },
+    { name: "Artist Database", description: "Manage artist records", path: "/admin/dj-artists", frameNumber: "T6" },
+    { name: "News Management", description: "Article generation and editing", path: "/admin/news-agent", frameNumber: "T7" },
+    { name: "Analytics", description: "Site usage metrics", path: "/analytics", frameNumber: "T8" },
+    { name: "Activity Log", description: "Admin action history", path: "/admin/activity-log", frameNumber: "T9" },
+    { name: "Image Gallery", description: "Generated image management", path: "/admin/images", frameNumber: "T10" },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header with logout */}
+    <div className="space-y-12">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
-            // Control Panel
-          </div>
-          <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight">
-            Admin Dashboard
-          </h1>
+          <div className="font-mono text-[10px] text-crimson uppercase tracking-[0.3em] mb-2">// techno.dog</div>
+          <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight">Control Room</h1>
         </div>
-        <Button
-          variant="outline"
-          onClick={handleLogout}
-          className="font-mono text-xs uppercase tracking-wider"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Logout
+        <Button variant="outline" onClick={handleLogout} className="font-mono text-xs uppercase tracking-wider">
+          <LogOut className="w-4 h-4 mr-2" />End Session
         </Button>
       </div>
 
-      {/* Admin Tools Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {adminTools.map((tool) => (
-          <Link
-            key={tool.path}
-            to={tool.path}
-            className={`group border bg-card p-6 transition-all duration-300 ${
-              tool.highlight 
-                ? 'border-crimson/50 hover:border-crimson hover:bg-crimson/10' 
-                : 'border-border hover:border-logo-green/50 hover:bg-card/80'
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 border bg-muted/50 flex items-center justify-center transition-colors ${
-                tool.highlight
-                  ? 'border-crimson/50 group-hover:border-crimson group-hover:bg-crimson/20'
-                  : 'border-muted group-hover:border-logo-green/50 group-hover:bg-logo-green/10'
-              }`}>
-                <tool.icon className={`w-6 h-6 transition-colors ${
-                  tool.highlight
-                    ? 'text-crimson'
-                    : 'text-muted-foreground group-hover:text-logo-green'
-                }`} />
-              </div>
-              <div className="flex-1">
-                <h3 className={`font-mono text-sm uppercase tracking-tight transition-colors ${
-                  tool.highlight
-                    ? 'text-crimson'
-                    : 'group-hover:text-logo-green'
-                }`}>
-                  {tool.title}
-                </h3>
-                <p className="font-mono text-xs text-muted-foreground mt-1">
-                  {tool.description}
-                </p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Activity Feed, Scheduled Jobs & Quick Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Real-time Activity Feed */}
-        <RealtimeActivityFeed />
-
-        {/* Scheduled Jobs Status */}
-        <ScheduledJobsStatus />
-
-        {/* Quick Stats */}
-        <div className="border border-border bg-card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Settings className="w-4 h-4 text-muted-foreground" />
-            <h3 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              Quick Info
-            </h3>
+      {/* Agents Section */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="px-2 py-1 bg-crimson/20 border border-crimson/50">
+            <span className="font-mono text-[10px] text-crimson uppercase tracking-widest">Automated Agents</span>
           </div>
-          <div className="space-y-4">
-            <div className="text-center p-4 border border-border/50">
-              <div className="font-mono text-2xl text-logo-green">●</div>
-              <div className="font-mono text-[10px] text-muted-foreground uppercase mt-1">
-                System Online
-              </div>
-            </div>
-            <div className="text-center p-4 border border-border/50">
-              <div className="font-mono text-xs text-muted-foreground">
-                Session active for 24h
-              </div>
-            </div>
-          </div>
+          <div className="flex-1 h-px bg-crimson/20" />
         </div>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {agents.map((agent) => (
+            <AgentCard key={agent.name} {...agent} />
+          ))}
+        </div>
+      </section>
+
+      {/* Tools Section */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="px-2 py-1 bg-logo-green/20 border border-logo-green/50">
+            <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest">Manual Tools</span>
+          </div>
+          <div className="flex-1 h-px bg-logo-green/20" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {tools.map((tool) => (
+            <ToolCard key={tool.path} {...tool} />
+          ))}
+        </div>
+      </section>
+
+      {/* Status Panels */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AgentReportsList />
+        <RealtimeActivityFeed />
+      </section>
     </div>
   );
 };
@@ -308,13 +161,8 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PageSEO
-        title="Admin"
-        description="techno.dog administration panel"
-        path="/admin"
-      />
+      <PageSEO title="Control Room" description="techno.dog administration" path="/admin" />
       <Header />
-
       <main className="pt-24 lg:pt-16">
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
@@ -322,7 +170,6 @@ const Admin = () => {
           </div>
         </section>
       </main>
-
       <Footer />
     </div>
   );
