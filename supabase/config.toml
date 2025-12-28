@@ -228,3 +228,6 @@ verify_jwt = false
 
 [functions.artist-enrichment-orchestrator]
 verify_jwt = false
+
+[functions.ai-artist-research]
+verify_jwt = false
