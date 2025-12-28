@@ -18,12 +18,13 @@ interface OrchestrationRequest {
 
 interface PipelineStep {
   step: string;
-  agent: "claude" | "gpt";
+  agent: "claude" | "gpt" | "lovable";
   status: "pending" | "running" | "completed" | "failed";
   startedAt?: string;
   completedAt?: string;
   result?: any;
   error?: string;
+  usedFallback?: boolean;
 }
 
 interface PipelineRun {
@@ -44,14 +45,20 @@ serve(async (req) => {
   try {
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+    // At least one AI provider must be configured
+    const hasAnthropicKey = !!ANTHROPIC_API_KEY;
+    const hasOpenAIKey = !!OPENAI_API_KEY;
+    const hasLovableKey = !!LOVABLE_API_KEY;
+    
+    if (!hasAnthropicKey && !hasLovableKey) {
+      throw new Error("No AI provider configured (need ANTHROPIC_API_KEY or LOVABLE_API_KEY)");
     }
-    if (!OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY is not configured");
+    if (!hasOpenAIKey && !hasLovableKey) {
+      throw new Error("No implementation AI configured (need OPENAI_API_KEY or LOVABLE_API_KEY)");
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -112,18 +119,24 @@ ${await getSystemStats(supabase)}
 
 Analyze the target and provide a safe improvement plan.`;
 
-        console.log("Calling Claude for review...");
-        const reviewResult = await callClaude(ANTHROPIC_API_KEY, systemPrompt, userPrompt);
+        console.log("Calling Claude for review (with Lovable AI fallback)...");
+        const { result: reviewResult, usedFallback } = await callClaudeWithFallback(
+          ANTHROPIC_API_KEY,
+          LOVABLE_API_KEY,
+          systemPrompt,
+          userPrompt
+        );
         
         // Log the review to analytics
-        await logPipelineEvent(supabase, "review", target, "claude", reviewResult);
+        await logPipelineEvent(supabase, "review", target, usedFallback ? "lovable" : "claude", reviewResult);
 
         return new Response(JSON.stringify({
           success: true,
-          agent: "claude",
+          agent: usedFallback ? "lovable" : "claude",
           action: "review",
           target,
           result: reviewResult,
+          usedFallback,
           timestamp: new Date().toISOString(),
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -180,18 +193,24 @@ ${dryRun ? "THIS IS A DRY RUN - describe what would be done but don't actually i
 Additional context:
 ${context || "No additional context"}`;
 
-        console.log("Calling GPT for implementation...");
-        const implementResult = await callGPT(OPENAI_API_KEY, systemPrompt, userPrompt);
+        console.log("Calling GPT for implementation (with Lovable AI fallback)...");
+        const { result: implementResult, usedFallback: implFallback } = await callGPTWithFallback(
+          OPENAI_API_KEY,
+          LOVABLE_API_KEY,
+          systemPrompt,
+          userPrompt
+        );
 
-        await logPipelineEvent(supabase, "implement", target, "gpt", implementResult);
+        await logPipelineEvent(supabase, "implement", target, implFallback ? "lovable" : "gpt", implementResult);
 
         return new Response(JSON.stringify({
           success: true,
-          agent: "gpt",
+          agent: implFallback ? "lovable" : "gpt",
           action: "implement",
           target,
           dryRun,
           result: implementResult,
+          usedFallback: implFallback,
           timestamp: new Date().toISOString(),
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -241,17 +260,23 @@ Verify nothing is broken and the implementation is correct.
 Current system state:
 ${await getSystemStats(supabase)}`;
 
-        console.log("Calling Claude for validation...");
-        const validateResult = await callClaude(ANTHROPIC_API_KEY, systemPrompt, userPrompt);
+        console.log("Calling Claude for validation (with Lovable AI fallback)...");
+        const { result: validateResult, usedFallback: valFallback } = await callClaudeWithFallback(
+          ANTHROPIC_API_KEY,
+          LOVABLE_API_KEY,
+          systemPrompt,
+          userPrompt
+        );
 
-        await logPipelineEvent(supabase, "validate", target, "claude", validateResult);
+        await logPipelineEvent(supabase, "validate", target, valFallback ? "lovable" : "claude", validateResult);
 
         return new Response(JSON.stringify({
           success: true,
-          agent: "claude",
+          agent: valFallback ? "lovable" : "claude",
           action: "validate",
           target,
           result: validateResult,
+          usedFallback: valFallback,
           timestamp: new Date().toISOString(),
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -286,11 +311,16 @@ Analyze and create a safe improvement plan. Respond with JSON only.`;
         const reviewUserPrompt = `Review: ${target}\nContext: ${context || "General review"}\nStats: ${await getSystemStats(supabase)}`;
 
         let reviewResult;
+        let reviewFallback = false;
         try {
-          reviewResult = await callClaude(ANTHROPIC_API_KEY, reviewSystemPrompt, reviewUserPrompt);
+          const reviewResponse = await callClaudeWithFallback(ANTHROPIC_API_KEY, LOVABLE_API_KEY, reviewSystemPrompt, reviewUserPrompt);
+          reviewResult = reviewResponse.result;
+          reviewFallback = reviewResponse.usedFallback;
           pipelineRun.steps[0].status = "completed";
           pipelineRun.steps[0].completedAt = new Date().toISOString();
           pipelineRun.steps[0].result = reviewResult;
+          pipelineRun.steps[0].usedFallback = reviewFallback;
+          if (reviewFallback) pipelineRun.steps[0].agent = "lovable";
         } catch (e) {
           pipelineRun.steps[0].status = "failed";
           pipelineRun.steps[0].error = e instanceof Error ? e.message : "Unknown error";
@@ -310,11 +340,16 @@ Follow the plan exactly. Respond with JSON only.`;
         const implementUserPrompt = `Implement plan for: ${target}\nPLAN: ${JSON.stringify(reviewResult)}\n${dryRun ? "DRY RUN - describe only" : "Implement now"}`;
 
         let implementResult;
+        let implFallback = false;
         try {
-          implementResult = await callGPT(OPENAI_API_KEY, implementSystemPrompt, implementUserPrompt);
+          const implResponse = await callGPTWithFallback(OPENAI_API_KEY, LOVABLE_API_KEY, implementSystemPrompt, implementUserPrompt);
+          implementResult = implResponse.result;
+          implFallback = implResponse.usedFallback;
           pipelineRun.steps[1].status = "completed";
           pipelineRun.steps[1].completedAt = new Date().toISOString();
           pipelineRun.steps[1].result = implementResult;
+          pipelineRun.steps[1].usedFallback = implFallback;
+          if (implFallback) pipelineRun.steps[1].agent = "lovable";
         } catch (e) {
           pipelineRun.steps[1].status = "failed";
           pipelineRun.steps[1].error = e instanceof Error ? e.message : "Unknown error";
@@ -334,11 +369,16 @@ Check for regressions and security issues. Respond with JSON only.`;
         const validateUserPrompt = `Validate changes to: ${target}\nCHANGES: ${JSON.stringify(implementResult)}\nStats: ${await getSystemStats(supabase)}`;
 
         let validateResult;
+        let valFallback = false;
         try {
-          validateResult = await callClaude(ANTHROPIC_API_KEY, validateSystemPrompt, validateUserPrompt);
+          const valResponse = await callClaudeWithFallback(ANTHROPIC_API_KEY, LOVABLE_API_KEY, validateSystemPrompt, validateUserPrompt);
+          validateResult = valResponse.result;
+          valFallback = valResponse.usedFallback;
           pipelineRun.steps[2].status = "completed";
           pipelineRun.steps[2].completedAt = new Date().toISOString();
           pipelineRun.steps[2].result = validateResult;
+          pipelineRun.steps[2].usedFallback = valFallback;
+          if (valFallback) pipelineRun.steps[2].agent = "lovable";
         } catch (e) {
           pipelineRun.steps[2].status = "failed";
           pipelineRun.steps[2].error = e instanceof Error ? e.message : "Unknown error";
@@ -377,6 +417,7 @@ Check for regressions and security issues. Respond with JSON only.`;
           status: {
             claudeConfigured: !!ANTHROPIC_API_KEY,
             gptConfigured: !!OPENAI_API_KEY,
+            lovableConfigured: !!LOVABLE_API_KEY,
             recentPipelineRuns: recentEvents?.length || 0,
             systemStats: stats,
           },
@@ -412,6 +453,115 @@ Check for regressions and security issues. Respond with JSON only.`;
 });
 
 // ============ HELPER FUNCTIONS ============
+
+const AI_TIMEOUT_MS = 25000; // 25 second timeout before fallback
+
+async function callWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error("Request timeout")), timeoutMs)
+    )
+  ]);
+}
+
+async function callLovableAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<any> {
+  console.log("Calling Lovable AI Gateway (gemini-2.5-flash)...");
+  
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Lovable AI error:", response.status, errorText);
+    throw new Error(`Lovable AI error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || "";
+
+  // Try to parse JSON from response
+  try {
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+  } catch {
+    // Return raw content if not JSON
+  }
+
+  return { rawResponse: content };
+}
+
+async function callClaudeWithFallback(
+  claudeKey: string | undefined,
+  lovableKey: string | undefined,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<{ result: any; usedFallback: boolean }> {
+  // Try Claude first if configured
+  if (claudeKey) {
+    try {
+      const result = await callWithTimeout(
+        callClaude(claudeKey, systemPrompt, userPrompt),
+        AI_TIMEOUT_MS
+      );
+      return { result, usedFallback: false };
+    } catch (error) {
+      console.warn("Claude failed, attempting Lovable AI fallback:", error instanceof Error ? error.message : "Unknown error");
+    }
+  }
+
+  // Fallback to Lovable AI
+  if (lovableKey) {
+    console.log("Using Lovable AI as fallback...");
+    const result = await callLovableAI(lovableKey, systemPrompt, userPrompt);
+    return { result, usedFallback: true };
+  }
+
+  throw new Error("No AI provider available");
+}
+
+async function callGPTWithFallback(
+  gptKey: string | undefined,
+  lovableKey: string | undefined,
+  systemPrompt: string,
+  userPrompt: string
+): Promise<{ result: any; usedFallback: boolean }> {
+  // Try GPT first if configured
+  if (gptKey) {
+    try {
+      const result = await callWithTimeout(
+        callGPT(gptKey, systemPrompt, userPrompt),
+        AI_TIMEOUT_MS
+      );
+      return { result, usedFallback: false };
+    } catch (error) {
+      console.warn("GPT failed, attempting Lovable AI fallback:", error instanceof Error ? error.message : "Unknown error");
+    }
+  }
+
+  // Fallback to Lovable AI
+  if (lovableKey) {
+    console.log("Using Lovable AI as fallback...");
+    const result = await callLovableAI(lovableKey, systemPrompt, userPrompt);
+    return { result, usedFallback: true };
+  }
+
+  throw new Error("No AI provider available");
+}
 
 async function callClaude(apiKey: string, systemPrompt: string, userPrompt: string): Promise<any> {
   console.log("Calling Anthropic Claude...");
