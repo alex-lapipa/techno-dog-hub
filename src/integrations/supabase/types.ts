@@ -254,6 +254,445 @@ export type Database = {
           },
         ]
       }
+      artist_aliases: {
+        Row: {
+          alias_id: string
+          alias_name: string
+          alias_type: string | null
+          artist_id: string
+          created_at: string | null
+          source_system: string | null
+        }
+        Insert: {
+          alias_id?: string
+          alias_name: string
+          alias_type?: string | null
+          artist_id: string
+          created_at?: string | null
+          source_system?: string | null
+        }
+        Update: {
+          alias_id?: string
+          alias_name?: string
+          alias_type?: string | null
+          artist_id?: string
+          created_at?: string | null
+          source_system?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_aliases_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_assets: {
+        Row: {
+          alt_text: string | null
+          artist_id: string
+          asset_id: string
+          asset_type: string
+          author: string | null
+          copyright_status: string | null
+          created_at: string | null
+          is_primary: boolean | null
+          license: string | null
+          license_url: string | null
+          quality_score: number | null
+          source_name: string | null
+          source_record_id: string | null
+          source_system: string | null
+          source_url: string | null
+          storage_path: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          artist_id: string
+          asset_id?: string
+          asset_type?: string
+          author?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          is_primary?: boolean | null
+          license?: string | null
+          license_url?: string | null
+          quality_score?: number | null
+          source_name?: string | null
+          source_record_id?: string | null
+          source_system?: string | null
+          source_url?: string | null
+          storage_path?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          artist_id?: string
+          asset_id?: string
+          asset_type?: string
+          author?: string | null
+          copyright_status?: string | null
+          created_at?: string | null
+          is_primary?: boolean | null
+          license?: string | null
+          license_url?: string | null
+          quality_score?: number | null
+          source_name?: string | null
+          source_record_id?: string | null
+          source_system?: string | null
+          source_url?: string | null
+          storage_path?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_assets_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_documents: {
+        Row: {
+          artist_id: string
+          chunk_id: string | null
+          chunk_index: number | null
+          content: string
+          created_at: string | null
+          document_id: string
+          document_type: string
+          embedding: string | null
+          metadata: Json | null
+          source_record_id: string | null
+          source_system: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          chunk_id?: string | null
+          chunk_index?: number | null
+          content: string
+          created_at?: string | null
+          document_id?: string
+          document_type: string
+          embedding?: string | null
+          metadata?: Json | null
+          source_record_id?: string | null
+          source_system?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          chunk_id?: string | null
+          chunk_index?: number | null
+          content?: string
+          created_at?: string | null
+          document_id?: string
+          document_type?: string
+          embedding?: string | null
+          metadata?: Json | null
+          source_record_id?: string | null
+          source_system?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_documents_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_gear: {
+        Row: {
+          artist_id: string
+          created_at: string | null
+          gear_category: string
+          gear_id: string
+          gear_items: string[] | null
+          rider_notes: string | null
+          source_system: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string | null
+          gear_category: string
+          gear_id?: string
+          gear_items?: string[] | null
+          rider_notes?: string | null
+          source_system?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string | null
+          gear_category?: string
+          gear_id?: string
+          gear_items?: string[] | null
+          rider_notes?: string | null
+          source_system?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_gear_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_merge_candidates: {
+        Row: {
+          artist_a_id: string
+          artist_b_id: string
+          candidate_id: string
+          created_at: string | null
+          match_reasons: Json | null
+          match_score: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          artist_a_id: string
+          artist_b_id: string
+          candidate_id?: string
+          created_at?: string | null
+          match_reasons?: Json | null
+          match_score: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          artist_a_id?: string
+          artist_b_id?: string
+          candidate_id?: string
+          created_at?: string | null
+          match_reasons?: Json | null
+          match_score?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_merge_candidates_artist_a_id_fkey"
+            columns: ["artist_a_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_merge_candidates_artist_b_id_fkey"
+            columns: ["artist_b_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_migration_log: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          log_id: string
+          operation: string
+          source_record_id: string | null
+          source_system: string | null
+          success: boolean | null
+          target_artist_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          log_id?: string
+          operation: string
+          source_record_id?: string | null
+          source_system?: string | null
+          success?: boolean | null
+          target_artist_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          log_id?: string
+          operation?: string
+          source_record_id?: string | null
+          source_system?: string | null
+          success?: boolean | null
+          target_artist_id?: string | null
+        }
+        Relationships: []
+      }
+      artist_profiles: {
+        Row: {
+          artist_id: string
+          bio_long: string | null
+          bio_short: string | null
+          career_highlights: string[] | null
+          collaborators: string[] | null
+          confidence_score: number | null
+          created_at: string | null
+          crews: string[] | null
+          influences: string[] | null
+          key_releases: Json | null
+          known_for: string | null
+          labels: string[] | null
+          last_synced_at: string | null
+          press_notes: string | null
+          profile_id: string
+          social_links: Json | null
+          source_payload: Json | null
+          source_priority: number | null
+          source_record_id: string | null
+          source_system: string
+          subgenres: string[] | null
+          tags: string[] | null
+          top_tracks: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id: string
+          bio_long?: string | null
+          bio_short?: string | null
+          career_highlights?: string[] | null
+          collaborators?: string[] | null
+          confidence_score?: number | null
+          created_at?: string | null
+          crews?: string[] | null
+          influences?: string[] | null
+          key_releases?: Json | null
+          known_for?: string | null
+          labels?: string[] | null
+          last_synced_at?: string | null
+          press_notes?: string | null
+          profile_id?: string
+          social_links?: Json | null
+          source_payload?: Json | null
+          source_priority?: number | null
+          source_record_id?: string | null
+          source_system: string
+          subgenres?: string[] | null
+          tags?: string[] | null
+          top_tracks?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string
+          bio_long?: string | null
+          bio_short?: string | null
+          career_highlights?: string[] | null
+          collaborators?: string[] | null
+          confidence_score?: number | null
+          created_at?: string | null
+          crews?: string[] | null
+          influences?: string[] | null
+          key_releases?: Json | null
+          known_for?: string | null
+          labels?: string[] | null
+          last_synced_at?: string | null
+          press_notes?: string | null
+          profile_id?: string
+          social_links?: Json | null
+          source_payload?: Json | null
+          source_priority?: number | null
+          source_record_id?: string | null
+          source_system?: string
+          subgenres?: string[] | null
+          tags?: string[] | null
+          top_tracks?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_profiles_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
+      artist_source_map: {
+        Row: {
+          artist_id: string | null
+          created_at: string | null
+          is_merged: boolean | null
+          mapping_id: string
+          match_confidence: number | null
+          match_method: string | null
+          merged_into_artist_id: string | null
+          notes: string | null
+          source_record_id: string
+          source_system: string
+          source_table: string
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id?: string | null
+          created_at?: string | null
+          is_merged?: boolean | null
+          mapping_id?: string
+          match_confidence?: number | null
+          match_method?: string | null
+          merged_into_artist_id?: string | null
+          notes?: string | null
+          source_record_id: string
+          source_system: string
+          source_table: string
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string | null
+          created_at?: string | null
+          is_merged?: boolean | null
+          mapping_id?: string
+          match_confidence?: number | null
+          match_method?: string | null
+          merged_into_artist_id?: string | null
+          notes?: string | null
+          source_record_id?: string
+          source_system?: string
+          source_table?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_source_map_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_source_map_merged_into_artist_id_fkey"
+            columns: ["merged_into_artist_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+        ]
+      }
       badges: {
         Row: {
           category: string
@@ -293,6 +732,60 @@ export type Database = {
           rarity?: string
           slug?: string
           unlock_criteria?: Json
+        }
+        Relationships: []
+      }
+      canonical_artists: {
+        Row: {
+          active_years: string | null
+          artist_id: string
+          canonical_name: string
+          city: string | null
+          country: string | null
+          created_at: string | null
+          is_active: boolean | null
+          needs_review: boolean | null
+          primary_genre: string | null
+          rank: number | null
+          real_name: string | null
+          region: string | null
+          slug: string
+          sort_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          active_years?: string | null
+          artist_id?: string
+          canonical_name: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          is_active?: boolean | null
+          needs_review?: boolean | null
+          primary_genre?: string | null
+          rank?: number | null
+          real_name?: string | null
+          region?: string | null
+          slug: string
+          sort_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          active_years?: string | null
+          artist_id?: string
+          canonical_name?: string
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          is_active?: boolean | null
+          needs_review?: boolean | null
+          primary_genre?: string | null
+          rank?: number | null
+          real_name?: string | null
+          region?: string | null
+          slug?: string
+          sort_name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1849,7 +2342,24 @@ export type Database = {
           title: string
         }[]
       }
+      normalize_artist_name: { Args: { name: string }; Returns: string }
       revoke_admin_role: { Args: { target_user_id: string }; Returns: boolean }
+      search_artist_documents: {
+        Args: {
+          filter_artist_id?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          artist_id: string
+          content: string
+          document_id: string
+          document_type: string
+          similarity: number
+          title: string
+        }[]
+      }
       search_dj_artists: {
         Args: {
           match_count?: number
