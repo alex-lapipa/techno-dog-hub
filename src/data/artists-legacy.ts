@@ -2174,6 +2174,609 @@ export const artists: Artist[] = [
       "Allen & Heath Xone:92"
     ],
     riderNotes: "Vinyl preferred. Extended marathon sets specialty."
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NEW ARTISTS FROM RAG DATABASE
+  // ═══════════════════════════════════════════════════════════════
+
+  // DETROIT LEGENDS
+  {
+    id: "juan-atkins",
+    name: "Juan Atkins",
+    realName: "Juan Atkins",
+    city: "Detroit",
+    country: "USA",
+    region: "North America",
+    active: "1981–present",
+    tags: ["Detroit", "electro", "originator", "Metroplex", "Belleville Three"],
+    bio: "Universally credited as 'Godfather of Techno' and 'The Originator.' Coined the term 'techno,' founded the first Detroit techno label (Metroplex, 1985), and is part of the legendary Belleville Three alongside Derrick May and Kevin Saunderson.",
+    labels: ["Metroplex", "Deep Space"],
+    careerHighlights: [
+      "Coined the term 'techno'",
+      "Founded Metroplex Records in 1985",
+      "Part of the Belleville Three",
+      "Created Cybotron with Rick Davis",
+      "Model 500 project"
+    ],
+    keyReleases: [
+      { title: "No UFOs", label: "Metroplex", year: 1985, format: "12\"" },
+      { title: "Clear", label: "Fantasy", year: 1983, format: "12\"" },
+      { title: "Alleys of Your Mind", label: "Deep Space", year: 1981, format: "12\"" },
+      { title: "Techno City", label: "Metroplex", year: 1984, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-808",
+      "Roland TR-909",
+      "Sequential Circuits Prophet-5",
+      "Korg MS-20"
+    ],
+    djSetup: [
+      "Technics SL-1200MK2",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Vinyl preferred. Detroit techno purist."
+  },
+  {
+    id: "derrick-may",
+    name: "Derrick May",
+    realName: "Derrick May",
+    city: "Detroit",
+    country: "USA",
+    region: "North America",
+    active: "1987–present",
+    tags: ["Detroit", "Transmat", "Belleville Three", "soulful"],
+    bio: "Known as 'The Innovator.' His 1987 track 'Strings of Life' remains one of the most influential dance records ever made. Part of the Belleville Three who created techno music in Detroit.",
+    labels: ["Transmat", "Fragile"],
+    careerHighlights: [
+      "Created 'Strings of Life' in 1987",
+      "Founded Transmat Records",
+      "Part of the Belleville Three",
+      "Rhythim Is Rhythim project"
+    ],
+    keyReleases: [
+      { title: "Strings of Life", label: "Transmat", year: 1987, format: "12\"" },
+      { title: "Nude Photo", label: "Transmat", year: 1987, format: "12\"" },
+      { title: "It Is What It Is", label: "Transmat", year: 1988, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Roland Juno-106",
+      "Yamaha DX7",
+      "Ensoniq Mirage"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Soulful techno. Extended sets preferred."
+  },
+  {
+    id: "kevin-saunderson",
+    name: "Kevin Saunderson",
+    realName: "Kevin Saunderson",
+    city: "Detroit",
+    country: "USA",
+    region: "North America",
+    active: "1987–present",
+    tags: ["Detroit", "KMS", "Inner City", "Belleville Three"],
+    bio: "Known as 'The Elevator.' Created the crossover hit 'Big Fun' with Inner City. Founded KMS Records and brought Detroit techno to mainstream audiences while maintaining underground credibility.",
+    labels: ["KMS"],
+    careerHighlights: [
+      "Part of the Belleville Three",
+      "Created Inner City project",
+      "'Big Fun' reached UK Top 10",
+      "Founded KMS Records"
+    ],
+    keyReleases: [
+      { title: "Big Fun", label: "KMS", year: 1988, format: "12\"" },
+      { title: "Good Life", label: "KMS", year: 1988, format: "12\"" },
+      { title: "Rock to the Beat", label: "KMS", year: 1988, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Roland TB-303",
+      "Yamaha DX7"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Full range sound system essential."
+  },
+  {
+    id: "drexciya",
+    name: "Drexciya",
+    realName: "James Stinson & Gerald Donald",
+    city: "Detroit",
+    country: "USA",
+    region: "North America",
+    active: "1989–2002",
+    tags: ["Detroit", "electro", "afrofuturism", "mythology", "Underground Resistance"],
+    bio: "Created electronic music's ultimate afrofuturist mythology—underwater descendants of slaves thrown overboard during the Middle Passage. Never gave interviews, appeared only masked. Revolutionary conceptual depth that influenced generations.",
+    labels: ["Underground Resistance", "Tresor", "Warp", "Clone"],
+    careerHighlights: [
+      "Created the Drexciyan mythology",
+      "Never revealed identities publicly",
+      "Influenced entire afrofuturism movement",
+      "Gerald Donald continues as Dopplereffekt"
+    ],
+    keyReleases: [
+      { title: "Neptune's Lair", label: "Tresor", year: 1999, format: "LP" },
+      { title: "Deep Sea Dweller", label: "Shockwave", year: 1992, format: "12\"" },
+      { title: "Aquatic Invasion", label: "Underground Resistance", year: 1995, format: "12\"" },
+      { title: "Bubble Metropolis", label: "Submerge", year: 1993, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-808",
+      "Roland TB-303",
+      "Sequential Circuits Pro-One"
+    ],
+    riderNotes: "Anonymous collective. Masks required."
+  },
+  {
+    id: "carl-craig",
+    name: "Carl Craig",
+    realName: "Carl Craig",
+    city: "Detroit",
+    country: "USA",
+    region: "North America",
+    active: "1989–present",
+    tags: ["Detroit", "Planet E", "jazz", "orchestral", "experimental"],
+    bio: "Founder of Planet E Communications. Known for blending techno with jazz and orchestral elements. His 'More Songs About Food and Revolutionary Art' is considered a genre classic. Grammy-nominated producer.",
+    labels: ["Planet E"],
+    careerHighlights: [
+      "Founded Planet E Communications in 1991",
+      "Grammy nomination for Rebirth",
+      "Detroit Symphony Orchestra collaboration",
+      "Movement Festival co-founder"
+    ],
+    keyReleases: [
+      { title: "More Songs About Food and Revolutionary Art", label: "Planet E", year: 1997, format: "LP" },
+      { title: "Landcruising", label: "Blanco Y Negro", year: 1995, format: "LP" },
+      { title: "Bug in the Bassbin", label: "Planet E", year: 1992, format: "12\"" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Moog Voyager",
+      "Prophet-5",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Extended sets. High-fidelity monitoring essential."
+  },
+  {
+    id: "richie-hawtin",
+    name: "Richie Hawtin",
+    realName: "Richard Hawtin",
+    city: "Windsor/Berlin",
+    country: "Canada/Germany",
+    region: "North America",
+    active: "1990–present",
+    tags: ["minimal", "Plus 8", "M_nus", "Plastikman", "technology"],
+    bio: "Pioneer of minimal techno as Plastikman. Co-founded Plus 8 Records with John Acquaviva. His use of technology in performance set new standards. Founded M_nus label and championed the minimal movement.",
+    labels: ["M_nus", "Plus 8"],
+    careerHighlights: [
+      "Created Plastikman alias",
+      "Co-founded Plus 8 Records in 1990",
+      "Founded M_nus in 1998",
+      "Pioneer of DJ technology innovation",
+      "ENTER. concept at Space Ibiza"
+    ],
+    keyReleases: [
+      { title: "Sheet One", label: "Plus 8", year: 1993, format: "LP" },
+      { title: "Consumed", label: "M_nus", year: 1998, format: "LP" },
+      { title: "Spastik", label: "Plus 8", year: 1993, format: "12\"" },
+      { title: "DE9: Closer to the Edit", label: "M_nus", year: 2001, format: "LP" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Roland TB-303",
+      "Modular synthesizers",
+      "Ableton Live"
+    ],
+    liveSetup: [
+      "Custom PLAYdifferently MODEL 1",
+      "Traktor with custom controllers"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "PLAYdifferently MODEL 1"
+    ],
+    riderNotes: "Requires PLAYdifferently MODEL 1 mixer. Extended sets."
+  },
+
+  // BERLIN
+  {
+    id: "basic-channel",
+    name: "Basic Channel",
+    realName: "Moritz von Oswald & Mark Ernestus",
+    city: "Berlin",
+    country: "Germany",
+    region: "Europe",
+    active: "1993–present",
+    tags: ["dub techno", "minimal", "Chain Reaction", "pioneering"],
+    bio: "Pioneering dub techno duo. Founded the influential Basic Channel and Chain Reaction labels in Berlin. Their stripped-down, dub-influenced approach to techno defined an entire genre.",
+    labels: ["Basic Channel", "Chain Reaction", "Rhythm & Sound"],
+    careerHighlights: [
+      "Invented dub techno genre",
+      "Founded Basic Channel label",
+      "Created Chain Reaction imprint",
+      "Hard Wax record store founders"
+    ],
+    keyReleases: [
+      { title: "Phylyps Trak", label: "Basic Channel", year: 1993, format: "12\"" },
+      { title: "Quadrant Dub", label: "Basic Channel", year: 1994, format: "12\"" },
+      { title: "Radiance", label: "Chain Reaction", year: 1995, format: "LP" }
+    ],
+    studioGear: [
+      "Roland Space Echo",
+      "Analog filters",
+      "Dub mixing techniques"
+    ],
+    riderNotes: "Dub techno pioneers. Quality sound system essential."
+  },
+
+  // UK
+  {
+    id: "aphex-twin",
+    name: "Aphex Twin",
+    realName: "Richard David James",
+    city: "Cornwall/London",
+    country: "UK",
+    region: "Europe",
+    active: "1985–present",
+    tags: ["IDM", "ambient", "acid", "experimental", "Warp"],
+    bio: "Pioneered IDM/braindance. 'Selected Ambient Works 85-92' changed electronic music forever. Co-founded Rephlex Records. Notorious for hoaxes and legend-building. One of the most influential electronic artists ever.",
+    labels: ["Warp", "Rephlex"],
+    careerHighlights: [
+      "Selected Ambient Works 85-92",
+      "Co-founded Rephlex Records",
+      "Grammy Award for Syro",
+      "Invented 'braindance' term"
+    ],
+    keyReleases: [
+      { title: "Selected Ambient Works 85-92", label: "R&S", year: 1992, format: "LP" },
+      { title: "Syro", label: "Warp", year: 2014, format: "LP" },
+      { title: "Drukqs", label: "Warp", year: 2001, format: "2LP" },
+      { title: "...I Care Because You Do", label: "Warp", year: 1995, format: "LP" }
+    ],
+    studioGear: [
+      "Modular synthesizers",
+      "Custom software",
+      "Modified vintage equipment"
+    ],
+    riderNotes: "Rare live performances. Experimental setups."
+  },
+  {
+    id: "autechre",
+    name: "Autechre",
+    realName: "Sean Booth & Rob Brown",
+    city: "Manchester",
+    country: "UK",
+    region: "Europe",
+    active: "1987–present",
+    tags: ["IDM", "experimental", "abstract", "Warp", "glitch"],
+    bio: "Pushed electronic music into increasingly abstract territory over 30+ years. Never compromised artistic vision. 'Tri Repetae' considered genre-defining. Their later work explores generative and algorithmic composition.",
+    labels: ["Warp"],
+    careerHighlights: [
+      "30+ years on Warp Records",
+      "Tri Repetae defined IDM",
+      "Pioneered generative music",
+      "Never compromised vision"
+    ],
+    keyReleases: [
+      { title: "Tri Repetae", label: "Warp", year: 1995, format: "LP" },
+      { title: "Amber", label: "Warp", year: 1994, format: "LP" },
+      { title: "LP5", label: "Warp", year: 1998, format: "LP" },
+      { title: "Exai", label: "Warp", year: 2013, format: "2LP" }
+    ],
+    studioGear: [
+      "Max/MSP",
+      "Custom software",
+      "Modular synthesizers"
+    ],
+    riderNotes: "Extended live performances. Complete darkness preferred."
+  },
+  {
+    id: "luke-slater",
+    name: "Luke Slater",
+    realName: "Luke Slater",
+    city: "London",
+    country: "UK",
+    region: "Europe",
+    active: "1989–present",
+    tags: ["Mote-Evolver", "PAS", "UK", "hypnotic", "hardware"],
+    bio: "The man behind Planetary Assault Systems, 7th Plain, and The 7th Plain. Founded Mote-Evolver label. His PAS project delivers some of techno's most hypnotic, relentless productions.",
+    labels: ["Mote-Evolver", "Novamute", "Ostgut Ton"],
+    careerHighlights: [
+      "Created Planetary Assault Systems",
+      "Founded Mote-Evolver Records",
+      "7th Plain ambient project",
+      "L.B. Dub Corp alias"
+    ],
+    keyReleases: [
+      { title: "The Eyes Themselves", label: "Mote-Evolver", year: 2009, format: "LP" },
+      { title: "Wireless", label: "Novamute", year: 1999, format: "LP" },
+      { title: "Arc Angel", label: "Mote-Evolver", year: 2010, format: "12\"" }
+    ],
+    studioGear: [
+      "Modular synthesizers",
+      "Elektron machines",
+      "Roland TR-909"
+    ],
+    liveSetup: [
+      "Full modular system",
+      "Elektron Analog Rytm",
+      "Custom controllers"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Allen & Heath Xone:92"
+    ],
+    riderNotes: "Extended sets. Hardware live preferred."
+  },
+  {
+    id: "carl-cox",
+    name: "Carl Cox",
+    realName: "Carl Cox",
+    city: "Brighton",
+    country: "UK",
+    region: "Europe",
+    active: "1985–present",
+    tags: ["Space Ibiza", "three-deck", "festival", "house", "techno"],
+    bio: "The King. Legendary three-deck DJ who bridged house and techno. His residency at Space Ibiza became legendary. One of techno's most beloved and enduring figures.",
+    labels: ["Intec", "23rd Century"],
+    careerHighlights: [
+      "16-year Space Ibiza residency",
+      "Pioneer of three-deck mixing",
+      "Founded Intec Records",
+      "Global festival headliner"
+    ],
+    keyReleases: [
+      { title: "Phuture 2000", label: "Edel", year: 1994, format: "12\"" },
+      { title: "I Want You (Forever)", label: "Edel", year: 1991, format: "12\"" }
+    ],
+    studioGear: [
+      "Pioneer CDJ setup",
+      "Roland TR-909",
+      "Native Instruments"
+    ],
+    djSetup: [
+      "Three Pioneer CDJ-3000",
+      "Pioneer DJM-V10",
+      "MODEL 1 by PLAYdifferently"
+    ],
+    riderNotes: "Requires three-deck setup. Festival-grade sound essential."
+  },
+
+  // INTERNATIONAL
+  {
+    id: "laurent-garnier",
+    name: "Laurent Garnier",
+    realName: "Laurent Garnier",
+    city: "Paris",
+    country: "France",
+    region: "Europe",
+    active: "1987–present",
+    tags: ["French", "F Communications", "eclectic", "jazz", "warehouse"],
+    bio: "French techno pioneer. Founded F Communications label. Known for eclectic DJ sets spanning jazz to hard techno. His 'Wake Up' nights at Rex Club defined French electronic music.",
+    labels: ["F Communications"],
+    careerHighlights: [
+      "Founded F Communications",
+      "Rex Club Paris residency",
+      "Wake Up parties series",
+      "French techno pioneer"
+    ],
+    keyReleases: [
+      { title: "Shot in the Dark", label: "F Communications", year: 1994, format: "LP" },
+      { title: "30", label: "F Communications", year: 1997, format: "LP" },
+      { title: "Unreasonable Behaviour", label: "F Communications", year: 2000, format: "LP" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Moog synthesizers",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Extended eclectic sets. Quality monitoring essential."
+  },
+  {
+    id: "dave-clarke",
+    name: "Dave Clarke",
+    realName: "Dave Clarke",
+    city: "Brighton/Amsterdam",
+    country: "UK/Netherlands",
+    region: "Europe",
+    active: "1990–present",
+    tags: ["electro", "Baron of Techno", "Red", "ADE"],
+    bio: "The Baron of Techno. Known for his 'Red' series of EPs. Long-time Amsterdam resident and ADE fixture. His hard, driving style influenced countless producers.",
+    labels: ["White Noise", "Skint"],
+    careerHighlights: [
+      "Red series defined 90s techno",
+      "Amsterdam Dance Event regular",
+      "BBC Radio 1 presenter",
+      "White Noise podcast"
+    ],
+    keyReleases: [
+      { title: "Red 1", label: "Deconstruction", year: 1994, format: "12\"" },
+      { title: "Red 2", label: "Deconstruction", year: 1994, format: "12\"" },
+      { title: "Archive One", label: "Skint", year: 1996, format: "LP" }
+    ],
+    studioGear: [
+      "Roland TR-909",
+      "Roland TB-303",
+      "Elektron machines"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Standard Pioneer setup. Electro-friendly programming."
+  },
+  {
+    id: "chris-liebing",
+    name: "Chris Liebing",
+    realName: "Chris Liebing",
+    city: "Frankfurt",
+    country: "Germany",
+    region: "Europe",
+    active: "1990–present",
+    tags: ["Frankfurt", "CLR", "hard techno", "Spinclub"],
+    bio: "Frankfurt techno legend. Founded CLR label and podcast. Known for his pounding, industrial-tinged techno and marathon DJ sets.",
+    labels: ["CLR"],
+    careerHighlights: [
+      "Founded CLR Records",
+      "CLR Podcast pioneer",
+      "Spinclub Frankfurt co-founder",
+      "Nature One festival resident"
+    ],
+    keyReleases: [
+      { title: "Another Day", label: "CLR", year: 2010, format: "12\"" },
+      { title: "Stigmata", label: "CLR", year: 2011, format: "LP" }
+    ],
+    studioGear: [
+      "Native Instruments",
+      "Ableton Live",
+      "Elektron machines"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Extended sets preferred. Industrial venues."
+  },
+  {
+    id: "adam-beyer",
+    name: "Adam Beyer",
+    realName: "Adam Beyer",
+    city: "Stockholm",
+    country: "Sweden",
+    region: "Europe",
+    active: "1993–present",
+    tags: ["Drumcode", "Swedish", "driving", "peak-time"],
+    bio: "Swedish techno powerhouse. Founded Drumcode Records, one of the most successful techno labels globally. His driving, peak-time sound defines modern festival techno.",
+    labels: ["Drumcode", "Truesoul"],
+    careerHighlights: [
+      "Founded Drumcode Records 1996",
+      "Drumcode Festival curator",
+      "Global festival headliner",
+      "Truesoul label"
+    ],
+    keyReleases: [
+      { title: "Decoded", label: "Drumcode", year: 2012, format: "LP" },
+      { title: "Ignition Key", label: "Drumcode", year: 2003, format: "12\"" }
+    ],
+    studioGear: [
+      "Native Instruments",
+      "Ableton Live",
+      "Roland TR-909"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Festival-ready setup. Peak-time programming."
+  },
+  {
+    id: "amelie-lens",
+    name: "Amelie Lens",
+    realName: "Amelie Lens",
+    city: "Antwerp",
+    country: "Belgium",
+    region: "Europe",
+    active: "2015–present",
+    tags: ["Belgian", "LENSKE", "driving", "peak-time", "festival"],
+    bio: "Belgian techno phenomenon. Founded LENSKE label and Exhale events. Rose rapidly to become one of techno's most in-demand artists with her high-energy, driving style.",
+    labels: ["LENSKE", "Drumcode"],
+    careerHighlights: [
+      "Founded LENSKE Records",
+      "Exhale events series",
+      "Rapid rise to global headliner",
+      "Tomorrowland mainstage"
+    ],
+    keyReleases: [
+      { title: "Hypnotized", label: "LENSKE", year: 2019, format: "12\"" },
+      { title: "Higher", label: "Drumcode", year: 2021, format: "12\"" }
+    ],
+    studioGear: [
+      "Ableton Live",
+      "Native Instruments",
+      "Elektron machines"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Standard Pioneer setup. High-energy sets."
+  },
+  {
+    id: "charlotte-de-witte",
+    name: "Charlotte de Witte",
+    realName: "Charlotte de Witte",
+    city: "Ghent",
+    country: "Belgium",
+    region: "Europe",
+    active: "2015–present",
+    tags: ["Belgian", "KNTXT", "dark", "driving", "festival"],
+    bio: "Belgian techno queen. Founded KNTXT label and events. Known for dark, driving techno and became the first woman to close Tomorrowland mainstage.",
+    labels: ["KNTXT", "Drumcode"],
+    careerHighlights: [
+      "Founded KNTXT Records",
+      "First woman to close Tomorrowland",
+      "BBC Radio 1 Essential Mix",
+      "Global ambassador for techno"
+    ],
+    keyReleases: [
+      { title: "Chosen", label: "Drumcode", year: 2018, format: "12\"" },
+      { title: "Rave On Time", label: "KNTXT", year: 2021, format: "12\"" }
+    ],
+    studioGear: [
+      "Ableton Live",
+      "Native Instruments Maschine",
+      "Elektron"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Standard Pioneer setup. Dark techno programming."
+  },
+  {
+    id: "jeff-rushin",
+    name: "Jeff Rushin",
+    realName: "Jeff Rushin",
+    city: "Berlin",
+    country: "Germany",
+    region: "Europe",
+    active: "2012–present",
+    tags: ["Berlin", "Figure", "hypnotic", "deep"],
+    bio: "Berlin-based producer known for hypnotic, deep techno. Regular on Figure and Token records. His productions blend driving rhythms with atmospheric depth.",
+    labels: ["Figure", "Token"],
+    careerHighlights: [
+      "Figure Records regular",
+      "Token releases",
+      "Berghain performances"
+    ],
+    keyReleases: [
+      { title: "Pulse", label: "Figure", year: 2018, format: "12\"" }
+    ],
+    studioGear: [
+      "Elektron Analog Four",
+      "Roland TR-8S",
+      "Ableton Live"
+    ],
+    djSetup: [
+      "Pioneer CDJ-2000NXS2",
+      "Pioneer DJM-900NXS2"
+    ],
+    riderNotes: "Standard Pioneer setup."
   }
 ];
 
