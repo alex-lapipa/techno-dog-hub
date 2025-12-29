@@ -76,6 +76,7 @@ const KnowledgeGapAdmin = lazy(() => import("./pages/KnowledgeGapAdmin"));
 const TicketingAdmin = lazy(() => import("./pages/TicketingAdmin"));
 const DogAgentAdmin = lazy(() => import("./pages/DogAgentAdmin"));
 const TrainingCenter = lazy(() => import("./pages/TrainingCenter"));
+const DoggiesAdmin = lazy(() => import("./pages/DoggiesAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -161,6 +162,7 @@ const App = () => (
                     <Route path="/admin/dog-agent" element={<DogAgentAdmin />} />
                     <Route path="/admin/artist-enrichment" element={<ArtistEnrichmentAdmin />} />
                     <Route path="/admin/training" element={<TrainingCenter />} />
+                    <Route path="/admin/doggies" element={<DoggiesAdmin />} />
                     {/* Festivals */}
                     <Route path="/festivals" element={<Festivals />} />
                     <Route path="/festivals/:id" element={<FestivalDetail />} />
