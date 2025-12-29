@@ -14,7 +14,7 @@ interface Message {
   timestamp: Date;
 }
 
-type DogVoice = 'female' | 'male';
+type DogVoice = 'she' | 'he' | 'they' | 'it';
 
 const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -29,7 +29,7 @@ const DogChat = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMessageIndex, setSpeakingMessageIndex] = useState<number | null>(null);
   const [audioVisualization, setAudioVisualization] = useState<number[]>([0.3, 0.5, 0.7, 0.5, 0.3]);
-  const [selectedVoice, setSelectedVoice] = useState<DogVoice>('female');
+  const [selectedVoice, setSelectedVoice] = useState<DogVoice>('they');
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const visualizationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -275,28 +275,50 @@ const DogChat = () => {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="tracking-tight">Techno Dog</span>
               {/* Voice Selector */}
-              <div className="flex items-center gap-1 bg-muted/50 rounded-full p-0.5 border border-border/50">
+              <div className="flex items-center gap-0.5 bg-muted/50 rounded-full p-0.5 border border-border/50">
                 <button
-                  onClick={() => setSelectedVoice('female')}
+                  onClick={() => setSelectedVoice('she')}
                   className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
-                    selectedVoice === 'female' 
+                    selectedVoice === 'she' 
                       ? 'bg-logo-green text-background' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
-                  title="Female dog voice"
+                  title="She/Her voice"
                 >
-                  ♀ She
+                  She
                 </button>
                 <button
-                  onClick={() => setSelectedVoice('male')}
+                  onClick={() => setSelectedVoice('he')}
                   className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
-                    selectedVoice === 'male' 
+                    selectedVoice === 'he' 
                       ? 'bg-logo-green text-background' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
-                  title="Male dog voice"
+                  title="He/Him voice"
                 >
-                  ♂ He
+                  He
+                </button>
+                <button
+                  onClick={() => setSelectedVoice('they')}
+                  className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
+                    selectedVoice === 'they' 
+                      ? 'bg-logo-green text-background' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="They/Them voice"
+                >
+                  They
+                </button>
+                <button
+                  onClick={() => setSelectedVoice('it')}
+                  className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
+                    selectedVoice === 'it' 
+                      ? 'bg-logo-green text-background' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="It/Its voice (robotic)"
+                >
+                  It
                 </button>
               </div>
               {isSpeaking && (
