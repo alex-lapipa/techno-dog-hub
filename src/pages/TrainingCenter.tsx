@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import DogChat from "@/components/admin/DogChat";
 import { 
   BookOpen, 
   Users, 
@@ -25,7 +26,8 @@ import {
   HandHeart,
   GitBranch,
   Target,
-  Rocket
+  Rocket,
+  Dog
 } from "lucide-react";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -615,8 +617,12 @@ const TrainingCenter = () => {
       icon={BookOpen}
       iconColor="text-logo-green"
     >
-      <Tabs defaultValue="onboarding" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+      <Tabs defaultValue="dog" className="space-y-6">
+        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+          <TabsTrigger value="dog" className="font-mono text-xs">
+            <Dog className="w-3.5 h-3.5 mr-1.5" />
+            Ask Dog
+          </TabsTrigger>
           <TabsTrigger value="onboarding" className="font-mono text-xs">
             <Rocket className="w-3.5 h-3.5 mr-1.5" />
             Onboarding
@@ -634,6 +640,79 @@ const TrainingCenter = () => {
             Philosophy
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dog">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DogChat />
+            <div className="space-y-4">
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="font-mono text-lg flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-logo-green" />
+                    Meet Dog 🐕
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Dog is your friendly AI companion who knows everything about techno.dog! 
+                    Unlike intimidating documentation, Dog explains things in a warm, approachable way.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                      <p className="text-xs font-mono text-logo-green mb-1">KNOWS ABOUT</p>
+                      <p className="text-sm">All artists, venues, festivals & gear</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                      <p className="text-xs font-mono text-logo-green mb-1">CAN EXPLAIN</p>
+                      <p className="text-sm">How to use every feature</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                      <p className="text-xs font-mono text-logo-green mb-1">UNDERSTANDS</p>
+                      <p className="text-sm">Community philosophy & values</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                      <p className="text-xs font-mono text-logo-green mb-1">ORCHESTRATES</p>
+                      <p className="text-sm">All automated agents</p>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-logo-green/10 border border-logo-green/30">
+                    <p className="text-sm italic">
+                      "Woof! I'm here because we believe learning should feel like chatting with a friend, 
+                      not reading a boring manual. Ask me anything - I don't bite! 🐾"
+                    </p>
+                    <p className="text-xs text-right mt-2 text-logo-green font-mono">— Dog</p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-border/50">
+                <CardHeader>
+                  <CardTitle className="font-mono text-sm">Why a Dog?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <Heart className="w-4 h-4 text-logo-green mt-0.5 shrink-0" />
+                      <span><strong>Empathy:</strong> Dogs sense how you feel and respond accordingly</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Users className="w-4 h-4 text-logo-green mt-0.5 shrink-0" />
+                      <span><strong>Approachable:</strong> Everyone feels comfortable talking to a dog</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Zap className="w-4 h-4 text-logo-green mt-0.5 shrink-0" />
+                      <span><strong>Enthusiastic:</strong> Dogs get excited about helping - so does Dog!</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Globe className="w-4 h-4 text-logo-green mt-0.5 shrink-0" />
+                      <span><strong>Loyal:</strong> Like a real dog, Dog is always here when you need help</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
 
         <TabsContent value="onboarding">
           <OnboardingSection />

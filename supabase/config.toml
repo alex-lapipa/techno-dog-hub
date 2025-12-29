@@ -246,3 +246,6 @@ verify_jwt = false
 
 [functions.ticketing-widget]
 verify_jwt = false
+
+[functions.dog-agent]
+verify_jwt = false
