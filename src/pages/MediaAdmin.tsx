@@ -710,7 +710,7 @@ const MediaAdmin = () => {
                         onClick={() => { setSelectedAsset(asset); setDetailDialogOpen(true); }}
                       >
                         {asset.source_url ? (
-                          <img src={asset.storage_url || asset.source_url} alt="" className="w-full h-full object-cover" />
+                          <img src={asset.storage_url || asset.source_url} alt={asset.alt_text || `${asset.entity_name} media asset`} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"><Image className="w-6 h-6 text-muted-foreground" /></div>
                         )}

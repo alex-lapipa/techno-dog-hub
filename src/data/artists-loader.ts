@@ -95,19 +95,27 @@ const parseNationality = (nationality: string | null): { city: string; country: 
 
 // Dynamically load full artist data (legacy + RAG enrichment)
 export const loadArtistById = async (id: string) => {
-  const { getArtistById, artists: legacyArtists } = await import('./artists-legacy');
+  const { getArtistById } = await import('./artists-legacy');
   
   // First check legacy data
   const legacyArtist = getArtistById(id);
   
-  // Try to find matching RAG data
+  // Create search patterns for efficient DB lookup
+  const searchPatterns = [
+    id,
+    id.replace(/-/g, ' '),
+    id.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  ];
+  
+  // Use a targeted query instead of fetching all artists
   const { data: ragArtists } = await supabase
     .from('dj_artists')
     .select('*')
-    .limit(200);
+    .or(searchPatterns.map(p => `artist_name.ilike.%${p}%`).join(','))
+    .limit(5);
   
-  if (ragArtists) {
-    // Find matching artist in RAG data
+  if (ragArtists && ragArtists.length > 0) {
+    // Find best matching artist in results
     const normalizedId = normalizeForMatch(id);
     const ragMatch = ragArtists.find(ra => {
       const normalizedRagName = normalizeForMatch(ra.artist_name);
@@ -116,7 +124,7 @@ export const loadArtistById = async (id: string) => {
              normalizedId.includes(normalizedRagName) ||
              ragSlug === id ||
              id.includes(ragSlug);
-    });
+    }) || ragArtists[0]; // Fallback to first result if pattern match fails
     
     if (legacyArtist && ragMatch) {
       // Merge legacy with RAG data
