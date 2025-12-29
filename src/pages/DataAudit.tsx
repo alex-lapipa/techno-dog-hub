@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Database, AlertTriangle, CheckCircle, XCircle, RefreshCw, ChevronRight, ChevronDown, FileText, Users, Disc, Calendar, MapPin, Building, Radio, GitMerge, Zap, Shield, BarChart3, List, Grid3X3, Eye, Play, Loader2 } from 'lucide-react';
-import { useAuditActions, AuditProposal, AuditIssue } from '@/hooks/useAuditActions';
+import { Database, AlertTriangle, CheckCircle, RefreshCw, ChevronRight, ChevronDown, FileText, Users, Disc, Calendar, MapPin, Building, Radio, GitMerge, Zap, Shield, BarChart3, List, Grid3X3, Eye, Play, Loader2, Terminal, Activity } from 'lucide-react';
+import { useAuditActions, AuditProposal } from '@/hooks/useAuditActions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
@@ -18,22 +18,58 @@ const entityIcons: Record<string, any> = {
   jobs: Zap
 };
 
-const severityColors: Record<string, string> = {
-  critical: 'bg-red-500/20 text-red-400 border-red-500/30',
-  high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  info: 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+// VHS scanline overlay component
+const VHSOverlay = () => (
+  <div className="pointer-events-none fixed inset-0 z-50">
+    {/* Scanlines */}
+    <div 
+      className="absolute inset-0 opacity-[0.03]"
+      style={{
+        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.03) 1px, rgba(255,255,255,0.03) 2px)',
+        backgroundSize: '100% 2px'
+      }}
+    />
+    {/* VHS tracking noise */}
+    <div 
+      className="absolute inset-0 opacity-[0.02] animate-pulse"
+      style={{
+        background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%)',
+        backgroundSize: '100% 4px'
+      }}
+    />
+  </div>
+);
+
+// Thin red line divider
+const RedLine = ({ className = '' }: { className?: string }) => (
+  <div className={`h-px bg-[hsl(var(--crimson))] opacity-60 ${className}`} />
+);
+
+// Status indicator with glow
+const StatusDot = ({ status }: { status: 'ok' | 'warning' | 'error' }) => {
+  const colors = {
+    ok: 'bg-[hsl(var(--logo-green))]',
+    warning: 'text-foreground',
+    error: 'bg-[hsl(var(--crimson))]'
+  };
+  const glows = {
+    ok: 'shadow-[0_0_8px_hsl(var(--logo-green))]',
+    warning: '',
+    error: 'shadow-[0_0_8px_hsl(var(--crimson))]'
+  };
+  return (
+    <div className={`w-2 h-2 rounded-full ${colors[status]} ${glows[status]} animate-pulse`} />
+  );
 };
 
 export default function TechnoDocAuditAgent() {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedIssues, setExpandedIssues] = useState(new Set<string>());
   const [selectedProposals, setSelectedProposals] = useState(new Set<string>());
-  const [viewMode, setViewMode] = useState('list');
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<AuditProposal | null>(null);
+  const [glitchFrame, setGlitchFrame] = useState(0);
 
   const {
     isLoading,
@@ -42,10 +78,16 @@ export default function TechnoDocAuditAgent() {
     runScan,
     getPreview,
     applyProposal,
-    setPreviewData
   } = useAuditActions();
 
-  // Run initial scan on mount
+  // VHS glitch effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGlitchFrame(prev => (prev + 1) % 100);
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     runScan();
   }, [runScan]);
@@ -75,7 +117,7 @@ export default function TechnoDocAuditAgent() {
 
   const handleConfirmApply = async () => {
     if (!selectedProposal) return;
-    await applyProposal(selectedProposal, false); // dryRun = false
+    await applyProposal(selectedProposal, false);
     setConfirmDialogOpen(false);
     setSelectedProposal(null);
   };
@@ -99,67 +141,92 @@ export default function TechnoDocAuditAgent() {
   const criticalCount = auditData?.issues.filter(i => i.severity === 'critical').length || 0;
   const highCount = auditData?.issues.filter(i => i.severity === 'high').length || 0;
 
+  const getSeverityStyle = (severity: string) => {
+    switch (severity) {
+      case 'critical':
+        return 'border-[hsl(var(--crimson))] text-[hsl(var(--crimson))] bg-[hsl(var(--crimson))]/5';
+      case 'high':
+        return 'border-[hsl(var(--crimson))]/60 text-[hsl(var(--crimson))] bg-[hsl(var(--crimson))]/5';
+      case 'medium':
+        return 'border-foreground/30 text-foreground/80 bg-foreground/5';
+      case 'low':
+        return 'border-[hsl(var(--logo-green))]/30 text-[hsl(var(--logo-green))] bg-[hsl(var(--logo-green))]/5';
+      default:
+        return 'border-foreground/20 text-foreground/60 bg-foreground/5';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0a0b] text-gray-100 font-mono">
+    <div className="min-h-screen bg-background text-foreground font-mono relative">
+      <VHSOverlay />
+      
       {/* Header */}
-      <header className="border-b border-gray-800 bg-[#0d0d0e]">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      <header className="border-b border-[hsl(var(--crimson))]/30 bg-background/95 backdrop-blur-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <Database className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Terminal className="w-8 h-8 text-[hsl(var(--logo-green))]" />
+                <div className="absolute -inset-1 bg-[hsl(var(--logo-green))]/20 blur-md -z-10" />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight">techno.dog</h1>
-                <p className="text-xs text-gray-500">TechnoDoc Audit Agent v1.0</p>
+                <h1 className="text-lg font-bold tracking-[0.3em] text-foreground uppercase">
+                  TECHNODOC
+                </h1>
+                <p className="text-[10px] tracking-[0.2em] text-[hsl(var(--logo-green))] uppercase">
+                  DATA INTEGRITY AGENT v1.0
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700">
-                <div className={`w-2 h-2 rounded-full ${auditData ? 'bg-green-500' : 'bg-yellow-500'} animate-pulse`} />
-                <span className="text-xs text-gray-400">{auditData ? 'Connected' : 'Connecting...'}</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 border border-foreground/20">
+                <StatusDot status={auditData ? 'ok' : 'warning'} />
+                <span className="text-[10px] tracking-wider uppercase text-foreground/60">
+                  {auditData ? 'CONNECTED' : 'SCANNING'}
+                </span>
               </div>
               <button
                 onClick={() => runScan()}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-[hsl(var(--logo-green))]/50 text-[hsl(var(--logo-green))] hover:bg-[hsl(var(--logo-green))]/10 disabled:opacity-50 disabled:cursor-not-allowed text-xs tracking-wider uppercase transition-all"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <RefreshCw className="w-4 h-4" />
                 )}
-                {isLoading ? 'Scanning...' : 'Run Audit'}
+                {isLoading ? 'SCANNING' : 'RUN AUDIT'}
               </button>
             </div>
           </div>
         </div>
+        <RedLine />
       </header>
 
       {/* Navigation */}
-      <nav className="border-b border-gray-800 bg-[#0d0d0e]/50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex gap-1">
+      <nav className="border-b border-foreground/10 bg-background/80">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex gap-0">
             {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'schema', label: 'Schema', icon: Grid3X3 },
-              { id: 'issues', label: 'Issues', icon: AlertTriangle, badge: criticalCount + highCount },
-              { id: 'proposals', label: 'Proposals', icon: Zap, badge: auditData?.proposals.length || 0 },
-              { id: 'duplicates', label: 'Duplicates', icon: GitMerge },
-            ].map(tab => (
+              { id: 'overview', label: 'OVERVIEW', icon: BarChart3 },
+              { id: 'schema', label: 'SCHEMA', icon: Grid3X3 },
+              { id: 'issues', label: 'ISSUES', icon: AlertTriangle, badge: criticalCount + highCount },
+              { id: 'proposals', label: 'PROPOSALS', icon: Zap, badge: auditData?.proposals.length || 0 },
+              { id: 'duplicates', label: 'DUPLICATES', icon: GitMerge },
+            ].map((tab, idx) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex items-center gap-2 px-5 py-3 text-[10px] font-medium tracking-[0.2em] uppercase border-b-2 transition-all ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-300'
-                }`}
+                    ? 'border-[hsl(var(--logo-green))] text-[hsl(var(--logo-green))]'
+                    : 'border-transparent text-foreground/40 hover:text-foreground/70'
+                } ${idx > 0 ? 'border-l border-foreground/10' : ''}`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className="w-3.5 h-3.5" />
                 {tab.label}
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full">
+                  <span className="px-1.5 py-0.5 bg-[hsl(var(--crimson))]/20 text-[hsl(var(--crimson))] text-[9px] border border-[hsl(var(--crimson))]/30">
                     {tab.badge}
                   </span>
                 )}
@@ -170,73 +237,115 @@ export default function TechnoDocAuditAgent() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         {!auditData && isLoading && (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex items-center justify-center py-24">
             <div className="text-center">
-              <Loader2 className="w-12 h-12 animate-spin text-purple-500 mx-auto mb-4" />
-              <p className="text-gray-400">Running database audit...</p>
+              <div className="relative">
+                <Database className="w-16 h-16 text-[hsl(var(--logo-green))]/50 mx-auto mb-6 animate-pulse" />
+                <div className="absolute inset-0 bg-[hsl(var(--logo-green))]/10 blur-xl" />
+              </div>
+              <p className="text-[10px] tracking-[0.3em] text-foreground/40 uppercase">
+                SCANNING DATABASE
+              </p>
+              <div className="mt-4 w-48 h-px bg-gradient-to-r from-transparent via-[hsl(var(--logo-green))]/50 to-transparent mx-auto animate-pulse" />
             </div>
           </div>
         )}
 
         {auditData && activeTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Health Score Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="col-span-1 bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-6 border border-purple-500/20">
-                <p className="text-sm text-gray-400 mb-2">Overall Health</p>
-                <div className="flex items-end gap-2">
-                  <span className="text-5xl font-bold">{overallHealth}</span>
-                  <span className="text-2xl text-gray-500 mb-1">/100</span>
+            <div className="grid grid-cols-4 gap-4">
+              {/* Main health score */}
+              <div className="relative border border-[hsl(var(--logo-green))]/30 p-6 bg-[hsl(var(--logo-green))]/5">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-[hsl(var(--logo-green))]/5 blur-2xl" />
+                <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-3">SYSTEM HEALTH</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-[hsl(var(--logo-green))]">{overallHealth}</span>
+                  <span className="text-lg text-foreground/30">/100</span>
                 </div>
-                <div className="mt-4 h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div className="mt-4 h-1 bg-foreground/10 overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                    className="h-full bg-[hsl(var(--logo-green))] transition-all duration-1000"
                     style={{ width: `${overallHealth}%` }}
                   />
                 </div>
               </div>
               
-              <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                <p className="text-sm text-gray-400 mb-2">Total Records</p>
-                <p className="text-3xl font-bold">{auditData.totalRecords.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-2">Across {auditData.schema.tables.length} tables</p>
+              <div className="border border-foreground/10 p-6">
+                <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-3">TOTAL RECORDS</p>
+                <p className="text-3xl font-bold text-foreground">{auditData.totalRecords.toLocaleString()}</p>
+                <p className="text-[9px] text-foreground/30 mt-2 uppercase tracking-wider">
+                  {auditData.schema.tables.length} TABLES
+                </p>
               </div>
               
-              <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                <p className="text-sm text-gray-400 mb-2">Critical Issues</p>
-                <p className="text-3xl font-bold text-red-400">{criticalCount}</p>
-                <p className="text-xs text-gray-500 mt-2">Require immediate attention</p>
+              <div className="border border-[hsl(var(--crimson))]/30 p-6 bg-[hsl(var(--crimson))]/5">
+                <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-3">CRITICAL ISSUES</p>
+                <p className="text-3xl font-bold text-[hsl(var(--crimson))]">{criticalCount}</p>
+                <p className="text-[9px] text-[hsl(var(--crimson))]/50 mt-2 uppercase tracking-wider">
+                  IMMEDIATE ACTION
+                </p>
               </div>
               
-              <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                <p className="text-sm text-gray-400 mb-2">Pending Proposals</p>
-                <p className="text-3xl font-bold text-purple-400">{auditData.proposals.length}</p>
-                <p className="text-xs text-gray-500 mt-2">Ready for review</p>
+              <div className="border border-foreground/10 p-6">
+                <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-3">PROPOSALS</p>
+                <p className="text-3xl font-bold text-foreground">{auditData.proposals.length}</p>
+                <p className="text-[9px] text-foreground/30 mt-2 uppercase tracking-wider">
+                  READY FOR REVIEW
+                </p>
               </div>
             </div>
 
+            <RedLine className="my-8" />
+
             {/* Entity Health Grid */}
-            <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-purple-400" />
-                Entity Health Scores
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <Activity className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+                <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                  ENTITY HEALTH MATRIX
+                </h2>
+              </div>
+              <div className="grid grid-cols-5 gap-3">
                 {Object.entries(auditData.healthScores).map(([entity, score]) => {
                   const Icon = entityIcons[entity] || Database;
-                  const color = score >= 80 ? 'text-green-400' : score >= 60 ? 'text-yellow-400' : 'text-red-400';
+                  const isHealthy = score >= 80;
+                  const isWarning = score >= 60 && score < 80;
                   return (
-                    <div key={entity} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div 
+                      key={entity} 
+                      className={`border p-4 transition-all ${
+                        isHealthy 
+                          ? 'border-[hsl(var(--logo-green))]/20 bg-[hsl(var(--logo-green))]/5' 
+                          : isWarning 
+                            ? 'border-foreground/20' 
+                            : 'border-[hsl(var(--crimson))]/30 bg-[hsl(var(--crimson))]/5'
+                      }`}
+                    >
                       <div className="flex items-center gap-2 mb-3">
-                        <Icon className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm capitalize">{entity}</span>
+                        <Icon className="w-3 h-3 text-foreground/40" />
+                        <span className="text-[9px] uppercase tracking-wider text-foreground/60">{entity}</span>
                       </div>
-                      <p className={`text-2xl font-bold ${color}`}>{score}%</p>
-                      <div className="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                      <p className={`text-2xl font-bold ${
+                        isHealthy 
+                          ? 'text-[hsl(var(--logo-green))]' 
+                          : isWarning 
+                            ? 'text-foreground' 
+                            : 'text-[hsl(var(--crimson))]'
+                      }`}>
+                        {score}%
+                      </p>
+                      <div className="mt-2 h-0.5 bg-foreground/10 overflow-hidden">
                         <div 
-                          className={`h-full rounded-full ${score >= 80 ? 'bg-green-500' : score >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                          className={`h-full ${
+                            isHealthy 
+                              ? 'bg-[hsl(var(--logo-green))]' 
+                              : isWarning 
+                                ? 'bg-foreground/50' 
+                                : 'bg-[hsl(var(--crimson))]'
+                          }`}
                           style={{ width: `${score}%` }}
                         />
                       </div>
@@ -246,28 +355,34 @@ export default function TechnoDocAuditAgent() {
               </div>
             </div>
 
-            {/* Recent Issues Summary */}
-            <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-6">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                Priority Issues
-              </h2>
+            <RedLine className="my-8" />
+
+            {/* Priority Issues */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <AlertTriangle className="w-4 h-4 text-[hsl(var(--crimson))]" />
+                <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                  PRIORITY ALERTS
+                </h2>
+              </div>
               {auditData.issues.filter(i => i.severity === 'critical' || i.severity === 'high').length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500/50" />
-                  <p>No critical or high priority issues found</p>
+                <div className="border border-[hsl(var(--logo-green))]/20 p-8 text-center">
+                  <CheckCircle className="w-10 h-10 mx-auto mb-4 text-[hsl(var(--logo-green))]/50" />
+                  <p className="text-[10px] tracking-[0.2em] text-foreground/40 uppercase">
+                    NO CRITICAL ISSUES DETECTED
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {auditData.issues.filter(i => i.severity === 'critical' || i.severity === 'high').map(issue => (
-                    <div key={issue.id} className={`flex items-center justify-between p-3 rounded-lg border ${severityColors[issue.severity]}`}>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs uppercase font-bold px-2 py-0.5 rounded bg-black/20">
+                    <div key={issue.id} className={`flex items-center justify-between p-4 border ${getSeverityStyle(issue.severity)}`}>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[8px] uppercase font-bold px-2 py-1 border border-current">
                           {issue.severity}
                         </span>
-                        <span className="text-sm">{issue.message}</span>
+                        <span className="text-xs">{issue.message}</span>
                       </div>
-                      <span className="text-sm font-mono">{issue.count} records</span>
+                      <span className="text-[10px] font-mono text-foreground/50">{issue.count} RECORDS</span>
                     </div>
                   ))}
                 </div>
@@ -277,52 +392,49 @@ export default function TechnoDocAuditAgent() {
         )}
 
         {auditData && activeTab === 'schema' && (
-          <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Grid3X3 className="w-5 h-5 text-purple-400" />
-              Database Schema
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <Grid3X3 className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+              <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                DATABASE SCHEMA
+              </h2>
+            </div>
+            <div className="border border-foreground/10">
+              <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Table</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Entity</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Rows</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Relations</th>
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Health</th>
+                  <tr className="border-b border-[hsl(var(--crimson))]/20">
+                    <th className="text-left py-3 px-4 text-[9px] tracking-[0.2em] text-foreground/40 uppercase">Table</th>
+                    <th className="text-left py-3 px-4 text-[9px] tracking-[0.2em] text-foreground/40 uppercase">Entity</th>
+                    <th className="text-left py-3 px-4 text-[9px] tracking-[0.2em] text-foreground/40 uppercase">Records</th>
+                    <th className="text-left py-3 px-4 text-[9px] tracking-[0.2em] text-foreground/40 uppercase">Health</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {auditData.schema.tables.map(table => {
+                  {auditData.schema.tables.map((table, idx) => {
                     const Icon = entityIcons[table.entity] || Database;
                     const health = auditData.healthScores[table.entity] || 80;
+                    const isHealthy = health >= 80;
                     return (
-                      <tr key={table.name} className="border-b border-gray-800 hover:bg-gray-800/30">
+                      <tr key={table.name} className={`border-b border-foreground/5 hover:bg-foreground/5 ${idx % 2 === 0 ? 'bg-foreground/[0.02]' : ''}`}>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <Icon className="w-4 h-4 text-purple-400" />
-                            <span className="font-medium">{table.name}</span>
+                            <Icon className="w-3 h-3 text-[hsl(var(--logo-green))]/50" />
+                            <span className="font-mono">{table.name}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-gray-400 capitalize">{table.entity}</td>
-                        <td className="py-3 px-4 text-gray-400">{table.rows.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-foreground/50 uppercase text-[10px] tracking-wider">{table.entity}</td>
+                        <td className="py-3 px-4 font-mono text-foreground/70">{table.rows.toLocaleString()}</td>
                         <td className="py-3 px-4">
-                          {table.hasRelations ? (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-gray-600" />
-                          )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-16 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div className="flex items-center gap-3">
+                            <div className="w-16 h-1 bg-foreground/10 overflow-hidden">
                               <div 
-                                className={`h-full rounded-full ${health >= 80 ? 'bg-green-500' : health >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                className={`h-full ${isHealthy ? 'bg-[hsl(var(--logo-green))]' : 'bg-[hsl(var(--crimson))]'}`}
                                 style={{ width: `${health}%` }}
                               />
                             </div>
-                            <span className="text-xs text-gray-400">{health}%</span>
+                            <span className={`text-[10px] ${isHealthy ? 'text-[hsl(var(--logo-green))]' : 'text-[hsl(var(--crimson))]'}`}>
+                              {health}%
+                            </span>
                           </div>
                         </td>
                       </tr>
@@ -335,80 +447,67 @@ export default function TechnoDocAuditAgent() {
         )}
 
         {auditData && activeTab === 'issues' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                All Issues ({auditData.issues.length})
-              </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-purple-600' : 'bg-gray-800'}`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-purple-600' : 'bg-gray-800'}`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-4 h-4 text-[hsl(var(--crimson))]" />
+                <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                  ALL ISSUES ({auditData.issues.length})
+                </h2>
               </div>
             </div>
             
             {auditData.issues.length === 0 ? (
-              <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-12 text-center">
-                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500/50" />
-                <p className="text-xl font-medium text-gray-300">No issues detected</p>
-                <p className="text-sm text-gray-500 mt-2">Your database is in good health</p>
+              <div className="border border-[hsl(var(--logo-green))]/20 p-16 text-center">
+                <CheckCircle className="w-12 h-12 mx-auto mb-4 text-[hsl(var(--logo-green))]/30" />
+                <p className="text-[11px] tracking-[0.2em] text-foreground/40 uppercase">ZERO ISSUES DETECTED</p>
+                <p className="text-[10px] text-foreground/20 mt-2">DATABASE INTEGRITY VERIFIED</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {auditData.issues.map(issue => (
                   <div 
                     key={issue.id}
-                    className="bg-gray-900/50 rounded-lg border border-gray-800 overflow-hidden"
+                    className="border border-foreground/10 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleIssue(issue.id)}
-                      className="w-full flex items-center justify-between p-4 hover:bg-gray-800/30 transition-colors"
+                      className="w-full flex items-center justify-between p-4 hover:bg-foreground/5 transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         {expandedIssues.has(issue.id) ? (
-                          <ChevronDown className="w-4 h-4 text-gray-500" />
+                          <ChevronDown className="w-3 h-3 text-foreground/30" />
                         ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-500" />
+                          <ChevronRight className="w-3 h-3 text-foreground/30" />
                         )}
-                        <span className={`text-xs uppercase font-bold px-2 py-0.5 rounded border ${severityColors[issue.severity]}`}>
+                        <span className={`text-[8px] uppercase font-bold px-2 py-1 border ${getSeverityStyle(issue.severity)}`}>
                           {issue.severity}
                         </span>
-                        <span className="text-xs text-gray-500 uppercase">{issue.type}</span>
-                        <span className="text-sm">{issue.message}</span>
+                        <span className="text-[9px] text-foreground/40 uppercase tracking-wider">{issue.type}</span>
+                        <span className="text-xs">{issue.message}</span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-xs text-gray-500 capitalize">{issue.entity}</span>
-                        <span className="text-sm font-mono text-gray-400">{issue.count}</span>
+                        <span className="text-[9px] text-foreground/30 uppercase">{issue.entity}</span>
+                        <span className="text-[10px] font-mono text-foreground/50">{issue.count}</span>
                       </div>
                     </button>
                     {expandedIssues.has(issue.id) && (
-                      <div className="px-4 pb-4 pt-2 border-t border-gray-800 bg-gray-800/20">
-                        <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="px-4 pb-4 pt-2 border-t border-foreground/5 bg-foreground/[0.02]">
+                        <RedLine className="mb-4" />
+                        <div className="grid grid-cols-3 gap-4 text-xs">
                           <div>
-                            <p className="text-gray-500 mb-1">Affected Table</p>
+                            <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-1">TABLE</p>
                             <p className="font-mono">{issue.table}</p>
                           </div>
                           <div>
-                            <p className="text-gray-500 mb-1">Records Affected</p>
-                            <p>{issue.count}</p>
+                            <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-1">AFFECTED</p>
+                            <p>{issue.count} records</p>
                           </div>
                           <div>
-                            <p className="text-gray-500 mb-1">Auto-fixable</p>
-                            <p>{issue.fixable ? (
-                              <span className="text-green-400">Yes</span>
-                            ) : (
-                              <span className="text-gray-500">Manual review required</span>
-                            )}</p>
+                            <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-1">AUTO-FIX</p>
+                            <p className={issue.fixable ? 'text-[hsl(var(--logo-green))]' : 'text-foreground/30'}>
+                              {issue.fixable ? 'AVAILABLE' : 'MANUAL'}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -421,95 +520,106 @@ export default function TechnoDocAuditAgent() {
         )}
 
         {auditData && activeTab === 'proposals' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Zap className="w-5 h-5 text-purple-400" />
-                Improvement Proposals ({auditData.proposals.length})
-              </h2>
+              <div className="flex items-center gap-3">
+                <Zap className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+                <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                  IMPROVEMENT PROPOSALS ({auditData.proposals.length})
+                </h2>
+              </div>
               <button
                 disabled={selectedProposals.size === 0 || isLoading}
                 onClick={handleApplySelected}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-[hsl(var(--logo-green))]/50 text-[hsl(var(--logo-green))] hover:bg-[hsl(var(--logo-green))]/10 disabled:opacity-30 disabled:cursor-not-allowed text-[10px] tracking-wider uppercase transition-all"
               >
-                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                Apply Selected ({selectedProposals.size})
+                {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
+                APPLY SELECTED ({selectedProposals.size})
               </button>
             </div>
             
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 flex items-start gap-3">
-              <Shield className="w-5 h-5 text-yellow-400 mt-0.5" />
+            <div className="border border-foreground/20 p-4 flex items-start gap-4 bg-foreground/[0.02]">
+              <Shield className="w-5 h-5 text-[hsl(var(--logo-green))] mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-yellow-400">Non-Destructive Mode Active</p>
-                <p className="text-xs text-yellow-400/70 mt-1">All changes create rollback snapshots. Original data is preserved with full recovery capability.</p>
+                <p className="text-[10px] font-bold tracking-[0.2em] text-[hsl(var(--logo-green))] uppercase">
+                  NON-DESTRUCTIVE MODE ACTIVE
+                </p>
+                <p className="text-[9px] text-foreground/40 mt-1 tracking-wider">
+                  ALL CHANGES CREATE ROLLBACK SNAPSHOTS. ORIGINAL DATA PRESERVED.
+                </p>
               </div>
             </div>
 
             {auditData.proposals.length === 0 ? (
-              <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-12 text-center">
-                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500/50" />
-                <p className="text-xl font-medium text-gray-300">No proposals needed</p>
-                <p className="text-sm text-gray-500 mt-2">Your data is looking good</p>
+              <div className="border border-[hsl(var(--logo-green))]/20 p-16 text-center">
+                <CheckCircle className="w-12 h-12 mx-auto mb-4 text-[hsl(var(--logo-green))]/30" />
+                <p className="text-[11px] tracking-[0.2em] text-foreground/40 uppercase">NO PROPOSALS NEEDED</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {auditData.proposals.map(proposal => (
                   <div 
                     key={proposal.id}
-                    className={`bg-gray-900/50 rounded-lg border ${selectedProposals.has(proposal.id) ? 'border-purple-500' : 'border-gray-800'} p-4`}
+                    className={`border p-5 transition-all ${
+                      selectedProposals.has(proposal.id) 
+                        ? 'border-[hsl(var(--logo-green))]/50 bg-[hsl(var(--logo-green))]/5' 
+                        : 'border-foreground/10'
+                    }`}
                   >
                     <div className="flex items-start gap-4">
                       <input
                         type="checkbox"
                         checked={selectedProposals.has(proposal.id)}
                         onChange={() => toggleProposal(proposal.id)}
-                        className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-800 text-purple-500 focus:ring-purple-500"
+                        className="mt-1 w-4 h-4 rounded-none border-foreground/30 bg-transparent checked:bg-[hsl(var(--logo-green))] checked:border-[hsl(var(--logo-green))] focus:ring-[hsl(var(--logo-green))] focus:ring-offset-0"
                       />
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-xs uppercase font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-[9px] uppercase font-bold px-2 py-1 border border-[hsl(var(--logo-green))]/30 text-[hsl(var(--logo-green))]">
                             {proposal.action}
                           </span>
-                          <span className="text-xs text-gray-500 capitalize">{proposal.entity}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded ${
-                            proposal.risk === 'low' ? 'bg-green-500/20 text-green-400' : 
-                            proposal.risk === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 
-                            'bg-red-500/20 text-red-400'
+                          <span className="text-[9px] text-foreground/40 uppercase tracking-wider">{proposal.entity}</span>
+                          <span className={`text-[9px] px-2 py-1 border ${
+                            proposal.risk === 'low' 
+                              ? 'border-[hsl(var(--logo-green))]/30 text-[hsl(var(--logo-green))]' 
+                              : proposal.risk === 'medium' 
+                                ? 'border-foreground/30 text-foreground/60' 
+                                : 'border-[hsl(var(--crimson))]/30 text-[hsl(var(--crimson))]'
                           }`}>
-                            {proposal.risk} risk
+                            {proposal.risk.toUpperCase()} RISK
                           </span>
                         </div>
-                        <p className="text-sm mb-3">{proposal.description}</p>
-                        <div className="flex items-center gap-4">
+                        <p className="text-xs mb-4">{proposal.description}</p>
+                        <div className="flex items-center gap-6">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Confidence:</span>
-                            <div className="w-20 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                            <span className="text-[9px] text-foreground/30 uppercase">CONFIDENCE:</span>
+                            <div className="w-20 h-1 bg-foreground/10 overflow-hidden">
                               <div 
-                                className="h-full bg-purple-500 rounded-full"
+                                className="h-full bg-[hsl(var(--logo-green))]"
                                 style={{ width: `${proposal.confidence * 100}%` }}
                               />
                             </div>
-                            <span className="text-xs text-gray-400">{Math.round(proposal.confidence * 100)}%</span>
+                            <span className="text-[9px] text-[hsl(var(--logo-green))]">{Math.round(proposal.confidence * 100)}%</span>
                           </div>
-                          <span className="text-xs text-gray-500 font-mono">{proposal.targetIds?.length || 0} records</span>
+                          <span className="text-[9px] text-foreground/30 font-mono">{proposal.targetIds?.length || 0} RECORDS</span>
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => handlePreview(proposal)}
                           disabled={isLoading}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 rounded text-xs font-medium"
+                          className="flex items-center gap-1.5 px-3 py-1.5 border border-foreground/20 text-foreground/60 hover:text-foreground hover:border-foreground/40 disabled:opacity-50 text-[9px] tracking-wider uppercase transition-all"
                         >
                           <Eye className="w-3 h-3" />
-                          Preview
+                          PREVIEW
                         </button>
                         <button 
                           onClick={() => handleApplyClick(proposal)}
                           disabled={isLoading}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded text-xs font-medium"
+                          className="flex items-center gap-1.5 px-3 py-1.5 border border-[hsl(var(--logo-green))]/50 text-[hsl(var(--logo-green))] hover:bg-[hsl(var(--logo-green))]/10 disabled:opacity-50 text-[9px] tracking-wider uppercase transition-all"
                         >
                           <Play className="w-3 h-3" />
-                          Apply
+                          APPLY
                         </button>
                       </div>
                     </div>
@@ -521,26 +631,28 @@ export default function TechnoDocAuditAgent() {
         )}
 
         {auditData && activeTab === 'duplicates' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <GitMerge className="w-5 h-5 text-purple-400" />
-              Duplicate Detection
-            </h2>
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 mb-6">
+              <GitMerge className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+              <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                DUPLICATE DETECTION
+              </h2>
+            </div>
             
-            <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-6">
-              <div className="text-center py-8">
-                <GitMerge className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 mb-2">
-                  {auditData.issues.filter(i => i.type === 'duplicate').reduce((sum, i) => sum + i.count, 0)} potential duplicates detected
-                </p>
-                <p className="text-sm text-gray-500 mb-6">Review and merge candidates to maintain data integrity</p>
-                <button 
-                  onClick={() => setActiveTab('proposals')}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium"
-                >
-                  View Merge Proposals
-                </button>
-              </div>
+            <div className="border border-foreground/10 p-12 text-center">
+              <GitMerge className="w-12 h-12 text-foreground/20 mx-auto mb-6" />
+              <p className="text-foreground/60 mb-2">
+                {auditData.issues.filter(i => i.type === 'duplicate').reduce((sum, i) => sum + i.count, 0)} potential duplicates detected
+              </p>
+              <p className="text-[10px] text-foreground/30 mb-6 tracking-wider uppercase">
+                REVIEW AND MERGE TO MAINTAIN INTEGRITY
+              </p>
+              <button 
+                onClick={() => setActiveTab('proposals')}
+                className="px-5 py-2 border border-[hsl(var(--logo-green))]/50 text-[hsl(var(--logo-green))] hover:bg-[hsl(var(--logo-green))]/10 text-[10px] tracking-wider uppercase transition-all"
+              >
+                VIEW MERGE PROPOSALS
+              </button>
             </div>
           </div>
         )}
@@ -548,44 +660,45 @@ export default function TechnoDocAuditAgent() {
 
       {/* Preview Dialog */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 text-gray-100 max-w-2xl">
+        <DialogContent className="bg-background border-[hsl(var(--crimson))]/30 text-foreground max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-purple-400" />
-              Preview: {selectedProposal?.action}
+            <DialogTitle className="flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase">
+              <Eye className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+              PREVIEW: {selectedProposal?.action}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              Review the changes before applying. This is a safe preview.
+            <DialogDescription className="text-foreground/40 text-[10px] tracking-wider">
+              SAFE PREVIEW - NO CHANGES APPLIED
             </DialogDescription>
           </DialogHeader>
           
           {previewData && (
             <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <RedLine />
+              <div className="grid grid-cols-2 gap-4 text-xs">
                 <div>
-                  <p className="text-gray-500 mb-1">Fix Type</p>
+                  <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-1">FIX TYPE</p>
                   <p className="font-mono">{previewData.fixType}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 mb-1">Estimated Changes</p>
+                  <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-1">ESTIMATED CHANGES</p>
                   <p>{previewData.estimatedChanges} records</p>
                 </div>
               </div>
               
               <div>
-                <p className="text-gray-500 mb-2">Action Description</p>
-                <p className="text-sm bg-gray-800/50 p-3 rounded border border-gray-700">
+                <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-2">ACTION</p>
+                <p className="text-xs border border-foreground/10 p-3 bg-foreground/[0.02]">
                   {previewData.action}
                 </p>
               </div>
 
               {previewData.affectedRecords.length > 0 && (
                 <div>
-                  <p className="text-gray-500 mb-2">Affected Records (sample)</p>
-                  <div className="max-h-48 overflow-y-auto bg-gray-800/50 rounded border border-gray-700">
-                    {previewData.affectedRecords.slice(0, 5).map((record, idx) => (
-                      <div key={idx} className="p-2 border-b border-gray-700 last:border-0 text-xs font-mono">
-                        {JSON.stringify(record, null, 2).slice(0, 200)}...
+                  <p className="text-[9px] text-foreground/30 uppercase tracking-wider mb-2">AFFECTED RECORDS (SAMPLE)</p>
+                  <div className="max-h-40 overflow-y-auto border border-foreground/10 bg-foreground/[0.02]">
+                    {previewData.affectedRecords.slice(0, 3).map((record, idx) => (
+                      <div key={idx} className="p-2 border-b border-foreground/5 last:border-0 text-[10px] font-mono text-foreground/60">
+                        {JSON.stringify(record, null, 2).slice(0, 150)}...
                       </div>
                     ))}
                   </div>
@@ -595,8 +708,12 @@ export default function TechnoDocAuditAgent() {
           )}
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPreviewDialogOpen(false)}>
-              Close
+            <Button 
+              variant="outline" 
+              onClick={() => setPreviewDialogOpen(false)}
+              className="border-foreground/20 text-foreground/60 hover:bg-foreground/5 text-[10px] tracking-wider uppercase"
+            >
+              CLOSE
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -604,48 +721,54 @@ export default function TechnoDocAuditAgent() {
 
       {/* Confirm Apply Dialog */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 text-gray-100">
+        <DialogContent className="bg-background border-[hsl(var(--crimson))]/30 text-foreground">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-yellow-400" />
-              Confirm Apply
+            <DialogTitle className="flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase">
+              <Shield className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+              CONFIRM APPLY
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
-              A rollback snapshot will be created before applying changes.
+            <DialogDescription className="text-foreground/40 text-[10px] tracking-wider">
+              ROLLBACK SNAPSHOT WILL BE CREATED
             </DialogDescription>
           </DialogHeader>
           
           {selectedProposal && (
             <div className="py-4">
-              <p className="text-sm mb-4">{selectedProposal.description}</p>
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3 text-xs">
-                <p className="text-yellow-400 font-medium">Safe Mode Active</p>
-                <p className="text-yellow-400/70 mt-1">Changes can be reverted using the rollback snapshot stored in agent_reports.</p>
+              <p className="text-xs mb-4">{selectedProposal.description}</p>
+              <div className="border border-[hsl(var(--logo-green))]/20 p-3 bg-[hsl(var(--logo-green))]/5 text-[10px]">
+                <p className="text-[hsl(var(--logo-green))] font-bold tracking-wider uppercase">SAFE MODE ACTIVE</p>
+                <p className="text-foreground/40 mt-1">
+                  CHANGES STORED IN AGENT_REPORTS FOR RECOVERY
+                </p>
               </div>
             </div>
           )}
           
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setConfirmDialogOpen(false)}>
-              Cancel
+            <Button 
+              variant="outline" 
+              onClick={() => setConfirmDialogOpen(false)}
+              className="border-foreground/20 text-foreground/60 hover:bg-foreground/5 text-[10px] tracking-wider uppercase"
+            >
+              CANCEL
             </Button>
             <Button 
               onClick={handleConfirmApply}
               disabled={isLoading}
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-[hsl(var(--logo-green))]/20 border border-[hsl(var(--logo-green))]/50 text-[hsl(var(--logo-green))] hover:bg-[hsl(var(--logo-green))]/30 text-[10px] tracking-wider uppercase"
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Apply Changes
+              {isLoading ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
+              APPLY CHANGES
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 bg-[#0d0d0e]/50 mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between text-xs text-gray-500">
-          <span>TechnoDoc Audit Agent • Non-destructive by design</span>
-          <span>Last audit: {auditData?.timestamp ? new Date(auditData.timestamp).toLocaleString() : 'Never'}</span>
+      <footer className="border-t border-[hsl(var(--crimson))]/20 bg-background/80 mt-16">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[9px] text-foreground/30 tracking-wider uppercase">
+          <span>TECHNODOC AUDIT AGENT • NON-DESTRUCTIVE BY DESIGN</span>
+          <span>LAST AUDIT: {auditData?.timestamp ? new Date(auditData.timestamp).toLocaleString() : '—'}</span>
         </div>
       </footer>
     </div>
