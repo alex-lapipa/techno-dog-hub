@@ -11,11 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield } from "lucide-react";
+import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield, Eye, EyeOff, Star, TrendingUp, Share2, Download, ExternalLink } from "lucide-react";
 import DogSilhouette from "@/components/DogSilhouette";
 import { dogVariants, GrumpyDog } from "@/components/DogPack";
 import DoggyExport from "@/components/DoggyExport";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
+import { useDoggyVariants, useDoggyAnalytics, useUpdateDoggyVariant } from "@/hooks/useDoggyData";
+import { Link } from "react-router-dom";
 
 const packQuotes = [
   "A well-organized pack is a happy pack!",
@@ -33,6 +35,9 @@ const packQuotes = [
 const DoggiesAdmin = () => {
   const { isAdmin, loading } = useAdminAuth();
   const { toast } = useToast();
+  const { data: dbVariants, isLoading: variantsLoading } = useDoggyVariants();
+  const { data: analyticsData, isLoading: analyticsLoading } = useDoggyAnalytics();
+  const updateVariant = useUpdateDoggyVariant();
   
   const [packHealth, setPackHealth] = useState(94);
   const [cohesionScore, setCohesionScore] = useState(87);
@@ -110,7 +115,15 @@ const DoggiesAdmin = () => {
     });
   };
 
-  if (loading) {
+  const toggleVisibility = (variantId: string, currentActive: boolean) => {
+    updateVariant.mutate({ id: variantId, updates: { is_active: !currentActive } });
+  };
+
+  const toggleFeatured = (variantId: string, currentFeatured: boolean) => {
+    updateVariant.mutate({ id: variantId, updates: { is_featured: !currentFeatured } });
+  };
+
+  if (loading || variantsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingState message="Herding doggies..." />
@@ -131,6 +144,8 @@ const DoggiesAdmin = () => {
       </div>
     );
   }
+
+  const stats = analyticsData?.stats;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -154,6 +169,12 @@ const DoggiesAdmin = () => {
               <p className="font-mono text-sm text-muted-foreground mt-2 italic">"{packQuote}"</p>
             </div>
             <div className="flex gap-2">
+              <Link to="/doggies">
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  View Public Page
+                </Button>
+              </Link>
               <Button variant="outline" onClick={shufflePack}>
                 <Shuffle className="w-4 h-4 mr-2" />
                 Shuffle Pack
@@ -165,8 +186,44 @@ const DoggiesAdmin = () => {
             </div>
           </div>
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Analytics Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-mono text-xs text-muted-foreground uppercase">Total Shares</p>
+                    <p className="font-mono text-2xl font-bold text-logo-green">{stats?.totalShares || 0}</p>
+                  </div>
+                  <Share2 className="w-8 h-8 text-logo-green opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-mono text-xs text-muted-foreground uppercase">Downloads</p>
+                    <p className="font-mono text-2xl font-bold text-logo-green">{stats?.totalDownloads || 0}</p>
+                  </div>
+                  <Download className="w-8 h-8 text-logo-green opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-mono text-xs text-muted-foreground uppercase">Views</p>
+                    <p className="font-mono text-2xl font-bold">{stats?.totalViews || 0}</p>
+                  </div>
+                  <Eye className="w-8 h-8 opacity-50" />
+                </div>
+              </CardContent>
+            </Card>
+            
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -184,31 +241,6 @@ const DoggiesAdmin = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-mono text-xs text-muted-foreground uppercase">Cohesion Score</p>
-                    <p className="font-mono text-2xl font-bold text-logo-green">{cohesionScore}%</p>
-                  </div>
-                  <Shield className="w-8 h-8 text-logo-green opacity-50" />
-                </div>
-                <Progress value={cohesionScore} className="mt-2 h-1" />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-mono text-xs text-muted-foreground uppercase">Active Doggies</p>
-                    <p className="font-mono text-2xl font-bold">{dogVariants.length + generatedDogs.length}</p>
-                  </div>
-                  <DogSilhouette className="w-8 h-8 opacity-50" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
                     <p className="font-mono text-xs text-muted-foreground uppercase">Bork Mode</p>
                     <p className="font-mono text-sm mt-1">{borkMode ? 'ACTIVATED' : 'Standby'}</p>
                   </div>
@@ -218,6 +250,33 @@ const DoggiesAdmin = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Sharing Analytics by Dog */}
+          {stats && Object.keys(stats.byVariant).length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-mono text-base flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-logo-green" />
+                  Sharing Analytics by Dog
+                </CardTitle>
+                <CardDescription>See which doggies are the most popular</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {Object.entries(stats.byVariant).map(([name, data]) => (
+                    <div key={name} className="p-3 rounded-lg border bg-muted/30">
+                      <p className="font-mono text-xs font-bold">{name}</p>
+                      <div className="flex gap-2 mt-1 text-[10px] font-mono text-muted-foreground">
+                        <span>{data.shares} shares</span>
+                        <span>•</span>
+                        <span>{data.downloads} dl</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Wagging Intensity Control */}
           <Card>
@@ -273,48 +332,52 @@ const DoggiesAdmin = () => {
             </CardContent>
           </Card>
 
-          {/* The Pack */}
+          {/* The Pack - with DB controls */}
           <Card>
             <CardHeader>
-              <CardTitle className="font-mono text-base">The Pack</CardTitle>
-              <CardDescription>Click a doggie to inspect their status</CardDescription>
+              <CardTitle className="font-mono text-base">The Pack (Database Managed)</CardTitle>
+              <CardDescription>Toggle visibility and featured status for the public page</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                {dogVariants.map((dog, index) => {
-                  const DogComponent = dog.Component;
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {dbVariants?.map((dbDog, index) => {
+                  const dogData = dogVariants.find(d => d.name.toLowerCase() === dbDog.name.toLowerCase()) || dogVariants[0];
+                  const DogComponent = dogData.Component;
                   return (
                     <div 
-                      key={dog.name}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all hover:border-logo-green hover:bg-logo-green/5 ${selectedDog === index ? 'border-logo-green bg-logo-green/10' : ''}`}
-                      onClick={() => setSelectedDog(selectedDog === index ? null : index)}
+                      key={dbDog.id}
+                      className={`p-4 rounded-lg border transition-all ${!dbDog.is_active ? 'opacity-40' : ''} ${dbDog.is_featured ? 'border-logo-green bg-logo-green/10' : ''}`}
                     >
                       <DogComponent className="w-16 h-16 mx-auto mb-2" animated={borkMode || waggingIntensity[0] > 80} />
-                      <p className="font-mono text-xs text-center font-bold">{dog.name}</p>
-                      <Badge variant="outline" className="w-full justify-center mt-1 text-[10px]">{dog.status}</Badge>
+                      <p className="font-mono text-xs text-center font-bold">{dbDog.name}</p>
+                      <p className="font-mono text-[10px] text-center text-muted-foreground truncate">{dbDog.personality}</p>
+                      <Badge variant="outline" className="w-full justify-center mt-1 text-[10px]">{dbDog.status}</Badge>
+                      
+                      {/* Controls */}
+                      <div className="flex gap-1 mt-3 justify-center">
+                        <Button
+                          size="sm"
+                          variant={dbDog.is_active ? "ghost" : "outline"}
+                          className="h-7 px-2"
+                          onClick={() => toggleVisibility(dbDog.id, dbDog.is_active)}
+                          title={dbDog.is_active ? "Hide from public" : "Show on public"}
+                        >
+                          {dbDog.is_active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={dbDog.is_featured ? "default" : "ghost"}
+                          className={`h-7 px-2 ${dbDog.is_featured ? 'bg-logo-green text-background hover:bg-logo-green/80' : ''}`}
+                          onClick={() => toggleFeatured(dbDog.id, dbDog.is_featured)}
+                          title={dbDog.is_featured ? "Remove featured" : "Make featured"}
+                        >
+                          <Star className="w-3 h-3" />
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              
-              {selectedDog !== null && (
-                <div className="mt-6 p-4 border border-logo-green/30 rounded-lg bg-logo-green/5">
-                  <div className="flex items-start gap-4">
-                    {(() => {
-                      const DogComponent = dogVariants[selectedDog].Component;
-                      return <DogComponent className="w-20 h-20" animated />;
-                    })()}
-                    <div>
-                      <h3 className="font-mono text-lg font-bold">{dogVariants[selectedDog].name} Dog</h3>
-                      <p className="font-mono text-sm text-muted-foreground">{dogVariants[selectedDog].personality}</p>
-                      <div className="flex gap-2 mt-2">
-                        <Badge variant="outline">{dogVariants[selectedDog].status}</Badge>
-                        <Badge variant="secondary">Pack Member Since Day 1</Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 

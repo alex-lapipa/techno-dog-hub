@@ -4,32 +4,75 @@ import { Link } from "react-router-dom";
 import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
+import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
 
 const TechnoDoggies = () => {
+  const { data: dbVariants, isLoading } = useActiveDoggyVariants();
+  const logAction = useLogDoggyAction();
+  
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedDogs, setSelectedDogs] = useState<number[]>([]);
 
-  const currentDog = dogVariants[currentDogIndex];
-  const DogComponent = currentDog.Component;
+  // Get the active variants from DB, fallback to static if loading
+  const activeVariants = dbVariants?.map(dbDog => {
+    const match = dogVariants.find(d => d.name.toLowerCase() === dbDog.name.toLowerCase());
+    return match ? { ...match, dbData: dbDog } : null;
+  }).filter(Boolean) || dogVariants;
+
+  const currentDog = activeVariants[currentDogIndex] || activeVariants[0];
+  const DogComponent = currentDog?.Component || dogVariants[0].Component;
+  const currentDbData = (currentDog as any)?.dbData;
+
+  // Log view on mount
+  useEffect(() => {
+    if (currentDog) {
+      logAction.mutate({
+        variantId: currentDbData?.id,
+        variantName: currentDog.name,
+        actionType: "view",
+      });
+    }
+  }, []);
 
   const nextDog = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setCurrentDogIndex(prev => (prev + 1) % dogVariants.length);
+      const newIndex = (currentDogIndex + 1) % activeVariants.length;
+      setCurrentDogIndex(newIndex);
       setIsAnimating(false);
+      
+      const nextDog = activeVariants[newIndex];
+      if (nextDog) {
+        logAction.mutate({
+          variantId: (nextDog as any)?.dbData?.id,
+          variantName: nextDog.name,
+          actionType: "view",
+        });
+      }
     }, 150);
   };
 
   const randomDog = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setCurrentDogIndex(Math.floor(Math.random() * dogVariants.length));
+      const newIndex = Math.floor(Math.random() * activeVariants.length);
+      setCurrentDogIndex(newIndex);
       setIsAnimating(false);
+      
+      const randomDog = activeVariants[newIndex];
+      if (randomDog) {
+        logAction.mutate({
+          variantId: (randomDog as any)?.dbData?.id,
+          variantName: randomDog.name,
+          actionType: "view",
+        });
+      }
     }, 150);
   };
 
@@ -42,10 +85,16 @@ const TechnoDoggies = () => {
   };
 
   const shareViaEmail = () => {
+    logAction.mutate({
+      variantId: currentDbData?.id,
+      variantName: currentDog?.name || "Unknown",
+      actionType: "share_email",
+    });
+    
     const subject = encodeURIComponent("Check out these Techno Doggies! 🐕");
     const body = encodeURIComponent(
       `I found these awesome Techno Doggies at techno.dog!\n\n` +
-      `My favorite is the ${currentDog.name} Dog - ${currentDog.personality}\n\n` +
+      `My favorite is the ${currentDog?.name} Dog - ${currentDog?.personality}\n\n` +
       `Create your own pack: https://techno.dog/doggies\n\n` +
       `🐕 Bork bork!`
     );
@@ -60,6 +109,12 @@ const TechnoDoggies = () => {
       return;
     }
 
+    logAction.mutate({
+      variantId: currentDbData?.id,
+      variantName: currentDog?.name || "Unknown",
+      actionType: "download",
+    });
+
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -71,17 +126,36 @@ const TechnoDoggies = () => {
     img.onload = () => {
       ctx?.drawImage(img, 0, 0, 512, 512);
       const link = document.createElement('a');
-      link.download = `techno-${currentDog.name.toLowerCase()}-dog.png`;
+      link.download = `techno-${currentDog?.name.toLowerCase()}-dog.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-      toast.success(`Downloaded ${currentDog.name} Dog!`);
+      toast.success(`Downloaded ${currentDog?.name} Dog!`);
     };
     
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
   };
 
+  const handleSocialShare = (platform: string) => {
+    logAction.mutate({
+      variantId: currentDbData?.id,
+      variantName: currentDog?.name || "Unknown",
+      actionType: `share_${platform}`,
+    });
+  };
+
   const shareUrl = "https://techno.dog/doggies";
-  const shareText = `Check out the ${currentDog.name} Techno Dog! 🐕 Create your own pack at techno.dog`;
+  const shareText = `Check out the ${currentDog?.name} Techno Dog! 🐕 Create your own pack at techno.dog`;
+
+  // Get featured dogs
+  const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading doggies...</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -124,6 +198,34 @@ const TechnoDoggies = () => {
             </p>
           </div>
 
+          {/* Featured Dogs */}
+          {featuredDogs.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Star className="w-4 h-4 text-logo-green" />
+                <span className="font-mono text-xs uppercase tracking-wider text-logo-green">Featured Doggies</span>
+              </div>
+              <div className="flex justify-center gap-4 flex-wrap">
+                {featuredDogs.map((dog: any, index: number) => {
+                  const Dog = dog.Component;
+                  return (
+                    <button
+                      key={dog.name}
+                      onClick={() => {
+                        const fullIndex = activeVariants.findIndex(v => v.name === dog.name);
+                        setCurrentDogIndex(fullIndex >= 0 ? fullIndex : 0);
+                      }}
+                      className="p-3 rounded-lg border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 transition-all"
+                    >
+                      <Dog className="w-10 h-10 mx-auto" />
+                      <p className="text-[10px] font-mono text-logo-green mt-1">{dog.name}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Main Dog Display */}
           <Card className="max-w-md mx-auto mb-8 border-logo-green/30 bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8">
@@ -135,14 +237,19 @@ const TechnoDoggies = () => {
               >
                 <DogComponent className="w-32 h-32" animated />
                 <h2 className="mt-4 text-2xl font-bold text-foreground font-mono">
-                  {currentDog.name} Dog
+                  {currentDog?.name} Dog
                 </h2>
                 <p className="text-sm text-muted-foreground text-center mt-2 font-mono">
-                  {currentDog.personality}
+                  {currentDbData?.personality || currentDog?.personality}
                 </p>
                 <span className="mt-3 px-3 py-1 text-xs uppercase tracking-wider rounded-full border border-logo-green/30 text-logo-green font-mono">
-                  {currentDog.status}
+                  {currentDbData?.status || currentDog?.status}
                 </span>
+                {currentDbData?.is_featured && (
+                  <Badge variant="secondary" className="mt-2 text-[10px]">
+                    <Star className="w-3 h-3 mr-1" /> Featured
+                  </Badge>
+                )}
               </div>
 
               {/* Controls */}
@@ -166,7 +273,9 @@ const TechnoDoggies = () => {
               </h3>
               
               <div className="flex flex-wrap gap-2 justify-center mb-4">
-                <SocialShareButtons url={shareUrl} text={shareText} size="default" />
+                <div onClick={() => handleSocialShare("whatsapp")}>
+                  <SocialShareButtons url={shareUrl} text={shareText} size="default" />
+                </div>
               </div>
 
               <div className="flex gap-2 justify-center">
@@ -188,9 +297,10 @@ const TechnoDoggies = () => {
               Meet the Full Pack
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {dogVariants.map((dog, index) => {
+              {activeVariants.map((dog: any, index: number) => {
                 const Dog = dog.Component;
                 const isSelected = selectedDogs.includes(index);
+                const isFeatured = dog.dbData?.is_featured;
                 return (
                   <button
                     key={dog.name}
@@ -201,13 +311,16 @@ const TechnoDoggies = () => {
                     className={`p-4 rounded-lg border transition-all hover:scale-105 ${
                       isSelected 
                         ? 'border-logo-green bg-logo-green/10' 
-                        : 'border-border/50 hover:border-logo-green/50'
+                        : isFeatured 
+                          ? 'border-logo-green/50 hover:border-logo-green'
+                          : 'border-border/50 hover:border-logo-green/50'
                     }`}
                   >
                     <Dog className="w-12 h-12 mx-auto" />
                     <p className="text-xs font-mono text-muted-foreground mt-2 text-center">
                       {dog.name}
                     </p>
+                    {isFeatured && <Star className="w-3 h-3 mx-auto mt-1 text-logo-green" />}
                   </button>
                 );
               })}

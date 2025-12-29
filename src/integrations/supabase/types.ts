@@ -1585,6 +1585,77 @@ export type Database = {
         }
         Relationships: []
       }
+      doggy_analytics: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          variant_id: string | null
+          variant_name: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          variant_id?: string | null
+          variant_name: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          variant_id?: string | null
+          variant_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doggy_analytics_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "doggy_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doggy_variants: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          name: string
+          personality: string | null
+          slug: string
+          sort_order: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name: string
+          personality?: string | null
+          slug: string
+          sort_order?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          name?: string
+          personality?: string | null
+          slug?: string
+          sort_order?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       email_events: {
         Row: {
           created_at: string
