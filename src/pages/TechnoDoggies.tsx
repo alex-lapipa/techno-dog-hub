@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import PageSEO from "@/components/PageSEO";
 import { Link } from "react-router-dom";
 import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
@@ -163,9 +164,23 @@ const TechnoDoggies = () => {
       <Helmet>
         <title>Techno Doggies - Create & Share Your Pack | techno.dog</title>
         <meta name="description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bork bork!" />
-        <meta property="og:title" content="Techno Doggies - Create & Share Your Pack" />
-        <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community." />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
         <meta property="og:url" content="https://techno.dog/doggies" />
+        <meta property="og:title" content="Techno Doggies - Create & Share Your Pack 🐕" />
+        <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the borks!" />
+        <meta property="og:image" content="https://techno.dog/og-doggies.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Techno Dog DJ with headphones and turntables" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://techno.dog/doggies" />
+        <meta name="twitter:title" content="Techno Doggies - Create & Share Your Pack 🐕" />
+        <meta name="twitter:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community." />
+        <meta name="twitter:image" content="https://techno.dog/og-doggies.png" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
