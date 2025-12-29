@@ -8,7 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert } from "lucide-react";
+import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert, BookOpen } from "lucide-react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
@@ -299,9 +299,19 @@ const AdminDashboard = () => {
             <p className="font-mono text-xs text-muted-foreground mt-1">{userEmail}</p>
           )}
         </div>
-        <Button variant="outline" onClick={handleLogout} className="font-mono text-xs uppercase tracking-wider">
-          <LogOut className="w-4 h-4 mr-2" />End Session
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="brutalist" 
+            onClick={() => navigate('/admin/training')}
+            className="font-mono text-xs uppercase tracking-wider bg-logo-green hover:bg-logo-green/90 text-background animate-pulse hover:animate-none"
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            New Here? Start Training
+          </Button>
+          <Button variant="outline" onClick={handleLogout} className="font-mono text-xs uppercase tracking-wider">
+            <LogOut className="w-4 h-4 mr-2" />End Session
+          </Button>
+        </div>
       </div>
 
       {/* Automated Tasks Section */}
