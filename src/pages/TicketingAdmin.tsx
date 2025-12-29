@@ -18,16 +18,26 @@ import {
   Zap,
   Users,
   CreditCard,
-  QrCode
+  QrCode,
+  Globe,
+  Play
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export default function TicketingAdmin() {
   const navigate = useNavigate();
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
+  const [embedOrgSlug, setEmbedOrgSlug] = useState('your-org');
+  const [embedEventSlug, setEmbedEventSlug] = useState('your-event');
+  const [embedColor, setEmbedColor] = useState('#dc2626');
+  const [showPreview, setShowPreview] = useState(false);
 
   const copyToClipboard = (section: string, content: string) => {
     navigator.clipboard.writeText(content);
@@ -483,6 +493,265 @@ ${divider}
                 <span className="text-muted-foreground">{' }}'}</span>
               </div>
               <div className="text-muted-foreground">{'/>'}</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Embeddable Widget Section */}
+        <Card className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-800 border-2 border-logo-green/50 shadow-lg shadow-logo-green/10">
+          <CardHeader>
+            <CardTitle className="font-mono text-lg flex items-center gap-3">
+              <div className="p-2 bg-logo-green/20 rounded-lg">
+                <Globe className="w-6 h-6 text-logo-green" />
+              </div>
+              <div>
+                <span className="text-logo-green">EMBEDDABLE WIDGET</span>
+                <p className="text-xs text-muted-foreground font-normal mt-1">
+                  Copy & paste to deploy on any external website — no download required
+                </p>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Tabs defaultValue="configure" className="w-full">
+              <TabsList className="bg-zinc-800 border border-border">
+                <TabsTrigger value="configure" className="font-mono text-xs">Configure</TabsTrigger>
+                <TabsTrigger value="embed" className="font-mono text-xs">Embed Code</TabsTrigger>
+                <TabsTrigger value="preview" className="font-mono text-xs">Preview</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="configure" className="mt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono text-muted-foreground">Organization Slug</label>
+                    <Input 
+                      value={embedOrgSlug}
+                      onChange={(e) => setEmbedOrgSlug(e.target.value)}
+                      placeholder="your-org"
+                      className="bg-zinc-800 border-border font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono text-muted-foreground">Event Slug</label>
+                    <Input 
+                      value={embedEventSlug}
+                      onChange={(e) => setEmbedEventSlug(e.target.value)}
+                      placeholder="summer-fest-2025"
+                      className="bg-zinc-800 border-border font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono text-muted-foreground">Primary Color</label>
+                    <div className="flex gap-2">
+                      <Input 
+                        type="color"
+                        value={embedColor}
+                        onChange={(e) => setEmbedColor(e.target.value)}
+                        className="w-12 h-10 p-1 bg-zinc-800 border-border"
+                      />
+                      <Input 
+                        value={embedColor}
+                        onChange={(e) => setEmbedColor(e.target.value)}
+                        className="bg-zinc-800 border-border font-mono flex-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="embed" className="mt-4 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">STEP 1: Add the container div</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('container', `<div id="techno-tickets" data-techno-tickets data-org-slug="${embedOrgSlug}" data-event-slug="${embedEventSlug}" data-primary-color="${embedColor}"></div>`)}
+                      className="font-mono text-xs"
+                    >
+                      {copiedSection === 'container' ? <><Check className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy</>}
+                    </Button>
+                  </div>
+                  <div className="bg-zinc-950 border border-border p-4 font-mono text-sm overflow-x-auto">
+                    <span className="text-muted-foreground">{'<'}</span>
+                    <span className="text-amber-400">div</span>
+                    <span className="text-muted-foreground"> </span>
+                    <span className="text-logo-green">id</span>
+                    <span className="text-muted-foreground">=</span>
+                    <span className="text-crimson">"techno-tickets"</span>
+                    <br />
+                    <span className="text-muted-foreground pl-4"> </span>
+                    <span className="text-logo-green">data-techno-tickets</span>
+                    <br />
+                    <span className="text-muted-foreground pl-4"> </span>
+                    <span className="text-logo-green">data-org-slug</span>
+                    <span className="text-muted-foreground">=</span>
+                    <span className="text-crimson">"{embedOrgSlug}"</span>
+                    <br />
+                    <span className="text-muted-foreground pl-4"> </span>
+                    <span className="text-logo-green">data-event-slug</span>
+                    <span className="text-muted-foreground">=</span>
+                    <span className="text-crimson">"{embedEventSlug}"</span>
+                    <br />
+                    <span className="text-muted-foreground pl-4"> </span>
+                    <span className="text-logo-green">data-primary-color</span>
+                    <span className="text-muted-foreground">=</span>
+                    <span className="text-crimson">"{embedColor}"</span>
+                    <span className="text-muted-foreground">{'>'}</span>
+                    <span className="text-muted-foreground">{'</'}</span>
+                    <span className="text-amber-400">div</span>
+                    <span className="text-muted-foreground">{'>'}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">STEP 2: Add the script (before {'</body>'})</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('script', `<script src="${SUPABASE_URL}/functions/v1/ticketing-widget?action=script" async></script>`)}
+                      className="font-mono text-xs"
+                    >
+                      {copiedSection === 'script' ? <><Check className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy</>}
+                    </Button>
+                  </div>
+                  <div className="bg-zinc-950 border border-border p-4 font-mono text-sm overflow-x-auto">
+                    <span className="text-muted-foreground">{'<'}</span>
+                    <span className="text-amber-400">script</span>
+                    <span className="text-muted-foreground"> </span>
+                    <span className="text-logo-green">src</span>
+                    <span className="text-muted-foreground">=</span>
+                    <span className="text-crimson break-all">"{SUPABASE_URL}/functions/v1/ticketing-widget?action=script"</span>
+                    <span className="text-muted-foreground"> </span>
+                    <span className="text-logo-green">async</span>
+                    <span className="text-muted-foreground">{'></'}</span>
+                    <span className="text-amber-400">script</span>
+                    <span className="text-muted-foreground">{'>'}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">COMPLETE SNIPPET (copy all)</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => copyToClipboard('full', `<!-- Techno.Dog Ticketing Widget -->
+<div id="techno-tickets" 
+  data-techno-tickets 
+  data-org-slug="${embedOrgSlug}" 
+  data-event-slug="${embedEventSlug}" 
+  data-primary-color="${embedColor}">
+</div>
+<script src="${SUPABASE_URL}/functions/v1/ticketing-widget?action=script" async></script>`)}
+                      className="font-mono text-xs"
+                    >
+                      {copiedSection === 'full' ? <><Check className="w-3 h-3 mr-1" /> Copied</> : <><Copy className="w-3 h-3 mr-1" /> Copy All</>}
+                    </Button>
+                  </div>
+                  <div className="bg-zinc-950 border border-logo-green/30 p-4 font-mono text-xs overflow-x-auto">
+                    <pre className="text-muted-foreground whitespace-pre-wrap">{`<!-- Techno.Dog Ticketing Widget -->
+<div id="techno-tickets" 
+  data-techno-tickets 
+  data-org-slug="${embedOrgSlug}" 
+  data-event-slug="${embedEventSlug}" 
+  data-primary-color="${embedColor}">
+</div>
+<script src="${SUPABASE_URL}/functions/v1/ticketing-widget?action=script" async></script>`}</pre>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="preview" className="mt-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">Live widget preview (demo data)</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowPreview(!showPreview)}
+                      className="font-mono text-xs border-logo-green/50 text-logo-green hover:bg-logo-green/10"
+                    >
+                      <Play className="w-3 h-3 mr-1" />
+                      {showPreview ? 'Reload' : 'Load Preview'}
+                    </Button>
+                  </div>
+                  
+                  {showPreview && (
+                    <div className="border border-border rounded-lg overflow-hidden bg-zinc-950 p-8">
+                      <div 
+                        id="preview-widget"
+                        dangerouslySetInnerHTML={{
+                          __html: `
+                            <div style="font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; background: #0a0a0a; border: 1px solid #27272a; border-radius: 8px; overflow: hidden; color: #fafafa;">
+                              <div style="background: linear-gradient(135deg, #18181b 0%, #27272a 100%); padding: 20px; border-bottom: 1px solid #3f3f46;">
+                                <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">${embedEventSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
+                                <p style="margin: 0; font-size: 13px; color: #a1a1aa;">Saturday, February 15, 2025</p>
+                              </div>
+                              <div style="padding: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; margin-bottom: 12px; background: #18181b; border: 1px solid #27272a; border-radius: 6px;">
+                                  <div>
+                                    <div style="font-weight: 600; font-size: 15px;">Early Bird</div>
+                                    <div style="font-size: 11px; color: #71717a; margin-top: 4px;">33 remaining</div>
+                                  </div>
+                                  <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="color: #22c55e; font-weight: 700; font-size: 18px;">€35.00</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                      <button style="width: 32px; height: 32px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; border-radius: 4px; cursor: pointer;">−</button>
+                                      <span style="min-width: 24px; text-align: center; font-weight: 600;">0</span>
+                                      <button style="width: 32px; height: 32px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; border-radius: 4px; cursor: pointer;">+</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; margin-bottom: 12px; background: #18181b; border: 1px solid #27272a; border-radius: 6px;">
+                                  <div>
+                                    <div style="font-weight: 600; font-size: 15px;">General Admission</div>
+                                    <div style="font-size: 11px; color: #71717a; margin-top: 4px;">377 remaining</div>
+                                  </div>
+                                  <div style="display: flex; align-items: center; gap: 16px;">
+                                    <div style="color: #22c55e; font-weight: 700; font-size: 18px;">€50.00</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                      <button style="width: 32px; height: 32px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; border-radius: 4px; cursor: pointer;">−</button>
+                                      <span style="min-width: 24px; text-align: center; font-weight: 600;">0</span>
+                                      <button style="width: 32px; height: 32px; border: 1px solid #3f3f46; background: #27272a; color: #fafafa; border-radius: 4px; cursor: pointer;">+</button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 16px 0; margin-bottom: 16px; border-top: 1px solid #27272a; font-size: 18px;">
+                                  <span style="color: #a1a1aa;">Total</span>
+                                  <span style="font-weight: 700; color: #22c55e;">€0.00</span>
+                                </div>
+                                <button style="width: 100%; padding: 16px; background: ${embedColor}; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.5;">
+                                  Proceed to Checkout
+                                </button>
+                              </div>
+                              <div style="text-align: center; padding: 12px; font-size: 11px; color: #52525b; background: #0a0a0a; border-top: 1px solid #27272a;">
+                                Powered by <a href="https://techno.dog" style="color: ${embedColor}; text-decoration: none;">Techno.Dog</a>
+                              </div>
+                            </div>
+                          `
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <div className="flex items-center gap-4 pt-4 border-t border-border">
+              <Badge variant="outline" className="font-mono text-[10px] border-logo-green/50 text-logo-green">
+                <Zap className="w-3 h-3 mr-1" />
+                AUTO-DEPLOY
+              </Badge>
+              <Badge variant="outline" className="font-mono text-[10px] border-crimson/50 text-crimson">
+                <Shield className="w-3 h-3 mr-1" />
+                CORS ENABLED
+              </Badge>
+              <Badge variant="outline" className="font-mono text-[10px] border-muted-foreground/50 text-muted-foreground">
+                <Server className="w-3 h-3 mr-1" />
+                EDGE FUNCTION
+              </Badge>
             </div>
           </CardContent>
         </Card>
