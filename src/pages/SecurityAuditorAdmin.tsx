@@ -88,16 +88,15 @@ const SecurityAuditorAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="SECURITY AUDITOR"
-      description="Scans for access control issues and suspicious activity"
+      title="Security"
+      description="Access control and activity monitoring"
       icon={ShieldAlert}
       iconColor="text-crimson"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Run Audit"
-      agentButtonColor="bg-crimson hover:bg-crimson/80"
+      runButtonText="Audit"
     >
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -86,20 +86,18 @@ const AnalyticsReporterAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="ANALYTICS REPORTER"
-      description="Generates weekly usage insights and trends"
+      title="Analytics"
+      description="Usage insights and trends"
       icon={BarChart3}
       iconColor="text-logo-green"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Generate Report"
-      agentButtonColor="bg-logo-green hover:bg-logo-green/80"
+      runButtonText="Generate"
       actions={
-        <Button onClick={() => navigate('/analytics')} variant="outline" size="sm" className="font-mono text-xs">
-          <Eye className="w-4 h-4 mr-2" />
-          Full Analytics
+        <Button onClick={() => navigate('/analytics')} variant="outline" size="sm" className="font-mono text-xs uppercase">
+          View All
         </Button>
       }
     >

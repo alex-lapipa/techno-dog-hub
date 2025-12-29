@@ -108,16 +108,15 @@ const KnowledgeGapAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="KNOWLEDGE GAP DETECTOR"
-      description="Identifies missing artists, data, and content gaps"
+      title="Knowledge Gaps"
+      description="Missing artists, data, and content"
       icon={Search}
       iconColor="text-amber-500"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Detect Gaps"
-      agentButtonColor="bg-amber-500 hover:bg-amber-600 text-black"
+      runButtonText="Detect"
     >
       {/* Coverage Overview */}
       <Card className="bg-zinc-900 border-amber-500/30">

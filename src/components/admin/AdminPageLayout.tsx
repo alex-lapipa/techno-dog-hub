@@ -2,21 +2,20 @@ import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, RefreshCw, Bot, Loader2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface AdminPageLayoutProps {
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   iconColor?: string;
   children: ReactNode;
   onRefresh?: () => void;
   onRunAgent?: () => void;
   isLoading?: boolean;
   isRunning?: boolean;
-  agentButtonText?: string;
-  agentButtonColor?: string;
+  runButtonText?: string;
   actions?: ReactNode;
 }
 
@@ -30,8 +29,7 @@ export const AdminPageLayout = ({
   onRunAgent,
   isLoading = false,
   isRunning = false,
-  agentButtonText = 'Run Agent',
-  agentButtonColor = 'bg-crimson hover:bg-crimson/80',
+  runButtonText = 'Run',
   actions
 }: AdminPageLayoutProps) => {
   const navigate = useNavigate();
@@ -41,8 +39,8 @@ export const AdminPageLayout = ({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-crimson" />
-          <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">Loading...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">Loading</p>
         </div>
       </div>
     );
@@ -55,11 +53,11 @@ export const AdminPageLayout = ({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* VHS Scanline overlay */}
+      {/* Subtle scanline overlay */}
       <div 
-        className="fixed inset-0 pointer-events-none z-50 opacity-[0.02]"
+        className="fixed inset-0 pointer-events-none z-50 opacity-[0.015]"
         style={{
-          background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.3) 1px, rgba(0,0,0,0.3) 2px)',
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.2) 1px, rgba(0,0,0,0.2) 2px)',
         }}
       />
       
@@ -72,24 +70,24 @@ export const AdminPageLayout = ({
                 variant="ghost" 
                 size="icon" 
                 onClick={() => navigate('/admin')}
-                className="hover:bg-zinc-800"
+                className="hover:bg-muted"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-mono font-bold text-foreground flex items-center gap-2">
-                  <Icon className={`w-6 h-6 ${iconColor}`} />
+                <h1 className="text-xl font-mono uppercase tracking-tight text-foreground flex items-center gap-2">
+                  {Icon && <Icon className={`w-5 h-5 ${iconColor}`} />}
                   {title}
                 </h1>
-                <p className="text-sm text-muted-foreground font-mono">
+                <p className="text-xs text-muted-foreground font-mono mt-0.5">
                   {description}
                 </p>
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
               {onRefresh && (
-                <Button onClick={onRefresh} variant="outline" size="sm" className="font-mono text-xs">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                <Button onClick={onRefresh} variant="outline" size="sm" className="font-mono text-xs uppercase">
+                  <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               )}
@@ -98,14 +96,11 @@ export const AdminPageLayout = ({
                   onClick={onRunAgent} 
                   disabled={isRunning} 
                   size="sm" 
-                  className={`font-mono text-xs ${agentButtonColor}`}
+                  variant="brutalist"
+                  className="font-mono text-xs uppercase"
                 >
-                  {isRunning ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Bot className="w-4 h-4 mr-2" />
-                  )}
-                  {isRunning ? 'Running...' : agentButtonText}
+                  {isRunning && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
+                  {isRunning ? 'Running' : runButtonText}
                 </Button>
               )}
               {actions}

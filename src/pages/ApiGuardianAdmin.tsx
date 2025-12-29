@@ -77,15 +77,15 @@ const ApiGuardianAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="API GUARDIAN"
-      description="Monitors developer API health, keys, rate limits, and RAG content"
+      title="API"
+      description="Keys, rate limits, and usage"
       icon={Shield}
       iconColor="text-crimson"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonColor="bg-crimson hover:bg-crimson/80"
+      runButtonText="Scan"
     >
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
