@@ -430,44 +430,47 @@ const AdminDashboard = () => {
 };
 
 const Admin = () => {
-  const { isAdmin, loading } = useAdminAuth();
-  const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  if (loading) {
+  // Development mode bypass - skip all auth checks
+  const isDevelopment = import.meta.env.DEV;
+
+  if (!isDevelopment && (adminLoading || authLoading)) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingState message="Authenticating..." />
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center px-4 py-16">
+          <LoadingState />
+        </main>
+        <Footer />
       </div>
     );
   }
 
-  // Determine what to show
-  let content;
-  if (!user) {
-    // Not logged in - show login form
-    content = <AdminLoginForm />;
-  } else if (!isAdmin) {
-    // Logged in but not admin - show access denied
-    content = <AccessDenied />;
-  } else {
-    // Admin - show dashboard
-    content = <AdminDashboard />;
-  }
+  // In development mode, always show dashboard
+  const showDashboard = isDevelopment || isAdmin;
+  const showAccessDenied = !isDevelopment && user && !isAdmin;
+  const showLogin = !isDevelopment && !user;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO title="Control Room" description="techno.dog administration" path="/admin" />
+    <div className="min-h-screen bg-background flex flex-col">
+      <PageSEO 
+        title="Control Room | techno.dog" 
+        description="Admin control center for techno.dog"
+        path="/admin"
+        noindex={true}
+      />
       <Header />
-      <main className="pt-24 lg:pt-16">
-        <section className="border-b border-border">
-          <div className="container mx-auto px-4 md:px-8 py-12">
-            {content}
-          </div>
-        </section>
+      <main className="flex-1 px-4 py-8 md:py-12">
+        <div className="container mx-auto max-w-7xl">
+          {showLogin && <AdminLoginForm />}
+          {showAccessDenied && <AccessDenied />}
+          {showDashboard && <AdminDashboard />}
+        </div>
       </main>
       <Footer />
-      {/* AI Assistant - only show for admins */}
-      {isAdmin && <AdminAIAssistant />}
+      {showDashboard && <AdminAIAssistant />}
     </div>
   );
 };
