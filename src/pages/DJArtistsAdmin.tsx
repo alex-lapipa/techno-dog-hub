@@ -4,12 +4,13 @@ import { AdminPageLayout } from '@/components/admin/AdminPageLayout';
 import DJArtistSearch from '@/components/DJArtistSearch';
 import DJArtistCharts from '@/components/admin/DJArtistCharts';
 import DJArtistTable from '@/components/admin/DJArtistTable';
+import ArtistDatabaseManager from '@/components/admin/ArtistDatabaseManager';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Upload, Search, Database, Loader2, Users, BarChart3, List } from 'lucide-react';
+import { Upload, Search, Database, Loader2, Users, BarChart3, List, Brain } from 'lucide-react';
 
 interface DJArtist {
   id: number;
@@ -98,8 +99,12 @@ const DJArtistsAdmin = () => {
       onRefresh={fetchArtists}
       isLoading={loading}
     >
-      <Tabs defaultValue="visualize" className="space-y-6">
-        <TabsList className="font-mono">
+      <Tabs defaultValue="agents" className="space-y-6">
+        <TabsList className="font-mono flex-wrap">
+          <TabsTrigger value="agents" className="gap-2">
+            <Brain className="w-4 h-4" />
+            Agents
+          </TabsTrigger>
           <TabsTrigger value="visualize" className="gap-2">
             <BarChart3 className="w-4 h-4" />
             Visualize
@@ -121,6 +126,11 @@ const DJArtistsAdmin = () => {
             Stats
           </TabsTrigger>
         </TabsList>
+
+        {/* Agents Tab - Artist Database Manager */}
+        <TabsContent value="agents">
+          <ArtistDatabaseManager />
+        </TabsContent>
 
         {/* Visualize Tab */}
         <TabsContent value="visualize">
