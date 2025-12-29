@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useAgentRunner } from "@/hooks/useAgentRunner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft,
@@ -322,28 +322,21 @@ const HealthAlertsPanel = () => {
 const SystemHealth = () => {
   const { isAdmin, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const [health, setHealth] = useState<SystemHealth | null>(null);
-  const [loading, setLoading] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
 
-  const fetchHealth = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("system-health");
-
-      if (error) throw error;
+  // Use shared agent runner for health checks
+  const { isRunning: loading, runAgent } = useAgentRunner({
+    functionName: 'system-health',
+    onSuccess: (data) => {
       setHealth(data);
-    } catch (e: any) {
-      toast({
-        title: "Health check failed",
-        description: e.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    },
+    errorMessage: 'Health check failed'
+  });
+
+  const fetchHealth = async () => {
+    await runAgent();
   };
 
   useEffect(() => {
