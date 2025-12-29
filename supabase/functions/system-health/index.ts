@@ -63,11 +63,12 @@ async function checkDatabase(supabase: any): Promise<HealthCheck> {
       };
     }
 
+    // Increased threshold to 2000ms to reduce false positives
     return {
       name: "Database",
-      status: latency < 500 ? "healthy" : "degraded",
+      status: latency < 2000 ? "healthy" : "degraded",
       latency,
-      message: latency < 500 ? "Connected" : "Slow response",
+      message: latency < 2000 ? "Connected" : "Slow response",
       lastChecked: new Date().toISOString(),
     };
   } catch (e: unknown) {
@@ -160,7 +161,8 @@ async function checkEdgeFunction(
   const start = Date.now();
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    // Increased timeout to 15s to account for cold starts
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const response = await fetch(
       `${supabaseUrl}/functions/v1/${functionName}`,
@@ -213,7 +215,8 @@ async function checkApiEndpoint(
   const start = Date.now();
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    // Increased timeout to 15s to account for cold starts
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const response = await fetch(
       `${supabaseUrl}/functions/v1${endpoint.path}`,
