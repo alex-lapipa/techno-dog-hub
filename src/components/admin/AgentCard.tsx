@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Play, Loader2, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AgentCardProps {
@@ -13,6 +14,7 @@ interface AgentCardProps {
   pendingReports?: number;
   frameNumber?: string;
   functionName?: string;
+  path?: string;
 }
 
 const AgentCard = ({
@@ -23,11 +25,19 @@ const AgentCard = ({
   lastRun,
   pendingReports = 0,
   frameNumber = '01',
-  functionName
+  functionName,
+  path
 }: AgentCardProps) => {
   const [isRunning, setIsRunning] = useState(false);
   const [runStatus, setRunStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    if (path && !isRunning) {
+      navigate(path);
+    }
+  };
 
   const statusColors = {
     active: 'bg-logo-green/20 border-logo-green/50 text-logo-green',
@@ -85,10 +95,12 @@ const AgentCard = ({
 
   return (
     <div
+      onClick={handleCardClick}
       className={cn(
         "group relative w-full text-left bg-zinc-800 p-1 transition-all duration-300",
         "hover:scale-[1.02]",
-        initialStatus === 'disabled' && "opacity-50"
+        initialStatus === 'disabled' && "opacity-50",
+        path && "cursor-pointer"
       )}
     >
       {/* Sprocket holes left */}
@@ -168,27 +180,32 @@ const AgentCard = ({
               )}
             </div>
             
-            {functionName && (
-              <button
-                onClick={handleRun}
-                disabled={isRunning || initialStatus === 'disabled'}
-                className={cn(
-                  "flex items-center gap-1 px-2 py-1 border font-mono text-[10px] uppercase tracking-wider transition-all",
-                  "hover:bg-logo-green/20 hover:border-logo-green/60 hover:text-logo-green",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  isRunning 
-                    ? "border-logo-green/60 text-logo-green bg-logo-green/10" 
-                    : "border-border text-muted-foreground"
-                )}
-              >
-                {isRunning ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <Play className="w-3 h-3" />
-                )}
-                {isRunning ? 'Running' : 'Run'}
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {functionName && (
+                <button
+                  onClick={handleRun}
+                  disabled={isRunning || initialStatus === 'disabled'}
+                  className={cn(
+                    "flex items-center gap-1 px-2 py-1 border font-mono text-[10px] uppercase tracking-wider transition-all",
+                    "hover:bg-logo-green/20 hover:border-logo-green/60 hover:text-logo-green",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    isRunning 
+                      ? "border-logo-green/60 text-logo-green bg-logo-green/10" 
+                      : "border-border text-muted-foreground"
+                  )}
+                >
+                  {isRunning ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Play className="w-3 h-3" />
+                  )}
+                  {isRunning ? 'Running' : 'Run'}
+                </button>
+              )}
+              {path && (
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-crimson transition-colors" />
+              )}
+            </div>
           </div>
         </div>
 
