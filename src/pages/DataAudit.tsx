@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Database, AlertTriangle, CheckCircle, RefreshCw, ChevronRight, ChevronDown, FileText, Users, Disc, Calendar, MapPin, Building, Radio, GitMerge, Zap, Shield, BarChart3, List, Grid3X3, Eye, Play, Loader2, Terminal, Activity } from 'lucide-react';
-import { useAuditActions, AuditProposal } from '@/hooks/useAuditActions';
+import { Database, AlertTriangle, CheckCircle, RefreshCw, ChevronRight, ChevronDown, FileText, Users, Disc, Calendar, MapPin, Building, Radio, GitMerge, Zap, Shield, BarChart3, List, Grid3X3, Eye, Play, Loader2, Terminal, Activity, Link2 } from 'lucide-react';
+import { useAuditActions, AuditProposal, SourceMapStats } from '@/hooks/useAuditActions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
@@ -354,6 +354,60 @@ export default function TechnoDocAuditAgent() {
                 })}
               </div>
             </div>
+
+            <RedLine className="my-8" />
+
+            {/* Source Map Stats - DJ Artists ↔ Canonical Artists Link Status */}
+            {auditData.sourceMapStats && (
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <Link2 className="w-4 h-4 text-[hsl(var(--logo-green))]" />
+                  <h2 className="text-[11px] tracking-[0.3em] text-foreground uppercase">
+                    ARTIST DATA UNIFICATION
+                  </h2>
+                </div>
+                <div className="grid grid-cols-5 gap-3">
+                  <div className="border border-foreground/10 p-4">
+                    <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-2">CANONICAL</p>
+                    <p className="text-2xl font-bold text-foreground">{auditData.sourceMapStats.total_canonical}</p>
+                    <p className="text-[9px] text-foreground/30 mt-1">verified artists</p>
+                  </div>
+                  <div className="border border-foreground/10 p-4">
+                    <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-2">RAG</p>
+                    <p className="text-2xl font-bold text-foreground">{auditData.sourceMapStats.total_rag}</p>
+                    <p className="text-[9px] text-foreground/30 mt-1">dj_artists</p>
+                  </div>
+                  <div className={`border p-4 ${auditData.sourceMapStats.link_percentage >= 80 ? 'border-[hsl(var(--logo-green))]/30 bg-[hsl(var(--logo-green))]/5' : 'border-foreground/10'}`}>
+                    <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-2">LINKED</p>
+                    <p className={`text-2xl font-bold ${auditData.sourceMapStats.link_percentage >= 80 ? 'text-[hsl(var(--logo-green))]' : 'text-foreground'}`}>
+                      {auditData.sourceMapStats.linked_count}
+                    </p>
+                    <p className="text-[9px] text-foreground/30 mt-1">{auditData.sourceMapStats.link_percentage}% linked</p>
+                  </div>
+                  <div className={`border p-4 ${auditData.sourceMapStats.canonical_only > 0 ? 'border-foreground/20' : 'border-foreground/10'}`}>
+                    <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-2">CANONICAL ONLY</p>
+                    <p className="text-2xl font-bold text-foreground/70">{auditData.sourceMapStats.canonical_only}</p>
+                    <p className="text-[9px] text-foreground/30 mt-1">no RAG link</p>
+                  </div>
+                  <div className={`border p-4 ${auditData.sourceMapStats.rag_only > 0 ? 'border-[hsl(var(--crimson))]/30 bg-[hsl(var(--crimson))]/5' : 'border-foreground/10'}`}>
+                    <p className="text-[9px] tracking-[0.2em] text-foreground/50 uppercase mb-2">RAG ONLY</p>
+                    <p className={`text-2xl font-bold ${auditData.sourceMapStats.rag_only > 0 ? 'text-[hsl(var(--crimson))]' : 'text-foreground/70'}`}>
+                      {auditData.sourceMapStats.rag_only}
+                    </p>
+                    <p className="text-[9px] text-foreground/30 mt-1">needs migration</p>
+                  </div>
+                </div>
+                <div className="mt-4 h-1.5 bg-foreground/10 overflow-hidden">
+                  <div 
+                    className="h-full bg-[hsl(var(--logo-green))] transition-all duration-1000"
+                    style={{ width: `${auditData.sourceMapStats.link_percentage}%` }}
+                  />
+                </div>
+                <p className="text-[9px] text-foreground/30 mt-2 text-right uppercase tracking-wider">
+                  SOURCE MAP COMPLETENESS: {auditData.sourceMapStats.link_percentage}%
+                </p>
+              </div>
+            )}
 
             <RedLine className="my-8" />
 
