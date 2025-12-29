@@ -499,7 +499,10 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
     ];
 
     // =================================================================
-    // INTELLIGENT MODEL ROUTING - GPT-5 for complex, Gemini for fast
+    // 3-TIER INTELLIGENT MODEL ROUTING
+    // Tier 1: GPT-5 for complex reasoning (highest quality)
+    // Tier 2: Gemini Flash for medium complexity (balanced)
+    // Tier 3: Gemini Flash-Lite for ultra-fast simple queries (speed)
     // =================================================================
     
     // Detect complex reasoning queries that benefit from GPT-5
@@ -516,15 +519,61 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
       /best|worst|top.*reason|rank.*why/i
     ];
     
-    const isComplexQuery = complexPatterns.some(pattern => pattern.test(queryText)) ||
-      queryText.split(' ').length > 15 || // Long queries often need more reasoning
-      (conversationHistory?.length > 4); // Deep conversations need context
+    // Detect simple queries that can use ultra-fast model
+    const simplePatterns = [
+      /^(hi|hello|hey|yo|sup|what'?s up)/i,
+      /^(thanks|thank you|thx|cheers)/i,
+      /^(yes|no|ok|okay|sure|cool|nice)/i,
+      /^who is [a-z\s]+\??$/i,  // Simple "who is X?" questions
+      /^what is [a-z\s]+\??$/i, // Simple "what is X?" questions
+      /^when (is|was|did)/i,    // Simple time questions
+      /^where (is|was|are)/i,   // Simple location questions
+      /^list |^name /i,         // Simple list requests
+    ];
     
-    const selectedModel = isComplexQuery ? 'openai/gpt-5' : 'google/gemini-2.5-flash';
-    const modelLabel = isComplexQuery ? 'GPT-5 (complex reasoning)' : 'Gemini Flash (fast)';
+    const wordCount = queryText.split(' ').length;
+    const hasConversationDepth = (conversationHistory?.length || 0) > 4;
+    
+    // Determine query complexity tier
+    const isComplexQuery = complexPatterns.some(pattern => pattern.test(queryText)) ||
+      wordCount > 20 || // Long queries need more reasoning
+      hasConversationDepth; // Deep conversations need context
+    
+    const isSimpleQuery = !isComplexQuery && (
+      simplePatterns.some(pattern => pattern.test(queryText)) ||
+      wordCount <= 5 // Very short queries
+    );
+    
+    // Select model based on tier
+    type ModelTier = 'complex' | 'balanced' | 'fast';
+    const tier: ModelTier = isComplexQuery ? 'complex' : (isSimpleQuery ? 'fast' : 'balanced');
+    
+    const modelConfig = {
+      complex: {
+        model: 'openai/gpt-5',
+        label: 'GPT-5 (complex reasoning)',
+        temperature: 0.7,
+        maxTokens: 2000
+      },
+      balanced: {
+        model: 'google/gemini-2.5-flash',
+        label: 'Gemini Flash (balanced)',
+        temperature: 0.8,
+        maxTokens: 1500
+      },
+      fast: {
+        model: 'google/gemini-2.5-flash-lite',
+        label: 'Gemini Flash-Lite (ultra-fast)',
+        temperature: 0.9,
+        maxTokens: 800
+      }
+    };
+    
+    const selectedConfig = modelConfig[tier];
 
     console.log(`Dog Agent: Processing query with ${contextParts.length} knowledge sections`);
-    console.log(`Dog Agent: Model selected - ${modelLabel}`);
+    console.log(`Dog Agent: Query tier - ${tier} | Model - ${selectedConfig.label}`);
+    console.log(`Dog Agent: Word count: ${wordCount}, Conversation depth: ${conversationHistory?.length || 0}`);
 
     // Call Lovable AI Gateway with selected model
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -534,10 +583,10 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: selectedModel,
+        model: selectedConfig.model,
         messages,
-        temperature: isComplexQuery ? 0.7 : 0.8, // Slightly lower temp for complex reasoning
-        max_tokens: isComplexQuery ? 2000 : 1500, // More tokens for complex answers
+        temperature: selectedConfig.temperature,
+        max_tokens: selectedConfig.maxTokens,
       }),
     });
 
@@ -573,8 +622,10 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
         response_length: dogResponse.length,
         knowledge_sections: contextParts.length,
         had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0,
-        model_used: selectedModel,
-        is_complex_query: isComplexQuery
+        model_used: selectedConfig.model,
+        model_tier: tier,
+        is_complex_query: isComplexQuery,
+        is_simple_query: isSimpleQuery
       }
     });
 
@@ -599,8 +650,11 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
           artists: ragArtists.length,
           documents: ragDocuments.length
         },
-        model: selectedModel,
-        isComplexQuery
+        model: selectedConfig.model,
+        modelLabel: selectedConfig.label,
+        tier,
+        isComplexQuery,
+        isSimpleQuery
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
