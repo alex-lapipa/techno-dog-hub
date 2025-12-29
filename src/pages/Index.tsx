@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import TechnoChat from "@/components/TechnoChat";
+
 import DailySpotlight from "@/components/DailySpotlight";
 import PageSEO from "@/components/PageSEO";
 
@@ -273,9 +273,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* AI Chat section */}
-        <TechnoChat />
       </main>
       
       <Footer />
