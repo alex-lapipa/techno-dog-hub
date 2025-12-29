@@ -1,10 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders, handleCors, jsonResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
 
 interface HealthCheck {
   name: string;
@@ -13,14 +8,13 @@ interface HealthCheck {
   details?: string;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+  const supabaseKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const supabase = createServiceClient();
 
   console.log("Health Monitor: Starting health checks...");
 
@@ -168,11 +162,9 @@ serve(async (req) => {
 
   console.log(`Health Monitor: Complete. Status: ${overallStatus}`);
 
-  return new Response(JSON.stringify({
+  return jsonResponse({
     status: overallStatus,
     timestamp: new Date().toISOString(),
     checks
-  }), {
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
