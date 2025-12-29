@@ -18,7 +18,9 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Globe,
+  Search
 } from 'lucide-react';
 
 interface AgentStats {
@@ -51,10 +53,13 @@ const GearAgentAdmin = () => {
   const [needsContent, setNeedsContent] = useState<GearItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEnriching, setIsEnriching] = useState(false);
+  const [isScraping, setIsScraping] = useState(false);
   const [isChatting, setIsChatting] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [selectedGear, setSelectedGear] = useState<string | null>(null);
+  const [scrapeResults, setScrapeResults] = useState<any[]>([]);
+  const [firecrawlEnabled, setFirecrawlEnabled] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -80,6 +85,7 @@ const GearAgentAdmin = () => {
       setStats(data.stats);
       setRecentItems(data.recentItems || []);
       setNeedsContent(data.needsContent || []);
+      setFirecrawlEnabled(data.firecrawlEnabled || false);
     } catch (err) {
       console.error('Failed to fetch agent status:', err);
       toast({
@@ -143,6 +149,71 @@ const GearAgentAdmin = () => {
       });
     } finally {
       setIsEnriching(false);
+    }
+  };
+
+  const handleScrapeSingle = async (gearId: string) => {
+    setSelectedGear(gearId);
+    setIsScraping(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('gear-expert-agent', {
+        body: { action: 'scrape-equipboard', gearId }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: 'Scrape complete',
+          description: `Found ${data.extracted?.notable_artists?.length || 0} artists for ${data.gearName}`
+        });
+        setScrapeResults(prev => [...prev, data]);
+      } else {
+        toast({
+          title: 'No data found',
+          description: data.error || 'Could not find gear on Equipboard',
+          variant: 'destructive'
+        });
+      }
+
+      fetchStatus();
+    } catch (err) {
+      console.error('Scrape failed:', err);
+      toast({
+        title: 'Scrape failed',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsScraping(false);
+      setSelectedGear(null);
+    }
+  };
+
+  const handleBatchScrape = async () => {
+    setIsScraping(true);
+    setScrapeResults([]);
+    try {
+      const { data, error } = await supabase.functions.invoke('gear-expert-agent', {
+        body: { action: 'batch-scrape-equipboard', limit: 3 }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Batch scrape complete',
+        description: data.message
+      });
+
+      setScrapeResults(data.results || []);
+      fetchStatus();
+    } catch (err) {
+      console.error('Batch scrape failed:', err);
+      toast({
+        title: 'Batch scrape failed',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsScraping(false);
     }
   };
 
@@ -356,6 +427,94 @@ const GearAgentAdmin = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Equipboard Scraping Section */}
+        <Card className="bg-zinc-900 border-logo-green/30">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-mono text-sm flex items-center gap-2">
+              <Globe className="w-4 h-4 text-logo-green" />
+              EQUIPBOARD SCRAPER
+              {firecrawlEnabled ? (
+                <Badge variant="outline" className="text-logo-green border-logo-green/50 text-[10px] ml-2">
+                  FIRECRAWL ACTIVE
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-crimson border-crimson/50 text-[10px] ml-2">
+                  FIRECRAWL DISABLED
+                </Badge>
+              )}
+            </CardTitle>
+            <Button 
+              onClick={handleBatchScrape} 
+              disabled={isScraping || !firecrawlEnabled}
+              size="sm"
+              className="bg-logo-green hover:bg-logo-green/80"
+            >
+              {isScraping ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Search className="w-4 h-4 mr-2" />
+              )}
+              Scrape Batch (3)
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mb-4">
+              Scrapes equipboard.com to find which artists use each gear, famous tracks, and detailed specifications.
+            </p>
+            
+            {/* Scrape individual gear items */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+              {needsContent.slice(0, 6).map((gear) => (
+                <div 
+                  key={gear.id} 
+                  className="flex items-center justify-between p-2 bg-zinc-800 border border-border rounded"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground truncate">{gear.name}</p>
+                    <p className="text-xs text-muted-foreground">{gear.brand}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleScrapeSingle(gear.id)}
+                    disabled={isScraping || !firecrawlEnabled}
+                    className="ml-2"
+                  >
+                    {isScraping && selectedGear === gear.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Globe className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {/* Scrape Results */}
+            {scrapeResults.length > 0 && (
+              <div className="space-y-2 mt-4 pt-4 border-t border-border">
+                <p className="text-xs font-mono text-muted-foreground uppercase">Recent Scrape Results</p>
+                {scrapeResults.map((result, i) => (
+                  <div key={i} className="p-2 bg-zinc-800 border border-border rounded text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-foreground">{result.name || result.gearName}</span>
+                      {result.success ? (
+                        <Badge variant="outline" className="text-logo-green border-logo-green/50">
+                          {result.artistsFound || 0} artists
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-crimson border-crimson/50">
+                          Failed
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Chat Interface */}
         <Card className="bg-zinc-900 border-crimson/20">
