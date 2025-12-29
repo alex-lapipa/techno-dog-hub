@@ -10,7 +10,7 @@ const Footer = () => {
     { label: 'Artists', path: '/artists' },
     { label: 'News', path: '/news' },
     { label: 'Venues', path: '/venues' },
-    { label: 'User Stories', path: '/mad/stories' },
+    { label: 'Techno Doggies', path: '/doggies' },
   ];
 
   const resourceLinks = [

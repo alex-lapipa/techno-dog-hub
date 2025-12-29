@@ -78,6 +78,7 @@ const DogAgentAdmin = lazy(() => import("./pages/DogAgentAdmin"));
 const TrainingCenter = lazy(() => import("./pages/TrainingCenter"));
 const DoggiesAdmin = lazy(() => import("./pages/DoggiesAdmin"));
 const DoggyWidget = lazy(() => import("./pages/DoggyWidget"));
+const TechnoDoggies = lazy(() => import("./pages/TechnoDoggies"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -165,6 +166,8 @@ const App = () => (
                     <Route path="/admin/training" element={<TrainingCenter />} />
                     <Route path="/admin/doggies" element={<DoggiesAdmin />} />
                     <Route path="/doggy-widget" element={<DoggyWidget />} />
+                    <Route path="/doggies" element={<TechnoDoggies />} />
+                    
                     {/* Festivals */}
                     <Route path="/festivals" element={<Festivals />} />
                     <Route path="/festivals/:id" element={<FestivalDetail />} />
