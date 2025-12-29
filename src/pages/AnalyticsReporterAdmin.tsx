@@ -6,11 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { AdminPageLayout, AdminStatsCard } from '@/components/admin';
 import { 
-  Bot, 
-  RefreshCw, 
-  Loader2,
-  ArrowLeft,
   BarChart3,
   TrendingUp,
   Users,
@@ -20,19 +17,13 @@ import {
 
 const AnalyticsReporterAdmin = () => {
   const navigate = useNavigate();
-  const { isAdmin, loading: authLoading } = useAdminAuth();
+  const { isAdmin } = useAdminAuth();
   const { toast } = useToast();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [insights, setInsights] = useState<any[]>([]);
   const [latestReport, setLatestReport] = useState<any>(null);
-
-  useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate('/admin');
-    }
-  }, [isAdmin, authLoading, navigate]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -93,133 +84,81 @@ const AnalyticsReporterAdmin = () => {
     }
   };
 
-  if (authLoading || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-crimson" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-mono font-bold text-foreground flex items-center gap-2">
-                <BarChart3 className="w-6 h-6 text-logo-green" />
-                ANALYTICS REPORTER
-              </h1>
-              <p className="text-sm text-muted-foreground font-mono">
-                Generates weekly usage insights and trends
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={fetchData} variant="outline" size="sm">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={() => navigate('/analytics')} variant="outline" size="sm">
-              <Eye className="w-4 h-4 mr-2" />
-              Full Analytics
-            </Button>
-            <Button onClick={runAgent} disabled={isRunning} size="sm" className="bg-logo-green hover:bg-logo-green/80">
-              {isRunning ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Bot className="w-4 h-4 mr-2" />}
-              Generate Report
-            </Button>
-          </div>
-        </div>
+    <AdminPageLayout
+      title="ANALYTICS REPORTER"
+      description="Generates weekly usage insights and trends"
+      icon={BarChart3}
+      iconColor="text-logo-green"
+      onRefresh={fetchData}
+      onRunAgent={runAgent}
+      isLoading={isLoading}
+      isRunning={isRunning}
+      agentButtonText="Generate Report"
+      agentButtonColor="bg-logo-green hover:bg-logo-green/80"
+      actions={
+        <Button onClick={() => navigate('/analytics')} variant="outline" size="sm" className="font-mono text-xs">
+          <Eye className="w-4 h-4 mr-2" />
+          Full Analytics
+        </Button>
+      }
+    >
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AdminStatsCard
+          label="Insights"
+          value={insights.length}
+          icon={TrendingUp}
+          iconColor="text-logo-green"
+        />
+        <AdminStatsCard
+          label="Last Report"
+          value={latestReport ? new Date(latestReport.created_at).toLocaleDateString() : 'Never'}
+          icon={Calendar}
+        />
+        <AdminStatsCard
+          label="Status"
+          value="ACTIVE"
+          icon={BarChart3}
+          iconColor="text-logo-green"
+        />
+        <AdminStatsCard
+          label="Schedule"
+          value="Weekly"
+          icon={Users}
+        />
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-zinc-900 border-crimson/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono uppercase">Insights</p>
-                  <p className="text-3xl font-bold text-foreground">{insights.length}</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-logo-green/60" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-crimson/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono uppercase">Last Report</p>
-                  <p className="text-sm font-bold text-foreground">
-                    {latestReport ? new Date(latestReport.created_at).toLocaleDateString() : 'Never'}
+      {/* Insights List */}
+      <Card className="bg-zinc-900 border-crimson/20">
+        <CardHeader>
+          <CardTitle className="font-mono text-sm flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-logo-green" />
+            GENERATED INSIGHTS
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {insights.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No insights generated yet. Run the agent to generate insights.</p>
+            ) : (
+              insights.map((insight) => (
+                <div key={insight.id} className="p-4 bg-zinc-800 border border-border rounded">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-foreground">{insight.title}</span>
+                    <Badge variant="outline">{insight.insight_type}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{insight.content}</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(insight.generated_at).toLocaleString()}
                   </p>
                 </div>
-                <Calendar className="w-8 h-8 text-muted-foreground/60" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-crimson/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono uppercase">Status</p>
-                  <p className="text-xl font-bold text-logo-green">ACTIVE</p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-logo-green/60" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-crimson/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono uppercase">Schedule</p>
-                  <p className="text-sm font-bold text-foreground">Weekly</p>
-                </div>
-                <Users className="w-8 h-8 text-muted-foreground/60" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Insights List */}
-        <Card className="bg-zinc-900 border-crimson/20">
-          <CardHeader>
-            <CardTitle className="font-mono text-sm flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-logo-green" />
-              GENERATED INSIGHTS
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {insights.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No insights generated yet. Run the agent to generate insights.</p>
-              ) : (
-                insights.map((insight) => (
-                  <div key={insight.id} className="p-4 bg-zinc-800 border border-border rounded">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-foreground">{insight.title}</span>
-                      <Badge variant="outline">{insight.insight_type}</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{insight.content}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {new Date(insight.generated_at).toLocaleString()}
-                    </p>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </AdminPageLayout>
   );
 };
 
