@@ -249,3 +249,6 @@ verify_jwt = false
 
 [functions.dog-agent]
 verify_jwt = false
+
+[functions.dog-voice]
+verify_jwt = false
