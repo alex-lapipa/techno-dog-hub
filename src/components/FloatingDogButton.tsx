@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import HexagonLogo from '@/components/HexagonLogo';
+import DogSilhouette from '@/components/DogSilhouette';
 import DogChat from '@/components/admin/DogChat';
 
 const FloatingDogButton = () => {
@@ -24,8 +24,8 @@ const FloatingDogButton = () => {
         {/* Outer glow ring */}
         <div className="absolute inset-0 rounded-full bg-logo-green/20 animate-ping" style={{ animationDuration: '2s' }} />
         
-        {/* Logo */}
-        <HexagonLogo className="w-10 h-10 transition-transform duration-300 group-hover:rotate-12 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
+        {/* Dog Silhouette */}
+        <DogSilhouette className="w-10 h-10 transition-transform duration-300 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
         
         {/* Tooltip */}
         <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-background/95 border border-logo-green/40 text-foreground text-xs font-mono px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">

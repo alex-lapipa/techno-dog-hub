@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Sparkles, Heart, Volume2, Square, Mic, MicOff } from "lucide-react";
-import HexagonLogo from "@/components/HexagonLogo";
+import { Send, Loader2, Sparkles, Heart, Volume2, Square } from "lucide-react";
+import DogSilhouette from "@/components/DogSilhouette";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -253,7 +253,7 @@ const DogChat = () => {
           {/* Dog Avatar with Audio Visualization */}
           <div className="relative">
             <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center border-2 border-logo-green shadow-[0_0_20px_hsl(var(--logo-green)/0.3)] transition-all duration-300 ${isSpeaking ? 'animate-pulse' : ''}`}>
-              <HexagonLogo className="w-8 h-8" />
+              <DogSilhouette className="w-8 h-8" animated={isSpeaking} />
             </div>
             {/* Speaking indicator */}
             {isSpeaking && (
@@ -307,7 +307,7 @@ const DogChat = () => {
                   {message.role === 'assistant' && (
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5">
-                        <HexagonLogo className="w-4 h-4" />
+                        <DogSilhouette className="w-4 h-4" />
                         <span className="text-xs font-mono text-logo-green uppercase tracking-wider">Techno Dog</span>
                       </div>
                       <Button
@@ -343,7 +343,7 @@ const DogChat = () => {
               <div className="flex justify-start animate-fade-in">
                 <div className="bg-muted/50 border border-border/50 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <HexagonLogo className="w-5 h-5 animate-bounce" />
+                    <DogSilhouette className="w-5 h-5 animate-bounce" />
                     <span className="text-xs font-mono text-muted-foreground italic">
                       *sniffing through the crates fr fr...*
                     </span>
