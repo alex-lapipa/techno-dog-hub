@@ -5,6 +5,8 @@ import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect, useCallback } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Menu, Shield, Heart, Code, ShoppingBag, Radio } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import DogChat from "@/components/admin/DogChat";
 
 // Scenes group: Festivals, Venues, Crews with horizontal navigation
 const SCENES_ITEMS = [
@@ -20,6 +22,7 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [dogChatOpen, setDogChatOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -114,13 +117,17 @@ const Header = () => {
       }`}>
         <div className="container mx-auto px-4 md:px-6">
           <nav className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group shrink-0">
+            {/* Logo - Click to open Dog Chat */}
+            <button 
+              onClick={() => setDogChatOpen(true)}
+              className="flex items-center gap-3 group shrink-0 cursor-pointer"
+              aria-label="Open Dog AI Assistant"
+            >
               <HexagonLogo className="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(100_100%_60%/0.8)]" />
               <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
                 techno.dog
               </span>
-            </Link>
+            </button>
 
             {/* Navigation */}
             <div className="hidden lg:flex items-center gap-0.5">
@@ -309,6 +316,14 @@ const Header = () => {
         </nav>
       </div>
     </header>
+
+      {/* Dog Chat Dialog */}
+      <Dialog open={dogChatOpen} onOpenChange={setDogChatOpen}>
+        <DialogContent className="max-w-2xl h-[80vh] p-0 overflow-hidden bg-background border-logo-green/30">
+          <DialogTitle className="sr-only">Dog AI Assistant</DialogTitle>
+          <DogChat />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
