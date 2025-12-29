@@ -24,6 +24,9 @@ export interface CanonicalArtist {
   rank: number | null;
   is_active: boolean;
   needs_review: boolean;
+  photo_url: string | null;
+  photo_source: string | null;
+  photo_verified: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -294,6 +297,8 @@ export async function loadCanonicalArtistsSummary(): Promise<CanonicalArtistSumm
       region,
       rank,
       real_name,
+      photo_url,
+      photo_source,
       artist_profiles (
         tags,
         subgenres,
@@ -321,9 +326,11 @@ export async function loadCanonicalArtistsSummary(): Promise<CanonicalArtistSumm
       (b.source_priority || 0) - (a.source_priority || 0)
     )[0] || {};
 
-    // Get primary photo
+    // Get primary photo - prefer direct photo_url, fallback to assets
     const assets = artist.artist_assets || [];
     const primaryAsset = assets.find((a: any) => a.is_primary) || assets[0];
+    const photoUrl = artist.photo_url || primaryAsset?.url || null;
+    const photoSource = artist.photo_source || primaryAsset?.source_name || null;
 
     // Parse location - use city if present, otherwise parse from country
     const location = artist.city 
@@ -340,8 +347,8 @@ export async function loadCanonicalArtistsSummary(): Promise<CanonicalArtistSumm
       rank: artist.rank,
       realName: artist.real_name,
       tags: primaryProfile.tags || [],
-      photoUrl: primaryAsset?.url || null,
-      photoSource: primaryAsset?.source_name || null,
+      photoUrl,
+      photoSource,
       subgenres: primaryProfile.subgenres || [],
       labels: primaryProfile.labels || [],
       knownFor: primaryProfile.known_for || null,
@@ -389,20 +396,21 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     (b.source_priority || 0) - (a.source_priority || 0)
   )[0] || {} as CanonicalArtistProfile;
 
-  // Get primary photo asset
+  // Get primary photo - prefer direct photo_url, fallback to assets
   const assets = canonical.assets || [];
   const primaryAsset = assets.find(a => a.is_primary) || assets[0];
+  const photoUrl = canonical.photo_url || primaryAsset?.url;
 
-  // Build image attribution if we have asset data
+  // Build image attribution if we have photo data
   let image: ImageAttribution | undefined;
-  if (primaryAsset) {
+  if (photoUrl) {
     image = {
-      url: primaryAsset.url,
-      author: primaryAsset.author || 'Unknown',
-      license: primaryAsset.license || 'Unknown',
-      licenseUrl: primaryAsset.license_url || '',
-      sourceUrl: primaryAsset.source_url || primaryAsset.url,
-      sourceName: primaryAsset.source_name || 'Unknown',
+      url: photoUrl,
+      author: primaryAsset?.author || 'Wikimedia Commons',
+      license: primaryAsset?.license || 'CC BY-SA',
+      licenseUrl: primaryAsset?.license_url || 'https://creativecommons.org/licenses/by-sa/4.0/',
+      sourceUrl: canonical.photo_source || primaryAsset?.source_url || photoUrl,
+      sourceName: primaryAsset?.source_name || 'Wikipedia',
     };
   }
 
@@ -468,7 +476,7 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     active: canonical.active_years || 'Unknown',
     tags: primaryProfile.tags || primaryProfile.subgenres || [],
     bio: cleanText(bio) || '',
-    photoUrl: primaryAsset?.url,
+    photoUrl,
     image,
     labels: primaryProfile.labels || [],
     collaborators: primaryProfile.collaborators || [],
