@@ -2478,6 +2478,276 @@ export type Database = {
         }
         Relationships: []
       }
+      tkt_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          doors_open: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          name: string
+          organization_id: string
+          settings: Json | null
+          slug: string
+          start_date: string
+          status: string
+          updated_at: string
+          venue_address: string | null
+          venue_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          doors_open?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          organization_id: string
+          settings?: Json | null
+          slug: string
+          start_date: string
+          status?: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          doors_open?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          organization_id?: string
+          settings?: Json | null
+          slug?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          venue_address?: string | null
+          venue_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tkt_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "tkt_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tkt_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          quantity: number
+          subtotal_cents: number
+          ticket_type_id: string
+          unit_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          quantity: number
+          subtotal_cents: number
+          ticket_type_id: string
+          unit_price_cents: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          quantity?: number
+          subtotal_cents?: number
+          ticket_type_id?: string
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tkt_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "tkt_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tkt_order_items_ticket_type_id_fkey"
+            columns: ["ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "tkt_ticket_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tkt_orders: {
+        Row: {
+          created_at: string
+          currency: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          event_id: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          order_number: string
+          payment_method: string | null
+          payment_reference: string | null
+          status: string
+          total_cents: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          order_number: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: string
+          total_cents: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          order_number?: string
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: string
+          total_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tkt_orders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "tkt_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tkt_organizations: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          description: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          settings: Json | null
+          slug: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          settings?: Json | null
+          slug: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          settings?: Json | null
+          slug?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      tkt_ticket_types: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          event_id: string
+          id: string
+          is_active: boolean
+          max_per_order: number | null
+          name: string
+          price_cents: number
+          quantity_sold: number
+          quantity_total: number
+          sale_end: string | null
+          sale_start: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          event_id: string
+          id?: string
+          is_active?: boolean
+          max_per_order?: number | null
+          name: string
+          price_cents: number
+          quantity_sold?: number
+          quantity_total: number
+          sale_end?: string | null
+          sale_start?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          event_id?: string
+          id?: string
+          is_active?: boolean
+          max_per_order?: number | null
+          name?: string
+          price_cents?: number
+          quantity_sold?: number
+          quantity_total?: number
+          sale_end?: string | null
+          sale_start?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tkt_ticket_types_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "tkt_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           awarded_at: string
