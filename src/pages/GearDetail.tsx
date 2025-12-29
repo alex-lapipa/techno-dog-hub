@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight, Loader2, Waves, Filter, Activity, Sparkles } from "lucide-react";
 import { gearCategories } from "@/data/gear";
 import { useGearData, useGearItem } from "@/hooks/useGearData";
 import { PageLayout } from "@/components/layout";
@@ -264,6 +264,87 @@ const GearDetail = () => {
               )}
             </div>
           </div>
+
+          {/* Signal Path / Core Specs */}
+          {gearItem.technicalSpecs && (
+            gearItem.technicalSpecs.oscillatorsPerVoice || 
+            gearItem.technicalSpecs.filters || 
+            gearItem.technicalSpecs.lfos || 
+            gearItem.technicalSpecs.envelopes ||
+            gearItem.technicalSpecs.effectsOnboard
+          ) && (
+            <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                <Waves className="w-4 h-4 sm:w-5 sm:h-5" />
+                Signal Path
+              </h2>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                {gearItem.technicalSpecs.oscillatorsPerVoice && (
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Waves className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                        Oscillators
+                      </h3>
+                    </div>
+                    <p className="font-mono text-sm sm:text-base font-medium">{gearItem.technicalSpecs.oscillatorsPerVoice}</p>
+                    {gearItem.technicalSpecs.oscillatorTypes && (
+                      <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mt-1">{gearItem.technicalSpecs.oscillatorTypes}</p>
+                    )}
+                  </div>
+                )}
+                
+                {gearItem.technicalSpecs.filters && (
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Filter className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                        Filter
+                      </h3>
+                    </div>
+                    <p className="font-mono text-xs sm:text-sm">{gearItem.technicalSpecs.filters}</p>
+                  </div>
+                )}
+                
+                {gearItem.technicalSpecs.lfos && (
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                        LFO
+                      </h3>
+                    </div>
+                    <p className="font-mono text-xs sm:text-sm">{gearItem.technicalSpecs.lfos}</p>
+                  </div>
+                )}
+                
+                {gearItem.technicalSpecs.envelopes && (
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sliders className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                        Envelopes
+                      </h3>
+                    </div>
+                    <p className="font-mono text-xs sm:text-sm">{gearItem.technicalSpecs.envelopes}</p>
+                  </div>
+                )}
+                
+                {gearItem.technicalSpecs.effectsOnboard && (
+                  <div className="border border-border p-3 sm:p-4 bg-card/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                      <h3 className="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                        Effects
+                      </h3>
+                    </div>
+                    <p className="font-mono text-xs sm:text-sm">{gearItem.technicalSpecs.effectsOnboard}</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {/* Technical Overview */}
           <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">

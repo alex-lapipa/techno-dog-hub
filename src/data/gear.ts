@@ -10,6 +10,17 @@ export interface ImageAttribution {
   sourceName: string;    // e.g. "Wikimedia Commons"
 }
 
+export interface TechnicalSpecs {
+  oscillatorsPerVoice?: string;
+  oscillatorTypes?: string;
+  filters?: string;
+  lfos?: string;
+  envelopes?: string;
+  effectsOnboard?: string;
+  samplingSpec?: string;
+  timbrality?: string;
+}
+
 export interface GearItem {
   id: string;
   name: string;
@@ -31,6 +42,8 @@ export interface GearItem {
     strengths?: string;
     limitations?: string;
   };
+  // Extended technical specifications
+  technicalSpecs?: TechnicalSpecs;
   notableArtists: {
     name: string;
     usage: string;

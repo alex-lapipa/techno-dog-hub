@@ -446,6 +446,186 @@ Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be 
       });
     }
 
+    // NEW: Enrich technical specifications in batches
+    if (action === 'enrich-technical-specs') {
+      const batchLimit = limit || 3;
+      
+      // Find gear items missing technical specs - prioritize synths
+      const { data: allGear } = await supabase
+        .from('gear_catalog')
+        .select('*')
+        .order('category', { ascending: true }) // synths first
+        .order('name', { ascending: true });
+
+      // Score items by missing technical specs
+      const scoredGear = (allGear || []).map(gear => {
+        let specScore = 0;
+        if (!gear.oscillators_per_voice && gear.category === 'synth') specScore += 3;
+        if (!gear.oscillator_types && gear.category === 'synth') specScore += 2;
+        if (!gear.filters) specScore += 2;
+        if (!gear.lfos && gear.category === 'synth') specScore += 2;
+        if (!gear.envelopes && gear.category === 'synth') specScore += 2;
+        if (!gear.effects_onboard) specScore += 1;
+        if (!gear.polyphony) specScore += 2;
+        if (!gear.sequencer_arp) specScore += 1;
+        return { ...gear, specScore };
+      });
+
+      // Get items with missing specs
+      const needsSpecs = scoredGear
+        .filter(g => g.specScore > 0)
+        .sort((a, b) => b.specScore - a.specScore)
+        .slice(0, batchLimit);
+
+      if (needsSpecs.length === 0) {
+        return new Response(JSON.stringify({
+          success: true,
+          enriched: 0,
+          message: 'All gear items have complete technical specs!'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const results = [];
+      
+      for (const gear of needsSpecs) {
+        try {
+          console.log(`Enriching technical specs for: ${gear.brand} ${gear.name} (category: ${gear.category})`);
+          
+          // Add delay between API calls
+          if (results.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+          }
+
+          // Generate technical specs using AI
+          const specPrompt = `You are a synthesizer and music gear expert. Generate detailed technical specifications for the ${gear.brand} ${gear.name} (${gear.category}, released ${gear.release_year || 'unknown year'}).
+
+Current known data:
+- Category: ${gear.category}
+- Synthesis Type: ${gear.synthesis_type || 'unknown'}
+- Brand: ${gear.brand}
+
+Return a JSON object with ONLY these fields (use null if not applicable to this type of gear):
+{
+  "oscillators_per_voice": "e.g., '3', '2 + sub', 'N/A for samplers'",
+  "oscillator_types": "e.g., '3 VCO (saw/pulse/tri)', '2 DCO + noise', 'Digital wavetable'",
+  "filters": "e.g., '24dB/oct Moog ladder LPF', 'Multimode SVF (LP/HP/BP)', '12dB/oct resonant LPF'",
+  "lfos": "e.g., '2 LFO', '1 LFO with multiple shapes', 'Per-voice LFO'",
+  "envelopes": "e.g., '2 ADSR', '3 EG (filter/amp/pitch)', '1 AD + 1 ADSR'",
+  "effects_onboard": "e.g., 'Chorus, delay, reverb', 'Analog distortion', 'None/N/A'",
+  "polyphony": "e.g., 'Monophonic', '8 voices', '16-voice multitimbral'",
+  "sequencer_arp": "e.g., '16-step sequencer + arpeggiator', '64-step sequencer', 'None'"
+}
+
+Be accurate and specific to this exact model. For samplers/drum machines, adapt the fields appropriately (e.g., sampling spec instead of oscillators).`;
+
+          const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${OPENAI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: 'You are a music gear expert. Return accurate technical specifications as valid JSON.' },
+                { role: 'user', content: specPrompt }
+              ],
+              response_format: { type: "json_object" }
+            }),
+          });
+
+          const aiData = await aiResponse.json();
+          const specs = JSON.parse(aiData.choices[0].message.content);
+
+          // Build update object with only new values
+          const updateData: Record<string, any> = {
+            updated_at: new Date().toISOString(),
+          };
+
+          const fieldsUpdated: string[] = [];
+
+          if (specs.oscillators_per_voice && !gear.oscillators_per_voice && specs.oscillators_per_voice !== 'null') {
+            updateData.oscillators_per_voice = specs.oscillators_per_voice;
+            fieldsUpdated.push('oscillators_per_voice');
+          }
+          if (specs.oscillator_types && !gear.oscillator_types && specs.oscillator_types !== 'null') {
+            updateData.oscillator_types = specs.oscillator_types;
+            fieldsUpdated.push('oscillator_types');
+          }
+          if (specs.filters && !gear.filters && specs.filters !== 'null') {
+            updateData.filters = specs.filters;
+            fieldsUpdated.push('filters');
+          }
+          if (specs.lfos && !gear.lfos && specs.lfos !== 'null') {
+            updateData.lfos = specs.lfos;
+            fieldsUpdated.push('lfos');
+          }
+          if (specs.envelopes && !gear.envelopes && specs.envelopes !== 'null') {
+            updateData.envelopes = specs.envelopes;
+            fieldsUpdated.push('envelopes');
+          }
+          if (specs.effects_onboard && !gear.effects_onboard && specs.effects_onboard !== 'null' && specs.effects_onboard !== 'None' && specs.effects_onboard !== 'N/A') {
+            updateData.effects_onboard = specs.effects_onboard;
+            fieldsUpdated.push('effects_onboard');
+          }
+          if (specs.polyphony && !gear.polyphony && specs.polyphony !== 'null') {
+            updateData.polyphony = specs.polyphony;
+            fieldsUpdated.push('polyphony');
+          }
+          if (specs.sequencer_arp && !gear.sequencer_arp && specs.sequencer_arp !== 'null' && specs.sequencer_arp !== 'None') {
+            updateData.sequencer_arp = specs.sequencer_arp;
+            fieldsUpdated.push('sequencer_arp');
+          }
+
+          if (fieldsUpdated.length > 0) {
+            await supabase
+              .from('gear_catalog')
+              .update(updateData)
+              .eq('id', gear.id);
+          }
+
+          results.push({
+            id: gear.id,
+            name: `${gear.brand} ${gear.name}`,
+            category: gear.category,
+            specScore: gear.specScore,
+            fieldsUpdated,
+            success: true
+          });
+
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          console.error(`Failed to enrich specs for ${gear.name}:`, errorMessage);
+          results.push({ 
+            id: gear.id, 
+            name: `${gear.brand} ${gear.name}`, 
+            success: false, 
+            error: errorMessage 
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      const totalFieldsUpdated = results.reduce((acc, r) => acc + (r.fieldsUpdated?.length || 0), 0);
+
+      // Count remaining items needing specs
+      const remainingCount = scoredGear.filter(g => g.specScore > 0).length - successCount;
+
+      return new Response(JSON.stringify({
+        success: true,
+        processed: successCount,
+        total: results.length,
+        totalFieldsUpdated,
+        remainingItems: remainingCount,
+        results,
+        message: `Technical specs enriched: ${successCount}/${results.length} items, ${totalFieldsUpdated} fields updated. ${remainingCount} items remaining.`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // NEW: Scrape equipboard.com for a specific gear item
     if (action === 'scrape-equipboard' && gearId) {
       const { data: gear, error: gearError } = await supabase

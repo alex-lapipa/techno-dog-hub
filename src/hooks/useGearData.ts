@@ -89,6 +89,17 @@ function mapDbToGearItem(row: any): GearItem {
       strengths: row.strengths || undefined,
       limitations: row.limitations || undefined
     },
+    // Extended technical specs
+    technicalSpecs: {
+      oscillatorsPerVoice: row.oscillators_per_voice || undefined,
+      oscillatorTypes: row.oscillator_types || undefined,
+      filters: row.filters || undefined,
+      lfos: row.lfos || undefined,
+      envelopes: row.envelopes || undefined,
+      effectsOnboard: row.effects_onboard || undefined,
+      samplingSpec: row.sampling_spec || undefined,
+      timbrality: row.timbrality || undefined
+    },
     notableArtists,
     famousTracks,
     technoApplications: {
