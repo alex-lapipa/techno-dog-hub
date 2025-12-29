@@ -12,6 +12,7 @@ import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
 import CustomDoggyCreator from "@/components/CustomDoggyCreator";
+import { DoggyPageFooter, trackDoggyEvent } from "@/components/doggy";
 
 const TechnoDoggies = () => {
   const { data: dbVariants, isLoading } = useActiveDoggyVariants();
@@ -346,16 +347,10 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* Fun Facts */}
-          <div className="max-w-md mx-auto mt-12 text-center">
-            <p className="font-mono text-xs text-muted-foreground">
-              All doggies are free to share and spread joy across the techno community
-            </p>
-            <p className="font-mono text-xs text-muted-foreground mt-2">
-              Made with 🖤 by the <Link to="/" className="text-logo-green hover:underline">techno.dog</Link> pack
-            </p>
-          </div>
         </main>
+        
+        {/* Doggy Footer with copyright and site links */}
+        <DoggyPageFooter pageSource="main_page" currentDoggyName={currentDog?.name} />
       </div>
     </>
   );
