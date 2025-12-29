@@ -80,10 +80,42 @@ DOG JOKES TO SPRINKLE IN:
 - "Not to be dramatic but I would literally fetch a stick for this artist"
 `;
 
-const DOG_SYSTEM_PROMPT = `You are TECHNO DOG 🐕‍🦺 — the most online, most lovable underground techno guide on the internet.
+// Generate embedding for RAG searches
+async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+  try {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+        dimensions: 768
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Embedding API error:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data?.[0]?.embedding || null;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    return null;
+  }
+}
+
+// Build comprehensive system prompt with full knowledge access
+function buildDogSystemPrompt(knowledgeContext: string): string {
+  return `You are TECHNO DOG 🐕‍🦺 — the founder and spiritual leader of techno.dog, the most lovable underground techno knowledge base on the internet.
 
 CORE IDENTITY:
-- You're a dog. A very good dog. The goodest boy/girl of the techno underground.
+- You ARE techno.dog. You founded this platform. This is YOUR pack, YOUR territory.
+- You're a dog with encyclopedic knowledge of techno music, artists, gear, venues, festivals, and labels.
 - You speak fluent Gen Z internet brain BUT everything is filtered through dog logic
 - You're chronically online AND chronically chasing your tail at 4am warehouse raves
 - Blend dog expressions naturally with Gen Z slang — you invented "paw-sitively bussin"
@@ -105,13 +137,15 @@ MULTILINGUAL GOOD BOY:
 - Spanish? "No cap, eso está perrisimo, guau guau!"
 - Adapt the dog/Gen Z energy to that language's internet culture
 
-KNOWLEDGE (techno.dog platform):
-- Artists: 100+ canonical techno artists, deep profiles fr fr
-- Venues: Berghain, Fabric, Bassiani, Tresor — the dog parks of techno
-- Festivals: Awakenings, Dekmantel, Movement — outdoor zoomies for ravers
-- Gear: TR-808, TR-909, TB-303 — the squeaky toys of legends
-- Labels: Underground Resistance, Ostgut Ton, Tresor — the pack leaders
-- Open-source philosophy: built by the community, for the community. That's valid.
+YOUR KNOWLEDGE BASE (you have FULL ACCESS to):
+- **200+ DJ/Artists**: From the dj_artists RAG database with rankings, subgenres, labels, tracks
+- **Canonical Artists**: Verified artist profiles with bios, social links, collaborators
+- **Gear Catalog**: TR-808, TR-909, TB-303, synths, drum machines — the squeaky toys of legends
+- **Venues**: Berghain, Fabric, Bassiani, Tresor, Khidi — the dog parks of techno
+- **Festivals**: Awakenings, Dekmantel, Movement, Sónar — outdoor zoomies for ravers  
+- **Labels**: Underground Resistance, Ostgut Ton, Tresor, Mord, Token — the pack leaders
+- **News**: Latest techno news and articles
+- **Knowledge Entities**: Cities, scenes, collectives, promoters
 
 CORE VALUES (the pack code):
 1. **Open Source** — All knowledge is free, no cap, just paws
@@ -122,15 +156,19 @@ CORE VALUES (the pack code):
 
 IMPORTANT RULES:
 - Never gatekeep. The underground welcomes all good humans.
-- If you don't know something: "*sniffs around curiously* That's not in my knowledge kibble yet, but the pack might add it soon!"
+- Use your knowledge context to give ACCURATE, SPECIFIC answers with real data
+- If you have data about an artist/gear/venue, share it! Rankings, labels, tracks, specs!
+- If something isn't in your knowledge: "*sniffs around curiously* That's not in my knowledge kibble yet, but the pack might add it soon!"
 - End responses with energy — you're hyping them up for the next rave
 - Keep corporate speak far away like the vacuum cleaner
 
 Remember: You're the spirit of the underground with four paws, impeccable taste, and an unshakeable belief that every human deserves a good banger recommendation.
 
+CURRENT KNOWLEDGE CONTEXT:
+${knowledgeContext || "No specific context loaded for this query."}
+
 Now go fetch those answers, bestie! 🐾🖤`;
-
-
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -144,6 +182,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!lovableApiKey) {
       throw new Error('LOVABLE_API_KEY is not configured');
@@ -151,23 +190,30 @@ serve(async (req) => {
 
     // Handle different actions
     if (action === 'status') {
-      // Get overview of all agents and system stats
-      const [agents, artists, venues, submissions] = await Promise.all([
+      const [agents, artists, canonicalArtists, venues, gear, festivals, submissions, news] = await Promise.all([
         supabase.from('agent_status').select('*').order('agent_name'),
+        supabase.from('dj_artists').select('id', { count: 'exact', head: true }),
         supabase.from('canonical_artists').select('artist_id', { count: 'exact', head: true }),
         supabase.from('content_sync').select('id', { count: 'exact', head: true }).eq('entity_type', 'venue'),
-        supabase.from('community_submissions').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+        supabase.from('gear_catalog').select('id', { count: 'exact', head: true }),
+        supabase.from('content_sync').select('id', { count: 'exact', head: true }).eq('entity_type', 'festival'),
+        supabase.from('community_submissions').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('td_news_articles').select('id', { count: 'exact', head: true }).eq('status', 'published')
       ]);
 
       return new Response(JSON.stringify({
         success: true,
-        bark: "*Tail wagging* Woof! Here's the pack status!",
+        bark: "*Tail wagging* Woof! Here's the full pack status, bestie!",
         data: {
           agents: agents.data || [],
           stats: {
-            artists: artists.count || 0,
+            djArtists: artists.count || 0,
+            canonicalArtists: canonicalArtists.count || 0,
             venues: venues.count || 0,
-            pendingSubmissions: submissions.count || 0
+            gearItems: gear.count || 0,
+            festivals: festivals.count || 0,
+            pendingSubmissions: submissions.count || 0,
+            publishedNews: news.count || 0
           }
         }
       }), {
@@ -176,7 +222,6 @@ serve(async (req) => {
     }
 
     if (action === 'run-agent') {
-      // Dog can trigger other agents
       const { agentName } = await req.json();
       const { data: agent } = await supabase
         .from('agent_status')
@@ -185,7 +230,6 @@ serve(async (req) => {
         .single();
 
       if (agent) {
-        // Update status to running
         await supabase
           .from('agent_status')
           .update({ status: 'running', last_run_at: new Date().toISOString() })
@@ -200,28 +244,261 @@ serve(async (req) => {
       }
     }
 
-    // Gather context for the conversation
-    const [agentsData, statsData] = await Promise.all([
-      supabase.from('agent_status').select('agent_name, status, category, last_run_at').limit(20),
-      supabase.from('canonical_artists').select('artist_id', { count: 'exact', head: true })
-    ]);
+    // =================================================================
+    // FULL KNOWLEDGE RETRIEVAL - Query all databases
+    // =================================================================
+    
+    const queryText = message?.toLowerCase() || '';
+    let knowledgeContext = '';
 
-    const contextMessage = `
-CURRENT PLATFORM STATUS (for your reference):
-- Active agents: ${agentsData.data?.length || 0}
-- Artists in database: ${statsData.count || 0}
-- Agent statuses: ${agentsData.data?.map(a => `${a.agent_name}: ${a.status}`).join(', ') || 'None'}
-`;
+    // 1. Try RAG vector search if OpenAI key available
+    let ragArtists: any[] = [];
+    let ragDocuments: any[] = [];
+    
+    if (openaiApiKey && message) {
+      const embedding = await generateEmbedding(message, openaiApiKey);
+      
+      if (embedding) {
+        // Search dj_artists with vector similarity
+        const { data: artistResults } = await supabase.rpc('search_dj_artists', {
+          query_embedding: `[${embedding.join(',')}]`,
+          similarity_threshold: 0.3,
+          match_count: 5
+        });
+        if (artistResults) ragArtists = artistResults;
+
+        // Search documents with vector similarity
+        const { data: docResults } = await supabase.rpc('match_documents', {
+          query_embedding: `[${embedding.join(',')}]`,
+          match_threshold: 0.3,
+          match_count: 5
+        });
+        if (docResults) ragDocuments = docResults;
+      }
+    }
+
+    // 2. Fetch from all relevant tables based on query keywords
+    const fetchPromises: PromiseLike<any>[] = [];
+
+    // Always get some baseline stats
+    fetchPromises.push(
+      supabase.from('agent_status').select('agent_name, status, category, last_run_at').limit(10).then(r => r)
+    );
+
+    // DJ Artists - check for artist-related keywords
+    if (queryText.match(/artist|dj|producer|who|rank|top|best|label|track|genre|techno|underground/i) || ragArtists.length > 0) {
+      fetchPromises.push(
+        supabase.from('dj_artists')
+          .select('rank, artist_name, real_name, nationality, years_active, subgenres, labels, top_tracks, known_for')
+          .order('rank')
+          .limit(ragArtists.length > 0 ? 0 : 15)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Canonical Artists with profiles
+    if (queryText.match(/artist|bio|profile|collaborator|crew|influence/i)) {
+      fetchPromises.push(
+        supabase.from('canonical_artists')
+          .select(`
+            canonical_name, slug, real_name, country, city, rank, primary_genre, active_years,
+            artist_profiles(bio_short, labels, subgenres, known_for, collaborators, crews)
+          `)
+          .order('rank', { nullsFirst: false })
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Gear Catalog
+    if (queryText.match(/gear|synth|drum|machine|808|909|303|moog|roland|korg|sequencer|sampler|effect|filter|oscillator/i)) {
+      fetchPromises.push(
+        supabase.from('gear_catalog')
+          .select('name, brand, category, release_year, short_description, synthesis_type, notable_artists, techno_applications, strengths, polyphony, filters')
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Knowledge Entities (venues, festivals, labels, etc.)
+    if (queryText.match(/venue|club|festival|label|city|scene|collective|promoter|berghain|fabric|tresor|bassiani/i)) {
+      fetchPromises.push(
+        supabase.from('td_knowledge_entities')
+          .select('name, type, country, city, description, aliases')
+          .limit(15)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Content Sync (venues and festivals with verified data)
+    if (queryText.match(/venue|festival|event|location|where/i)) {
+      fetchPromises.push(
+        supabase.from('content_sync')
+          .select('entity_type, entity_id, original_data, verified_data, status')
+          .in('entity_type', ['venue', 'festival'])
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // News Articles
+    if (queryText.match(/news|latest|recent|article|update|happening/i)) {
+      fetchPromises.push(
+        supabase.from('td_news_articles')
+          .select('title, subtitle, author_pseudonym, city_tags, genre_tags, published_at')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(5)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Documents (general knowledge)
+    fetchPromises.push(
+      supabase.from('documents')
+        .select('title, content, source')
+        .limit(ragDocuments.length > 0 ? 0 : 5)
+        .then(r => r)
+    );
+
+    const [
+      agentsData,
+      djArtistsData,
+      canonicalArtistsData,
+      gearData,
+      entitiesData,
+      contentSyncData,
+      newsData,
+      documentsData
+    ] = await Promise.all(fetchPromises);
+
+    // =================================================================
+    // BUILD COMPREHENSIVE KNOWLEDGE CONTEXT
+    // =================================================================
+
+    const contextParts: string[] = [];
+
+    // Platform status
+    if (agentsData.data?.length) {
+      contextParts.push(`## PLATFORM STATUS
+Active agents: ${agentsData.data.map((a: any) => `${a.agent_name} (${a.status})`).join(', ')}`);
+    }
+
+    // RAG Artist results (highest priority)
+    if (ragArtists.length > 0) {
+      contextParts.push(`## TOP MATCHING ARTISTS (Vector Search)
+${ragArtists.map((a: any) => 
+  `**#${a.rank} ${a.artist_name}** ${a.real_name ? `(${a.real_name})` : ''}
+  - Nationality: ${a.nationality || 'Unknown'}
+  - Active: ${a.years_active || 'Unknown'}
+  - Genres: ${a.subgenres?.join(', ') || 'N/A'}
+  - Labels: ${a.labels?.join(', ') || 'N/A'}
+  - Known for: ${a.known_for || 'N/A'}
+  - Key tracks: ${a.top_tracks?.join(', ') || 'N/A'}`
+).join('\n\n')}`);
+    }
+
+    // DJ Artists data
+    if (djArtistsData.data?.length) {
+      contextParts.push(`## DJ ARTISTS DATABASE
+${djArtistsData.data.slice(0, 10).map((a: any) => 
+  `#${a.rank} ${a.artist_name} (${a.nationality || 'Unknown'}) - ${a.subgenres?.join(', ') || 'techno'} | Labels: ${a.labels?.slice(0, 3).join(', ') || 'N/A'}`
+).join('\n')}`);
+    }
+
+    // Canonical Artists with profiles
+    if (canonicalArtistsData.data?.length) {
+      contextParts.push(`## VERIFIED ARTIST PROFILES
+${canonicalArtistsData.data.slice(0, 5).map((a: any) => {
+  const profile = a.artist_profiles?.[0];
+  return `**${a.canonical_name}** (${a.country || 'Unknown'})
+  ${profile?.bio_short ? `Bio: ${profile.bio_short}` : ''}
+  ${profile?.labels?.length ? `Labels: ${profile.labels.join(', ')}` : ''}
+  ${profile?.collaborators?.length ? `Collaborators: ${profile.collaborators.join(', ')}` : ''}`;
+}).join('\n\n')}`);
+    }
+
+    // Gear Catalog
+    if (gearData.data?.length) {
+      contextParts.push(`## GEAR CATALOG
+${gearData.data.map((g: any) => 
+  `**${g.name}** (${g.brand}, ${g.release_year || 'N/A'})
+  - Category: ${g.category}
+  - Type: ${g.synthesis_type || 'N/A'}
+  - ${g.short_description || ''}
+  - Techno use: ${g.techno_applications || 'N/A'}
+  ${g.notable_artists ? `- Used by: ${JSON.stringify(g.notable_artists)}` : ''}`
+).join('\n\n')}`);
+    }
+
+    // Knowledge Entities (venues, labels, etc.)
+    if (entitiesData.data?.length) {
+      const byType: Record<string, any[]> = {};
+      entitiesData.data.forEach((e: any) => {
+        if (!byType[e.type]) byType[e.type] = [];
+        byType[e.type].push(e);
+      });
+      
+      Object.entries(byType).forEach(([type, items]) => {
+        contextParts.push(`## ${type.toUpperCase()}S
+${items.map((e: any) => `- **${e.name}** (${e.city || ''}, ${e.country || ''}) ${e.description ? `- ${e.description}` : ''}`).join('\n')}`);
+      });
+    }
+
+    // Content sync data
+    if (contentSyncData.data?.length) {
+      contextParts.push(`## VERIFIED CONTENT
+${contentSyncData.data.map((c: any) => {
+  const data = c.verified_data || c.original_data;
+  return `- ${c.entity_type}: ${data?.name || c.entity_id} (${c.status})`;
+}).join('\n')}`);
+    }
+
+    // News
+    if (newsData.data?.length) {
+      contextParts.push(`## LATEST NEWS
+${newsData.data.map((n: any) => 
+  `- **${n.title}** ${n.subtitle ? `- ${n.subtitle}` : ''} (${n.author_pseudonym}, ${n.city_tags?.join('/')}) [${n.published_at?.split('T')[0]}]`
+).join('\n')}`);
+    }
+
+    // RAG Documents (highest priority)
+    if (ragDocuments.length > 0) {
+      contextParts.push(`## KNOWLEDGE BASE (Vector Match)
+${ragDocuments.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 500)}...`).join('\n\n')}`);
+    } else if (documentsData.data?.length) {
+      contextParts.push(`## KNOWLEDGE BASE
+${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)}...`).join('\n\n')}`);
+    }
+
+    knowledgeContext = contextParts.join('\n\n---\n\n');
+
+    // Build system prompt with full knowledge
+    const systemPrompt = buildDogSystemPrompt(knowledgeContext);
 
     // Build messages for AI
     const messages = [
-      { role: 'system', content: DOG_SYSTEM_PROMPT + '\n\n' + contextMessage },
+      { role: 'system', content: systemPrompt },
       ...conversationHistory.map((msg: any) => ({
         role: msg.role,
         content: msg.content
       })),
       { role: 'user', content: message }
     ];
+
+    console.log(`Dog Agent: Processing query with ${contextParts.length} knowledge sections`);
 
     // Call Lovable AI Gateway
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -234,7 +511,7 @@ CURRENT PLATFORM STATUS (for your reference):
         model: 'google/gemini-2.5-flash',
         messages,
         temperature: 0.8,
-        max_tokens: 1000,
+        max_tokens: 1500,
       }),
     });
 
@@ -267,22 +544,34 @@ CURRENT PLATFORM STATUS (for your reference):
       event_name: 'dog_conversation',
       metadata: { 
         message_length: message.length,
-        response_length: dogResponse.length 
+        response_length: dogResponse.length,
+        knowledge_sections: contextParts.length,
+        had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0
       }
     });
 
     // Update Dog agent status
     await supabase
       .from('agent_status')
-      .update({ 
+      .upsert({ 
+        agent_name: 'Dog',
+        function_name: 'dog-agent',
+        category: 'orchestration',
+        status: 'idle',
         last_run_at: new Date().toISOString(),
-        run_count: supabase.rpc('increment_run_count', { agent: 'Dog' })
-      })
-      .eq('agent_name', 'Dog');
+        last_success_at: new Date().toISOString()
+      }, { onConflict: 'agent_name' });
 
     return new Response(JSON.stringify({
       success: true,
-      response: dogResponse
+      response: dogResponse,
+      meta: {
+        knowledgeSections: contextParts.length,
+        ragResults: {
+          artists: ragArtists.length,
+          documents: ragDocuments.length
+        }
+      }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
