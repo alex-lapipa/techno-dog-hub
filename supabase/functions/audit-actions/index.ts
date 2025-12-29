@@ -512,45 +512,59 @@ async function mergeDuplicates(supabase: any, targetIds: string[], rollbackData:
 
   // Keep the highest ranked (lowest number), soft-delete others by adding [DUPLICATE] prefix
   const keepRecord = records[0];
-  const duplicateIds = records.slice(1).map((r: { id: number }) => r.id);
+  const duplicateRecords = records.slice(1);
+  let updatedCount = 0;
 
-  const { error } = await supabase
-    .from('dj_artists')
-    .update({ artist_name: supabase.sql`'[DUPLICATE] ' || artist_name` })
-    .in('id', duplicateIds);
-
-  if (error) {
-    return { success: false, action: 'merge_duplicates', affectedCount: 0, details: error.message, rollbackData };
+  // Update each duplicate individually to prepend [DUPLICATE]
+  for (const record of duplicateRecords) {
+    const newName = `[DUPLICATE] ${record.artist_name}`;
+    const { error } = await supabase
+      .from('dj_artists')
+      .update({ artist_name: newName })
+      .eq('id', record.id);
+    
+    if (!error) updatedCount++;
   }
 
   return {
     success: true,
     action: 'merge_duplicates',
-    affectedCount: duplicateIds.length,
-    details: `Marked ${duplicateIds.length} duplicates, kept "${keepRecord.artist_name}" (rank ${keepRecord.rank})`,
+    affectedCount: updatedCount,
+    details: `Marked ${updatedCount} duplicates, kept "${keepRecord.artist_name}" (rank ${keepRecord.rank})`,
     rollbackData
   };
 }
 
 async function archiveOrphaned(supabase: any, targetIds: string[], rollbackData: any): Promise<FixResult> {
   // Soft delete by updating a field (we don't actually delete)
-  const { error, count } = await supabase
+  // First get the current records to preserve existing alt_text
+  const { data: assets } = await supabase
     .from('media_assets')
-    .update({ 
-      alt_text: supabase.sql`COALESCE(alt_text, '') || ' [ARCHIVED - orphaned]'`,
-      updated_at: new Date().toISOString()
-    })
+    .select('id, alt_text')
     .in('id', targetIds);
 
-  if (error) {
-    return { success: false, action: 'archive_orphaned', affectedCount: 0, details: error.message, rollbackData };
+  let updatedCount = 0;
+  
+  if (assets) {
+    for (const asset of assets) {
+      const newAltText = `${asset.alt_text || ''} [ARCHIVED - orphaned]`.trim();
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ 
+          alt_text: newAltText,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', asset.id);
+      
+      if (!error) updatedCount++;
+    }
   }
 
   return {
     success: true,
     action: 'archive_orphaned',
-    affectedCount: targetIds.length,
-    details: `Archived ${targetIds.length} orphaned media assets`,
+    affectedCount: updatedCount,
+    details: `Archived ${updatedCount} orphaned media assets`,
     rollbackData
   };
 }
@@ -580,23 +594,34 @@ async function resetFailedJobs(supabase: any, targetIds: string[], rollbackData:
 }
 
 async function flagStaleSubmissions(supabase: any, targetIds: string[], rollbackData: any): Promise<FixResult> {
-  const { error } = await supabase
+  // Get current records to preserve existing admin_notes
+  const { data: submissions } = await supabase
     .from('community_submissions')
-    .update({ 
-      admin_notes: supabase.sql`COALESCE(admin_notes, '') || ' [FLAGGED: Stale - pending > 7 days]'`,
-      updated_at: new Date().toISOString()
-    })
+    .select('id, admin_notes')
     .in('id', targetIds);
 
-  if (error) {
-    return { success: false, action: 'flag_stale', affectedCount: 0, details: error.message, rollbackData };
+  let updatedCount = 0;
+
+  if (submissions) {
+    for (const submission of submissions) {
+      const newNotes = `${submission.admin_notes || ''} [FLAGGED: Stale - pending > 7 days]`.trim();
+      const { error } = await supabase
+        .from('community_submissions')
+        .update({ 
+          admin_notes: newNotes,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', submission.id);
+      
+      if (!error) updatedCount++;
+    }
   }
 
   return {
     success: true,
     action: 'flag_stale',
-    affectedCount: targetIds.length,
-    details: `Flagged ${targetIds.length} stale submissions`,
+    affectedCount: updatedCount,
+    details: `Flagged ${updatedCount} stale submissions`,
     rollbackData
   };
 }
