@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageSEO from "@/components/PageSEO";
+import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,13 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Award, Plus, Edit2, Gift, Users, TrendingUp, Trophy, 
-  Loader2, ArrowLeft, Search, Star, Zap, Target, Crown
+  Loader2, Search, Star, Zap, Target, Crown
 } from "lucide-react";
-import { LoadingState } from "@/components/ui/loading-state";
 
 interface BadgeData {
   id: string;
@@ -83,8 +79,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 const BadgeAdmin = () => {
-  const { isAdmin, loading: authLoading } = useAdminAuth();
-  const navigate = useNavigate();
+  const { isAdmin } = useAdminAuth();
   const { toast } = useToast();
 
   const [badges, setBadges] = useState<BadgeData[]>([]);
@@ -361,64 +356,27 @@ const BadgeAdmin = () => {
       b.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (authLoading || loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <LoadingState message="Loading badges..." />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    navigate("/admin");
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <PageSEO
-        title="Badge Management"
-        description="Manage gamification badges and awards"
-        path="/admin/badges"
-      />
-      <Header />
-      <main className="pt-24 lg:pt-16">
-        <section className="border-b border-border">
-          <div className="container mx-auto px-4 md:px-8 py-12">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate("/admin")}
-                  className="font-mono text-xs"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-                <div>
-                  <div className="font-mono text-[10px] text-crimson uppercase tracking-[0.3em] mb-1">
-                    // gamification
-                  </div>
-                  <h1 className="font-mono text-2xl md:text-3xl uppercase tracking-tight flex items-center gap-3">
-                    <Award className="w-6 h-6 text-amber-500" />
-                    Badge Management
-                  </h1>
-                </div>
-              </div>
-              <Button onClick={() => openEditDialog()} className="font-mono text-xs uppercase">
-                <Plus className="w-4 h-4 mr-2" />
-                New Badge
-              </Button>
-            </div>
-
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="font-mono">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="badges">All Badges</TabsTrigger>
-                <TabsTrigger value="awards">Recent Awards</TabsTrigger>
-              </TabsList>
+    <AdminPageLayout
+      title="Badge Management"
+      description="Manage gamification badges and awards"
+      icon={Award}
+      iconColor="text-amber-500"
+      onRefresh={loadData}
+      isLoading={loading}
+      actions={
+        <Button onClick={() => openEditDialog()} className="font-mono text-xs uppercase">
+          <Plus className="w-4 h-4 mr-2" />
+          New Badge
+        </Button>
+      }
+    >
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="font-mono">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="badges">All Badges</TabsTrigger>
+          <TabsTrigger value="awards">Recent Awards</TabsTrigger>
+        </TabsList>
 
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
@@ -685,12 +643,7 @@ const BadgeAdmin = () => {
                 </Card>
               </TabsContent>
             </Tabs>
-          </div>
-        </section>
-      </main>
-      <Footer />
-
-      {/* Edit/Create Badge Dialog */}
+      
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -912,7 +865,7 @@ const BadgeAdmin = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 };
 
