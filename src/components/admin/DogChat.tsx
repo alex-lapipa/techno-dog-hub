@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Dog, Loader2, Sparkles, Heart } from "lucide-react";
+import { Send, Dog, Loader2, Sparkles, Heart, Volume2, VolumeX, Square } from "lucide-react";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,7 +23,10 @@ const DogChat = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingMessageIndex, setSpeakingMessageIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,6 +34,85 @@ const DogChat = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const speakMessage = async (text: string, messageIndex: number) => {
+    // If already speaking this message, stop it
+    if (isSpeaking && speakingMessageIndex === messageIndex) {
+      stopSpeaking();
+      return;
+    }
+
+    // Stop any current audio
+    stopSpeaking();
+
+    setIsSpeaking(true);
+    setSpeakingMessageIndex(messageIndex);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-voice`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Voice request failed: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.onended = () => {
+        setIsSpeaking(false);
+        setSpeakingMessageIndex(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+      audioRef.current.onerror = () => {
+        setIsSpeaking(false);
+        setSpeakingMessageIndex(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audioRef.current.play();
+    } catch (error) {
+      console.error('Voice error:', error);
+      setIsSpeaking(false);
+      setSpeakingMessageIndex(null);
+      toast({
+        title: "*confused bark*",
+        description: "Couldn't speak that one. Try again!",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    setIsSpeaking(false);
+    setSpeakingMessageIndex(null);
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -52,14 +133,27 @@ const DogChat = () => {
         content: m.content
       }));
 
-      const { data, error } = await supabase.functions.invoke('dog-agent', {
-        body: {
-          message: userMessage.content,
-          conversationHistory
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-agent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            message: userMessage.content,
+            conversationHistory
+          }),
         }
-      });
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
 
       const assistantMessage: Message = {
         role: 'assistant',
@@ -107,12 +201,16 @@ const DogChat = () => {
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center border-2 border-logo-green shadow-[0_0_20px_hsl(var(--logo-green)/0.3)]">
             <Dog className="w-7 h-7 text-logo-green" />
           </div>
-          <div>
+          <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="tracking-tight">Techno Dog</span>
               <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green uppercase tracking-wider">
                 <Sparkles className="w-3 h-3 mr-1" />
                 Underground Guide
+              </Badge>
+              <Badge variant="outline" className="text-[10px] font-mono border-crimson/50 text-crimson uppercase tracking-wider">
+                <Volume2 className="w-3 h-3 mr-1" />
+                Voice
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground font-normal mt-0.5">
@@ -138,9 +236,24 @@ const DogChat = () => {
                   }`}
                 >
                   {message.role === 'assistant' && (
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <Dog className="w-4 h-4 text-logo-green" />
-                      <span className="text-xs font-mono text-logo-green uppercase tracking-wider">Techno Dog</span>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <Dog className="w-4 h-4 text-logo-green" />
+                        <span className="text-xs font-mono text-logo-green uppercase tracking-wider">Techno Dog</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-logo-green/20"
+                        onClick={() => speakMessage(message.content, index)}
+                        title={isSpeaking && speakingMessageIndex === index ? "Stop" : "Speak"}
+                      >
+                        {isSpeaking && speakingMessageIndex === index ? (
+                          <Square className="w-3 h-3 text-crimson" />
+                        ) : (
+                          <Volume2 className="w-3 h-3 text-logo-green" />
+                        )}
+                      </Button>
                     </div>
                   )}
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">
