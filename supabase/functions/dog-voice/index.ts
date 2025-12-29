@@ -5,12 +5,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Voice options for the dog
+// Voice options for the dog - inclusive voice selection
 const DOG_VOICES = {
-  // Female dog - using "Jessica" for a warm, friendly female voice
-  female: "cgSgspJ2msm6clMCkdW9",
-  // Male dog - using "George" for a friendly, energetic male voice
-  male: "JBFqnCBsd6RMkjVDRZzb"
+  // She - warm, friendly feminine voice (Jessica)
+  she: "cgSgspJ2msm6clMCkdW9",
+  // He - energetic masculine voice (George)
+  he: "JBFqnCBsd6RMkjVDRZzb",
+  // They - balanced, neutral voice (River - androgynous)
+  they: "SAz9YHcvj6GT2YYXdXww",
+  // It - robotic/glitchy voice (Glitch)
+  it: "kPtEHAvRnjUJFv7SK9WI"
 };
 
 // Dog sounds to occasionally sprinkle in
@@ -23,7 +27,7 @@ const DOG_SOUNDS = {
 };
 
 // Inject dog sounds into text occasionally (not too much!)
-function addDogSounds(text: string, voice: 'male' | 'female'): string {
+function addDogSounds(text: string, voice: string): string {
   // Only add sounds ~30% of the time to keep it fun but not annoying
   if (Math.random() > 0.3) {
     return text;
@@ -59,7 +63,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice = 'female' } = await req.json();
+    const { text, voice = 'they' } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
@@ -71,7 +75,7 @@ serve(async (req) => {
     }
 
     // Get the voice ID based on selection
-    const voiceId = DOG_VOICES[voice as keyof typeof DOG_VOICES] || DOG_VOICES.female;
+    const voiceId = DOG_VOICES[voice as keyof typeof DOG_VOICES] || DOG_VOICES.they;
 
     // Clean the text - remove emojis and asterisks for cleaner speech
     let cleanText = text
@@ -81,26 +85,43 @@ serve(async (req) => {
       .trim();
 
     // Add occasional dog sounds
-    cleanText = addDogSounds(cleanText, voice as 'male' | 'female');
+    cleanText = addDogSounds(cleanText, voice);
 
     console.log(`Generating ${voice} voice for:`, cleanText.substring(0, 100) + "...");
 
-    // Adjust voice settings based on gender
-    const voiceSettings = voice === 'female' 
-      ? {
-          stability: 0.45,
-          similarity_boost: 0.8,
-          style: 0.55,
-          use_speaker_boost: true,
-          speed: 1.05,
-        }
-      : {
-          stability: 0.4,
-          similarity_boost: 0.75,
-          style: 0.6,
-          use_speaker_boost: true,
-          speed: 1.1,
-        };
+    // Adjust voice settings based on voice type
+    const voiceSettings: Record<string, { stability: number; similarity_boost: number; style: number; use_speaker_boost: boolean; speed: number }> = {
+      she: {
+        stability: 0.45,
+        similarity_boost: 0.8,
+        style: 0.55,
+        use_speaker_boost: true,
+        speed: 1.05,
+      },
+      he: {
+        stability: 0.4,
+        similarity_boost: 0.75,
+        style: 0.6,
+        use_speaker_boost: true,
+        speed: 1.1,
+      },
+      they: {
+        stability: 0.5,
+        similarity_boost: 0.7,
+        style: 0.5,
+        use_speaker_boost: true,
+        speed: 1.0,
+      },
+      it: {
+        stability: 0.3,
+        similarity_boost: 0.6,
+        style: 0.7,
+        use_speaker_boost: false,
+        speed: 0.95,
+      }
+    };
+    
+    const settings = voiceSettings[voice] || voiceSettings.they;
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
@@ -114,7 +135,7 @@ serve(async (req) => {
           text: cleanText,
           model_id: "eleven_turbo_v2_5",
           output_format: "mp3_44100_128",
-          voice_settings: voiceSettings,
+          voice_settings: settings,
         }),
       }
     );
