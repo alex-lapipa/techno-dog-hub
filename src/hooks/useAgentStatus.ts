@@ -129,13 +129,20 @@ export const useAgentStatus = (): UseAgentStatusReturn => {
 
       const duration = Date.now() - startTime;
       
+      // Get fresh counts from DB to avoid stale closure
+      const { data: currentAgent } = await supabase
+        .from('agent_status')
+        .select('run_count, success_count')
+        .eq('agent_name', agentName)
+        .single();
+      
       // Update status to success
       await updateAgentStatus(agentName, {
         status: 'success',
         last_success_at: new Date().toISOString(),
         last_error_message: null,
-        run_count: (agents.find(a => a.agent_name === agentName)?.run_count || 0) + 1,
-        success_count: (agents.find(a => a.agent_name === agentName)?.success_count || 0) + 1,
+        run_count: (currentAgent?.run_count || 0) + 1,
+        success_count: (currentAgent?.success_count || 0) + 1,
         avg_duration_ms: duration
       });
 
@@ -143,33 +150,55 @@ export const useAgentStatus = (): UseAgentStatusReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       
+      // Get fresh counts from DB to avoid stale closure
+      const { data: currentAgent } = await supabase
+        .from('agent_status')
+        .select('run_count, error_count')
+        .eq('agent_name', agentName)
+        .single();
+      
       // Update status to error
       await updateAgentStatus(agentName, {
         status: 'error',
         last_error_at: new Date().toISOString(),
         last_error_message: errorMessage,
-        run_count: (agents.find(a => a.agent_name === agentName)?.run_count || 0) + 1,
-        error_count: (agents.find(a => a.agent_name === agentName)?.error_count || 0) + 1
+        run_count: (currentAgent?.run_count || 0) + 1,
+        error_count: (currentAgent?.error_count || 0) + 1
       });
 
       throw err;
     }
-  }, [agents, updateAgentStatus]);
+  }, [updateAgentStatus]);
 
   const runAllAgents = useCallback(async () => {
     setIsRunningAll(true);
+
+    // Get fresh agent list from DB to avoid stale closure
+    const { data: freshAgents } = await supabase
+      .from('agent_status')
+      .select('agent_name, function_name, status')
+      .neq('status', 'disabled');
+
+    const enabledAgents = freshAgents || [];
+    
+    // Run agents in parallel batches of 3 for better performance
+    const BATCH_SIZE = 3;
     let success = 0;
     let failed = 0;
 
-    const enabledAgents = agents.filter(a => a.status !== 'disabled');
-
-    for (const agent of enabledAgents) {
-      try {
-        await runAgent(agent.agent_name, agent.function_name);
-        success++;
-      } catch {
-        failed++;
-      }
+    for (let i = 0; i < enabledAgents.length; i += BATCH_SIZE) {
+      const batch = enabledAgents.slice(i, i + BATCH_SIZE);
+      const results = await Promise.allSettled(
+        batch.map(agent => runAgent(agent.agent_name, agent.function_name))
+      );
+      
+      results.forEach(result => {
+        if (result.status === 'fulfilled') {
+          success++;
+        } else {
+          failed++;
+        }
+      });
     }
 
     setIsRunningAll(false);
@@ -181,7 +210,7 @@ export const useAgentStatus = (): UseAgentStatusReturn => {
     });
 
     return { success, failed };
-  }, [agents, runAgent, toast]);
+  }, [runAgent, toast]);
 
   return {
     agents,

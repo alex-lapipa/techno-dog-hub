@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
@@ -46,8 +46,13 @@ export const AdminPageLayout = ({
     );
   }
 
+  useEffect(() => {
+    if (!authLoading && !isLoading && !isAdmin) {
+      navigate('/admin');
+    }
+  }, [isAdmin, authLoading, isLoading, navigate]);
+
   if (!isAdmin) {
-    navigate('/admin');
     return null;
   }
 
