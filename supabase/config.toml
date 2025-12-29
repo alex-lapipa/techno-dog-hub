@@ -252,3 +252,6 @@ verify_jwt = false
 
 [functions.dog-voice]
 verify_jwt = false
+
+[functions.generate-doggy]
+verify_jwt = false
