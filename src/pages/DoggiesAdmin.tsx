@@ -11,9 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Volume2, Shield } from "lucide-react";
+import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield } from "lucide-react";
 import DogSilhouette from "@/components/DogSilhouette";
-import { dogVariants, HappyDog, SleepyDog, ExcitedDog, GrumpyDog, CuriousDog, PartyDog, DJDog, PuppyDog, OldDog, TechnoDog } from "@/components/DogPack";
+import { dogVariants, GrumpyDog } from "@/components/DogPack";
+import DoggyExport from "@/components/DoggyExport";
 
 const packQuotes = [
   "A well-organized pack is a happy pack!",
@@ -366,6 +367,9 @@ const DoggiesAdmin = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Doggie Export & Sharing Station */}
+          <DoggyExport selectedDog={selectedDog} generatedDogs={generatedDogs} />
 
           {/* Fun Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
