@@ -14,6 +14,8 @@ interface Message {
   timestamp: Date;
 }
 
+type DogVoice = 'female' | 'male';
+
 const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -27,6 +29,7 @@ const DogChat = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMessageIndex, setSpeakingMessageIndex] = useState<number | null>(null);
   const [audioVisualization, setAudioVisualization] = useState<number[]>([0.3, 0.5, 0.7, 0.5, 0.3]);
+  const [selectedVoice, setSelectedVoice] = useState<DogVoice>('female');
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const visualizationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -100,7 +103,7 @@ const DogChat = () => {
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({ text, voice: selectedVoice }),
         }
       );
 
@@ -271,10 +274,31 @@ const DogChat = () => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="tracking-tight">Techno Dog</span>
-              <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green uppercase tracking-wider shrink-0">
-                <Sparkles className="w-3 h-3 mr-1" />
-                Gen Z Mode
-              </Badge>
+              {/* Voice Selector */}
+              <div className="flex items-center gap-1 bg-muted/50 rounded-full p-0.5 border border-border/50">
+                <button
+                  onClick={() => setSelectedVoice('female')}
+                  className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
+                    selectedVoice === 'female' 
+                      ? 'bg-logo-green text-background' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Female dog voice"
+                >
+                  ♀ She
+                </button>
+                <button
+                  onClick={() => setSelectedVoice('male')}
+                  className={`text-[10px] px-2 py-0.5 rounded-full transition-all font-mono ${
+                    selectedVoice === 'male' 
+                      ? 'bg-logo-green text-background' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Male dog voice"
+                >
+                  ♂ He
+                </button>
+              </div>
               {isSpeaking && (
                 <Badge variant="outline" className="text-[10px] font-mono border-crimson/50 text-crimson uppercase tracking-wider animate-pulse shrink-0">
                   <Volume2 className="w-3 h-3 mr-1" />
