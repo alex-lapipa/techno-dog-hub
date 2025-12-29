@@ -302,9 +302,9 @@ const AdminDashboard = () => {
         </div>
         <div className="flex items-center gap-3">
           <Button 
-            variant="brutalist" 
+            variant="outline" 
             onClick={() => navigate('/admin/training')}
-            className="font-mono text-xs uppercase tracking-wider bg-logo-green hover:bg-logo-green/90 text-background animate-pulse hover:animate-none"
+            className="font-mono text-xs uppercase tracking-wider bg-transparent border-logo-green text-logo-green hover:bg-logo-green/10 hover:text-logo-green animate-border-flicker"
           >
             <BookOpen className="w-4 h-4 mr-2" />
             New Here? Start Training

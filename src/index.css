@@ -349,4 +349,25 @@
   .crimson-glow {
     background: linear-gradient(to top, hsl(var(--crimson) / 0.4), hsl(var(--crimson) / 0.15) 50%, transparent);
   }
+
+  /* Flickering border animation for CTAs */
+  @keyframes border-flicker {
+    0%, 100% { border-color: hsl(var(--logo-green)); opacity: 1; }
+    10% { border-color: hsl(var(--logo-green) / 0.7); opacity: 0.9; }
+    20% { border-color: hsl(var(--logo-green)); opacity: 1; }
+    30% { border-color: hsl(var(--logo-green) / 0.5); opacity: 0.85; }
+    50% { border-color: hsl(var(--logo-green)); opacity: 1; }
+    70% { border-color: hsl(var(--logo-green) / 0.6); opacity: 0.9; }
+    90% { border-color: hsl(var(--logo-green)); opacity: 1; }
+  }
+
+  .animate-border-flicker {
+    animation: border-flicker 3s ease-in-out infinite;
+  }
+
+  .animate-border-flicker:hover {
+    animation: none;
+    border-color: hsl(var(--logo-green)) !important;
+    opacity: 1 !important;
+  }
 }
