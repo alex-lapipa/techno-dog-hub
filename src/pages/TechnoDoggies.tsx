@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
+import CustomDoggyCreator from "@/components/CustomDoggyCreator";
 
 const TechnoDoggies = () => {
   const { data: dbVariants, isLoading } = useActiveDoggyVariants();
@@ -196,6 +197,11 @@ const TechnoDoggies = () => {
               Create and share your own pack of techno doggies. 
               Spread the borks across the internet! 🐕
             </p>
+          </div>
+
+          {/* Custom Doggy Creator */}
+          <div className="max-w-lg mx-auto mb-12">
+            <CustomDoggyCreator />
           </div>
 
           {/* Featured Dogs */}
