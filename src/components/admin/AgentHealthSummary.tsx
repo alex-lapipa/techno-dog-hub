@@ -1,7 +1,24 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, CheckCircle2, XCircle, Clock, TrendingUp, AlertTriangle } from "lucide-react";
+import { Activity, CheckCircle2, XCircle, Clock, AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+
+interface AgentStatus {
+  id: string;
+  agent_name: string;
+  function_name: string;
+  category: string;
+  status: 'idle' | 'running' | 'success' | 'error' | 'disabled';
+  last_run_at: string | null;
+  last_success_at: string | null;
+  last_error_at: string | null;
+  last_error_message: string | null;
+  run_count: number;
+  success_count: number;
+  error_count: number;
+  avg_duration_ms: number | null;
+}
 
 interface AgentStats {
   agent_name: string;
@@ -14,32 +31,71 @@ interface AgentStats {
 }
 
 const AgentHealthSummary = () => {
+  const [liveAgents, setLiveAgents] = useState<AgentStatus[]>([]);
   const [stats, setStats] = useState<AgentStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [totals, setTotals] = useState({
     totalReports: 0,
     totalErrors: 0,
     totalWarnings: 0,
-    avgSuccessRate: 0
+    avgSuccessRate: 0,
+    runningCount: 0
   });
 
   useEffect(() => {
-    fetchStats();
+    fetchData();
+
+    // Subscribe to real-time agent status updates
+    const channel = supabase
+      .channel('agent-health-live')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'agent_status'
+        },
+        (payload) => {
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+            setLiveAgents(prev => {
+              const updated = payload.new as AgentStatus;
+              const exists = prev.find(a => a.id === updated.id);
+              if (exists) {
+                return prev.map(a => a.id === updated.id ? updated : a);
+              }
+              return [...prev, updated];
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      // Get all reports from the last 30 days
+      // Fetch live agent status
+      const { data: agentData } = await supabase
+        .from('agent_status')
+        .select('*')
+        .order('agent_name');
+
+      if (agentData) {
+        setLiveAgents(agentData as unknown as AgentStatus[]);
+      }
+
+      // Also fetch historical report data for stats
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const { data: reports, error } = await supabase
+      const { data: reports } = await supabase
         .from('agent_reports')
         .select('agent_name, severity, created_at')
         .gte('created_at', thirtyDaysAgo.toISOString())
         .order('created_at', { ascending: false });
-
-      if (error) throw error;
 
       // Group by agent and calculate stats
       const agentMap = new Map<string, {
@@ -85,7 +141,6 @@ const AgentHealthSummary = () => {
         success_rate: data.total > 0 ? Math.round(((data.total - data.errors) / data.total) * 100) : 100
       }));
 
-      // Sort by last run (most recent first)
       agentStats.sort((a, b) => {
         if (!a.last_run) return 1;
         if (!b.last_run) return -1;
@@ -101,8 +156,9 @@ const AgentHealthSummary = () => {
       const avgSuccessRate = agentStats.length > 0 
         ? Math.round(agentStats.reduce((sum, a) => sum + a.success_rate, 0) / agentStats.length)
         : 100;
+      const runningCount = (agentData || []).filter((a: any) => a.status === 'running').length;
 
-      setTotals({ totalReports, totalErrors, totalWarnings, avgSuccessRate });
+      setTotals({ totalReports, totalErrors, totalWarnings, avgSuccessRate, runningCount });
     } catch (err) {
       console.error('Error fetching agent stats:', err);
     } finally {
@@ -131,6 +187,34 @@ const AgentHealthSummary = () => {
     return 'text-crimson';
   };
 
+  const getStatusIcon = (status: AgentStatus['status']) => {
+    switch (status) {
+      case 'running':
+        return <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />;
+      case 'success':
+        return <CheckCircle2 className="w-4 h-4 text-logo-green" />;
+      case 'error':
+        return <XCircle className="w-4 h-4 text-crimson" />;
+      case 'disabled':
+        return <XCircle className="w-4 h-4 text-muted-foreground" />;
+      default:
+        return <Clock className="w-4 h-4 text-muted-foreground" />;
+    }
+  };
+
+  const getStatusBorder = (status: AgentStatus['status']) => {
+    switch (status) {
+      case 'running':
+        return 'border-amber-500/50 bg-amber-500/10';
+      case 'success':
+        return 'border-logo-green/50 bg-logo-green/10';
+      case 'error':
+        return 'border-crimson/50 bg-crimson/10';
+      default:
+        return 'border-border bg-background/50';
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-zinc-900/50 border border-border p-4">
@@ -153,7 +237,19 @@ const AgentHealthSummary = () => {
       <div className="flex items-center gap-2 mb-4">
         <Activity className="w-4 h-4 text-logo-green" />
         <h3 className="font-mono text-xs uppercase tracking-wider text-logo-green">Agent Health</h3>
-        <span className="font-mono text-[10px] text-muted-foreground ml-auto">Last 30 days</span>
+        {totals.runningCount > 0 && (
+          <span className="px-1.5 py-0.5 bg-amber-500/20 border border-amber-500/50 font-mono text-[9px] text-amber-500">
+            {totals.runningCount} RUNNING
+          </span>
+        )}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={fetchData}
+          className="ml-auto p-1 h-6 w-6"
+        >
+          <RefreshCw className="w-3 h-3" />
+        </Button>
       </div>
 
       {/* Summary Stats */}
@@ -176,61 +272,60 @@ const AgentHealthSummary = () => {
         </div>
       </div>
 
-      {/* Per-Agent Stats */}
+      {/* Live Agent Status Grid */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
-        {stats.length === 0 ? (
+        {liveAgents.length === 0 && stats.length === 0 ? (
           <div className="text-center py-4">
             <div className="font-mono text-xs text-muted-foreground">No agent data yet</div>
           </div>
         ) : (
-          stats.map(agent => (
-            <div
-              key={agent.agent_name}
-              className="p-2 bg-background/30 border border-border/50 flex items-center gap-3"
-            >
-              {/* Health indicator */}
-              <div className={`w-8 h-8 flex items-center justify-center border ${
-                agent.success_rate >= 90 ? 'border-logo-green/50 bg-logo-green/10' :
-                agent.success_rate >= 70 ? 'border-amber-500/50 bg-amber-500/10' :
-                'border-crimson/50 bg-crimson/10'
-              }`}>
-                {agent.success_rate >= 90 ? (
-                  <CheckCircle2 className="w-4 h-4 text-logo-green" />
-                ) : agent.success_rate >= 70 ? (
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-crimson" />
-                )}
-              </div>
+          liveAgents.map(agent => {
+            const historicalStats = stats.find(s => s.agent_name === agent.agent_name);
+            const successRate = agent.run_count > 0 
+              ? Math.round((agent.success_count / agent.run_count) * 100)
+              : (historicalStats?.success_rate || 100);
 
-              {/* Agent name and last run */}
-              <div className="flex-1 min-w-0">
-                <div className="font-mono text-xs text-foreground truncate">{agent.agent_name}</div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  <span className="font-mono text-[10px]">{formatTimeAgo(agent.last_run)}</span>
+            return (
+              <div
+                key={agent.id}
+                className={`p-2 border flex items-center gap-3 transition-colors ${getStatusBorder(agent.status)}`}
+              >
+                {/* Status indicator */}
+                <div className={`w-8 h-8 flex items-center justify-center border ${getStatusBorder(agent.status)}`}>
+                  {getStatusIcon(agent.status)}
                 </div>
-              </div>
 
-              {/* Stats */}
-              <div className="flex items-center gap-3 text-right">
-                <div className="hidden sm:block">
-                  <div className="font-mono text-[10px] text-muted-foreground">{agent.total_reports} runs</div>
+                {/* Agent name and last run */}
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-xs text-foreground truncate">{agent.agent_name}</div>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    <span className="font-mono text-[10px]">{formatTimeAgo(agent.last_run_at)}</span>
+                    {agent.avg_duration_ms && (
+                      <span className="font-mono text-[10px] text-muted-foreground/60">
+                        ({Math.round(agent.avg_duration_ms / 1000)}s)
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  {agent.error_count > 0 && (
-                    <span className="font-mono text-[10px] text-crimson">{agent.error_count}E</span>
-                  )}
-                  {agent.warning_count > 0 && (
-                    <span className="font-mono text-[10px] text-amber-500">{agent.warning_count}W</span>
-                  )}
-                </div>
-                <div className={`font-mono text-xs font-medium ${getHealthColor(agent.success_rate)}`}>
-                  {agent.success_rate}%
+
+                {/* Stats */}
+                <div className="flex items-center gap-3 text-right">
+                  <div className="hidden sm:block">
+                    <div className="font-mono text-[10px] text-muted-foreground">{agent.run_count} runs</div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {agent.error_count > 0 && (
+                      <span className="font-mono text-[10px] text-crimson">{agent.error_count}E</span>
+                    )}
+                  </div>
+                  <div className={`font-mono text-xs font-medium ${getHealthColor(successRate)}`}>
+                    {successRate}%
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
