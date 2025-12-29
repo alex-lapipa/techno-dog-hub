@@ -1555,6 +1555,159 @@ export type Database = {
         }
         Relationships: []
       }
+      gear_catalog: {
+        Row: {
+          brand: string
+          category: string
+          created_at: string | null
+          current_price_notes: string | null
+          current_price_usd_high: number | null
+          current_price_usd_low: number | null
+          data_sources: string[] | null
+          designer: string | null
+          discontinued_year: number | null
+          effects_onboard: string | null
+          envelopes: string | null
+          famous_tracks: Json | null
+          filters: string | null
+          format: string | null
+          id: string
+          image_attribution: Json | null
+          image_url: string | null
+          instrument_type: string | null
+          io_connectivity: string | null
+          launch_price_notes: string | null
+          launch_price_usd: number | null
+          lfos: string | null
+          limitations: string | null
+          manufacturer_company: string | null
+          midi_sync: string | null
+          model: string | null
+          modifications: string | null
+          name: string
+          notable_artists: Json | null
+          notable_features: string | null
+          official_url: string | null
+          oscillator_types: string | null
+          oscillators_per_voice: string | null
+          polyphony: string | null
+          production_units: number | null
+          related_gear: string[] | null
+          release_year: number | null
+          sampling_spec: string | null
+          sequencer_arp: string | null
+          short_description: string | null
+          sources: string[] | null
+          strengths: string | null
+          synthesis_type: string | null
+          tags: string[] | null
+          techno_applications: string | null
+          timbrality: string | null
+          updated_at: string | null
+          youtube_videos: Json | null
+        }
+        Insert: {
+          brand: string
+          category: string
+          created_at?: string | null
+          current_price_notes?: string | null
+          current_price_usd_high?: number | null
+          current_price_usd_low?: number | null
+          data_sources?: string[] | null
+          designer?: string | null
+          discontinued_year?: number | null
+          effects_onboard?: string | null
+          envelopes?: string | null
+          famous_tracks?: Json | null
+          filters?: string | null
+          format?: string | null
+          id: string
+          image_attribution?: Json | null
+          image_url?: string | null
+          instrument_type?: string | null
+          io_connectivity?: string | null
+          launch_price_notes?: string | null
+          launch_price_usd?: number | null
+          lfos?: string | null
+          limitations?: string | null
+          manufacturer_company?: string | null
+          midi_sync?: string | null
+          model?: string | null
+          modifications?: string | null
+          name: string
+          notable_artists?: Json | null
+          notable_features?: string | null
+          official_url?: string | null
+          oscillator_types?: string | null
+          oscillators_per_voice?: string | null
+          polyphony?: string | null
+          production_units?: number | null
+          related_gear?: string[] | null
+          release_year?: number | null
+          sampling_spec?: string | null
+          sequencer_arp?: string | null
+          short_description?: string | null
+          sources?: string[] | null
+          strengths?: string | null
+          synthesis_type?: string | null
+          tags?: string[] | null
+          techno_applications?: string | null
+          timbrality?: string | null
+          updated_at?: string | null
+          youtube_videos?: Json | null
+        }
+        Update: {
+          brand?: string
+          category?: string
+          created_at?: string | null
+          current_price_notes?: string | null
+          current_price_usd_high?: number | null
+          current_price_usd_low?: number | null
+          data_sources?: string[] | null
+          designer?: string | null
+          discontinued_year?: number | null
+          effects_onboard?: string | null
+          envelopes?: string | null
+          famous_tracks?: Json | null
+          filters?: string | null
+          format?: string | null
+          id?: string
+          image_attribution?: Json | null
+          image_url?: string | null
+          instrument_type?: string | null
+          io_connectivity?: string | null
+          launch_price_notes?: string | null
+          launch_price_usd?: number | null
+          lfos?: string | null
+          limitations?: string | null
+          manufacturer_company?: string | null
+          midi_sync?: string | null
+          model?: string | null
+          modifications?: string | null
+          name?: string
+          notable_artists?: Json | null
+          notable_features?: string | null
+          official_url?: string | null
+          oscillator_types?: string | null
+          oscillators_per_voice?: string | null
+          polyphony?: string | null
+          production_units?: number | null
+          related_gear?: string[] | null
+          release_year?: number | null
+          sampling_spec?: string | null
+          sequencer_arp?: string | null
+          short_description?: string | null
+          sources?: string[] | null
+          strengths?: string | null
+          synthesis_type?: string | null
+          tags?: string[] | null
+          techno_applications?: string | null
+          timbrality?: string | null
+          updated_at?: string | null
+          youtube_videos?: Json | null
+        }
+        Relationships: []
+      }
       health_alerts: {
         Row: {
           alert_type: string
