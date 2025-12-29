@@ -15,9 +15,10 @@ interface Video {
 
 interface YouTubeVideosProps {
   artistName: string;
+  realName?: string;
 }
 
-const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
+const YouTubeVideos = ({ artistName, realName }: YouTubeVideosProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,7 @@ const YouTubeVideos = ({ artistName }: YouTubeVideosProps) => {
       
       try {
         const { data, error: fnError } = await supabase.functions.invoke('youtube-search', {
-          body: { artistName, maxResults: 6 }
+          body: { artistName, realName, maxResults: 6 }
         });
 
         if (fnError) {

@@ -176,7 +176,7 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    const { artistName, maxResults = 6, forceRefresh = false, skipAIVerification = false } = await req.json();
+    const { artistName, realName, maxResults = 6, forceRefresh = false, skipAIVerification = false } = await req.json();
     
     if (!artistName) {
       return errorResponse('Artist name is required', 400);
@@ -213,13 +213,19 @@ serve(async (req) => {
       return errorResponse('YouTube API key not configured', 500);
     }
 
-    // Multiple search strategies for better accuracy
+    // Build search queries - include real name if available for disambiguation
     const searchQueries = [
       `"${artistName}" techno DJ set`,
       `"${artistName}" boiler room`,
       `"${artistName}" live set techno`,
       `"${artistName}" awakenings festival`
     ];
+    
+    // Add real name searches for disambiguation (e.g., "Karl O'Connor" for Regis)
+    if (realName && realName.toLowerCase() !== artistName.toLowerCase()) {
+      searchQueries.unshift(`"${realName}" "${artistName}" techno`);
+      searchQueries.unshift(`"${realName}" DJ set`);
+    }
 
     const allVideos: any[] = [];
     const seenIds = new Set<string>();
