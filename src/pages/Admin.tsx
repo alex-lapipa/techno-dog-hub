@@ -18,6 +18,7 @@ import AgentReportsList from "@/components/admin/AgentReportsList";
 import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
 import ScheduledJobsStatus from "@/components/admin/ScheduledJobsStatus";
 import AgentHealthSummary from "@/components/admin/AgentHealthSummary";
+import AdminAIAssistant from "@/components/admin/AdminAIAssistant";
 import { LeaderboardWidget } from "@/components/gamification";
 
 const AdminLoginForm = () => {
@@ -430,6 +431,8 @@ const Admin = () => {
         </section>
       </main>
       <Footer />
+      {/* AI Assistant - only show for admins */}
+      {isAdmin && <AdminAIAssistant />}
     </div>
   );
 };
