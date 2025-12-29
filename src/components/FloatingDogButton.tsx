@@ -1,23 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import HexagonLogo from '@/components/HexagonLogo';
 import DogChat from '@/components/admin/DogChat';
 
 const FloatingDogButton = () => {
   const [dogChatOpen, setDogChatOpen] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(true);
+
+  // Stop pulsing after first interaction
+  useEffect(() => {
+    if (dogChatOpen) {
+      setIsPulsing(false);
+    }
+  }, [dogChatOpen]);
 
   return (
     <>
       <button
         onClick={() => setDogChatOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-background/80 backdrop-blur-sm border border-logo-green/40 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-background/90 hover:border-logo-green hover:shadow-[0_0_20px_hsl(100_100%_60%/0.4)] group"
+        className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-background/90 backdrop-blur-md border-2 border-logo-green/60 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-background hover:border-logo-green hover:shadow-[0_0_30px_hsl(100_100%_60%/0.5)] group ${isPulsing ? 'animate-pulse' : ''}`}
         aria-label="Open Dog AI Assistant"
       >
-        <HexagonLogo className="w-9 h-9 transition-transform duration-300 group-hover:rotate-6 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
+        {/* Outer glow ring */}
+        <div className="absolute inset-0 rounded-full bg-logo-green/20 animate-ping" style={{ animationDuration: '2s' }} />
+        
+        {/* Logo */}
+        <HexagonLogo className="w-10 h-10 transition-transform duration-300 group-hover:rotate-12 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
+        
+        {/* Tooltip */}
+        <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-background/95 border border-logo-green/40 text-foreground text-xs font-mono px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
+          Ask Techno Dog 🐕
+        </span>
       </button>
 
       <Dialog open={dogChatOpen} onOpenChange={setDogChatOpen}>
-        <DialogContent className="max-w-2xl h-[80vh] p-0 overflow-hidden bg-background border-logo-green/30">
+        <DialogContent className="max-w-2xl h-[85vh] max-h-[700px] p-0 overflow-hidden bg-background border-logo-green/30 shadow-[0_0_40px_hsl(100_100%_60%/0.15)]">
           <DialogTitle className="sr-only">Dog AI Assistant</DialogTitle>
           <DogChat />
         </DialogContent>
