@@ -12,3 +12,10 @@ export { default as AdminPageLayout } from './AdminPageLayout';
 export { default as AdminStatsCard } from './AdminStatsCard';
 export { default as AdminDataTable } from './AdminDataTable';
 export { default as AdminAIAssistant } from './AdminAIAssistant';
+
+// Gear Agent components
+export { default as GearStatsGrid } from './GearStatsGrid';
+export { default as GearPipelineControl, type PipelineStep, type GapSummary } from './GearPipelineControl';
+export { default as GearGapAnalysis } from './GearGapAnalysis';
+export { default as GearChatInterface } from './GearChatInterface';
+export { default as GearItemsPanel } from './GearItemsPanel';
