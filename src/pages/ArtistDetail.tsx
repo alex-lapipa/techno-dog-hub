@@ -390,7 +390,7 @@ const ArtistDetail = () => {
           )}
 
           {/* YouTube DJ Sets & Performances */}
-          <YouTubeVideos artistName={artist.name} />
+          <YouTubeVideos artistName={artist.name} realName={artist.realName} />
 
           {/* Gear & Rider */}
           <section className="mb-12 border-t border-border pt-8">
