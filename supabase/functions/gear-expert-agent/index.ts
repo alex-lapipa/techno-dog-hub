@@ -1072,11 +1072,187 @@ Keep responses focused and technical but accessible. Use specific examples when 
       });
     }
 
+    // Generate embeddings for gear items
+    if (action === 'generate-embeddings') {
+      const batchLimit = limit || 10;
+      
+      // Get gear items without embeddings
+      const { data: gearWithoutEmbeddings } = await supabase
+        .from('gear_catalog')
+        .select('id, name, brand, category, short_description, techno_applications, notable_features, synthesis_type, release_year')
+        .is('embedding', null)
+        .limit(batchLimit);
+
+      if (!gearWithoutEmbeddings || gearWithoutEmbeddings.length === 0) {
+        // Check total with embeddings
+        const { count: withEmbeddings } = await supabase
+          .from('gear_catalog')
+          .select('*', { count: 'exact', head: true })
+          .not('embedding', 'is', null);
+
+        return new Response(JSON.stringify({
+          success: true,
+          processed: 0,
+          total: totalGear,
+          withEmbeddings,
+          message: 'All gear items have embeddings!'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const results = [];
+      
+      for (const gear of gearWithoutEmbeddings) {
+        try {
+          // Create rich text for embedding
+          const embeddingText = [
+            `${gear.brand} ${gear.name}`,
+            gear.category ? `Category: ${gear.category}` : '',
+            gear.synthesis_type ? `Synthesis: ${gear.synthesis_type}` : '',
+            gear.release_year ? `Released: ${gear.release_year}` : '',
+            gear.short_description || '',
+            gear.techno_applications ? `Techno applications: ${gear.techno_applications}` : '',
+            gear.notable_features ? `Features: ${gear.notable_features}` : ''
+          ].filter(Boolean).join('. ');
+
+          // Generate embedding via OpenAI
+          const embResponse = await fetch('https://api.openai.com/v1/embeddings', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${OPENAI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'text-embedding-3-small',
+              input: embeddingText,
+              dimensions: 1536
+            }),
+          });
+
+          const embData = await embResponse.json();
+          const embedding = embData.data[0].embedding;
+
+          // Store embedding
+          await supabase
+            .from('gear_catalog')
+            .update({ 
+              embedding: JSON.stringify(embedding),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', gear.id);
+
+          results.push({ id: gear.id, name: `${gear.brand} ${gear.name}`, success: true });
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          console.error(`Failed to embed ${gear.name}:`, errorMessage);
+          results.push({ id: gear.id, name: `${gear.brand} ${gear.name}`, success: false, error: errorMessage });
+        }
+      }
+
+      const { count: remaining } = await supabase
+        .from('gear_catalog')
+        .select('*', { count: 'exact', head: true })
+        .is('embedding', null);
+
+      return new Response(JSON.stringify({
+        success: true,
+        processed: results.filter(r => r.success).length,
+        total: results.length,
+        remaining,
+        results,
+        message: `Generated embeddings for ${results.filter(r => r.success).length} items, ${remaining} remaining`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // RAG search for gear
+    if (action === 'rag-search' && query) {
+      // Generate embedding for query
+      const embResponse = await fetch('https://api.openai.com/v1/embeddings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'text-embedding-3-small',
+          input: query,
+          dimensions: 1536
+        }),
+      });
+
+      const embData = await embResponse.json();
+      const queryEmbedding = embData.data[0].embedding;
+
+      // Search using vector similarity
+      const { data: matches, error: searchError } = await supabase.rpc('search_gear_by_embedding', {
+        query_embedding: JSON.stringify(queryEmbedding),
+        match_threshold: 0.5,
+        match_count: 5
+      });
+
+      if (searchError) {
+        console.error('RAG search error:', searchError);
+        return new Response(JSON.stringify({
+          success: false,
+          error: searchError.message
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Generate response using matched context
+      const context = matches?.map((m: any) => 
+        `${m.brand} ${m.name} (${m.category}): ${m.short_description || 'No description'}`
+      ).join('\n\n') || 'No matching gear found.';
+
+      const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: `You are a techno gear expert. Answer questions using ONLY the following gear context. Be specific and technical.
+
+GEAR CONTEXT:
+${context}`
+            },
+            { role: 'user', content: query }
+          ],
+        }),
+      });
+
+      const aiData = await aiResponse.json();
+      const answer = aiData.choices[0].message.content;
+
+      return new Response(JSON.stringify({
+        success: true,
+        response: answer,
+        matches: matches?.map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          brand: m.brand,
+          similarity: m.similarity
+        })),
+        matchCount: matches?.length || 0
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Default: return agent info
     return new Response(JSON.stringify({
       agent: 'Gear Expert',
-      version: '2.0',
-      capabilities: ['status', 'enrich', 'batch-enrich', 'scrape-equipboard', 'batch-scrape-equipboard', 'chat'],
+      version: '2.1',
+      capabilities: ['status', 'enrich', 'batch-enrich', 'scrape-equipboard', 'batch-scrape-equipboard', 'chat', 'generate-embeddings', 'rag-search', 'gap-analysis', 'fill-gaps', 'enrich-technical-specs'],
       firecrawlEnabled: !!FIRECRAWL_API_KEY,
       stats: { totalGear, withDescriptions, withTechnoApps }
     }), {
