@@ -35,6 +35,15 @@ export interface AuditSchema {
   }>;
 }
 
+export interface SourceMapStats {
+  total_canonical: number;
+  total_rag: number;
+  linked_count: number;
+  canonical_only: number;
+  rag_only: number;
+  link_percentage: number;
+}
+
 export interface AuditData {
   schema: AuditSchema;
   healthScores: Record<string, number>;
@@ -42,6 +51,7 @@ export interface AuditData {
   proposals: AuditProposal[];
   totalRecords: number;
   timestamp?: string;
+  sourceMapStats?: SourceMapStats;
 }
 
 export interface PreviewData {
@@ -76,6 +86,13 @@ export function useAuditActions() {
       if (error) throw error;
 
       const result = data as AuditData;
+      
+      // Fetch source map stats from the new database function
+      const { data: statsData } = await supabase.rpc('get_source_map_stats');
+      if (statsData && statsData.length > 0) {
+        result.sourceMapStats = statsData[0] as SourceMapStats;
+      }
+      
       setAuditData(result);
       toast.success(`Scan complete: ${result.issues.length} issues found`);
       return result;

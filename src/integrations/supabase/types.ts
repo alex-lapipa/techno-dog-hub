@@ -287,6 +287,13 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
+          {
+            foreignKeyName: "artist_aliases_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
         ]
       }
       artist_assets: {
@@ -358,6 +365,13 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
+          {
+            foreignKeyName: "artist_assets_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
         ]
       }
       artist_claims: {
@@ -418,6 +432,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_claims_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
           {
@@ -483,6 +504,13 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
+          {
+            foreignKeyName: "artist_documents_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
         ]
       }
       artist_enrichment_queue: {
@@ -528,6 +556,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_enrichment_queue_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -580,6 +615,13 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
+          {
+            foreignKeyName: "artist_enrichment_runs_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
         ]
       }
       artist_gear: {
@@ -619,6 +661,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_gear_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -666,10 +715,24 @@ export type Database = {
             referencedColumns: ["artist_id"]
           },
           {
+            foreignKeyName: "artist_merge_candidates_artist_a_id_fkey"
+            columns: ["artist_a_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
+          {
             foreignKeyName: "artist_merge_candidates_artist_b_id_fkey"
             columns: ["artist_b_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_merge_candidates_artist_b_id_fkey"
+            columns: ["artist_b_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -797,6 +860,13 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
+          {
+            foreignKeyName: "artist_profiles_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
         ]
       }
       artist_raw_documents: {
@@ -842,6 +912,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_raw_documents_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -898,10 +975,24 @@ export type Database = {
             referencedColumns: ["artist_id"]
           },
           {
+            foreignKeyName: "artist_source_map_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
+            referencedColumns: ["artist_id"]
+          },
+          {
             foreignKeyName: "artist_source_map_merged_into_artist_id_fkey"
             columns: ["merged_into_artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
+            referencedColumns: ["artist_id"]
+          },
+          {
+            foreignKeyName: "artist_source_map_merged_into_artist_id_fkey"
+            columns: ["merged_into_artist_id"]
+            isOneToOne: false
+            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -2561,6 +2652,40 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_artist_view: {
+        Row: {
+          artist_id: string | null
+          canonical_created_at: string | null
+          canonical_name: string | null
+          canonical_rank: number | null
+          canonical_updated_at: string | null
+          city: string | null
+          country: string | null
+          has_embedding: boolean | null
+          is_active: boolean | null
+          known_for: string | null
+          labels: string[] | null
+          link_status: string | null
+          mapping_id: string | null
+          match_confidence: number | null
+          match_method: string | null
+          nationality: string | null
+          needs_review: boolean | null
+          photo_url: string | null
+          photo_verified: boolean | null
+          rag_id: number | null
+          rag_name: string | null
+          rag_rank: number | null
+          real_name: string | null
+          region: string | null
+          slug: string | null
+          source_system: string | null
+          subgenres: string[] | null
+          top_tracks: string[] | null
+          years_active: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       award_badge: {
@@ -2634,6 +2759,17 @@ export type Database = {
         }
         Returns: string
       }
+      find_unlinked_artists: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          name: string
+          potential_match_id: string
+          potential_match_name: string
+          similarity: number
+          source: string
+        }[]
+      }
       generate_referral_code: { Args: never; Returns: string }
       get_current_xp_multiplier: {
         Args: never
@@ -2645,6 +2781,17 @@ export type Database = {
         }[]
       }
       get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
+      get_source_map_stats: {
+        Args: never
+        Returns: {
+          canonical_only: number
+          link_percentage: number
+          linked_count: number
+          rag_only: number
+          total_canonical: number
+          total_rag: number
+        }[]
+      }
       grant_admin_role: { Args: { target_user_id: string }; Returns: boolean }
       has_role: {
         Args: {
