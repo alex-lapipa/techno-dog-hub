@@ -1,4 +1,5 @@
 import { ExternalLink, Users, Headphones, Wrench, Code, HelpCircle, Music } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -50,8 +51,51 @@ const footerLinks = [
 ];
 
 const DoggyPageFooter = ({ pageSource, currentDoggyName }: DoggyPageFooterProps) => {
+  const location = useLocation();
+  const isMainSite = location.pathname.startsWith('/');
+  const isEmbeddedWidget = pageSource === 'widget';
+  
   const handleLinkClick = (linkLabel: string, path: string) => {
     trackDoggyEvent(pageSource, 'link_click', linkLabel, currentDoggyName, { path });
+  };
+
+  // For embedded widgets, always use external links
+  // For main site pages, use React Router for internal navigation
+  const renderLink = (link: typeof footerLinks[0]) => {
+    const IconComponent = link.icon;
+    const linkClasses = "group flex flex-col items-center p-3 rounded-lg border border-border/30 hover:border-logo-green/50 hover:bg-logo-green/5 transition-all duration-200";
+    
+    if (isEmbeddedWidget) {
+      return (
+        <a
+          key={link.path}
+          href={`https://techno.dog${link.path}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => handleLinkClick(link.label, link.path)}
+          className={linkClasses}
+        >
+          <IconComponent className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+          <span className="mt-1.5 font-mono text-xs text-foreground group-hover:text-logo-green transition-colors">
+            {link.label}
+          </span>
+        </a>
+      );
+    }
+    
+    return (
+      <Link
+        key={link.path}
+        to={link.path}
+        onClick={() => handleLinkClick(link.label, link.path)}
+        className={linkClasses}
+      >
+        <IconComponent className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+        <span className="mt-1.5 font-mono text-xs text-foreground group-hover:text-logo-green transition-colors">
+          {link.label}
+        </span>
+      </Link>
+    );
   };
 
   return (
@@ -59,53 +103,57 @@ const DoggyPageFooter = ({ pageSource, currentDoggyName }: DoggyPageFooterProps)
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Site Links */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          {footerLinks.map((link) => {
-            const IconComponent = link.icon;
-            return (
-              <a
-                key={link.path}
-                href={`https://techno.dog${link.path}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handleLinkClick(link.label, link.path)}
-                className="group flex flex-col items-center p-3 rounded-lg border border-border/30 hover:border-logo-green/50 hover:bg-logo-green/5 transition-all duration-200"
-              >
-                <IconComponent className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
-                <span className="mt-1.5 font-mono text-xs text-foreground group-hover:text-logo-green transition-colors">
-                  {link.label}
-                </span>
-              </a>
-            );
-          })}
+          {footerLinks.map(renderLink)}
         </div>
 
         {/* Copyright & Branding */}
         <div className="text-center space-y-3 pt-4 border-t border-border/30">
           <p className="font-mono text-xs text-muted-foreground">
             Techno Doggies are © {new Date().getFullYear()} the{' '}
-            <a 
-              href="https://techno.dog/community" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onClick={() => handleLinkClick('Community Copyright', '/community')}
-              className="text-logo-green hover:underline"
-            >
-              techno.dog community
-            </a>
+            {isEmbeddedWidget ? (
+              <a 
+                href="https://techno.dog/community" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => handleLinkClick('Community Copyright', '/community')}
+                className="text-logo-green hover:underline"
+              >
+                techno.dog community
+              </a>
+            ) : (
+              <Link 
+                to="/community"
+                onClick={() => handleLinkClick('Community Copyright', '/community')}
+                className="text-logo-green hover:underline"
+              >
+                techno.dog community
+              </Link>
+            )}
             . Free to share with attribution.
           </p>
           
-          <a 
-            href="https://techno.dog" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            onClick={() => handleLinkClick('Main Site', '/')}
-            className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-logo-green transition-colors"
-          >
-            <span className="font-bold">techno.dog</span>
-            <span>— Your global techno companion</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          {isEmbeddedWidget ? (
+            <a 
+              href="https://techno.dog" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onClick={() => handleLinkClick('Main Site', '/')}
+              className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-logo-green transition-colors"
+            >
+              <span className="font-bold">techno.dog</span>
+              <span>— Your global techno companion</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          ) : (
+            <Link 
+              to="/"
+              onClick={() => handleLinkClick('Main Site', '/')}
+              className="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-logo-green transition-colors"
+            >
+              <span className="font-bold">techno.dog</span>
+              <span>— Your global techno companion</span>
+            </Link>
+          )}
         </div>
       </div>
     </footer>

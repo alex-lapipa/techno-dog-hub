@@ -32,7 +32,7 @@ const TechnoDoggies = () => {
   const DogComponent = currentDog?.Component || dogVariants[0].Component;
   const currentDbData = (currentDog as any)?.dbData;
 
-  // Log view on mount
+  // Log view on mount and track page view
   useEffect(() => {
     if (currentDog) {
       logAction.mutate({
@@ -40,6 +40,8 @@ const TechnoDoggies = () => {
         variantName: currentDog.name,
         actionType: "view",
       });
+      // Track page view for analytics
+      trackDoggyEvent('main_page', 'page_view', undefined, currentDog.name);
     }
   }, []);
 
@@ -93,6 +95,8 @@ const TechnoDoggies = () => {
       variantName: currentDog?.name || "Unknown",
       actionType: "share_email",
     });
+    // Track in new analytics
+    trackDoggyEvent('main_page', 'share', 'email', currentDog?.name);
     
     const subject = encodeURIComponent("Check out these Techno Doggies!");
     const body = encodeURIComponent(
@@ -117,6 +121,8 @@ const TechnoDoggies = () => {
       variantName: currentDog?.name || "Unknown",
       actionType: "download",
     });
+    // Track in new analytics
+    trackDoggyEvent('main_page', 'download', undefined, currentDog?.name);
 
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement('canvas');
@@ -144,6 +150,8 @@ const TechnoDoggies = () => {
       variantName: currentDog?.name || "Unknown",
       actionType: `share_${platform}`,
     });
+    // Also track in the new analytics system
+    trackDoggyEvent('main_page', 'share', platform, currentDog?.name);
   };
 
   const shareUrl = "https://techno.dog/doggies";
