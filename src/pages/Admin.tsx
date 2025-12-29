@@ -149,15 +149,15 @@ const AdminDashboard = () => {
   };
 
   const agents = [
-    { name: "API Guardian", category: "Operations", description: "Monitors developer API health, keys, rate limits, and RAG content", status: "idle" as const, frameNumber: "00", functionName: "api-guardian", path: "/admin/api-guardian" },
-    { name: "Health Monitor", category: "Operations", description: "Checks edge functions, database, and API response times", status: "idle" as const, frameNumber: "01", functionName: "health-monitor", path: "/admin/health-monitor" },
-    { name: "Security Auditor", category: "Security", description: "Scans for access control issues and suspicious activity", status: "idle" as const, frameNumber: "02", functionName: "security-auditor", path: "/admin/security-auditor" },
-    { name: "Data Integrity", category: "Operations", description: "Detects orphaned records, duplicates, and missing data", status: "idle" as const, frameNumber: "03", functionName: "data-integrity", path: "/admin/data-integrity" },
-    { name: "Media Monitor", category: "Content", description: "Tracks media pipeline status and failed jobs", status: "idle" as const, frameNumber: "04", functionName: "media-monitor", path: "/admin/media-monitor" },
-    { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05", functionName: "submissions-triage", path: "/admin/submissions-triage" },
-    { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter", path: "/admin/analytics-reporter" },
-    { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector", path: "/admin/knowledge-gap" },
-    { name: "Gear Expert", category: "Content", description: "AI-powered gear database management and content generation", status: "idle" as const, frameNumber: "08", functionName: "gear-expert-agent", path: "/admin/gear-agent" },
+    { name: "API", category: "Operations", description: "Keys, rate limits, and usage", status: "idle" as const, frameNumber: "00", functionName: "api-guardian", path: "/admin/api-guardian" },
+    { name: "Health", category: "Operations", description: "System status and response times", status: "idle" as const, frameNumber: "01", functionName: "health-monitor", path: "/admin/health-monitor" },
+    { name: "Security", category: "Security", description: "Access control and activity", status: "idle" as const, frameNumber: "02", functionName: "security-auditor", path: "/admin/security-auditor" },
+    { name: "Data Integrity", category: "Operations", description: "Orphaned records and duplicates", status: "idle" as const, frameNumber: "03", functionName: "data-integrity", path: "/admin/data-integrity" },
+    { name: "Media", category: "Content", description: "Pipeline status and jobs", status: "idle" as const, frameNumber: "04", functionName: "media-monitor", path: "/admin/media-monitor" },
+    { name: "Submissions", category: "Content", description: "Pre-screen community submissions", status: "idle" as const, frameNumber: "05", functionName: "submissions-triage", path: "/admin/submissions-triage" },
+    { name: "Analytics", category: "Growth", description: "Usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter", path: "/admin/analytics-reporter" },
+    { name: "Knowledge", category: "Growth", description: "Missing artists and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector", path: "/admin/knowledge-gap" },
+    { name: "Gear", category: "Content", description: "Equipment database management", status: "idle" as const, frameNumber: "08", functionName: "gear-expert-agent", path: "/admin/gear-agent" },
   ];
 
   const runnableAgents = agents.filter(a => a.functionName);
@@ -269,22 +269,22 @@ const AdminDashboard = () => {
   const progressPercent = agentRunStates.length > 0 ? (completedCount / agentRunStates.length) * 100 : 0;
 
   const tools = [
-    { name: "System Status", description: "Real-time status of all services", path: "/admin/health", frameNumber: "T1" },
-    { name: "User Management", description: "Manage users and permissions", path: "/admin/users", frameNumber: "T2" },
-    { name: "Media Engine", description: "Photo acquisition pipeline", path: "/admin/media-engine", frameNumber: "T3" },
-    { name: "Content Moderation", description: "Review community submissions", path: "/admin/moderation", frameNumber: "T4" },
-    { name: "Submissions", description: "Full submission management", path: "/admin/submissions", frameNumber: "T5" },
-    { name: "Artist Database", description: "Manage artist records", path: "/admin/dj-artists", frameNumber: "T6" },
-    { name: "News Management", description: "Article generation and editing", path: "/admin/news-agent", frameNumber: "T7" },
-    { name: "Analytics", description: "Site usage metrics", path: "/analytics", frameNumber: "T8" },
-    { name: "Activity Log", description: "Admin action history", path: "/admin/activity-log", frameNumber: "T9" },
-    { name: "Image Gallery", description: "Generated image management", path: "/admin/images", frameNumber: "T10" },
-    { name: "API Docs", description: "Admin API documentation", path: "/api-docs", frameNumber: "T11" },
-    { name: "Badge Admin", description: "Manage gamification badges", path: "/admin/badges", frameNumber: "T12" },
-    { name: "XP Events", description: "Manage XP multiplier events", path: "/admin/xp-events", frameNumber: "T13" },
-    { name: "Notifications", description: "Manage alert channels", path: "/admin/notifications", frameNumber: "T14" },
-    { name: "Gear Expert", description: "AI gear database agent", path: "/admin/gear-agent", frameNumber: "T15" },
-    { name: "Ticketing", description: "Event ticketing module", path: "/admin/ticketing", frameNumber: "T16" },
+    { name: "System Status", description: "Service health overview", path: "/admin/health", frameNumber: "01" },
+    { name: "Users", description: "Manage permissions", path: "/admin/users", frameNumber: "02" },
+    { name: "Media Engine", description: "Photo pipeline", path: "/admin/media-engine", frameNumber: "03" },
+    { name: "Moderation", description: "Review submissions", path: "/admin/moderation", frameNumber: "04" },
+    { name: "Submissions", description: "Full management", path: "/admin/submissions", frameNumber: "05" },
+    { name: "Artists", description: "Database records", path: "/admin/dj-artists", frameNumber: "06" },
+    { name: "News", description: "Articles and drafts", path: "/admin/news-agent", frameNumber: "07" },
+    { name: "Analytics", description: "Usage metrics", path: "/analytics", frameNumber: "08" },
+    { name: "Activity", description: "Action history", path: "/admin/activity-log", frameNumber: "09" },
+    { name: "Images", description: "Generated assets", path: "/admin/images", frameNumber: "10" },
+    { name: "API Docs", description: "Documentation", path: "/api-docs", frameNumber: "11" },
+    { name: "Badges", description: "Gamification", path: "/admin/badges", frameNumber: "12" },
+    { name: "XP Events", description: "Multipliers", path: "/admin/xp-events", frameNumber: "13" },
+    { name: "Notifications", description: "Alert channels", path: "/admin/notifications", frameNumber: "14" },
+    { name: "Gear", description: "Equipment database", path: "/admin/gear-agent", frameNumber: "15" },
+    { name: "Ticketing", description: "Event tickets", path: "/admin/ticketing", frameNumber: "16" },
   ];
 
   return (
@@ -303,11 +303,11 @@ const AdminDashboard = () => {
         </Button>
       </div>
 
-      {/* Agents Section */}
+      {/* Automated Tasks Section */}
       <section>
         <div className="flex items-center gap-3 mb-6">
           <div className="px-2 py-1 bg-crimson/20 border border-crimson/50">
-            <span className="font-mono text-[10px] text-crimson uppercase tracking-widest">Automated Agents</span>
+            <span className="font-mono text-[10px] text-crimson uppercase tracking-widest">Automated</span>
           </div>
           <div className="flex-1 h-px bg-crimson/20" />
           <Button
@@ -406,7 +406,7 @@ const AdminDashboard = () => {
       <section>
         <div className="flex items-center gap-3 mb-6">
           <div className="px-2 py-1 bg-logo-green/20 border border-logo-green/50">
-            <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest">Manual Tools</span>
+            <span className="font-mono text-[10px] text-logo-green uppercase tracking-widest">Tools</span>
           </div>
           <div className="flex-1 h-px bg-logo-green/20" />
         </div>

@@ -98,16 +98,15 @@ const HealthMonitorAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="HEALTH MONITOR"
-      description="Checks edge functions, database, and API response times"
+      title="Health"
+      description="System status and response times"
       icon={Activity}
       iconColor="text-logo-green"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Run Agent"
-      agentButtonColor="bg-logo-green hover:bg-logo-green/80"
+      runButtonText="Check"
     >
       {/* Overall Health */}
       <Card className="bg-zinc-900 border-logo-green/30">

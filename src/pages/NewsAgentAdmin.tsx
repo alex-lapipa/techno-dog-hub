@@ -139,16 +139,15 @@ const NewsAgentAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="News Agent"
-      description="Automated news article generation"
+      title="News"
+      description="Article generation and drafts"
       icon={Newspaper}
       iconColor="text-amber-500"
       onRefresh={fetchData}
       onRunAgent={() => runAgent()}
       isLoading={loading}
       isRunning={isRunning}
-      agentButtonText="Run Now"
-      agentButtonColor="bg-amber-600 hover:bg-amber-500"
+      runButtonText="Generate"
     >
       <Tabs defaultValue="drafts" className="space-y-6">
         <TabsList className="font-mono">

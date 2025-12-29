@@ -91,16 +91,15 @@ const DataIntegrityAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="DATA INTEGRITY"
-      description="Detects orphaned records, duplicates, and missing data"
+      title="Data Integrity"
+      description="Detect orphaned records and duplicates"
       icon={Database}
       iconColor="text-amber-500"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Run Check"
-      agentButtonColor="bg-amber-500 hover:bg-amber-600 text-black"
+      runButtonText="Check"
     >
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

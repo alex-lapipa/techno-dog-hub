@@ -90,16 +90,15 @@ const SubmissionsTriageAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="SUBMISSIONS TRIAGE"
-      description="Pre-screens community submissions for review"
+      title="Submissions Triage"
+      description="Pre-screen community submissions"
       icon={FileCheck}
       iconColor="text-amber-500"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Run Triage"
-      agentButtonColor="bg-amber-500 hover:bg-amber-600 text-black"
+      runButtonText="Triage"
     >
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

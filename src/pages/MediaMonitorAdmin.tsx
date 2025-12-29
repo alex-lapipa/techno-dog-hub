@@ -92,16 +92,15 @@ const MediaMonitorAdmin = () => {
 
   return (
     <AdminPageLayout
-      title="MEDIA MONITOR"
-      description="Tracks media pipeline status and failed jobs"
+      title="Media"
+      description="Pipeline status and jobs"
       icon={Image}
       iconColor="text-logo-green"
       onRefresh={fetchData}
       onRunAgent={runAgent}
       isLoading={isLoading}
       isRunning={isRunning}
-      agentButtonText="Run Monitor"
-      agentButtonColor="bg-logo-green hover:bg-logo-green/80"
+      runButtonText="Scan"
     >
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
