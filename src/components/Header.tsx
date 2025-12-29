@@ -117,17 +117,25 @@ const Header = () => {
       }`}>
         <div className="container mx-auto px-4 md:px-6">
           <nav className="flex items-center justify-between h-14">
-            {/* Logo - Click to open Dog Chat */}
-            <button 
-              onClick={() => setDogChatOpen(true)}
-              className="flex items-center gap-3 group shrink-0 cursor-pointer"
-              aria-label="Open Dog AI Assistant"
-            >
-              <HexagonLogo className="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(100_100%_60%/0.8)]" />
-              <span className="text-xs font-mono tracking-[0.15em] text-foreground group-hover:animate-glitch hidden sm:block">
+            {/* Logo Area */}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Icon - Opens Dog Chat */}
+              <button 
+                onClick={() => setDogChatOpen(true)}
+                className="group cursor-pointer"
+                aria-label="Open Dog AI Assistant"
+              >
+                <HexagonLogo className="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)] group-hover:drop-shadow-[0_0_16px_hsl(100_100%_60%/0.8)]" />
+              </button>
+              {/* Text - Links to Homepage */}
+              <Link 
+                to="/"
+                onClick={() => trackNavigation(location.pathname, '/')}
+                className="text-xs font-mono tracking-[0.15em] text-foreground hover:text-logo-green hover:animate-glitch transition-colors hidden sm:block"
+              >
                 techno.dog
-              </span>
-            </button>
+              </Link>
+            </div>
 
             {/* Navigation */}
             <div className="hidden lg:flex items-center gap-0.5">
