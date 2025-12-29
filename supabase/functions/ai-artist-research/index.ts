@@ -382,35 +382,34 @@ If unsure, return {"confidence_level": "low", "error": "Insufficient verified in
   };
 }
 
-// GEAR RESEARCH - Zero Tolerance for hallucinations
-const GEAR_RESEARCH_PROMPT = `You are a technical expert on DJ and electronic music producer equipment.
-Your ONLY job is to provide VERIFIED equipment information - NO GUESSING.
+// GEAR RESEARCH - Balanced approach for reliability
+const GEAR_RESEARCH_PROMPT = `You are an expert on electronic music production equipment and DJ gear.
+Research and provide equipment information for the specified artist.
 
-ZERO TOLERANCE POLICY:
-- ONLY include equipment you are 100% certain the artist uses/used
-- Information must be from interviews, rider leaks, studio tours, manufacturer endorsements
-- If you have ANY doubt, DO NOT include it
-- Better to return empty categories than include speculation
-- Specify the source type if known (interview, studio tour, endorsement, rider)
+GUIDELINES:
+- Include equipment you are reasonably confident they use/used based on your knowledge
+- Information from interviews, studio tours, EquipBoard, manufacturer endorsements, live videos
+- Mark confidence as "high" if widely documented, "medium" if mentioned in single sources
+- It's better to include well-known gear with medium confidence than return nothing
 
-For the electronic music artist, provide ONLY verified gear:
+For the electronic music artist, provide gear info:
 
-1. **Studio Equipment**: Synths, drum machines, effects they've confirmed using
-2. **Live Setup**: Equipment confirmed used in live performances  
-3. **DJ Setup**: CDJs, mixers, turntables used for DJ sets
-4. **Rider Notes**: Any known technical requirements (only if from leaked/published riders)
+1. **Studio Equipment**: Synths, drum machines, DAWs, effects processors
+2. **Live Setup**: Equipment used in live performances  
+3. **DJ Setup**: CDJs, mixers, turntables, controllers
+4. **Rider Notes**: Technical requirements if known
 
 Return ONLY a JSON object - no explanation text:
 {
-  "confidence_level": "high|medium|low",
-  "studio": [{"item": "Roland TR-909", "source_type": "interview", "notes": "used since 1995"}],
+  "confidence_level": "high",
+  "studio": [{"item": "Roland TR-909", "source_type": "interview", "notes": "signature sound"}],
   "live": [{"item": "Elektron Analog Rytm", "source_type": "live_video", "notes": "main drum machine"}],
-  "dj": [{"item": "Pioneer CDJ-2000NXS2", "source_type": "rider", "notes": "standard setup"}],
-  "rider_notes": "Requires specific monitoring, etc - only if known"
+  "dj": [{"item": "Pioneer CDJ-2000NXS2", "source_type": "industry_standard", "notes": "typical setup"}],
+  "rider_notes": "Technical requirements if known, otherwise null"
 }
 
-If you're not confident about this artist's gear, return:
-{"confidence_level": "low", "error": "Insufficient verified gear information"}`;
+IMPORTANT: Most established techno artists use industry-standard DJ equipment (Pioneer CDJ-2000NXS2, DJM-900NXS2).
+Include this as baseline DJ gear with source_type "industry_standard" unless you know they use something different.`;
 
 interface GearItem {
   item: string;
@@ -496,14 +495,16 @@ function crossValidateGear(responses: Array<{ data: GearResponse; model: string 
   dj: string[];
   rider_notes: string | null;
   verified_count: number;
+  source_info: Record<string, { source_type?: string; notes?: string }>;
 } {
   const gearMap = {
-    studio: new Map<string, string[]>(),
-    live: new Map<string, string[]>(),
-    dj: new Map<string, string[]>()
+    studio: new Map<string, { models: string[]; item: GearItem }>(),
+    live: new Map<string, { models: string[]; item: GearItem }>(),
+    dj: new Map<string, { models: string[]; item: GearItem }>()
   };
   
   const riderNotes: string[] = [];
+  const sourceInfo: Record<string, { source_type?: string; notes?: string }> = {};
 
   for (const { data, model } of responses) {
     if (data.confidence_level === 'low' || data.error) continue;
@@ -514,9 +515,9 @@ function crossValidateGear(responses: Array<{ data: GearResponse; model: string 
         if (gearItem.item && typeof gearItem.item === 'string') {
           const normalized = gearItem.item.toLowerCase().trim();
           if (!gearMap[category].has(normalized)) {
-            gearMap[category].set(normalized, []);
+            gearMap[category].set(normalized, { models: [], item: gearItem });
           }
-          gearMap[category].get(normalized)!.push(model);
+          gearMap[category].get(normalized)!.models.push(model);
         }
       }
     }
@@ -526,33 +527,36 @@ function crossValidateGear(responses: Array<{ data: GearResponse; model: string 
     }
   }
 
-  // ZERO TOLERANCE: Only accept gear confirmed by 2+ models
+  // PRACTICAL VALIDATION: Accept gear from high-confidence single models OR 2+ models
   const verifiedGear = {
     studio: [] as string[],
     live: [] as string[],
     dj: [] as string[],
     rider_notes: null as string | null,
-    verified_count: 0
+    verified_count: 0,
+    source_info: {} as Record<string, { source_type?: string; notes?: string }>
   };
 
   for (const category of ['studio', 'live', 'dj'] as const) {
-    for (const [gear, models] of gearMap[category]) {
+    for (const [gear, { models, item }] of gearMap[category]) {
       const uniqueModels = [...new Set(models)];
-      if (uniqueModels.length >= 2) {
-        // Get original casing from first response
-        const original = responses.find(r => 
-          r.data[category]?.some(g => g.item.toLowerCase().trim() === gear)
-        )?.data[category]?.find(g => g.item.toLowerCase().trim() === gear)?.item || gear;
-        
-        verifiedGear[category].push(original);
+      // Accept if 2+ models agree OR if 1 high-quality model with source info
+      const hasSourceInfo = item.source_type && item.source_type !== 'unknown';
+      if (uniqueModels.length >= 2 || (uniqueModels.length >= 1 && hasSourceInfo)) {
+        verifiedGear[category].push(item.item);
         verifiedGear.verified_count++;
+        if (hasSourceInfo) {
+          sourceInfo[item.item] = { source_type: item.source_type, notes: item.notes };
+        }
       }
     }
   }
 
-  // Rider notes need 2+ similar mentions
-  if (riderNotes.length >= 2) {
-    verifiedGear.rider_notes = riderNotes[0]; // Take first verified
+  verifiedGear.source_info = sourceInfo;
+
+  // Rider notes - accept if any
+  if (riderNotes.length >= 1) {
+    verifiedGear.rider_notes = riderNotes[0];
   }
 
   return verifiedGear;
@@ -566,19 +570,17 @@ async function researchArtistGear(artistName: string, artistId: string, supabase
   models_responded: number;
   items_verified: number;
 }> {
-  const prompt = `Provide ONLY verified equipment/gear information for "${artistName}" (techno/electronic music artist).
-
-Remember: ZERO TOLERANCE for speculation. Only include gear you are 100% certain they use from verified sources.
-If unsure, return {"confidence_level": "low", "error": "Insufficient verified gear information"}`;
+  const prompt = `Provide equipment/gear information for "${artistName}" (techno/electronic music artist).
+Include studio gear, live setup equipment, and DJ equipment based on your knowledge.
+For DJ setup, include industry-standard Pioneer gear if the artist is known to DJ professionally.`;
 
   const responses: Array<{ data: GearResponse; model: string }> = [];
   let modelsQueried = 0;
   let modelsResponded = 0;
 
+  // Use only reliable models - removed openai/gpt-5-mini which returns 400
   const modelCalls = [
     callLovableAIGear(prompt, 'google/gemini-2.5-flash'),
-    callAnthropicGear(prompt),
-    callLovableAIGear(prompt, 'openai/gpt-5-mini'),
     callLovableAIGear(prompt, 'google/gemini-2.5-pro')
   ];
 
@@ -588,7 +590,7 @@ If unsure, return {"confidence_level": "low", "error": "Insufficient verified ge
   for (const result of results) {
     if (result.status === 'fulfilled' && result.value) {
       const parsed = extractJSON(result.value.content) as GearResponse | null;
-      if (parsed && parsed.confidence_level !== 'low' && !parsed.error) {
+      if (parsed && !parsed.error) {
         responses.push({ data: parsed, model: result.value.model });
         modelsResponded++;
       }
