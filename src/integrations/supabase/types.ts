@@ -1617,6 +1617,45 @@ export type Database = {
           },
         ]
       }
+      doggy_page_analytics: {
+        Row: {
+          created_at: string
+          doggy_name: string | null
+          event_type: string
+          id: string
+          link_clicked: string | null
+          metadata: Json | null
+          page_source: string
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          doggy_name?: string | null
+          event_type: string
+          id?: string
+          link_clicked?: string | null
+          metadata?: Json | null
+          page_source: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          doggy_name?: string | null
+          event_type?: string
+          id?: string
+          link_clicked?: string | null
+          metadata?: Json | null
+          page_source?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       doggy_variants: {
         Row: {
           created_at: string | null
