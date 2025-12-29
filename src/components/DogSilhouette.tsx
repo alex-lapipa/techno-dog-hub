@@ -13,7 +13,7 @@ const DogSilhouette = ({ className, animated = false }: DogSilhouetteProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Dog silhouette - greyhound/whippet style facing right */}
+      {/* Dog head - front facing */}
       <g 
         stroke="hsl(var(--logo-green))" 
         strokeWidth="1.5" 
@@ -22,42 +22,42 @@ const DogSilhouette = ({ className, animated = false }: DogSilhouetteProps) => {
         fill="none"
         className={animated ? "animate-pulse" : ""}
       >
-        {/* Head */}
-        <path d="M48 20 L54 18 L56 16" /> {/* Snout */}
-        <path d="M48 20 C46 18 44 17 42 18" /> {/* Top of head to ear start */}
-        <path d="M42 18 L40 12 L44 17" /> {/* Ear */}
+        {/* Head outline */}
+        <path d="M32 52 C22 52 16 46 14 40 C12 34 12 28 14 24 C16 20 20 16 24 14 L20 6 L28 12 C30 11 34 11 36 12 L44 6 L40 14 C44 16 48 20 50 24 C52 28 52 34 50 40 C48 46 42 52 32 52 Z" />
         
-        {/* Neck and back */}
-        <path d="M44 17 C46 20 47 22 46 26" /> {/* Neck curve */}
-        <path d="M46 26 C44 30 40 34 36 38 C32 42 26 44 20 44" /> {/* Back curve */}
+        {/* Left ear inner */}
+        <path d="M22 10 L26 14" />
         
-        {/* Tail */}
-        <path d="M20 44 C18 42 16 38 14 34 C12 32 10 32 8 34" /> {/* Tail up */}
+        {/* Right ear inner */}
+        <path d="M42 10 L38 14" />
         
-        {/* Rear leg */}
-        <path d="M20 44 L22 50 L20 54 L22 56" /> {/* Back leg */}
+        {/* Left eye */}
+        <circle cx="24" cy="30" r="3" />
+        <circle cx="24" cy="30" r="1" fill="hsl(var(--logo-green))" />
         
-        {/* Belly */}
-        <path d="M22 50 C28 50 34 48 40 46" /> {/* Belly line */}
-        
-        {/* Front legs */}
-        <path d="M40 46 L42 52 L40 56" /> {/* Front leg 1 */}
-        <path d="M44 44 L46 52 L44 56" /> {/* Front leg 2 */}
-        
-        {/* Chest */}
-        <path d="M46 26 C48 30 48 36 46 42 C45 44 44 45 44 44" /> {/* Chest curve */}
-        
-        {/* Eye */}
-        <circle cx="50" cy="18" r="1" fill="hsl(var(--logo-green))" />
+        {/* Right eye */}
+        <circle cx="40" cy="30" r="3" />
+        <circle cx="40" cy="30" r="1" fill="hsl(var(--logo-green))" />
         
         {/* Nose */}
-        <circle cx="56" cy="16" r="1" fill="hsl(var(--logo-green))" />
+        <ellipse cx="32" cy="40" rx="4" ry="3" fill="hsl(var(--logo-green))" />
+        
+        {/* Mouth */}
+        <path d="M32 43 L32 46" />
+        <path d="M28 48 C30 50 34 50 36 48" />
+        
+        {/* Whisker dots */}
+        <circle cx="22" cy="42" r="0.8" fill="hsl(var(--logo-green))" />
+        <circle cx="18" cy="40" r="0.8" fill="hsl(var(--logo-green))" />
+        <circle cx="42" cy="42" r="0.8" fill="hsl(var(--logo-green))" />
+        <circle cx="46" cy="40" r="0.8" fill="hsl(var(--logo-green))" />
       </g>
       
-      {/* Subtle glow effect on key points */}
+      {/* Subtle glow effect on eyes */}
       <g fill="hsl(var(--logo-green))" opacity="0.3">
-        <circle cx="50" cy="18" r="2" />
-        <circle cx="56" cy="16" r="2" />
+        <circle cx="24" cy="30" r="4" />
+        <circle cx="40" cy="30" r="4" />
+        <circle cx="32" cy="40" r="5" />
       </g>
     </svg>
   );
