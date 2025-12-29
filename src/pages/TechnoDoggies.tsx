@@ -293,10 +293,8 @@ const TechnoDoggies = () => {
                 Share This Doggy
               </h3>
               
-              <div className="flex flex-wrap gap-2 justify-center mb-4">
-                <div onClick={() => handleSocialShare("whatsapp")}>
-                  <SocialShareButtons url={shareUrl} text={shareText} size="default" />
-                </div>
+              <div className="flex justify-center mb-4" onClick={() => handleSocialShare("social")}>
+                <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
               </div>
 
               <div className="flex gap-2 justify-center">
