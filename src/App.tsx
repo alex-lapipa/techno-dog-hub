@@ -14,6 +14,7 @@ import PageTransition from "@/components/PageTransition";
 import { HelmetProvider } from 'react-helmet-async';
 import ParticleBackground from "@/components/ParticleBackground";
 import FilmGrainOverlay from "@/components/FilmGrainOverlay";
+import FloatingDogButton from "@/components/FloatingDogButton";
 
 // Eager load - critical path
 import Index from "./pages/Index";
@@ -111,6 +112,7 @@ const App = () => (
               <FilmGrainOverlay />
               <ScrollToTop />
               <ScrollToTopButton />
+              <FloatingDogButton />
               <Suspense fallback={<PageLoader />}>
                 <PageTransition>
                   <Routes>
