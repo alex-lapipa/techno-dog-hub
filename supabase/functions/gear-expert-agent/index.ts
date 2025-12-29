@@ -156,6 +156,296 @@ serve(async (req) => {
       });
     }
 
+    // NEW: Gap analysis - check what data is missing across all gear items
+    if (action === 'gap-analysis') {
+      const { data: allGear } = await supabase
+        .from('gear_catalog')
+        .select('id, name, brand, short_description, techno_applications, notable_artists, famous_tracks, youtube_videos, image_url, notable_features, strengths, limitations, data_sources')
+        .order('name');
+
+      const gaps = {
+        missingDescription: [] as { id: string; name: string; brand: string }[],
+        missingTechnoApps: [] as { id: string; name: string; brand: string }[],
+        missingArtists: [] as { id: string; name: string; brand: string }[],
+        missingTracks: [] as { id: string; name: string; brand: string }[],
+        missingVideos: [] as { id: string; name: string; brand: string }[],
+        missingImage: [] as { id: string; name: string; brand: string }[],
+        missingFeatures: [] as { id: string; name: string; brand: string }[],
+        notScrapedYet: [] as { id: string; name: string; brand: string }[],
+      };
+
+      for (const gear of allGear || []) {
+        const gearInfo = { id: gear.id, name: gear.name, brand: gear.brand };
+        
+        if (!gear.short_description) gaps.missingDescription.push(gearInfo);
+        if (!gear.techno_applications) gaps.missingTechnoApps.push(gearInfo);
+        if (!gear.notable_artists || (Array.isArray(gear.notable_artists) && gear.notable_artists.length === 0)) {
+          gaps.missingArtists.push(gearInfo);
+        }
+        if (!gear.famous_tracks || (Array.isArray(gear.famous_tracks) && gear.famous_tracks.length === 0)) {
+          gaps.missingTracks.push(gearInfo);
+        }
+        if (!gear.youtube_videos || (Array.isArray(gear.youtube_videos) && gear.youtube_videos.length === 0)) {
+          gaps.missingVideos.push(gearInfo);
+        }
+        if (!gear.image_url) gaps.missingImage.push(gearInfo);
+        if (!gear.notable_features) gaps.missingFeatures.push(gearInfo);
+        if (!gear.data_sources || !gear.data_sources.includes('equipboard.com')) {
+          gaps.notScrapedYet.push(gearInfo);
+        }
+      }
+
+      const summary = {
+        totalItems: allGear?.length || 0,
+        gapsFound: {
+          description: gaps.missingDescription.length,
+          technoApplications: gaps.missingTechnoApps.length,
+          notableArtists: gaps.missingArtists.length,
+          famousTracks: gaps.missingTracks.length,
+          youtubeVideos: gaps.missingVideos.length,
+          images: gaps.missingImage.length,
+          features: gaps.missingFeatures.length,
+          notScraped: gaps.notScrapedYet.length
+        }
+      };
+
+      return new Response(JSON.stringify({
+        success: true,
+        summary,
+        gaps,
+        message: `Gap analysis complete: ${gaps.notScrapedYet.length} items need scraping, ${gaps.missingDescription.length} need descriptions`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // NEW: Fill gaps - scrape and enrich items with missing data
+    if (action === 'fill-gaps') {
+      const batchLimit = limit || 5;
+      
+      // Get gear items with the most gaps first (prioritize items not yet scraped)
+      const { data: allGear } = await supabase
+        .from('gear_catalog')
+        .select('*')
+        .order('name');
+
+      // Score each item by how many gaps it has
+      const scoredGear = (allGear || []).map(gear => {
+        let gapScore = 0;
+        if (!gear.short_description) gapScore += 2;
+        if (!gear.techno_applications) gapScore += 2;
+        if (!gear.notable_artists || (Array.isArray(gear.notable_artists) && gear.notable_artists.length === 0)) gapScore += 3;
+        if (!gear.famous_tracks || (Array.isArray(gear.famous_tracks) && gear.famous_tracks.length === 0)) gapScore += 2;
+        if (!gear.notable_features) gapScore += 1;
+        if (!gear.strengths) gapScore += 1;
+        if (!gear.limitations) gapScore += 1;
+        if (!gear.data_sources || !gear.data_sources.includes('equipboard.com')) gapScore += 5;
+        return { ...gear, gapScore };
+      });
+
+      // Sort by gap score (most gaps first) and take top items
+      const prioritizedGear = scoredGear
+        .filter(g => g.gapScore > 0)
+        .sort((a, b) => b.gapScore - a.gapScore)
+        .slice(0, batchLimit);
+
+      if (prioritizedGear.length === 0) {
+        return new Response(JSON.stringify({
+          success: true,
+          filled: 0,
+          message: 'All gear items are fully populated!'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const results = [];
+      
+      for (const gear of prioritizedGear) {
+        try {
+          console.log(`Filling gaps for: ${gear.brand} ${gear.name} (gap score: ${gear.gapScore})`);
+          
+          // Add delay between requests
+          if (results.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, 2500));
+          }
+
+          const needsScraping = !gear.data_sources || !gear.data_sources.includes('equipboard.com');
+          let scrapedData: any = {};
+
+          // Step 1: Scrape from Equipboard if not done yet
+          if (needsScraping && FIRECRAWL_API_KEY) {
+            const brandSlug = gear.brand.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const nameSlug = gear.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const equipboardUrl = `https://equipboard.com/items/${brandSlug}-${nameSlug}`;
+            
+            console.log(`Scraping: ${equipboardUrl}`);
+            let scrapeResult = await scrapeUrl(equipboardUrl);
+            
+            // Try search if direct URL fails
+            if (!scrapeResult.success || !scrapeResult.markdown) {
+              const searchResult = await searchWeb(`site:equipboard.com ${gear.brand} ${gear.name}`);
+              if (searchResult.success && searchResult.results && searchResult.results.length > 0) {
+                scrapeResult = { success: true, markdown: searchResult.results[0].markdown };
+              }
+            }
+
+            if (scrapeResult.success && scrapeResult.markdown) {
+              // Extract data with AI
+              const extractionPrompt = `Extract gear info from Equipboard for ${gear.brand} ${gear.name}. Return JSON with:
+{
+  "notable_artists": [{"name": "Artist Name", "usage": "How they use it"}],
+  "famous_tracks": [{"artist": "Artist", "title": "Track", "year": 2020, "role": "bassline/drums/etc"}],
+  "short_description": "2-3 sentences about this gear in techno context",
+  "notable_features": "Key features for techno producers",
+  "techno_applications": "Specific techno production uses",
+  "strengths": "What's great about it",
+  "limitations": "Any drawbacks"
+}
+Use null for fields with no data. For arrays, use empty [] if nothing found.
+
+CONTENT:
+${scrapeResult.markdown.slice(0, 7000)}`;
+
+              const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  model: 'gpt-4o-mini',
+                  messages: [
+                    { role: 'system', content: 'Extract structured JSON from web content. Focus on techno/electronic music context.' },
+                    { role: 'user', content: extractionPrompt }
+                  ],
+                  response_format: { type: "json_object" }
+                }),
+              });
+
+              const aiData = await aiResponse.json();
+              scrapedData = JSON.parse(aiData.choices[0].message.content);
+            }
+          }
+
+          // Step 2: Generate AI content for remaining gaps
+          const missingFields = [];
+          if (!gear.short_description && !scrapedData.short_description) missingFields.push('short_description');
+          if (!gear.techno_applications && !scrapedData.techno_applications) missingFields.push('techno_applications');
+          if (!gear.notable_features && !scrapedData.notable_features) missingFields.push('notable_features');
+          if (!gear.strengths && !scrapedData.strengths) missingFields.push('strengths');
+          if (!gear.limitations && !scrapedData.limitations) missingFields.push('limitations');
+
+          let aiGeneratedData: any = {};
+          if (missingFields.length > 0) {
+            const generatePrompt = `Generate techno-focused content for ${gear.brand} ${gear.name} (${gear.category}, ${gear.release_year || 'year unknown'}).
+
+Return JSON with ONLY these fields: ${missingFields.join(', ')}
+
+Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be specific and technical.`;
+
+            const genResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                messages: [
+                  { role: 'system', content: 'You are a techno gear expert. Generate accurate, technical content.' },
+                  { role: 'user', content: generatePrompt }
+                ],
+                response_format: { type: "json_object" }
+              }),
+            });
+
+            const genData = await genResponse.json();
+            aiGeneratedData = JSON.parse(genData.choices[0].message.content);
+          }
+
+          // Step 3: Merge and update
+          const updateData: Record<string, any> = {
+            updated_at: new Date().toISOString(),
+          };
+
+          // Add data_sources if scraped
+          if (needsScraping && Object.keys(scrapedData).length > 0) {
+            updateData.data_sources = [...(gear.data_sources || []), 'equipboard.com'];
+          }
+
+          // Merge scraped data (priority) with AI generated data (fallback)
+          const mergedData = { ...aiGeneratedData, ...scrapedData };
+
+          if (mergedData.notable_artists && mergedData.notable_artists.length > 0 && 
+              (!gear.notable_artists || gear.notable_artists.length === 0)) {
+            updateData.notable_artists = mergedData.notable_artists;
+          }
+          if (mergedData.famous_tracks && mergedData.famous_tracks.length > 0 && 
+              (!gear.famous_tracks || gear.famous_tracks.length === 0)) {
+            updateData.famous_tracks = mergedData.famous_tracks;
+          }
+          if (mergedData.short_description && !gear.short_description) {
+            updateData.short_description = mergedData.short_description;
+          }
+          if (mergedData.notable_features && !gear.notable_features) {
+            updateData.notable_features = mergedData.notable_features;
+          }
+          if (mergedData.techno_applications && !gear.techno_applications) {
+            updateData.techno_applications = mergedData.techno_applications;
+          }
+          if (mergedData.strengths && !gear.strengths) {
+            updateData.strengths = mergedData.strengths;
+          }
+          if (mergedData.limitations && !gear.limitations) {
+            updateData.limitations = mergedData.limitations;
+          }
+
+          const fieldsUpdated = Object.keys(updateData).filter(k => k !== 'updated_at' && k !== 'data_sources');
+
+          if (fieldsUpdated.length > 0 || updateData.data_sources) {
+            await supabase
+              .from('gear_catalog')
+              .update(updateData)
+              .eq('id', gear.id);
+          }
+
+          results.push({
+            id: gear.id,
+            name: `${gear.brand} ${gear.name}`,
+            gapScore: gear.gapScore,
+            scraped: needsScraping && Object.keys(scrapedData).length > 0,
+            fieldsUpdated,
+            success: true
+          });
+
+        } catch (err: unknown) {
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          console.error(`Failed to fill gaps for ${gear.name}:`, errorMessage);
+          results.push({ 
+            id: gear.id, 
+            name: `${gear.brand} ${gear.name}`, 
+            success: false, 
+            error: errorMessage 
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      const totalFieldsUpdated = results.reduce((acc, r) => acc + (r.fieldsUpdated?.length || 0), 0);
+
+      return new Response(JSON.stringify({
+        success: true,
+        processed: successCount,
+        total: results.length,
+        totalFieldsUpdated,
+        results,
+        message: `Gap filling complete: ${successCount}/${results.length} items processed, ${totalFieldsUpdated} fields updated`
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // NEW: Scrape equipboard.com for a specific gear item
     if (action === 'scrape-equipboard' && gearId) {
       const { data: gear, error: gearError } = await supabase
