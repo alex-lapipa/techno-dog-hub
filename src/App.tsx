@@ -61,6 +61,7 @@ const NotificationChannels = lazy(() => import("./pages/NotificationChannels"));
 const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
 const ArtistMigrationAdmin = lazy(() => import("./pages/ArtistMigrationAdmin"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
+const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -173,6 +174,7 @@ const App = () => (
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/admin/artist-migration" element={<ArtistMigrationAdmin />} />
                     <Route path="/admin/data-audit" element={<DataAudit />} />
+                    <Route path="/admin/gear-agent" element={<GearAgentAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />

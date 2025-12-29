@@ -156,6 +156,7 @@ const AdminDashboard = () => {
     { name: "Submissions Triage", category: "Content", description: "Pre-screens community submissions for review", status: "idle" as const, frameNumber: "05", functionName: "submissions-triage" },
     { name: "Analytics Reporter", category: "Growth", description: "Generates weekly usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter" },
     { name: "Knowledge Gap", category: "Growth", description: "Identifies missing artists, data, and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector" },
+    { name: "Gear Expert", category: "Content", description: "AI-powered gear database management and content generation", status: "idle" as const, frameNumber: "08", functionName: "gear-expert-agent" },
   ];
 
   const runnableAgents = agents.filter(a => a.functionName);
@@ -247,6 +248,7 @@ const AdminDashboard = () => {
     { name: "Badge Admin", description: "Manage gamification badges", path: "/admin/badges", frameNumber: "T12" },
     { name: "XP Events", description: "Manage XP multiplier events", path: "/admin/xp-events", frameNumber: "T13" },
     { name: "Notifications", description: "Manage alert channels", path: "/admin/notifications", frameNumber: "T14" },
+    { name: "Gear Expert", description: "AI gear database agent", path: "/admin/gear-agent", frameNumber: "T15" },
   ];
 
   return (
