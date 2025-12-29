@@ -1,10 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, getRequiredEnv, getEnv } from "../_shared/supabase.ts";
 
 const GEN_Z_DOG_SLANG = `
 GEN Z + DOG LANGUAGE (blend these naturally - you're a chronically online pup):
@@ -170,22 +165,19 @@ ${knowledgeContext || "No specific context loaded for this query."}
 Now go fetch those answers, bestie! 🐾🖤`;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req: Request) => {
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { message, conversationHistory = [], action } = await req.json();
     
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    const supabase = createServiceClient();
+    const lovableApiKey = getEnv('LOVABLE_API_KEY');
+    const openaiApiKey = getEnv('OPENAI_API_KEY');
 
     if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+      return errorResponse('LOVABLE_API_KEY is not configured');
     }
 
     // Handle different actions

@@ -1,10 +1,6 @@
 import { createRoot } from "react-dom/client";
-import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(
-  <HelmetProvider>
-    <App />
-  </HelmetProvider>
-);
+// HelmetProvider is now in App.tsx - no duplicate needed
+createRoot(document.getElementById("root")!).render(<App />);

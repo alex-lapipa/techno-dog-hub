@@ -29,9 +29,19 @@ const FestivalsPage = () => {
     return festivals.filter(f => f.country === selectedCountry);
   }, [festivals, selectedCountry]);
 
-  const featuredIds = ['aquasella', 'lev', 'atonal', 'dekmantel', 'movement'];
-  const featured = filteredFestivals.filter(f => featuredIds.includes(f.id));
-  const others = filteredFestivals.filter(f => !featuredIds.includes(f.id));
+  // Featured festivals - derived from data with fallback strategy
+  const featured = useMemo(() => {
+    // Sort by founded date (oldest first) as a proxy for importance, limit to 5
+    const sorted = [...filteredFestivals].sort((a, b) => {
+      const aYear = parseInt(String(a.founded)) || 9999;
+      const bYear = parseInt(String(b.founded)) || 9999;
+      return aYear - bYear;
+    });
+    return sorted.slice(0, 5);
+  }, [filteredFestivals]);
+  
+  const featuredIds = useMemo(() => new Set(featured.map(f => f.id)), [featured]);
+  const others = useMemo(() => filteredFestivals.filter(f => !featuredIds.has(f.id)), [filteredFestivals, featuredIds]);
 
   const rowVirtualizer = useVirtualizer({
     count: others.length,

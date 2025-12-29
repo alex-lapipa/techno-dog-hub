@@ -78,7 +78,8 @@ export const GlitchImage = ({ src, alt, className = "", frameNumber = "01", size
   );
 };
 
-// SVG Filter component - render once in the app
+// GlitchSVGFilter is deprecated - use ChromaticAberrationFilter from @/components/shared/ChromaticAberrationFilter
+// Kept for backwards compatibility
 export const GlitchSVGFilter = () => (
   <svg className="absolute w-0 h-0" aria-hidden="true">
     <defs>

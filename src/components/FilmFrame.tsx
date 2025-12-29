@@ -45,15 +45,6 @@ const FilmFrame = ({
 
   return (
     <div className={cn("relative bg-zinc-800 p-1", className)}>
-      {/* SVG Filter for chromatic aberration */}
-      <svg className="absolute w-0 h-0" aria-hidden="true">
-        <defs>
-          <filter id="red-channel">
-            <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
-          </filter>
-        </defs>
-      </svg>
-
       {/* Sprocket holes left */}
       {showSprockets && (
         <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-2">
