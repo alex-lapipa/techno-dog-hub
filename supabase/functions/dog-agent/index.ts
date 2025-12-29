@@ -498,9 +498,35 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
       { role: 'user', content: message }
     ];
 
-    console.log(`Dog Agent: Processing query with ${contextParts.length} knowledge sections`);
+    // =================================================================
+    // INTELLIGENT MODEL ROUTING - GPT-5 for complex, Gemini for fast
+    // =================================================================
+    
+    // Detect complex reasoning queries that benefit from GPT-5
+    const complexPatterns = [
+      /compare|versus|vs\.?|difference between|similarities/i,
+      /explain|analyze|breakdown|deep dive|in-depth/i,
+      /why|how does|what makes|philosophy|theory/i,
+      /history of|evolution of|origins of|trajectory/i,
+      /recommend.*based on|suggest.*considering|if i like/i,
+      /relationship between|connection|influence.*on/i,
+      /controversial|debate|opinion|perspective/i,
+      /technical|mechanism|architecture|design of/i,
+      /predict|future|trend|where.*heading/i,
+      /best|worst|top.*reason|rank.*why/i
+    ];
+    
+    const isComplexQuery = complexPatterns.some(pattern => pattern.test(queryText)) ||
+      queryText.split(' ').length > 15 || // Long queries often need more reasoning
+      (conversationHistory?.length > 4); // Deep conversations need context
+    
+    const selectedModel = isComplexQuery ? 'openai/gpt-5' : 'google/gemini-2.5-flash';
+    const modelLabel = isComplexQuery ? 'GPT-5 (complex reasoning)' : 'Gemini Flash (fast)';
 
-    // Call Lovable AI Gateway
+    console.log(`Dog Agent: Processing query with ${contextParts.length} knowledge sections`);
+    console.log(`Dog Agent: Model selected - ${modelLabel}`);
+
+    // Call Lovable AI Gateway with selected model
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -508,10 +534,10 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: selectedModel,
         messages,
-        temperature: 0.8,
-        max_tokens: 1500,
+        temperature: isComplexQuery ? 0.7 : 0.8, // Slightly lower temp for complex reasoning
+        max_tokens: isComplexQuery ? 2000 : 1500, // More tokens for complex answers
       }),
     });
 
@@ -546,7 +572,9 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
         message_length: message.length,
         response_length: dogResponse.length,
         knowledge_sections: contextParts.length,
-        had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0
+        had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0,
+        model_used: selectedModel,
+        is_complex_query: isComplexQuery
       }
     });
 
@@ -570,7 +598,9 @@ ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)
         ragResults: {
           artists: ragArtists.length,
           documents: ragDocuments.length
-        }
+        },
+        model: selectedModel,
+        isComplexQuery
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
