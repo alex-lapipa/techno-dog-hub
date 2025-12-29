@@ -71,7 +71,10 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 async function generateToken(profileId: string): Promise<string> {
-  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "default-secret";
+  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!secret) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for token generation");
+  }
   const data = new TextEncoder().encode(profileId + secret);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));

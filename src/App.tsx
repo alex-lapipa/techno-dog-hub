@@ -204,7 +204,6 @@ const App = () => (
                     <Route path="/community/leaderboard" element={<CommunityLeaderboard />} />
                     <Route path="/community/profile/:profileId" element={<CommunityProfile />} />
                     <Route path="/my-submissions" element={<MySubmissions />} />
-                    <Route path="/my-submissions" element={<MySubmissions />} />
                     <Route path="/submit" element={<Navigate to="/technopedia#contribute" replace />} />
                     <Route path="/technopedia" element={<Technopedia />} />
                     
