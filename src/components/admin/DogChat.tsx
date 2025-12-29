@@ -332,7 +332,7 @@ const DogChat = () => {
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5">
                         <DogSilhouette className="w-4 h-4" />
-                        <span className="text-xs font-mono text-logo-green uppercase tracking-wider">Techno Dog</span>
+                        <span className="text-xs font-mono text-logo-green/80 uppercase tracking-wider font-normal">Techno Dog</span>
                       </div>
                       <Button
                         variant="ghost"
@@ -353,7 +353,7 @@ const DogChat = () => {
                       </Button>
                     </div>
                   )}
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed font-normal text-foreground/80">
                     {message.content}
                   </p>
                   <p className="text-[10px] opacity-50 mt-1.5 font-mono">
@@ -368,7 +368,7 @@ const DogChat = () => {
                 <div className="bg-muted/50 border border-border/50 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex items-center gap-2">
                     <DogSilhouette className="w-5 h-5 animate-bounce" />
-                    <span className="text-xs font-mono text-muted-foreground italic">
+                    <span className="text-xs font-mono text-muted-foreground/70 italic font-normal">
                       *sniffing through the crates fr fr...*
                     </span>
                     <Loader2 className="w-4 h-4 animate-spin text-logo-green" />
@@ -382,7 +382,7 @@ const DogChat = () => {
         {/* Suggested Questions */}
         {messages.length === 1 && (
           <div className="px-4 pb-2 shrink-0">
-            <p className="text-xs text-muted-foreground mb-2 font-mono">Quick questions:</p>
+            <p className="text-xs text-muted-foreground/70 mb-2 font-mono font-normal">Quick questions:</p>
             <div className="flex flex-wrap gap-2">
               {suggestedQuestions.map((question, index) => (
                 <Button
@@ -422,8 +422,8 @@ const DogChat = () => {
               )}
             </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1 font-mono uppercase tracking-wider">
-            <Heart className="w-3 h-3 text-crimson" />
+          <p className="text-[10px] text-muted-foreground/60 mt-2 text-center flex items-center justify-center gap-1 font-mono uppercase tracking-wider font-normal">
+            <Heart className="w-3 h-3 text-crimson/70" />
             Built by the scene, for the scene — no cap
           </p>
         </div>
