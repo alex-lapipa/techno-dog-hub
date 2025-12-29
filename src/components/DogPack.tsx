@@ -430,6 +430,193 @@ export const RockerDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Summer Dog - sunglasses and sun vibes
+export const SummerDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M20 34 L28 34 L30 38 L24 38 Z" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <path d="M34 34 L44 34 L42 38 L36 38 Z" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <path d="M28 36 L36 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 Q32 54 38 50" />
+      <circle cx="52" cy="10" r="6" opacity="0.3" />
+      <path d="M52 2 L52 6" />
+      <path d="M58 10 L62 10" />
+      <path d="M56 4 L58 6" />
+    </g>
+  </svg>
+);
+
+// Christmas Dog - Santa hat and festive
+export const ChristmasDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 32 Q12 22 18 16 Q22 18 24 26" />
+      <path d="M48 32 Q52 22 46 16 Q42 18 40 26" />
+      <ellipse cx="32" cy="42" rx="16" ry="14" />
+      <path d="M24 38 Q26 34 28 38" />
+      <path d="M36 38 Q38 34 40 38" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 52 Q32 56 38 52" />
+      <path d="M20 20 L32 4 L48 16" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <path d="M18 20 L48 20" strokeWidth="4" opacity="0.5" />
+      <circle cx="32" cy="4" r="3" fill="hsl(var(--logo-green))" />
+      <text x="6" y="30" fontSize="8" fill="hsl(var(--logo-green))">❄</text>
+      <text x="52" y="36" fontSize="8" fill="hsl(var(--logo-green))">❄</text>
+    </g>
+  </svg>
+);
+
+// Halloween Dog - spooky with bat ears
+export const HalloweenDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M12 28 Q8 12 18 6 Q22 8 20 20 L24 26" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <path d="M52 28 Q56 12 46 6 Q42 8 44 20 L40 26" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 L26 32 L28 36" />
+      <path d="M36 36 L38 32 L40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 L28 48 L30 50 L32 48 L34 50 L36 48 L38 50" />
+      <text x="4" y="50" fontSize="10" fill="hsl(var(--logo-green))">🦇</text>
+    </g>
+  </svg>
+);
+
+// Valentine Dog - hearts and love
+export const ValentineDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 34 Q24 30 28 34 Q32 38 32 34 Q32 30 36 34 Q40 38 36 42 L32 46 L28 42 Q24 38 24 34" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <ellipse cx="32" cy="48" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <text x="6" y="20" fontSize="8" fill="hsl(var(--logo-green))">♥</text>
+      <text x="50" y="16" fontSize="10" fill="hsl(var(--logo-green))">♥</text>
+      <text x="54" y="50" fontSize="6" fill="hsl(var(--logo-green))">♥</text>
+    </g>
+  </svg>
+);
+
+// Spring Dog - flowers and fresh
+export const SpringDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <circle cx="12" cy="12" r="3" opacity="0.5" />
+      <circle cx="10" cy="8" r="2" opacity="0.4" />
+      <circle cx="14" cy="8" r="2" opacity="0.4" />
+      <circle cx="8" cy="12" r="2" opacity="0.4" />
+      <circle cx="16" cy="12" r="2" opacity="0.4" />
+      <text x="50" y="18" fontSize="10" fill="hsl(var(--logo-green))">✿</text>
+    </g>
+  </svg>
+);
+
+// Autumn Dog - falling leaves
+export const AutumnDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <path d="M8 16 Q12 12 10 8 Q14 10 16 6 Q14 12 18 14 Q12 14 8 16" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <path d="M52 20 Q54 16 52 12 Q56 14 58 10 Q56 16 60 18 Q54 18 52 20" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <path d="M4 42 Q6 38 4 34" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// Winter Dog - scarf and snow
+export const WinterDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      <path d="M24 32 Q26 28 28 32" />
+      <path d="M36 32 Q38 28 40 32" />
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 46 Q32 50 38 46" />
+      <path d="M16 50 L48 50" strokeWidth="4" opacity="0.4" />
+      <path d="M44 50 L50 58" strokeWidth="4" opacity="0.4" />
+      <circle cx="8" cy="10" r="1.5" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="56" cy="14" r="1" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="52" cy="6" r="1.5" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// New Year Dog - party hat with 2025
+export const NewYearDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-bounce" : ""}>
+      <path d="M16 32 Q12 22 18 16 Q22 18 24 26" />
+      <path d="M48 32 Q52 22 46 16 Q42 18 40 26" />
+      <ellipse cx="32" cy="42" rx="16" ry="14" />
+      <path d="M24 38 Q26 34 28 38" />
+      <path d="M36 38 Q38 34 40 38" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 52 Q32 56 38 52" />
+      <path d="M26 22 L32 4 L38 22" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <text x="27" y="18" fontSize="6" fill="hsl(var(--logo-green))">25</text>
+      <circle cx="32" cy="4" r="2" fill="hsl(var(--logo-green))" />
+      <text x="4" y="20" fontSize="8" fill="hsl(var(--logo-green))">✦</text>
+      <text x="52" y="14" fontSize="8" fill="hsl(var(--logo-green))">✦</text>
+    </g>
+  </svg>
+);
+
+// Easter Dog - bunny ears
+export const EasterDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M22 24 Q20 4 26 2 Q30 8 28 24" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <path d="M42 24 Q44 4 38 2 Q34 8 36 24" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <ellipse cx="8" cy="50" rx="4" ry="3" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <ellipse cx="56" cy="48" rx="3" ry="2.5" fill="hsl(var(--logo-green))" opacity="0.3" />
+    </g>
+  </svg>
+);
+
+// Birthday Dog - cake and candle
+export const BirthdayDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-bounce" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <rect x="4" y="40" width="12" height="10" rx="2" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <path d="M10 40 L10 34" />
+      <circle cx="10" cy="32" r="2" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <text x="50" y="18" fontSize="10" fill="hsl(var(--logo-green))">🎈</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -453,4 +640,14 @@ export const dogVariants = [
   { name: 'Pirate', Component: PirateDog, personality: 'Sailing the underground seas', status: 'raiding' },
   { name: 'Scientist', Component: ScientistDog, personality: 'Experimenting with frequencies', status: 'researching' },
   { name: 'Rocker', Component: RockerDog, personality: 'Punk attitude, techno heart', status: 'shredding' },
+  { name: 'Summer', Component: SummerDog, personality: 'Beach vibes and sunset sets', status: 'chillin' },
+  { name: 'Christmas', Component: ChristmasDog, personality: 'Ho ho ho-use music', status: 'festive' },
+  { name: 'Halloween', Component: HalloweenDog, personality: 'Spooky beats after dark', status: 'haunting' },
+  { name: 'Valentine', Component: ValentineDog, personality: 'Spreading love on the floor', status: 'smitten' },
+  { name: 'Spring', Component: SpringDog, personality: 'Fresh blooms, fresh tunes', status: 'blooming' },
+  { name: 'Autumn', Component: AutumnDog, personality: 'Cozy warehouse sessions', status: 'falling' },
+  { name: 'Winter', Component: WinterDog, personality: 'Cold outside, fire inside', status: 'wrapped up' },
+  { name: 'New Year', Component: NewYearDog, personality: 'Counting down to the drop', status: 'celebrating' },
+  { name: 'Easter', Component: EasterDog, personality: 'Hopping through the beats', status: 'egg hunting' },
+  { name: 'Birthday', Component: BirthdayDog, personality: 'Every day is a party', status: 'making wishes' },
 ];
