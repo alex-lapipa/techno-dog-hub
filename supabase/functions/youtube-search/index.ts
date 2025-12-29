@@ -1,8 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
-import { createServiceClient, getRequiredEnv } from "../_shared/supabase.ts";
+import { createServiceClient } from "../_shared/supabase.ts";
 
-// Normalize artist name for matching
+// Extract clean artist name (remove parenthetical info)
+function cleanArtistName(name: string): string {
+  // Remove content in parentheses like "(Mad Mike Banks)"
+  let cleaned = name.replace(/\s*\([^)]*\)\s*/g, '').trim();
+  // Remove common suffixes
+  cleaned = cleaned.replace(/\s+(dj|producer|live|aka)$/i, '').trim();
+  return cleaned || name;
+}
+
+// Normalize for matching
 function normalizeForMatch(name: string): string {
   return name.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
@@ -10,32 +19,27 @@ function normalizeForMatch(name: string): string {
     .trim();
 }
 
-// Check if video title/channel contains artist name
-function videoMatchesArtist(video: any, artistName: string): boolean {
-  const normalizedArtist = normalizeForMatch(artistName);
-  const artistParts = normalizedArtist.split(' ');
-  
+// Check if video relates to artist - more permissive
+function videoMatchesArtist(video: any, artistName: string, altNames: string[]): boolean {
   const titleNorm = normalizeForMatch(video.title || '');
   const channelNorm = normalizeForMatch(video.channelTitle || '');
   const descNorm = normalizeForMatch(video.description || '');
+  const combined = `${titleNorm} ${channelNorm} ${descNorm}`;
   
-  if (titleNorm.includes(normalizedArtist) || 
-      channelNorm.includes(normalizedArtist) ||
-      descNorm.includes(normalizedArtist)) {
-    return true;
-  }
+  // Check all name variations
+  const namesToCheck = [artistName, ...altNames].map(n => normalizeForMatch(n));
   
-  if (artistParts.length > 1) {
-    const allPartsInTitle = artistParts.every(part => 
-      part.length > 2 && (titleNorm.includes(part) || channelNorm.includes(part))
-    );
-    if (allPartsInTitle) return true;
-  }
-  
-  if (artistParts.length === 1 && artistParts[0].length >= 4) {
-    const regex = new RegExp(`\\b${artistParts[0]}\\b`, 'i');
-    if (regex.test(video.title) || regex.test(video.channelTitle)) {
-      return true;
+  for (const nameNorm of namesToCheck) {
+    if (!nameNorm) continue;
+    
+    // Direct match
+    if (combined.includes(nameNorm)) return true;
+    
+    // Check individual words for multi-word names
+    const parts = nameNorm.split(' ').filter(p => p.length > 2);
+    if (parts.length > 1) {
+      const matchCount = parts.filter(part => combined.includes(part)).length;
+      if (matchCount >= Math.ceil(parts.length * 0.7)) return true;
     }
   }
   
@@ -52,15 +56,15 @@ function scoreVideo(video: any, artistName: string): number {
   if (titleLower.includes(artistLower)) score += 50;
   if (channelLower.includes(artistLower)) score += 30;
   
-  const officialChannels = ['boiler room', 'cercle', 'resident advisor', 'hate', 'awakenings', 'drumcode', 'time warp', 'mixmag', 'fabric london', 'dekmantel'];
+  const officialChannels = ['boiler room', 'cercle', 'resident advisor', 'hate', 'awakenings', 'drumcode', 'time warp', 'mixmag', 'dekmantel', 'tresor'];
   if (officialChannels.some(ch => channelLower.includes(ch))) score += 25;
   
-  const goodKeywords = ['dj set', 'live set', 'boiler room', 'cercle', 'awakenings', 'fabric', 'berghain', 'dekmantel', 'mixmag', 'tresor', 'ostgut ton', 'full set'];
+  const goodKeywords = ['dj set', 'live set', 'boiler room', 'cercle', 'awakenings', 'fabric', 'berghain', 'dekmantel', 'mixmag', 'full set', 'live', 'festival'];
   goodKeywords.forEach(kw => {
     if (titleLower.includes(kw)) score += 10;
   });
   
-  const badKeywords = ['reaction', 'tutorial', 'how to', 'review', 'unboxing', 'parody', 'cover', 'remix tutorial'];
+  const badKeywords = ['reaction', 'tutorial', 'how to', 'review', 'unboxing', 'parody', 'cover'];
   badKeywords.forEach(kw => {
     if (titleLower.includes(kw)) score -= 20;
   });
@@ -68,24 +72,61 @@ function scoreVideo(video: any, artistName: string): number {
   return score;
 }
 
-// Verify videos with OpenAI
-async function verifyWithOpenAI(videos: any[], artistName: string): Promise<Set<number>> {
-  const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-  if (!OPENAI_API_KEY || videos.length === 0) return new Set();
+// Search YouTube with a query
+async function searchYouTubeQuery(query: string, apiKey: string): Promise<any[]> {
+  const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
+  searchUrl.searchParams.set('part', 'snippet');
+  searchUrl.searchParams.set('q', query);
+  searchUrl.searchParams.set('type', 'video');
+  searchUrl.searchParams.set('maxResults', '15');
+  searchUrl.searchParams.set('order', 'relevance');
+  searchUrl.searchParams.set('videoDuration', 'long');
+  searchUrl.searchParams.set('key', apiKey);
+
+  console.log(`Searching: ${query}`);
+  
+  try {
+    const response = await fetch(searchUrl.toString());
+    if (!response.ok) {
+      console.error(`YouTube API error: ${response.status}`);
+      return [];
+    }
+
+    const data = await response.json();
+    return (data.items || []).map((item: any) => ({
+      id: item.id?.videoId,
+      title: item.snippet?.title,
+      description: item.snippet?.description,
+      thumbnail: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.medium?.url,
+      channelTitle: item.snippet?.channelTitle,
+      publishedAt: item.snippet?.publishedAt,
+    })).filter((v: any) => v.id);
+  } catch (error) {
+    console.error(`Search error:`, error);
+    return [];
+  }
+}
+
+// Verify videos with AI (using Lovable AI gateway)
+async function verifyWithAI(videos: any[], artistName: string): Promise<any[]> {
+  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  if (!LOVABLE_API_KEY || videos.length === 0) {
+    return videos.map(v => ({ ...v, aiVerified: true }));
+  }
 
   try {
     const videoList = videos.map((v, i) => 
-      `${i + 1}. Title: "${v.title}" | Channel: "${v.channelTitle}"`
+      `${i + 1}. "${v.title}" by ${v.channelTitle}`
     ).join('\n');
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: 'You verify YouTube videos for a techno music database. Return only valid JSON.' },
           { role: 'user', content: `Artist: "${artistName}" (techno/electronic artist)
@@ -93,163 +134,39 @@ async function verifyWithOpenAI(videos: any[], artistName: string): Promise<Set<
 Videos:
 ${videoList}
 
-Return {"valid": [numbers]} for videos that are DJ sets, live sets, or performances by this specific techno artist.
-Reject videos about different people with similar names, tutorials, reactions.` }
+Return {"valid": [numbers]} for videos that are likely DJ sets, live performances, or music by this artist or related to them.
+Be permissive - include videos that feature, mention, or are about this artist.` }
         ],
-        temperature: 0.1,
-        max_tokens: 200
+        temperature: 0.1
       }),
     });
 
-    if (!response.ok) return new Set();
+    if (!response.ok) {
+      console.log('AI verification skipped - API error');
+      return videos.map(v => ({ ...v, aiVerified: true }));
+    }
     
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return new Set();
     
-    const result = JSON.parse(jsonMatch[0]);
-    return new Set(result.valid || []);
-  } catch (error) {
-    console.error('OpenAI verification error:', error);
-    return new Set();
-  }
-}
-
-// Verify videos with Gemini
-async function verifyWithGemini(videos: any[], artistName: string): Promise<Set<number>> {
-  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-  if (!GEMINI_API_KEY || videos.length === 0) return new Set();
-
-  try {
-    const videoList = videos.map((v, i) => 
-      `${i + 1}. "${v.title}" by ${v.channelTitle}`
-    ).join('\n');
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `Verify these videos are by the techno artist "${artistName}".
-
-${videoList}
-
-Return JSON: {"valid": [1, 2, ...]} for videos that are DJ sets or live performances by this artist.
-Reject mismatches, tutorials, reactions. Only return the JSON.`
-          }]
-        }],
-        generationConfig: { temperature: 0.1 }
-      }),
-    });
-
-    if (!response.ok) return new Set();
-    
-    const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return new Set();
-    
-    const result = JSON.parse(jsonMatch[0]);
-    return new Set(result.valid || []);
-  } catch (error) {
-    console.error('Gemini verification error:', error);
-    return new Set();
-  }
-}
-
-// Multi-model consensus verification
-async function verifyVideosMultiModel(videos: any[], artistName: string): Promise<any[]> {
-  if (videos.length === 0) return [];
-
-  // Run both models in parallel
-  const [openaiValid, geminiValid] = await Promise.all([
-    verifyWithOpenAI(videos, artistName),
-    verifyWithGemini(videos, artistName)
-  ]);
-
-  console.log(`Verification for ${artistName}: OpenAI=${openaiValid.size}, Gemini=${geminiValid.size}`);
-
-  // Mark videos as verified if either model confirms (union for max coverage)
-  return videos.map((v, i) => ({
-    ...v,
-    aiVerified: openaiValid.has(i + 1) || geminiValid.has(i + 1),
-    verifiedBy: [
-      openaiValid.has(i + 1) ? 'openai' : null,
-      geminiValid.has(i + 1) ? 'gemini' : null
-    ].filter(Boolean)
-  }));
-}
-
-// Search YouTube with multiple query strategies
-async function searchYouTube(artistName: string, realName: string | null, apiKey: string): Promise<any[]> {
-  const searchQueries = [
-    `"${artistName}" techno DJ set`,
-    `"${artistName}" boiler room`,
-    `"${artistName}" live set techno`,
-    `"${artistName}" awakenings festival`,
-    `"${artistName}" dekmantel`,
-    `"${artistName}" cercle`,
-    `"${artistName}" fabric london`,
-    `${artistName} electronic music live`
-  ];
-  
-  if (realName && realName.toLowerCase() !== artistName.toLowerCase()) {
-    searchQueries.unshift(`"${realName}" "${artistName}" techno`);
-    searchQueries.unshift(`"${realName}" DJ set`);
-  }
-
-  const allVideos: any[] = [];
-  const seenIds = new Set<string>();
-
-  // Search up to 4 queries to maximize results
-  for (const searchQuery of searchQueries.slice(0, 4)) {
-    const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
-    searchUrl.searchParams.set('part', 'snippet');
-    searchUrl.searchParams.set('q', searchQuery);
-    searchUrl.searchParams.set('type', 'video');
-    searchUrl.searchParams.set('maxResults', '15');
-    searchUrl.searchParams.set('order', 'relevance');
-    searchUrl.searchParams.set('videoDuration', 'long');
-    searchUrl.searchParams.set('key', apiKey);
-
-    try {
-      const response = await fetch(searchUrl.toString());
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      
-      for (const item of (data.items || [])) {
-        const videoId = item.id?.videoId;
-        if (!videoId || seenIds.has(videoId)) continue;
-        
-        const video = {
-          id: videoId,
-          title: item.snippet.title,
-          description: item.snippet.description,
-          thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
-          channelTitle: item.snippet.channelTitle,
-          publishedAt: item.snippet.publishedAt,
-        };
-        
-        if (videoMatchesArtist(video, artistName)) {
-          seenIds.add(videoId);
-          allVideos.push({
-            ...video,
-            score: scoreVideo(video, artistName)
-          });
-        }
-      }
-    } catch (error) {
-      console.error(`Search error for "${searchQuery}":`, error);
+    if (!jsonMatch) {
+      return videos.map(v => ({ ...v, aiVerified: true }));
     }
-
-    // Stop early if we have enough candidates
-    if (allVideos.length >= 15) break;
+    
+    const result = JSON.parse(jsonMatch[0]);
+    const validIndices = new Set(result.valid || []);
+    
+    console.log(`AI verified ${validIndices.size}/${videos.length} videos`);
+    
+    return videos.map((v, i) => ({
+      ...v,
+      aiVerified: validIndices.has(i + 1)
+    }));
+  } catch (error) {
+    console.error('AI verification error:', error);
+    return videos.map(v => ({ ...v, aiVerified: true }));
   }
-
-  return allVideos;
 }
 
 serve(async (req) => {
@@ -265,22 +182,35 @@ serve(async (req) => {
 
     const supabase = createServiceClient();
     const normalizedName = artistName.toLowerCase().trim();
+    const cleanName = cleanArtistName(artistName);
+    const cleanNameNorm = cleanName.toLowerCase().trim();
     
-    // Check cache
+    // Check cache with multiple name variations
     if (!forceRefresh) {
-      const { data: cachedResult } = await supabase
-        .from('youtube_cache')
-        .select('videos, expires_at')
-        .ilike('artist_name', normalizedName)
-        .single();
+      // Try full name first, then clean name
+      const namesToTry = [normalizedName, cleanNameNorm];
+      console.log(`Checking cache for: ${namesToTry.join(', ')}`);
+      
+      for (const cacheName of namesToTry) {
+        const { data: cachedResult, error: cacheError } = await supabase
+          .from('youtube_cache')
+          .select('videos, expires_at')
+          .ilike('artist_name', cacheName)
+          .single();
 
-      if (cachedResult) {
-        const expiresAt = new Date(cachedResult.expires_at);
-        const videos = cachedResult.videos || [];
-        // Only use cache if it has 6 videos and hasn't expired
-        if (expiresAt > new Date() && videos.length >= 6) {
-          console.log(`Cache hit for ${artistName} (${videos.length} videos)`);
-          return jsonResponse({ videos: videos.slice(0, 6), cached: true, aiVerified: true });
+        if (cacheError) {
+          console.log(`Cache lookup error for ${cacheName}: ${cacheError.message}`);
+          continue;
+        }
+
+        if (cachedResult) {
+          const expiresAt = new Date(cachedResult.expires_at);
+          const videos = cachedResult.videos || [];
+          console.log(`Found cache for ${cacheName}: ${videos.length} videos, expires ${expiresAt.toISOString()}`);
+          if (expiresAt > new Date() && videos.length >= 1) {
+            console.log(`Cache hit for ${cacheName} (${videos.length} videos)`);
+            return jsonResponse({ videos: videos.slice(0, 6), cached: true, aiVerified: true });
+          }
         }
       }
     }
@@ -292,31 +222,74 @@ serve(async (req) => {
       return errorResponse('YouTube API key not configured', 500);
     }
 
-    // Search YouTube
-    const allVideos = await searchYouTube(artistName, realName, YOUTUBE_API_KEY);
+    // Use already-computed clean name for search
+    const altNames = [cleanName];
     
+    // Add real name as alternative
+    if (realName && realName.toLowerCase() !== cleanName.toLowerCase()) {
+      altNames.push(realName);
+    }
+    
+    // Extract any parenthetical content as alternative name
+    const parenMatch = artistName.match(/\(([^)]+)\)/);
+    if (parenMatch && parenMatch[1]) {
+      altNames.push(parenMatch[1]);
+    }
+
+    console.log(`Searching for: ${cleanName}, alternatives: ${altNames.join(', ')}`);
+
+    // Build search queries with clean name
+    const searchQueries = [
+      `${cleanName} techno DJ set`,
+      `${cleanName} boiler room`,
+      `${cleanName} live set`,
+      `${cleanName} electronic music`
+    ];
+    
+    // Add alternative name searches
+    if (altNames.length > 1) {
+      searchQueries.push(`${altNames[1]} DJ set`);
+      searchQueries.push(`${altNames[1]} techno`);
+    }
+
+    const allVideos: any[] = [];
+    const seenIds = new Set<string>();
+
+    // Search with multiple queries in parallel
+    const searchPromises = searchQueries.slice(0, 4).map(q => searchYouTubeQuery(q, YOUTUBE_API_KEY));
+    const searchResults = await Promise.all(searchPromises);
+
+    for (const videos of searchResults) {
+      for (const video of videos) {
+        if (seenIds.has(video.id)) continue;
+        
+        // More permissive matching
+        if (videoMatchesArtist(video, cleanName, altNames)) {
+          seenIds.add(video.id);
+          allVideos.push({
+            ...video,
+            score: scoreVideo(video, cleanName)
+          });
+        }
+      }
+    }
+
+    console.log(`Found ${allVideos.length} matching videos`);
+
     // Sort by score
     allVideos.sort((a, b) => b.score - a.score);
     
-    // Take top candidates for verification
+    // Take top candidates
     let candidates = allVideos.slice(0, 12).map(({ score, ...video }) => video);
 
-    // Multi-model verification
-    let verifiedVideos: any[] = [];
+    // AI verification
+    let finalVideos: any[] = [];
     if (candidates.length > 0) {
-      console.log(`Verifying ${candidates.length} videos for ${artistName}`);
-      const verified = await verifyVideosMultiModel(candidates, artistName);
-      
-      // Prioritize verified videos
+      const verified = await verifyWithAI(candidates, cleanName);
       const confirmed = verified.filter(v => v.aiVerified);
       const unconfirmed = verified.filter(v => !v.aiVerified);
-      
-      verifiedVideos = [...confirmed, ...unconfirmed];
-      console.log(`Verified: ${confirmed.length}, Unverified: ${unconfirmed.length}`);
+      finalVideos = [...confirmed, ...unconfirmed].slice(0, 6);
     }
-
-    // Take exactly 6 videos
-    const finalVideos = verifiedVideos.slice(0, 6);
 
     console.log(`Returning ${finalVideos.length} videos for ${artistName}`);
 
