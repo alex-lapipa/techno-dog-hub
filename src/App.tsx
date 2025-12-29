@@ -72,6 +72,7 @@ const MediaMonitorAdmin = lazy(() => import("./pages/MediaMonitorAdmin"));
 const SubmissionsTriageAdmin = lazy(() => import("./pages/SubmissionsTriageAdmin"));
 const AnalyticsReporterAdmin = lazy(() => import("./pages/AnalyticsReporterAdmin"));
 const KnowledgeGapAdmin = lazy(() => import("./pages/KnowledgeGapAdmin"));
+const TicketingAdmin = lazy(() => import("./pages/TicketingAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -152,6 +153,7 @@ const App = () => (
                     <Route path="/admin/submissions-triage" element={<SubmissionsTriageAdmin />} />
                     <Route path="/admin/analytics-reporter" element={<AnalyticsReporterAdmin />} />
                     <Route path="/admin/knowledge-gap" element={<KnowledgeGapAdmin />} />
+                    <Route path="/admin/ticketing" element={<TicketingAdmin />} />
                     {/* Festivals */}
                     <Route path="/festivals" element={<Festivals />} />
                     <Route path="/festivals/:id" element={<FestivalDetail />} />
