@@ -5,42 +5,71 @@ const HexagonLogo = ({ className = "" }: { className?: string }) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    {/* Outer hexagon */}
-    <polygon
-      points="50,2 93,27 93,73 50,98 7,73 7,27"
+    {/* Outer circle */}
+    <circle
+      cx="50"
+      cy="50"
+      r="46"
       stroke="hsl(100, 100%, 60%)"
       strokeWidth="4"
       fill="none"
     />
-    {/* Inner cube structure - top */}
-    <polygon
-      points="50,27 72,40 50,53 28,40"
+    {/* Greyhound dog face - stylized geometric */}
+    {/* Long elegant snout */}
+    <path
+      d="M50 75 L42 58 L38 50 L40 42 L44 38 L50 36 L56 38 L60 42 L62 50 L58 58 Z"
       stroke="hsl(100, 100%, 60%)"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
+      strokeLinejoin="round"
     />
-    {/* Inner cube structure - bottom left */}
-    <polygon
-      points="28,40 50,53 50,78 28,65"
+    {/* Left ear - tall and pointed like a greyhound */}
+    <path
+      d="M40 42 L32 22 L44 36"
       stroke="hsl(100, 100%, 60%)"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
+      strokeLinejoin="round"
     />
-    {/* Inner cube structure - bottom right */}
-    <polygon
-      points="72,40 50,53 50,78 72,65"
+    {/* Right ear - tall and pointed */}
+    <path
+      d="M60 42 L68 22 L56 36"
       stroke="hsl(100, 100%, 60%)"
-      strokeWidth="3"
+      strokeWidth="2.5"
       fill="none"
+      strokeLinejoin="round"
     />
-    {/* Top connecting lines */}
-    <line x1="50" y1="2" x2="50" y2="27" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
-    <line x1="7" y1="27" x2="28" y2="40" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
-    <line x1="93" y1="27" x2="72" y2="40" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
-    {/* Bottom connecting lines */}
-    <line x1="50" y1="78" x2="50" y2="98" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
-    <line x1="7" y1="73" x2="28" y2="65" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
-    <line x1="93" y1="73" x2="72" y2="65" stroke="hsl(100, 100%, 60%)" strokeWidth="3" />
+    {/* Left eye */}
+    <circle
+      cx="44"
+      cy="46"
+      r="3"
+      fill="hsl(100, 100%, 60%)"
+    />
+    {/* Right eye */}
+    <circle
+      cx="56"
+      cy="46"
+      r="3"
+      fill="hsl(100, 100%, 60%)"
+    />
+    {/* Nose */}
+    <ellipse
+      cx="50"
+      cy="62"
+      rx="4"
+      ry="3"
+      fill="hsl(100, 100%, 60%)"
+    />
+    {/* Snout line */}
+    <line
+      x1="50"
+      y1="65"
+      x2="50"
+      y2="72"
+      stroke="hsl(100, 100%, 60%)"
+      strokeWidth="2"
+    />
   </svg>
 );
 
