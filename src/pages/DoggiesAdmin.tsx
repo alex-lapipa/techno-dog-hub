@@ -62,7 +62,7 @@ const DoggiesAdmin = () => {
 
   const runPackCheck = () => {
     toast({
-      title: "🐕 Pack Check Initiated",
+      title: "Pack Check Initiated",
       description: "Sniffing all doggies for alignment issues...",
     });
     

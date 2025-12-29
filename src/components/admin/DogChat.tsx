@@ -18,7 +18,7 @@ const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "*tail wagging at 140bpm* 🐕‍🦺 Woof woof! I'm Techno Dog — your underground guide, no cap.\n\nFrom Detroit to Tbilisi, I got you fr fr. Artists, labels, venues, the gear that slaps, and why we built this open-source platform for the global techno community.\n\nWhat's on your mind, bestie? Ask in any language. Let's dig deep — it's giving knowledge time! 🖤",
+      content: "*tail wagging at 140bpm* Woof woof! I'm Techno Dog — your underground guide, no cap.\n\nFrom Detroit to Tbilisi, I got you fr fr. Artists, labels, venues, the gear that slaps, and why we built this open-source platform for the global techno community.\n\nWhat's on your mind, bestie? Ask in any language. Let's dig deep — it's giving knowledge time!",
       timestamp: new Date()
     }
   ]);

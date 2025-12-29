@@ -273,7 +273,7 @@ const Community = () => {
                             className="h-8 w-8 p-0"
                             title="Share on Twitter/X"
                             onClick={() => {
-                              const text = encodeURIComponent("Join the techno.dog community - the global techno knowledge base! 🐕🎛️");
+                              const text = encodeURIComponent("Join the techno.dog community - the global techno knowledge base!");
                               const url = encodeURIComponent(`${window.location.origin}/community?ref=${profile.referral_code}`);
                               window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
                             }}
@@ -288,7 +288,7 @@ const Community = () => {
                             className="h-8 w-8 p-0"
                             title="Share on WhatsApp"
                             onClick={() => {
-                              const text = encodeURIComponent(`Join the techno.dog community - the global techno knowledge base! 🐕🎛️ ${window.location.origin}/community?ref=${profile.referral_code}`);
+                              const text = encodeURIComponent(`Join the techno.dog community - the global techno knowledge base! ${window.location.origin}/community?ref=${profile.referral_code}`);
                               window.open(`https://wa.me/?text=${text}`, "_blank");
                             }}
                           >
@@ -302,7 +302,7 @@ const Community = () => {
                             className="h-8 w-8 p-0"
                             title="Share on Telegram"
                             onClick={() => {
-                              const text = encodeURIComponent("Join the techno.dog community - the global techno knowledge base! 🐕🎛️");
+                              const text = encodeURIComponent("Join the techno.dog community - the global techno knowledge base!");
                               const url = encodeURIComponent(`${window.location.origin}/community?ref=${profile.referral_code}`);
                               window.open(`https://t.me/share/url?url=${url}&text=${text}`, "_blank");
                             }}
