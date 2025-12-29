@@ -18,7 +18,7 @@ const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "*Excited tail wag* Woof woof! 🐕 I'm Dog, your friendly guide to techno.dog!\n\nI know everything about this platform - the artists, venues, how things work, and why we built it this way. I'm here to help you learn and explore!\n\nAsk me anything! What would you like to know? *sits attentively with ears perked*",
+      content: "*tail wagging to 140bpm* 🐕‍🦺 Woof! I'm Techno Dog — your underground guide.\n\nFrom Detroit to Berlin to Tbilisi, I know the scene. Artists, labels, venues, the gear that makes the sound, and why we built this open-source platform for the global techno community.\n\nWhat's on your mind? Ask in any language. Let's dig deep. 🖤",
       timestamp: new Date()
     }
   ]);
@@ -94,29 +94,29 @@ const DogChat = () => {
   };
 
   const suggestedQuestions = [
-    "How do I contribute to the database?",
-    "What are badges and how do I earn them?",
-    "How does the community verification work?",
-    "What makes this different from other sites?"
+    "Why is this open-source & community-led?",
+    "How can I contribute to the scene?",
+    "What makes techno.dog different?",
+    "Tell me about the global underground"
   ];
 
   return (
-    <Card className="border-logo-green/30 bg-gradient-to-br from-background to-logo-green/5 h-[600px] flex flex-col">
+    <Card className="border-logo-green/30 bg-gradient-to-br from-background via-background to-logo-green/5 h-[600px] flex flex-col">
       <CardHeader className="border-b border-border/50 pb-4">
         <CardTitle className="font-mono text-lg flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-logo-green/20 flex items-center justify-center border-2 border-logo-green animate-pulse">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center border-2 border-logo-green shadow-[0_0_20px_hsl(var(--logo-green)/0.3)]">
             <Dog className="w-7 h-7 text-logo-green" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span>Dog</span>
-              <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green">
+              <span className="tracking-tight">Techno Dog</span>
+              <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green uppercase tracking-wider">
                 <Sparkles className="w-3 h-3 mr-1" />
-                AI GUIDE
+                Underground Guide
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground font-normal mt-0.5">
-              Your friendly platform companion 🐾
+              From Detroit to Tbilisi — one scene, one pack 🖤
             </p>
           </div>
         </CardTitle>
@@ -140,7 +140,7 @@ const DogChat = () => {
                   {message.role === 'assistant' && (
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <Dog className="w-4 h-4 text-logo-green" />
-                      <span className="text-xs font-mono text-logo-green">Dog</span>
+                      <span className="text-xs font-mono text-logo-green uppercase tracking-wider">Techno Dog</span>
                     </div>
                   )}
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">
@@ -158,8 +158,8 @@ const DogChat = () => {
                 <div className="bg-muted/50 border border-border/50 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Dog className="w-4 h-4 text-logo-green animate-bounce" />
-                    <span className="text-xs font-mono text-muted-foreground">
-                      *sniffing around for answers...*
+                    <span className="text-xs font-mono text-muted-foreground italic">
+                      *digging through the crates...*
                     </span>
                     <Loader2 className="w-4 h-4 animate-spin text-logo-green" />
                   </div>
@@ -196,7 +196,7 @@ const DogChat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask Dog anything about techno.dog..."
+              placeholder="Ask Techno Dog anything... (any language)"
               className="flex-1 bg-background border-border/50 focus:border-logo-green"
               disabled={isLoading}
             />
@@ -212,9 +212,9 @@ const DogChat = () => {
               )}
             </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1">
-            <Heart className="w-3 h-3" />
-            Dog loves helping the community!
+          <p className="text-[10px] text-muted-foreground mt-2 text-center flex items-center justify-center gap-1 font-mono uppercase tracking-wider">
+            <Heart className="w-3 h-3 text-crimson" />
+            Built by the scene, for the scene
           </p>
         </div>
       </CardContent>
