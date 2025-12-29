@@ -101,15 +101,22 @@ ${videoList}
 
 For each video, determine if it is ACTUALLY a DJ set, live performance, or music video by "${artistName}" (the techno/electronic music artist).
 
-IMPORTANT considerations:
-- The artist name must clearly refer to the DJ/producer, not someone else with a similar name
+CRITICAL - DISAMBIGUATION RULES:
+- "Regis" = Karl O'Connor from Birmingham UK, Downwards/Sandwell District - NOT "Regis Mello" or any other Regis
+- "Surgeon" = Anthony Child from Birmingham UK - NOT medical content
+- "Blawan" = Jamie Roberts - NOT other artists
+- If the artist has a common name, look for techno context clues (venues, labels, collaborators)
+
+VALIDATION RULES:
+- The artist name must clearly refer to the specific techno DJ/producer, not someone else with a similar name
+- REJECT videos where another person with a similar/same name is performing
 - "${artistName}" may appear as a guest, collaborator, or b2b partner - these are valid
+- Look for techno venues/festivals: Berghain, Tresor, Fabric, Awakenings, Dekmantel, etc.
+- Look for techno labels: Downwards, Mord, Perc Trax, Ostgut Ton, etc.
 - Compilations or mixes ABOUT the artist are valid
 - Reaction videos, tutorials, or unrelated content should be rejected
-- If the title mentions "${artistName}" performing at a venue/festival, it's likely valid
-- Consider common aliases or project names the artist may use
 
-Return a JSON array with the video numbers that are VALID for this artist.
+Return a JSON array with the video numbers that are VALID for this specific techno artist.
 Example response: {"valid": [1, 2, 4]}
 
 Only return the JSON, no explanation.`;
