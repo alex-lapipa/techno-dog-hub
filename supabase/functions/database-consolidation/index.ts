@@ -339,14 +339,24 @@ Only include REAL aliases you're confident about. No made-up names.`;
 
   if (!dryRun) {
     for (const alias of aliases) {
-      await supabase
+      // Check if alias exists
+      const { data: existing } = await supabase
         .from('artist_aliases')
-        .upsert({
-          artist_id: artistId,
-          alias_name: alias.name,
-          alias_type: alias.type || 'alias',
-          source_system: 'consolidation_engine'
-        }, { onConflict: 'artist_id,alias_name', ignoreDuplicates: true });
+        .select('alias_id')
+        .eq('artist_id', artistId)
+        .eq('alias_name', alias.name)
+        .maybeSingle();
+      
+      if (!existing) {
+        await supabase
+          .from('artist_aliases')
+          .insert({
+            artist_id: artistId,
+            alias_name: alias.name,
+            alias_type: alias.type || 'alias',
+            source_system: 'consolidation_engine'
+          });
+      }
     }
   }
 
@@ -392,24 +402,53 @@ async function createGearDocument(
     // Generate embedding
     const embedding = await generateEmbedding(content);
     
-    // Insert document
-    const { error } = await supabase
+    // Check if document exists
+    const { data: existing } = await supabase
       .from('artist_documents')
-      .upsert({
-        artist_id: artistId,
-        document_type: 'gear',
-        title: `${artistName} Equipment & Gear`,
-        content,
-        embedding: `[${embedding.join(',')}]`,
-        source_system: 'consolidation_engine',
-        metadata: {
-          gear_categories: Object.keys(gearByCategory),
-          item_count: Object.values(gearByCategory).flat().length
-        }
-      }, { onConflict: 'artist_id,document_type,source_system' });
+      .select('document_id')
+      .eq('artist_id', artistId)
+      .eq('document_type', 'gear')
+      .maybeSingle();
+    
+    if (existing) {
+      // Update existing
+      const { error } = await supabase
+        .from('artist_documents')
+        .update({
+          title: `${artistName} Equipment & Gear`,
+          content,
+          embedding: `[${embedding.join(',')}]`,
+          updated_at: new Date().toISOString(),
+          metadata: {
+            gear_categories: Object.keys(gearByCategory),
+            item_count: Object.values(gearByCategory).flat().length
+          }
+        })
+        .eq('document_id', existing.document_id);
 
-    if (error) {
-      return { success: false, error: error.message };
+      if (error) {
+        return { success: false, error: error.message };
+      }
+    } else {
+      // Insert new
+      const { error } = await supabase
+        .from('artist_documents')
+        .insert({
+          artist_id: artistId,
+          document_type: 'gear',
+          title: `${artistName} Equipment & Gear`,
+          content,
+          embedding: `[${embedding.join(',')}]`,
+          source_system: 'consolidation_engine',
+          metadata: {
+            gear_categories: Object.keys(gearByCategory),
+            item_count: Object.values(gearByCategory).flat().length
+          }
+        });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
     }
   }
 

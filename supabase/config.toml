@@ -234,3 +234,6 @@ verify_jwt = false
 
 [functions.artist-photo-pipeline]
 verify_jwt = false
+
+[functions.database-consolidation]
+verify_jwt = false
