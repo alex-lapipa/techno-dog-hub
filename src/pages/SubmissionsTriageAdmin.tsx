@@ -6,33 +6,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { AdminPageLayout, AdminStatsCard } from '@/components/admin';
 import { 
-  Bot, 
-  RefreshCw, 
-  Loader2,
-  ArrowLeft,
   FileCheck,
   CheckCircle,
   Clock,
   XCircle,
-  Eye
+  Eye,
+  List
 } from 'lucide-react';
 
 const SubmissionsTriageAdmin = () => {
   const navigate = useNavigate();
-  const { isAdmin, loading: authLoading } = useAdminAuth();
+  const { isAdmin } = useAdminAuth();
   const { toast } = useToast();
   
   const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
-
-  useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate('/admin');
-    }
-  }, [isAdmin, authLoading, navigate]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -88,14 +80,6 @@ const SubmissionsTriageAdmin = () => {
     }
   };
 
-  if (authLoading || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-crimson" />
-      </div>
-    );
-  }
-
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved': return <CheckCircle className="w-4 h-4 text-logo-green" />;
@@ -105,119 +89,91 @@ const SubmissionsTriageAdmin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-mono font-bold text-foreground flex items-center gap-2">
-                <FileCheck className="w-6 h-6 text-amber-500" />
-                SUBMISSIONS TRIAGE
-              </h1>
-              <p className="text-sm text-muted-foreground font-mono">
-                Pre-screens community submissions for review
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={fetchData} variant="outline" size="sm">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-            <Button onClick={runAgent} disabled={isRunning} size="sm" className="bg-amber-500 hover:bg-amber-600 text-black">
-              {isRunning ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Bot className="w-4 h-4 mr-2" />}
-              Run Triage
-            </Button>
-          </div>
-        </div>
+    <AdminPageLayout
+      title="SUBMISSIONS TRIAGE"
+      description="Pre-screens community submissions for review"
+      icon={FileCheck}
+      iconColor="text-amber-500"
+      onRefresh={fetchData}
+      onRunAgent={runAgent}
+      isLoading={isLoading}
+      isRunning={isRunning}
+      agentButtonText="Run Triage"
+      agentButtonColor="bg-amber-500 hover:bg-amber-600 text-black"
+    >
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <AdminStatsCard
+          label="Total"
+          value={stats?.total || 0}
+          icon={List}
+        />
+        <AdminStatsCard
+          label="Pending"
+          value={stats?.pending || 0}
+          icon={Clock}
+          iconColor="text-amber-500"
+          className="border-amber-500/30"
+        />
+        <AdminStatsCard
+          label="Approved"
+          value={stats?.approved || 0}
+          icon={CheckCircle}
+          iconColor="text-logo-green"
+          className="border-logo-green/30"
+        />
+        <AdminStatsCard
+          label="Rejected"
+          value={stats?.rejected || 0}
+          icon={XCircle}
+          iconColor="text-crimson"
+          className="border-crimson/30"
+        />
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-zinc-900 border-crimson/20">
-            <CardContent className="pt-6">
-              <div>
-                <p className="text-xs text-muted-foreground font-mono uppercase">Total</p>
-                <p className="text-3xl font-bold text-foreground">{stats?.total || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-amber-500/30">
-            <CardContent className="pt-6">
-              <div>
-                <p className="text-xs text-muted-foreground font-mono uppercase">Pending</p>
-                <p className="text-3xl font-bold text-amber-500">{stats?.pending || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-logo-green/30">
-            <CardContent className="pt-6">
-              <div>
-                <p className="text-xs text-muted-foreground font-mono uppercase">Approved</p>
-                <p className="text-3xl font-bold text-logo-green">{stats?.approved || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-zinc-900 border-crimson/30">
-            <CardContent className="pt-6">
-              <div>
-                <p className="text-xs text-muted-foreground font-mono uppercase">Rejected</p>
-                <p className="text-3xl font-bold text-crimson">{stats?.rejected || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Submissions List */}
-        <Card className="bg-zinc-900 border-crimson/20">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-mono text-sm flex items-center gap-2">
-              <Eye className="w-4 h-4 text-amber-500" />
-              RECENT SUBMISSIONS
-            </CardTitle>
-            <Button variant="outline" size="sm" onClick={() => navigate('/admin/submissions')}>
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {submissions.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No submissions found</p>
-              ) : (
-                submissions.map((sub) => (
-                  <div key={sub.id} className="flex items-center justify-between p-3 bg-zinc-800 border border-border rounded">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(sub.status)}
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{sub.name || 'Unnamed submission'}</p>
-                        <p className="text-xs text-muted-foreground">{sub.submission_type || sub.entity_type}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={
-                        sub.status === 'approved' ? 'default' : 
-                        sub.status === 'rejected' ? 'destructive' : 'outline'
-                      }>
-                        {sub.status}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(sub.created_at).toLocaleDateString()}
-                      </span>
+      {/* Submissions List */}
+      <Card className="bg-zinc-900 border-crimson/20">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="font-mono text-sm flex items-center gap-2">
+            <Eye className="w-4 h-4 text-amber-500" />
+            RECENT SUBMISSIONS
+          </CardTitle>
+          <Button variant="outline" size="sm" onClick={() => navigate('/admin/submissions')}>
+            View All
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {submissions.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No submissions found</p>
+            ) : (
+              submissions.map((sub) => (
+                <div key={sub.id} className="flex items-center justify-between p-3 bg-zinc-800 border border-border rounded">
+                  <div className="flex items-center gap-3">
+                    {getStatusIcon(sub.status)}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{sub.name || 'Unnamed submission'}</p>
+                      <p className="text-xs text-muted-foreground">{sub.submission_type || sub.entity_type}</p>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={
+                      sub.status === 'approved' ? 'default' : 
+                      sub.status === 'rejected' ? 'destructive' : 'outline'
+                    }>
+                      {sub.status}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(sub.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </AdminPageLayout>
   );
 };
 
