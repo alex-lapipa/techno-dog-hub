@@ -274,14 +274,24 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     };
   }
 
-  // Get gear by category
-  const gearByCategory = (canonical.gear || []).reduce((acc, g) => {
-    acc[g.gear_category] = g.gear_items || [];
-    if (g.gear_category === 'rider' && g.rider_notes) {
-      acc.riderNotes = g.rider_notes;
+  // Get gear by category and consolidate rider notes
+  const gearByCategory: Record<string, string[]> = { studio: [], live: [], dj: [] };
+  const riderNotesArray: string[] = [];
+  
+  for (const g of canonical.gear || []) {
+    const category = g.gear_category?.toLowerCase() || 'studio';
+    if (category in gearByCategory && g.gear_items?.length) {
+      gearByCategory[category] = [...gearByCategory[category], ...g.gear_items];
     }
-    return acc;
-  }, {} as Record<string, string[] | string>);
+    if (g.rider_notes) {
+      riderNotesArray.push(g.rider_notes);
+    }
+  }
+  
+  // Combine all rider notes into one
+  const combinedRiderNotes = riderNotesArray.length > 0 
+    ? riderNotesArray.join(' ') 
+    : undefined;
 
   // Parse location - use city if present, otherwise parse from country
   const location = canonical.city 
@@ -306,10 +316,10 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     crews: primaryProfile.crews || [],
     careerHighlights: primaryProfile.career_highlights || [],
     keyReleases: (primaryProfile.key_releases as Array<{ title: string; label: string; year: number; format: string }>) || [],
-    studioGear: gearByCategory.studio as string[] || [],
-    liveSetup: gearByCategory.live as string[] || [],
-    djSetup: gearByCategory.dj as string[] || [],
-    riderNotes: gearByCategory.riderNotes as string || undefined,
+    studioGear: gearByCategory.studio || [],
+    liveSetup: gearByCategory.live || [],
+    djSetup: gearByCategory.dj || [],
+    riderNotes: combinedRiderNotes,
     knownFor: primaryProfile.known_for || undefined,
     topTracks: primaryProfile.top_tracks || [],
     subgenres: primaryProfile.subgenres || [],

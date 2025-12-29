@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Disc3, Wrench, Radio, User, ExternalLink, ChevronLeft, ChevronRight, BadgeCheck, Headphones } from "lucide-react";
 import { useArtist, useArtists } from "@/hooks/useData";
 import { PageLayout } from "@/components/layout";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
@@ -7,6 +7,7 @@ import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 const ArtistDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -247,8 +248,16 @@ const ArtistDetail = () => {
             {/* Artist Info */}
             <div className="space-y-6">
               <div>
-                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
-                  // {artist.region}
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
+                    // {artist.region}
+                  </div>
+                  {artist.rank && artist.rank <= 100 && (
+                    <Badge variant="outline" className="font-mono text-[10px] border-logo-green/50 text-logo-green">
+                      <BadgeCheck className="w-3 h-3 mr-1" />
+                      Verified
+                    </Badge>
+                  )}
                 </div>
                 <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight mb-2 hover:animate-glitch">
                   {artist.name}
@@ -269,7 +278,21 @@ const ArtistDetail = () => {
                   <Calendar className="w-4 h-4" />
                   {artist.active}
                 </div>
+                {(artist.studioGear?.length > 0 || artist.djSetup?.length > 0 || artist.liveSetup?.length > 0) && (
+                  <div className="flex items-center gap-2 text-logo-green">
+                    <Headphones className="w-4 h-4" />
+                    <span className="text-xs">Gear Data</span>
+                  </div>
+                )}
               </div>
+
+              {artist.knownFor && (
+                <div className="border-l-2 border-logo-green/50 pl-4">
+                  <p className="font-mono text-sm leading-relaxed text-foreground italic">
+                    "{artist.knownFor}"
+                  </p>
+                </div>
+              )}
 
               <p className="font-mono text-sm leading-relaxed text-muted-foreground">
                 {artist.bio}
@@ -374,66 +397,87 @@ const ArtistDetail = () => {
             <h2 className="font-mono text-xl uppercase tracking-wide mb-6 flex items-center gap-3">
               <Wrench className="w-5 h-5" />
               Gear & Rider
+              {(artist.studioGear?.length > 0 || artist.djSetup?.length > 0 || artist.liveSetup?.length > 0) && (
+                <Badge variant="outline" className="font-mono text-[10px] border-logo-green/50 text-logo-green ml-2">
+                  <BadgeCheck className="w-3 h-3 mr-1" />
+                  Verified
+                </Badge>
+              )}
             </h2>
             
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Studio Gear */}
-              {artist.studioGear && artist.studioGear.length > 0 && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
-                    <Radio className="w-4 h-4" />
-                    Studio
-                  </h3>
-                  <ul className="space-y-2">
-                    {artist.studioGear.map((gear, i) => (
-                      <li key={i} className="font-mono text-xs text-muted-foreground">
-                        → {gear}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            {(artist.studioGear?.length > 0 || artist.djSetup?.length > 0 || artist.liveSetup?.length > 0) ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Studio Gear */}
+                {artist.studioGear && artist.studioGear.length > 0 && (
+                  <div className="border border-border p-4 bg-card/30">
+                    <h3 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-4 flex items-center gap-2">
+                      <Radio className="w-4 h-4" />
+                      Studio
+                    </h3>
+                    <ul className="space-y-2">
+                      {artist.studioGear.map((gear, i) => (
+                        <li key={i} className="font-mono text-xs text-foreground flex items-start gap-2">
+                          <span className="text-logo-green">→</span> {gear}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              {/* Live Setup */}
-              {artist.liveSetup && artist.liveSetup.length > 0 && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
-                    Live Setup
-                  </h3>
-                  <ul className="space-y-2">
-                    {artist.liveSetup.map((gear, i) => (
-                      <li key={i} className="font-mono text-xs text-muted-foreground">
-                        → {gear}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                {/* Live Setup */}
+                {artist.liveSetup && artist.liveSetup.length > 0 && (
+                  <div className="border border-border p-4 bg-card/30">
+                    <h3 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-4 flex items-center gap-2">
+                      <Headphones className="w-4 h-4" />
+                      Live Setup
+                    </h3>
+                    <ul className="space-y-2">
+                      {artist.liveSetup.map((gear, i) => (
+                        <li key={i} className="font-mono text-xs text-foreground flex items-start gap-2">
+                          <span className="text-logo-green">→</span> {gear}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              {/* DJ Setup */}
-              {artist.djSetup && artist.djSetup.length > 0 && (
-                <div className="border border-border p-4">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-4">
-                    DJ Setup
-                  </h3>
-                  <ul className="space-y-2">
-                    {artist.djSetup.map((gear, i) => (
-                      <li key={i} className="font-mono text-xs text-muted-foreground">
-                        → {gear}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+                {/* DJ Setup */}
+                {artist.djSetup && artist.djSetup.length > 0 && (
+                  <div className="border border-border p-4 bg-card/30">
+                    <h3 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-4 flex items-center gap-2">
+                      <Disc3 className="w-4 h-4" />
+                      DJ Setup
+                    </h3>
+                    <ul className="space-y-2">
+                      {artist.djSetup.map((gear, i) => (
+                        <li key={i} className="font-mono text-xs text-foreground flex items-start gap-2">
+                          <span className="text-logo-green">→</span> {gear}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="border border-dashed border-border/50 p-8 text-center">
+                <Wrench className="w-8 h-8 mx-auto mb-3 text-muted-foreground/30" />
+                <p className="font-mono text-xs text-muted-foreground">
+                  Gear data not yet verified for this artist
+                </p>
+                <p className="font-mono text-[10px] text-muted-foreground/70 mt-1">
+                  Know their setup? Submit a contribution below
+                </p>
+              </div>
+            )}
 
             {/* Rider Notes */}
             {artist.riderNotes && (
-              <div className="mt-4 border border-border p-4 bg-card/50">
-                <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                  Rider Notes
+              <div className="mt-6 border border-logo-green/30 p-4 bg-logo-green/5">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-3 flex items-center gap-2">
+                  <BadgeCheck className="w-4 h-4" />
+                  Technical Rider Notes
                 </h3>
-                <p className="font-mono text-sm text-muted-foreground">
+                <p className="font-mono text-sm text-foreground leading-relaxed">
                   {artist.riderNotes}
                 </p>
               </div>

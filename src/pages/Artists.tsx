@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Film } from "lucide-react";
+import { ArrowRight, Film, Wrench } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import { useArtists, usePrefetchArtist, type ArtistSummary } from "@/hooks/useData";
@@ -8,7 +8,8 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ArtistsPage = () => {
   const parentRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,23 @@ const ArtistsPage = () => {
   
   const prefetchArtist = usePrefetchArtist();
   const { data: artists = [], isLoading } = useArtists();
+  const [artistsWithGear, setArtistsWithGear] = useState<Set<string>>(new Set());
+
+  // Fetch artists with gear data
+  useEffect(() => {
+    const fetchGearData = async () => {
+      const { data } = await supabase
+        .from('artist_gear')
+        .select('artist_id, canonical_artists!inner(slug)')
+        .limit(200);
+      
+      if (data) {
+        const slugs = new Set(data.map((g: any) => g.canonical_artists?.slug).filter(Boolean));
+        setArtistsWithGear(slugs);
+      }
+    };
+    fetchGearData();
+  }, []);
 
   const rowVirtualizer = useVirtualizer({
     count: artists.length,
@@ -146,6 +164,12 @@ const ArtistsPage = () => {
                               <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
                                 {artist.city}, {artist.country}
                               </span>
+                              {artistsWithGear.has(artist.id) && (
+                                <span className="flex items-center gap-1 font-mono text-[10px] text-logo-green">
+                                  <Wrench className="w-3 h-3" />
+                                  Gear
+                                </span>
+                              )}
                               {artist.labels && artist.labels.length > 0 && (
                                 <span className="hidden lg:inline font-mono text-[10px] text-muted-foreground">
                                   {artist.labels.slice(0, 2).join(' / ')}
