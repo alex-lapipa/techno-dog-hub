@@ -104,43 +104,175 @@ function parseLocation(country: string | null): { city: string; country: string;
   
   const location = country.toLowerCase();
   
-  // Handle specific patterns
-  if (location.includes('detroit') || location.includes('american (detroit)')) {
+  // Extract city from parentheses if present: "British (Birmingham)" -> Birmingham
+  const parenMatch = country.match(/\(([^)]+)\)/);
+  const parenCity = parenMatch ? parenMatch[1] : null;
+  
+  // Handle specific patterns with region mapping
+  
+  // Detroit patterns
+  if (location.includes('detroit')) {
     return { city: 'Detroit', country: 'USA', region: 'North America' };
   }
-  if (location.includes('berlin')) {
-    return { city: 'Berlin', country: 'Germany', region: 'Europe' };
+  
+  // American patterns
+  if (location.includes('american') || location.includes('united states') || location.includes('usa')) {
+    if (parenCity) {
+      const cityMap: Record<string, string> = {
+        'detroit': 'Detroit',
+        'nyc': 'New York',
+        'new york': 'New York',
+        'chicago': 'Chicago',
+        'los angeles': 'Los Angeles',
+        'la': 'Los Angeles',
+      };
+      const mappedCity = cityMap[parenCity.toLowerCase()] || parenCity;
+      return { city: mappedCity, country: 'USA', region: 'North America' };
+    }
+    return { city: 'USA', country: 'USA', region: 'North America' };
   }
-  if (location.includes('british') || location.includes('uk')) {
-    if (location.includes('birmingham')) return { city: 'Birmingham', country: 'UK', region: 'Europe' };
-    if (location.includes('london')) return { city: 'London', country: 'UK', region: 'Europe' };
+  
+  // German patterns
+  if (location.includes('german') || location.includes('germany')) {
+    if (location.includes('berlin')) return { city: 'Berlin', country: 'Germany', region: 'Europe' };
+    if (parenCity) {
+      const cityMap: Record<string, string> = {
+        'cologne': 'Cologne',
+        'köln': 'Cologne',
+        'berlin': 'Berlin',
+        'frankfurt': 'Frankfurt',
+        'munich': 'Munich',
+        'münchen': 'Munich',
+        'hamburg': 'Hamburg',
+      };
+      const mappedCity = cityMap[parenCity.toLowerCase()] || parenCity;
+      return { city: mappedCity, country: 'Germany', region: 'Europe' };
+    }
+    return { city: 'Berlin', country: 'Germany', region: 'Europe' }; // Default German artists to Berlin
+  }
+  
+  // British/UK patterns
+  if (location.includes('british') || location.includes('uk') || location.includes('united kingdom')) {
+    if (location.includes('birmingham') || parenCity?.toLowerCase() === 'birmingham') {
+      return { city: 'Birmingham', country: 'UK', region: 'Europe' };
+    }
+    if (location.includes('london') || parenCity?.toLowerCase() === 'london') {
+      return { city: 'London', country: 'UK', region: 'Europe' };
+    }
+    if (location.includes('manchester') || parenCity?.toLowerCase() === 'manchester') {
+      return { city: 'Manchester', country: 'UK', region: 'Europe' };
+    }
+    if (location.includes('cornwall') || parenCity?.toLowerCase() === 'cornwall') {
+      return { city: 'Cornwall', country: 'UK', region: 'Europe' };
+    }
+    if (location.includes('glasgow') || parenCity?.toLowerCase() === 'glasgow') {
+      return { city: 'Glasgow', country: 'UK', region: 'Europe' };
+    }
+    if (location.includes('sheffield') || parenCity?.toLowerCase() === 'sheffield') {
+      return { city: 'Sheffield', country: 'UK', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'UK', region: 'Europe' };
     return { city: 'UK', country: 'UK', region: 'Europe' };
   }
-  if (location.includes('german')) {
-    return { city: 'Germany', country: 'Germany', region: 'Europe' };
-  }
+  
+  // Spanish patterns  
   if (location.includes('spanish') || location.includes('spain')) {
+    if (location.includes('madrid') || parenCity?.toLowerCase() === 'madrid') {
+      return { city: 'Madrid', country: 'Spain', region: 'Europe' };
+    }
+    if (location.includes('barcelona') || parenCity?.toLowerCase() === 'barcelona') {
+      return { city: 'Barcelona', country: 'Spain', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Spain', region: 'Europe' };
     return { city: 'Spain', country: 'Spain', region: 'Europe' };
   }
-  if (location.includes('dutch') || location.includes('netherlands')) {
-    return { city: 'Netherlands', country: 'Netherlands', region: 'Europe' };
+  
+  // Dutch/Netherlands patterns
+  if (location.includes('dutch') || location.includes('netherlands') || location.includes('holland')) {
+    if (location.includes('amsterdam') || parenCity?.toLowerCase() === 'amsterdam') {
+      return { city: 'Amsterdam', country: 'Netherlands', region: 'Europe' };
+    }
+    if (location.includes('rotterdam') || parenCity?.toLowerCase() === 'rotterdam') {
+      return { city: 'Rotterdam', country: 'Netherlands', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Netherlands', region: 'Europe' };
+    return { city: 'Amsterdam', country: 'Netherlands', region: 'Europe' };
   }
+  
+  // Italian patterns
   if (location.includes('italian') || location.includes('italy')) {
+    if (parenCity) return { city: parenCity, country: 'Italy', region: 'Europe' };
     return { city: 'Italy', country: 'Italy', region: 'Europe' };
   }
+  
+  // French patterns
   if (location.includes('french') || location.includes('france')) {
-    return { city: 'France', country: 'France', region: 'Europe' };
+    if (location.includes('paris') || parenCity?.toLowerCase() === 'paris') {
+      return { city: 'Paris', country: 'France', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'France', region: 'Europe' };
+    return { city: 'Paris', country: 'France', region: 'Europe' };
   }
-  if (location.includes('georgian') || location.includes('tbilisi')) {
+  
+  // Georgian patterns
+  if (location.includes('georgian') || location.includes('georgia') || location.includes('tbilisi')) {
     return { city: 'Tbilisi', country: 'Georgia', region: 'Europe' };
   }
+  
+  // Japanese patterns
   if (location.includes('japanese') || location.includes('japan') || location.includes('tokyo')) {
+    if (parenCity) return { city: parenCity, country: 'Japan', region: 'Asia' };
     return { city: 'Tokyo', country: 'Japan', region: 'Asia' };
   }
-  if (location.includes('american') || location.includes('chicago')) {
-    if (location.includes('chicago')) return { city: 'Chicago', country: 'USA', region: 'North America' };
-    if (location.includes('new york')) return { city: 'New York', country: 'USA', region: 'North America' };
-    return { city: 'USA', country: 'USA', region: 'North America' };
+  
+  // Canadian patterns
+  if (location.includes('canadian') || location.includes('canada')) {
+    if (location.includes('montreal') || parenCity?.toLowerCase() === 'montreal') {
+      return { city: 'Montreal', country: 'Canada', region: 'North America' };
+    }
+    if (location.includes('toronto') || parenCity?.toLowerCase() === 'toronto') {
+      return { city: 'Toronto', country: 'Canada', region: 'North America' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Canada', region: 'North America' };
+    return { city: 'Canada', country: 'Canada', region: 'North America' };
+  }
+  
+  // Australian patterns
+  if (location.includes('australian') || location.includes('australia')) {
+    if (location.includes('melbourne') || parenCity?.toLowerCase() === 'melbourne') {
+      return { city: 'Melbourne', country: 'Australia', region: 'Oceania' };
+    }
+    if (location.includes('sydney') || parenCity?.toLowerCase() === 'sydney') {
+      return { city: 'Sydney', country: 'Australia', region: 'Oceania' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Australia', region: 'Oceania' };
+    return { city: 'Australia', country: 'Australia', region: 'Oceania' };
+  }
+  
+  // Belgian patterns
+  if (location.includes('belgian') || location.includes('belgium')) {
+    if (location.includes('brussels') || parenCity?.toLowerCase() === 'brussels') {
+      return { city: 'Brussels', country: 'Belgium', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Belgium', region: 'Europe' };
+    return { city: 'Brussels', country: 'Belgium', region: 'Europe' };
+  }
+  
+  // Portuguese patterns
+  if (location.includes('portuguese') || location.includes('portugal')) {
+    if (location.includes('lisbon') || parenCity?.toLowerCase() === 'lisbon') {
+      return { city: 'Lisbon', country: 'Portugal', region: 'Europe' };
+    }
+    if (parenCity) return { city: parenCity, country: 'Portugal', region: 'Europe' };
+    return { city: 'Lisbon', country: 'Portugal', region: 'Europe' };
+  }
+  
+  // Handle slash for dual nationality: "British/German"
+  if (location.includes('/')) {
+    const parts = country.split('/');
+    const firstNationality = parts[0].trim().toLowerCase();
+    if (firstNationality.includes('british')) return { city: 'UK', country: 'UK', region: 'Europe' };
+    if (firstNationality.includes('german')) return { city: 'Berlin', country: 'Germany', region: 'Europe' };
   }
   
   // Default: use the country field as-is
@@ -298,6 +430,34 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     ? { city: canonical.city, country: canonical.country || 'Unknown', region: canonical.region || 'Unknown' }
     : parseLocation(canonical.country);
 
+  // Determine bio - avoid duplication with knownFor
+  const knownFor = primaryProfile.known_for || undefined;
+  let bio = primaryProfile.bio_long || '';
+  
+  // If bio_short is the same as known_for, don't use it as bio (prevents duplication)
+  // Only use bio_short as fallback if it's different from known_for
+  if (!bio && primaryProfile.bio_short) {
+    const bioShort = primaryProfile.bio_short.trim();
+    const knownForTrimmed = (knownFor || '').trim();
+    if (bioShort !== knownForTrimmed) {
+      bio = bioShort;
+    }
+  }
+
+  // Clean up any AI jargon/symbols from bio and known_for
+  const cleanText = (text: string | undefined): string | undefined => {
+    if (!text) return undefined;
+    return text
+      .replace(/\*\*/g, '') // Remove markdown bold
+      .replace(/\*/g, '')   // Remove asterisks
+      .replace(/##/g, '')   // Remove markdown headers
+      .replace(/`/g, '')    // Remove code blocks
+      .replace(/\[|\]/g, '') // Remove brackets
+      .replace(/—/g, ' – ') // Normalize em-dashes
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+  };
+
   return {
     id: canonical.slug,
     name: canonical.canonical_name,
@@ -307,20 +467,20 @@ export function canonicalToLegacyArtist(canonical: FullCanonicalArtist): Artist 
     region: location.region,
     active: canonical.active_years || 'Unknown',
     tags: primaryProfile.tags || primaryProfile.subgenres || [],
-    bio: primaryProfile.bio_long || primaryProfile.bio_short || '',
+    bio: cleanText(bio) || '',
     photoUrl: primaryAsset?.url,
     image,
     labels: primaryProfile.labels || [],
     collaborators: primaryProfile.collaborators || [],
     influences: primaryProfile.influences || [],
     crews: primaryProfile.crews || [],
-    careerHighlights: primaryProfile.career_highlights || [],
+    careerHighlights: (primaryProfile.career_highlights || []).map(h => cleanText(h) || h),
     keyReleases: (primaryProfile.key_releases as Array<{ title: string; label: string; year: number; format: string }>) || [],
     studioGear: gearByCategory.studio || [],
     liveSetup: gearByCategory.live || [],
     djSetup: gearByCategory.dj || [],
-    riderNotes: combinedRiderNotes,
-    knownFor: primaryProfile.known_for || undefined,
+    riderNotes: cleanText(combinedRiderNotes),
+    knownFor: cleanText(knownFor),
     topTracks: primaryProfile.top_tracks || [],
     subgenres: primaryProfile.subgenres || [],
     rank: canonical.rank || undefined,
