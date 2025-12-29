@@ -62,6 +62,16 @@ const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
 const ArtistMigrationAdmin = lazy(() => import("./pages/ArtistMigrationAdmin"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
 const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
+
+// Agent Admin Pages
+const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
+const HealthMonitorAdmin = lazy(() => import("./pages/HealthMonitorAdmin"));
+const SecurityAuditorAdmin = lazy(() => import("./pages/SecurityAuditorAdmin"));
+const DataIntegrityAdmin = lazy(() => import("./pages/DataIntegrityAdmin"));
+const MediaMonitorAdmin = lazy(() => import("./pages/MediaMonitorAdmin"));
+const SubmissionsTriageAdmin = lazy(() => import("./pages/SubmissionsTriageAdmin"));
+const AnalyticsReporterAdmin = lazy(() => import("./pages/AnalyticsReporterAdmin"));
+const KnowledgeGapAdmin = lazy(() => import("./pages/KnowledgeGapAdmin"));
 const Store = lazy(() => import("./pages/Store"));
 const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
@@ -132,6 +142,16 @@ const App = () => (
                     <Route path="/admin/knowledge" element={<KnowledgeAdmin />} />
                     <Route path="/admin/badges" element={<BadgeAdmin />} />
                     <Route path="/admin/xp-events" element={<XPEventsAdmin />} />
+                    
+                    {/* Agent Admin Pages */}
+                    <Route path="/admin/api-guardian" element={<ApiGuardianAdmin />} />
+                    <Route path="/admin/health-monitor" element={<HealthMonitorAdmin />} />
+                    <Route path="/admin/security-auditor" element={<SecurityAuditorAdmin />} />
+                    <Route path="/admin/data-integrity" element={<DataIntegrityAdmin />} />
+                    <Route path="/admin/media-monitor" element={<MediaMonitorAdmin />} />
+                    <Route path="/admin/submissions-triage" element={<SubmissionsTriageAdmin />} />
+                    <Route path="/admin/analytics-reporter" element={<AnalyticsReporterAdmin />} />
+                    <Route path="/admin/knowledge-gap" element={<KnowledgeGapAdmin />} />
                     {/* Festivals */}
                     <Route path="/festivals" element={<Festivals />} />
                     <Route path="/festivals/:id" element={<FestivalDetail />} />
