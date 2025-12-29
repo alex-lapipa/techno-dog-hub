@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import ArtistEnrichmentAdmin from "@/pages/ArtistEnrichmentAdmin";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -61,6 +60,7 @@ const ActivityLog = lazy(() => import("./pages/ActivityLog"));
 const NotificationChannels = lazy(() => import("./pages/NotificationChannels"));
 const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
 const ArtistMigrationAdmin = lazy(() => import("./pages/ArtistMigrationAdmin"));
+const ArtistEnrichmentAdmin = lazy(() => import("./pages/ArtistEnrichmentAdmin"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
 const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
 
@@ -159,6 +159,7 @@ const App = () => (
                     <Route path="/admin/knowledge-gap" element={<KnowledgeGapAdmin />} />
                     <Route path="/admin/ticketing" element={<TicketingAdmin />} />
                     <Route path="/admin/dog-agent" element={<DogAgentAdmin />} />
+                    <Route path="/admin/artist-enrichment" element={<ArtistEnrichmentAdmin />} />
                     <Route path="/admin/training" element={<TrainingCenter />} />
                     {/* Festivals */}
                     <Route path="/festivals" element={<Festivals />} />
