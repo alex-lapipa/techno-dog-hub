@@ -250,6 +250,7 @@ const AdminDashboard = () => {
     { name: "XP Events", description: "Manage XP multiplier events", path: "/admin/xp-events", frameNumber: "T13" },
     { name: "Notifications", description: "Manage alert channels", path: "/admin/notifications", frameNumber: "T14" },
     { name: "Gear Expert", description: "AI gear database agent", path: "/admin/gear-agent", frameNumber: "T15" },
+    { name: "Ticketing", description: "Event ticketing module", path: "/admin/ticketing", frameNumber: "T16" },
   ];
 
   return (
