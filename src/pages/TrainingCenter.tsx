@@ -474,7 +474,7 @@ const PhilosophySection = () => {
       {/* Hero Statement */}
       <Card className="border-logo-green/30 bg-gradient-to-br from-logo-green/10 to-transparent">
         <CardContent className="p-8 text-center space-y-4">
-          <Heart className="w-12 h-12 text-logo-green mx-auto" />
+          <DogSilhouette className="w-12 h-12 mx-auto" />
           <h2 className="font-mono text-2xl font-bold">
             This Is Your Platform
           </h2>
