@@ -214,7 +214,7 @@ const DogChat = () => {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground font-normal mt-0.5">
-              From Detroit to Tbilisi — one scene, one pack 🖤
+              One scene, one pack 🖤
             </p>
           </div>
         </CardTitle>
