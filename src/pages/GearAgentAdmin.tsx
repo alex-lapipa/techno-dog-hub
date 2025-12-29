@@ -20,8 +20,12 @@ import {
   AlertCircle,
   ArrowLeft,
   Globe,
-  Search
+  Search,
+  Play,
+  Square,
+  Rocket
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface AgentStats {
   totalGear: number;
@@ -57,6 +61,14 @@ interface GapSummary {
   };
 }
 
+interface PipelineStep {
+  id: string;
+  name: string;
+  status: 'pending' | 'running' | 'completed' | 'error';
+  message?: string;
+  itemsProcessed?: number;
+}
+
 interface FillGapsResult {
   id: string;
   name: string;
@@ -88,6 +100,14 @@ const GearAgentAdmin = () => {
   const [firecrawlEnabled, setFirecrawlEnabled] = useState(false);
   const [gapSummary, setGapSummary] = useState<GapSummary | null>(null);
   const [fillGapsResults, setFillGapsResults] = useState<FillGapsResult[]>([]);
+  
+  // Pipeline state
+  const [isPipelineRunning, setIsPipelineRunning] = useState(false);
+  const [pipelineAborted, setPipelineAborted] = useState(false);
+  const [pipelineSteps, setPipelineSteps] = useState<PipelineStep[]>([]);
+  const [pipelineProgress, setPipelineProgress] = useState(0);
+  const [totalItemsToProcess, setTotalItemsToProcess] = useState(0);
+  const [itemsProcessed, setItemsProcessed] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -300,6 +320,141 @@ const GearAgentAdmin = () => {
     }
   };
 
+  // Master Pipeline - runs full gap analysis and filling automatically
+  const runFullPipeline = async () => {
+    setIsPipelineRunning(true);
+    setPipelineAborted(false);
+    setFillGapsResults([]);
+    setItemsProcessed(0);
+    
+    const steps: PipelineStep[] = [
+      { id: 'analyze', name: 'Analyze Database Gaps', status: 'pending' },
+      { id: 'fill', name: 'Fill Gaps in Batches', status: 'pending' },
+      { id: 'verify', name: 'Verify & Report', status: 'pending' }
+    ];
+    setPipelineSteps(steps);
+    setPipelineProgress(0);
+
+    try {
+      // Step 1: Analyze gaps
+      updatePipelineStep('analyze', 'running', 'Scanning database for missing data...');
+      
+      const { data: gapData, error: gapError } = await supabase.functions.invoke('gear-expert-agent', {
+        body: { action: 'gap-analysis' }
+      });
+
+      if (gapError) throw gapError;
+      if (pipelineAborted) return;
+
+      setGapSummary(gapData.summary);
+      const totalGaps = gapData.summary?.gapsFound?.notScraped || 0;
+      setTotalItemsToProcess(totalGaps);
+      
+      updatePipelineStep('analyze', 'completed', `Found ${totalGaps} items needing data`);
+      setPipelineProgress(20);
+
+      // Step 2: Fill gaps in batches
+      updatePipelineStep('fill', 'running', 'Starting batch processing...');
+      
+      const batchSize = 5;
+      let processed = 0;
+      let allResults: FillGapsResult[] = [];
+      let consecutiveErrors = 0;
+      const maxConsecutiveErrors = 3;
+
+      while (processed < totalGaps && !pipelineAborted && consecutiveErrors < maxConsecutiveErrors) {
+        const { data: fillData, error: fillError } = await supabase.functions.invoke('gear-expert-agent', {
+          body: { action: 'fill-gaps', limit: batchSize }
+        });
+
+        if (fillError) {
+          consecutiveErrors++;
+          console.error('Batch error:', fillError);
+          continue;
+        }
+
+        consecutiveErrors = 0;
+        const batchResults = fillData.results || [];
+        allResults = [...allResults, ...batchResults];
+        processed += batchResults.length;
+        setItemsProcessed(processed);
+        setFillGapsResults(allResults);
+
+        // Update progress (20% to 80% for filling)
+        const fillProgress = Math.min((processed / totalGaps) * 60, 60);
+        setPipelineProgress(20 + fillProgress);
+        updatePipelineStep('fill', 'running', `Processed ${processed}/${totalGaps} items...`);
+
+        // Check if we're done (no more items returned)
+        if (batchResults.length < batchSize) break;
+
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (pipelineAborted) {
+        updatePipelineStep('fill', 'error', 'Pipeline aborted by user');
+        return;
+      }
+
+      updatePipelineStep('fill', 'completed', `Processed ${processed} items successfully`);
+      setPipelineProgress(85);
+
+      // Step 3: Verify & Report
+      updatePipelineStep('verify', 'running', 'Generating final report...');
+      
+      // Refresh stats
+      await fetchStatus();
+      
+      // Run final gap analysis to show remaining gaps
+      const { data: finalGapData } = await supabase.functions.invoke('gear-expert-agent', {
+        body: { action: 'gap-analysis' }
+      });
+      
+      if (finalGapData?.summary) {
+        setGapSummary(finalGapData.summary);
+      }
+
+      const successCount = allResults.filter(r => r.success).length;
+      updatePipelineStep('verify', 'completed', `Completed: ${successCount}/${processed} items enriched`);
+      setPipelineProgress(100);
+
+      toast({
+        title: 'Pipeline Complete! 🎉',
+        description: `Successfully processed ${successCount} gear items`
+      });
+
+    } catch (err) {
+      console.error('Pipeline failed:', err);
+      toast({
+        title: 'Pipeline failed',
+        description: 'An error occurred during processing',
+        variant: 'destructive'
+      });
+      
+      // Mark current running step as error
+      setPipelineSteps(prev => prev.map(step => 
+        step.status === 'running' ? { ...step, status: 'error', message: 'Failed' } : step
+      ));
+    } finally {
+      setIsPipelineRunning(false);
+    }
+  };
+
+  const updatePipelineStep = (stepId: string, status: PipelineStep['status'], message: string) => {
+    setPipelineSteps(prev => prev.map(step => 
+      step.id === stepId ? { ...step, status, message } : step
+    ));
+  };
+
+  const abortPipeline = () => {
+    setPipelineAborted(true);
+    toast({
+      title: 'Aborting pipeline...',
+      description: 'Will stop after current batch completes'
+    });
+  };
+
   const handleChat = async () => {
     if (!chatInput.trim()) return;
 
@@ -418,6 +573,126 @@ const GearAgentAdmin = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Master Pipeline Control */}
+        <Card className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-800 border-2 border-logo-green/50 shadow-lg shadow-logo-green/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="font-mono text-lg flex items-center gap-3">
+              <div className="p-2 bg-logo-green/20 rounded-lg">
+                <Rocket className="w-6 h-6 text-logo-green" />
+              </div>
+              <div>
+                <span className="text-logo-green">MASTER PIPELINE</span>
+                <p className="text-xs text-muted-foreground font-normal mt-1">
+                  Run full database enrichment with one click
+                </p>
+              </div>
+            </CardTitle>
+            <div className="flex gap-2">
+              {!isPipelineRunning ? (
+                <Button 
+                  onClick={runFullPipeline}
+                  disabled={!firecrawlEnabled}
+                  size="lg"
+                  className="bg-logo-green hover:bg-logo-green/80 text-black font-bold px-6"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Run Full Pipeline
+                </Button>
+              ) : (
+                <Button 
+                  onClick={abortPipeline}
+                  variant="destructive"
+                  size="lg"
+                  className="font-bold px-6"
+                >
+                  <Square className="w-5 h-5 mr-2" />
+                  Stop Pipeline
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!firecrawlEnabled && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg mb-4">
+                <p className="text-sm text-amber-500">
+                  ⚠️ Firecrawl is not enabled. Connect Firecrawl to use the pipeline.
+                </p>
+              </div>
+            )}
+
+            {/* Pipeline Progress */}
+            {(isPipelineRunning || pipelineSteps.length > 0) && (
+              <div className="space-y-4">
+                {/* Overall Progress */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground font-mono">Overall Progress</span>
+                    <span className="text-foreground font-bold">{pipelineProgress}%</span>
+                  </div>
+                  <Progress value={pipelineProgress} className="h-3" />
+                  {totalItemsToProcess > 0 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      {itemsProcessed} / {totalItemsToProcess} items processed
+                    </p>
+                  )}
+                </div>
+
+                {/* Pipeline Steps */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                  {pipelineSteps.map((step, index) => (
+                    <div 
+                      key={step.id}
+                      className={`p-4 rounded-lg border ${
+                        step.status === 'completed' ? 'bg-logo-green/10 border-logo-green/50' :
+                        step.status === 'running' ? 'bg-amber-500/10 border-amber-500/50' :
+                        step.status === 'error' ? 'bg-crimson/10 border-crimson/50' :
+                        'bg-zinc-800 border-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-mono text-muted-foreground">
+                          STEP {index + 1}
+                        </span>
+                        {step.status === 'completed' && (
+                          <CheckCircle className="w-4 h-4 text-logo-green" />
+                        )}
+                        {step.status === 'running' && (
+                          <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />
+                        )}
+                        {step.status === 'error' && (
+                          <AlertCircle className="w-4 h-4 text-crimson" />
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-foreground">{step.name}</p>
+                      {step.message && (
+                        <p className="text-xs text-muted-foreground mt-1">{step.message}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Stats when not running */}
+            {!isPipelineRunning && pipelineSteps.length === 0 && (
+              <div className="grid grid-cols-3 gap-4 mt-2">
+                <div className="text-center p-3 bg-zinc-800 rounded-lg">
+                  <p className="text-2xl font-bold text-foreground">{gapSummary?.gapsFound?.notScraped || '?'}</p>
+                  <p className="text-xs text-muted-foreground">Items to Process</p>
+                </div>
+                <div className="text-center p-3 bg-zinc-800 rounded-lg">
+                  <p className="text-2xl font-bold text-foreground">~{Math.ceil((gapSummary?.gapsFound?.notScraped || 0) / 5)}</p>
+                  <p className="text-xs text-muted-foreground">Batches Needed</p>
+                </div>
+                <div className="text-center p-3 bg-zinc-800 rounded-lg">
+                  <p className="text-2xl font-bold text-foreground">~{Math.ceil((gapSummary?.gapsFound?.notScraped || 0) * 0.5)}</p>
+                  <p className="text-xs text-muted-foreground">Est. Minutes</p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Gap Analysis & Fill Gaps Section */}
         <Card className="bg-zinc-900 border-amber-500/30">
