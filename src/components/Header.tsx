@@ -67,7 +67,7 @@ const Header = () => {
   
   // Get current scene index for navigation arrows
   const getCurrentSceneIndex = useCallback(() => {
-    return SCENES_ITEMS.findIndex(item => isActive(item.path));
+    return SCENES_ITEMS.findIndex(item => location.pathname === item.path || location.pathname.startsWith(item.path + '/'));
   }, [location.pathname]);
 
   const navigateScene = useCallback((direction: 'prev' | 'next') => {

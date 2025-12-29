@@ -7,6 +7,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   loadArtistsSummaryUnified, 
   loadArtistByIdUnified,
@@ -107,21 +108,14 @@ export function useMigrationStatus() {
       const flags = getFeatureFlags();
       const phase = getCurrentMigrationPhase();
       
-      // Call migration status endpoint
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/artist-migration`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'status' }),
-        }
-      );
+      // Use supabase client for edge function call
+      const { data, error } = await supabase.functions.invoke('artist-migration', {
+        body: { action: 'status' }
+      });
       
-      if (!response.ok) {
+      if (error) {
         throw new Error('Failed to fetch migration status');
       }
-      
-      const data = await response.json();
       
       return {
         phase,
@@ -144,30 +138,23 @@ export function useMigrationOperations() {
     action: 'migrate_rag' | 'migrate_content_sync' | 'migrate_all' | 'validate',
     options?: { dryRun?: boolean; batchSize?: number }
   ) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/artist-migration`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action, 
-          dryRun: options?.dryRun ?? false,
-          batchSize: options?.batchSize ?? 50,
-        }),
+    const { data, error } = await supabase.functions.invoke('artist-migration', {
+      body: { 
+        action, 
+        dryRun: options?.dryRun ?? false,
+        batchSize: options?.batchSize ?? 50,
       }
-    );
+    });
     
-    if (!response.ok) {
+    if (error) {
       throw new Error('Migration operation failed');
     }
-    
-    const result = await response.json();
     
     // Invalidate queries after migration
     queryClient.invalidateQueries({ queryKey: artistQueryKeys.all });
     queryClient.invalidateQueries({ queryKey: artistQueryKeys.migration() });
     
-    return result;
+    return data;
   }, [queryClient]);
   
   const syncEmbeddings = useCallback(async (
@@ -175,25 +162,20 @@ export function useMigrationOperations() {
   ) => {
     const action = options?.artistId ? 'sync_artist' : 'sync_all';
     
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/artist-embedding-sync`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action,
-          artistId: options?.artistId,
-          forceRegenerate: options?.forceRegenerate ?? false,
-          batchSize: options?.batchSize ?? 10,
-        }),
+    const { data, error } = await supabase.functions.invoke('artist-embedding-sync', {
+      body: { 
+        action,
+        artistId: options?.artistId,
+        forceRegenerate: options?.forceRegenerate ?? false,
+        batchSize: options?.batchSize ?? 10,
       }
-    );
+    });
     
-    if (!response.ok) {
+    if (error) {
       throw new Error('Embedding sync failed');
     }
     
-    return response.json();
+    return data;
   }, []);
   
   return { runMigration, syncEmbeddings };

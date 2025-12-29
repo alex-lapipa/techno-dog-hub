@@ -55,8 +55,8 @@ const EntityImage = ({
         await supabase.functions.invoke('media-curator', {
           body: { action: 'enqueue', entityType, entityId, entityName }
         });
-      } catch (e) {
-        console.log('Could not enqueue media job');
+      } catch {
+        // Silently fail - media job enqueueing is non-critical
       }
     };
 
