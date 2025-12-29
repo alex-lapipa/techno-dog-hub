@@ -2,30 +2,52 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminPageLayout } from '@/components/admin/AdminPageLayout';
 import DJArtistSearch from '@/components/DJArtistSearch';
+import DJArtistCharts from '@/components/admin/DJArtistCharts';
+import DJArtistTable from '@/components/admin/DJArtistTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Upload, Search, Database, Loader2, Users } from 'lucide-react';
+import { Upload, Search, Database, Loader2, Users, BarChart3, List } from 'lucide-react';
+
+interface DJArtist {
+  id: number;
+  artist_name: string;
+  nationality: string | null;
+  subgenres: string[] | null;
+  labels: string[] | null;
+  rank: number;
+  known_for: string | null;
+  real_name: string | null;
+  years_active: string | null;
+}
 
 const DJArtistsAdmin = () => {
   const [jsonInput, setJsonInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
+  const [artists, setArtists] = useState<DJArtist[]>([]);
   const [artistCount, setArtistCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCount = async () => {
-      const { count } = await supabase
-        .from('dj_artists' as any)
-        .select('*', { count: 'exact', head: true });
-      setArtistCount(count);
-      setLoading(false);
-    };
-    fetchCount();
+    fetchArtists();
   }, []);
+
+  const fetchArtists = async () => {
+    setLoading(true);
+    const { data, count, error } = await supabase
+      .from('dj_artists')
+      .select('*', { count: 'exact' })
+      .order('rank', { ascending: true });
+    
+    if (!error && data) {
+      setArtists(data as unknown as DJArtist[]);
+      setArtistCount(count);
+    }
+    setLoading(false);
+  };
 
   const handleUpload = async (clearExisting: boolean) => {
     if (!jsonInput.trim()) {
@@ -33,10 +55,10 @@ const DJArtistsAdmin = () => {
       return;
     }
 
-    let artists;
+    let artistsData;
     try {
-      artists = JSON.parse(jsonInput);
-      if (!Array.isArray(artists)) {
+      artistsData = JSON.parse(jsonInput);
+      if (!Array.isArray(artistsData)) {
         throw new Error('JSON must be an array');
       }
     } catch (err) {
@@ -49,19 +71,14 @@ const DJArtistsAdmin = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('upload-dj-artists', {
-        body: { artists, clearExisting }
+        body: { artists: artistsData, clearExisting }
       });
 
       if (error) throw error;
 
       setUploadResult(data);
       toast.success(`Uploaded ${data.uploaded} artists successfully`);
-      
-      // Refresh count
-      const { count } = await supabase
-        .from('dj_artists' as any)
-        .select('*', { count: 'exact', head: true });
-      setArtistCount(count);
+      fetchArtists();
       
     } catch (err) {
       console.error('Upload error:', err);
@@ -72,26 +89,25 @@ const DJArtistsAdmin = () => {
     }
   };
 
-  const refreshCount = async () => {
-    setLoading(true);
-    const { count } = await supabase
-      .from('dj_artists' as any)
-      .select('*', { count: 'exact', head: true });
-    setArtistCount(count);
-    setLoading(false);
-  };
-
   return (
     <AdminPageLayout
       title="DJ Artists RAG"
       description={artistCount !== null ? `${artistCount} artists in database` : 'Vector database for artist search'}
       icon={Users}
       iconColor="text-purple-500"
-      onRefresh={refreshCount}
+      onRefresh={fetchArtists}
       isLoading={loading}
     >
-      <Tabs defaultValue="search" className="space-y-6">
+      <Tabs defaultValue="visualize" className="space-y-6">
         <TabsList className="font-mono">
+          <TabsTrigger value="visualize" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Visualize
+          </TabsTrigger>
+          <TabsTrigger value="list" className="gap-2">
+            <List className="w-4 h-4" />
+            List
+          </TabsTrigger>
           <TabsTrigger value="search" className="gap-2">
             <Search className="w-4 h-4" />
             Search
@@ -105,6 +121,28 @@ const DJArtistsAdmin = () => {
             Stats
           </TabsTrigger>
         </TabsList>
+
+        {/* Visualize Tab */}
+        <TabsContent value="visualize">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <DJArtistCharts artists={artists} />
+          )}
+        </TabsContent>
+
+        {/* List Tab */}
+        <TabsContent value="list">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <DJArtistTable artists={artists} />
+          )}
+        </TabsContent>
 
         {/* Search Tab */}
         <TabsContent value="search">
