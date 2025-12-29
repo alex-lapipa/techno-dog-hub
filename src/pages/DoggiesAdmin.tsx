@@ -15,6 +15,7 @@ import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield } f
 import DogSilhouette from "@/components/DogSilhouette";
 import { dogVariants, GrumpyDog } from "@/components/DogPack";
 import DoggyExport from "@/components/DoggyExport";
+import DoggyEmbedCode from "@/components/DoggyEmbedCode";
 
 const packQuotes = [
   "A well-organized pack is a happy pack!",
@@ -370,6 +371,9 @@ const DoggiesAdmin = () => {
 
           {/* Doggie Export & Sharing Station */}
           <DoggyExport selectedDog={selectedDog} generatedDogs={generatedDogs} />
+
+          {/* Embeddable Widget */}
+          <DoggyEmbedCode />
 
           {/* Fun Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
