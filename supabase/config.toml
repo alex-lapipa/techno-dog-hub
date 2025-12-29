@@ -240,3 +240,6 @@ verify_jwt = false
 
 [functions.admin-ai-assistant]
 verify_jwt = false
+
+[functions.gear-expert-agent]
+verify_jwt = false
