@@ -286,6 +286,7 @@ const AdminDashboard = () => {
     { name: "Gear", description: "Equipment database", path: "/admin/gear-agent", frameNumber: "15" },
     { name: "Ticketing", description: "Event tickets", path: "/admin/ticketing", frameNumber: "16" },
     { name: "Training", description: "Onboarding & docs", path: "/admin/training", frameNumber: "17" },
+    { name: "Dog Agent", description: "AI Orchestrator", path: "/admin/dog-agent", frameNumber: "18" },
   ];
 
   return (
