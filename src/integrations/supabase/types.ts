@@ -1567,6 +1567,7 @@ export type Database = {
           designer: string | null
           discontinued_year: number | null
           effects_onboard: string | null
+          embedding: string | null
           envelopes: string | null
           famous_tracks: Json | null
           filters: string | null
@@ -1617,6 +1618,7 @@ export type Database = {
           designer?: string | null
           discontinued_year?: number | null
           effects_onboard?: string | null
+          embedding?: string | null
           envelopes?: string | null
           famous_tracks?: Json | null
           filters?: string | null
@@ -1667,6 +1669,7 @@ export type Database = {
           designer?: string | null
           discontinued_year?: number | null
           effects_onboard?: string | null
+          embedding?: string | null
           envelopes?: string | null
           famous_tracks?: Json | null
           filters?: string | null
@@ -3008,6 +3011,21 @@ export type Database = {
           subgenres: string[]
           top_tracks: string[]
           years_active: string
+        }[]
+      }
+      search_gear_by_embedding: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          brand: string
+          category: string
+          id: string
+          name: string
+          short_description: string
+          similarity: number
         }[]
       }
       update_activity_streak: {
