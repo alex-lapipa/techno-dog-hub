@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import DogChat from "@/components/admin/DogChat";
+import DogSilhouette from "@/components/DogSilhouette";
 import { 
   BookOpen, 
   Users, 
@@ -20,14 +21,13 @@ import {
   MessageSquare,
   Trophy,
   Star,
-  Sparkles,
   Zap,
   Building,
   HandHeart,
   GitBranch,
   Target,
   Rocket,
-  Dog
+  Bot
 } from "lucide-react";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -288,7 +288,7 @@ const TechnicalOverviewSection = () => {
     },
     {
       title: "AI Assistants",
-      icon: Sparkles,
+      icon: Bot,
       description: "We use artificial intelligence to help verify information, write news articles, and keep data accurate. AI can't replace human knowledge, but it helps us work faster and catch errors.",
       simple: "Robot helpers that double-check facts and write drafts"
     },
@@ -620,7 +620,7 @@ const TrainingCenter = () => {
       <Tabs defaultValue="dog" className="space-y-6">
         <TabsList className="grid grid-cols-5 w-full max-w-3xl">
           <TabsTrigger value="dog" className="font-mono text-xs">
-            <Dog className="w-3.5 h-3.5 mr-1.5" />
+            <DogSilhouette className="w-4 h-4 mr-1.5" />
             Ask Dog
           </TabsTrigger>
           <TabsTrigger value="onboarding" className="font-mono text-xs">
@@ -648,8 +648,8 @@ const TrainingCenter = () => {
               <Card className="border-border/50">
                 <CardHeader>
                   <CardTitle className="font-mono text-lg flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-logo-green" />
-                    Meet Dog 🐕
+                    <DogSilhouette className="w-5 h-5" />
+                    Meet Dog
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
