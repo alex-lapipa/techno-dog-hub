@@ -95,6 +95,63 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_status: {
+        Row: {
+          agent_name: string
+          avg_duration_ms: number | null
+          category: string | null
+          config: Json | null
+          created_at: string
+          error_count: number | null
+          function_name: string
+          id: string
+          last_error_at: string | null
+          last_error_message: string | null
+          last_run_at: string | null
+          last_success_at: string | null
+          run_count: number | null
+          status: string
+          success_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_name: string
+          avg_duration_ms?: number | null
+          category?: string | null
+          config?: Json | null
+          created_at?: string
+          error_count?: number | null
+          function_name: string
+          id?: string
+          last_error_at?: string | null
+          last_error_message?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          run_count?: number | null
+          status?: string
+          success_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_name?: string
+          avg_duration_ms?: number | null
+          category?: string | null
+          config?: Json | null
+          created_at?: string
+          error_count?: number | null
+          function_name?: string
+          id?: string
+          last_error_at?: string | null
+          last_error_message?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          run_count?: number | null
+          status?: string
+          success_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string

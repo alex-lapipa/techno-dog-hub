@@ -162,6 +162,31 @@ const AdminDashboard = () => {
 
   const runnableAgents = agents.filter(a => a.functionName);
 
+  const updateAgentStatusInDb = async (agentName: string, status: string, errorMessage?: string) => {
+    try {
+      const updateData: Record<string, any> = {
+        status,
+        last_run_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      if (status === 'success') {
+        updateData.last_success_at = new Date().toISOString();
+        updateData.last_error_message = null;
+      } else if (status === 'error' && errorMessage) {
+        updateData.last_error_at = new Date().toISOString();
+        updateData.last_error_message = errorMessage;
+      }
+
+      await supabase
+        .from('agent_status')
+        .update(updateData)
+        .eq('agent_name', agentName);
+    } catch (err) {
+      console.error('Failed to update agent status:', err);
+    }
+  };
+
   const runAllAgents = async () => {
     setIsRunningAll(true);
     
@@ -183,6 +208,9 @@ const AdminDashboard = () => {
         idx === i ? { ...s, status: 'running' } : s
       ));
       
+      // Update DB status to running
+      await updateAgentStatusInDb(agent.name, 'running');
+      
       try {
         const { error } = await supabase.functions.invoke(agent.functionName!);
         
@@ -191,12 +219,18 @@ const AdminDashboard = () => {
         setAgentRunStates(prev => prev.map((s, idx) => 
           idx === i ? { ...s, status: 'success' } : s
         ));
+        
+        // Update DB status to success
+        await updateAgentStatusInDb(agent.name, 'success');
         successCount++;
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';
         setAgentRunStates(prev => prev.map((s, idx) => 
           idx === i ? { ...s, status: 'error', error: errorMsg } : s
         ));
+        
+        // Update DB status to error
+        await updateAgentStatusInDb(agent.name, 'error', errorMsg);
         errorCount++;
       }
     }
