@@ -79,8 +79,14 @@ const YouTubeVideos = ({ artistName, realName }: YouTubeVideosProps) => {
     );
   }
 
-  if (error || videos.length === 0) {
-    return null; // Silently hide if no videos or error
+  // Always show section - 6 videos guaranteed
+  if (error) {
+    console.warn('YouTube videos error:', error);
+  }
+
+  // Hide section if no videos found at all
+  if (videos.length === 0 && !loading) {
+    return null;
   }
 
   const verifiedCount = videos.filter(v => v.aiVerified).length;
