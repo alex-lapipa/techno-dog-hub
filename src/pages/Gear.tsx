@@ -1,16 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, Search, Sliders } from "lucide-react";
+import { ArrowRight, Search, Sliders, Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { gear, gearCategories, GearCategory } from "@/data/gear";
+import { useGearData } from "@/hooks/useGearData";
+import { gearCategories, GearCategory } from "@/data/gear";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
-
 const GearPage = () => {
   const { trackClick, trackSearch } = useAnalytics();
+  const { data: gear = [], isLoading } = useGearData();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -43,7 +44,7 @@ const GearPage = () => {
       
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [gear, searchQuery, selectedCategory]);
 
   const categories: (GearCategory | "all")[] = ["all", "synth", "drum-machine", "sampler", "sequencer", "effect", "daw", "midi-tool"];
 
@@ -64,6 +65,14 @@ const GearPage = () => {
       }
     }))
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

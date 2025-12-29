@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight } from "lucide-react";
-import { getGearById, getRelatedGear, gearCategories, gear } from "@/data/gear";
+import { ArrowLeft, Calendar, Building2, Sliders, Radio, Users, Disc3, Wrench, ExternalLink, Play, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { gearCategories } from "@/data/gear";
+import { useGearData, useGearItem } from "@/hooks/useGearData";
 import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import GearYouTubeVideos from "@/components/GearYouTubeVideos";
@@ -8,12 +9,23 @@ import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 
 const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const gearItem = id ? getGearById(id) : null;
+  const { data: gearItem, isLoading } = useGearItem(id || "");
+  const { data: allGear = [] } = useGearData();
 
   // Find prev/next gear for navigation
-  const currentIndex = gear.findIndex(g => g.id === id);
-  const prevGear = currentIndex > 0 ? gear[currentIndex - 1] : null;
-  const nextGear = currentIndex < gear.length - 1 ? gear[currentIndex + 1] : null;
+  const currentIndex = allGear.findIndex(g => g.id === id);
+  const prevGear = currentIndex > 0 ? allGear[currentIndex - 1] : null;
+  const nextGear = currentIndex < allGear.length - 1 ? allGear[currentIndex + 1] : null;
+
+  if (isLoading) {
+    return (
+      <PageLayout title="Loading..." path={`/gear/${id}`}>
+        <div className="container mx-auto px-4 py-16 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!gearItem) {
     return (
@@ -30,7 +42,7 @@ const GearDetail = () => {
     );
   }
 
-  const relatedItems = getRelatedGear(gearItem.relatedGear);
+  const relatedItems = allGear.filter(g => gearItem.relatedGear.includes(g.id));
 
   const productSchema = {
     "@context": "https://schema.org",
@@ -94,7 +106,7 @@ const GearDetail = () => {
               )}
 
               <span className="font-mono text-xs text-muted-foreground px-2">
-                {currentIndex + 1}/{gear.length}
+                {currentIndex + 1}/{allGear.length}
               </span>
 
               {nextGear ? (
