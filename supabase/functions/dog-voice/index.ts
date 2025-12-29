@@ -5,17 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Voice options for the dog - inclusive voice selection
-const DOG_VOICES = {
-  // She - warm, friendly feminine voice (Jessica)
-  she: "cgSgspJ2msm6clMCkdW9",
-  // He - energetic masculine voice (George)
-  he: "JBFqnCBsd6RMkjVDRZzb",
-  // They - balanced, neutral voice (River - androgynous)
-  they: "SAz9YHcvj6GT2YYXdXww",
-  // It - robotic/glitchy voice (Glitch)
-  it: "kPtEHAvRnjUJFv7SK9WI"
-};
+// Single voice for Techno Dog - Glitch (robotic/glitchy)
+const DOG_VOICE_ID = "kPtEHAvRnjUJFv7SK9WI";
 
 // Realistic dog sounds - phonetic representations that sound natural when spoken
 const DOG_SOUNDS = {
@@ -27,7 +18,7 @@ const DOG_SOUNDS = {
 };
 
 // Inject dog sounds into text occasionally (not too much!)
-function addDogSounds(text: string, voice: string): string {
+function addDogSounds(text: string): string {
   // Only add sounds ~30% of the time to keep it fun but not annoying
   if (Math.random() > 0.3) {
     return text;
@@ -63,7 +54,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, voice = 'they' } = await req.json();
+    const { text } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
     if (!ELEVENLABS_API_KEY) {
@@ -74,9 +65,6 @@ serve(async (req) => {
       throw new Error("Text is required");
     }
 
-    // Get the voice ID based on selection
-    const voiceId = DOG_VOICES[voice as keyof typeof DOG_VOICES] || DOG_VOICES.they;
-
     // Clean the text - remove emojis and asterisks for cleaner speech
     let cleanText = text
       .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
@@ -85,46 +73,21 @@ serve(async (req) => {
       .trim();
 
     // Add occasional dog sounds
-    cleanText = addDogSounds(cleanText, voice);
+    cleanText = addDogSounds(cleanText);
 
-    console.log(`Generating ${voice} voice for:`, cleanText.substring(0, 100) + "...");
+    console.log("Generating voice for:", cleanText.substring(0, 100) + "...");
 
-    // Adjust voice settings based on voice type
-    const voiceSettings: Record<string, { stability: number; similarity_boost: number; style: number; use_speaker_boost: boolean; speed: number }> = {
-      she: {
-        stability: 0.45,
-        similarity_boost: 0.8,
-        style: 0.55,
-        use_speaker_boost: true,
-        speed: 0.95,
-      },
-      he: {
-        stability: 0.4,
-        similarity_boost: 0.75,
-        style: 0.6,
-        use_speaker_boost: true,
-        speed: 0.97,
-      },
-      they: {
-        stability: 0.5,
-        similarity_boost: 0.7,
-        style: 0.5,
-        use_speaker_boost: true,
-        speed: 0.93,
-      },
-      it: {
-        stability: 0.3,
-        similarity_boost: 0.6,
-        style: 0.7,
-        use_speaker_boost: false,
-        speed: 0.90,
-      }
+    // Voice settings for Glitch voice
+    const voiceSettings = {
+      stability: 0.3,
+      similarity_boost: 0.6,
+      style: 0.7,
+      use_speaker_boost: false,
+      speed: 0.90,
     };
-    
-    const settings = voiceSettings[voice] || voiceSettings.they;
 
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${DOG_VOICE_ID}`,
       {
         method: "POST",
         headers: {
@@ -135,7 +98,7 @@ serve(async (req) => {
           text: cleanText,
           model_id: "eleven_turbo_v2_5",
           output_format: "mp3_44100_128",
-          voice_settings: settings,
+          voice_settings: voiceSettings,
         }),
       }
     );
