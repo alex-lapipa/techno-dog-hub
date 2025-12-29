@@ -73,18 +73,18 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
 
   const allDogs = [...dogVariants, ...generatedDogs];
 
-  // Dog emojis/text representations for sharing
-  const dogEmojis = [
-    { name: 'Happy', emoji: '🐕✨', text: '*wags tail excitedly*' },
-    { name: 'Sleepy', emoji: '🐕💤', text: '*snoozes peacefully*' },
-    { name: 'Excited', emoji: '🐕🎉', text: '*BORK BORK BORK*' },
-    { name: 'Grumpy', emoji: '🐕😤', text: '*judges silently*' },
-    { name: 'Curious', emoji: '🐕❓', text: '*tilts head*' },
-    { name: 'Party', emoji: '🐕🎊', text: '*celebrates*' },
-    { name: 'DJ', emoji: '🐕🎧', text: '*drops the beat*' },
-    { name: 'Puppy', emoji: '🐶💕', text: '*smol excitement*' },
-    { name: 'Old', emoji: '🐕🧓', text: '*wise borking*' },
-    { name: 'Techno', emoji: '🐕⚡', text: '*glitches happily*' },
+  // Dog text representations for sharing
+  const dogTexts = [
+    { name: 'Happy', text: '*wags tail excitedly*' },
+    { name: 'Sleepy', text: '*snoozes peacefully*' },
+    { name: 'Excited', text: '*BORK BORK BORK*' },
+    { name: 'Grumpy', text: '*judges silently*' },
+    { name: 'Curious', text: '*tilts head*' },
+    { name: 'Party', text: '*celebrates*' },
+    { name: 'DJ', text: '*drops the beat*' },
+    { name: 'Puppy', text: '*smol excitement*' },
+    { name: 'Old', text: '*wise borking*' },
+    { name: 'Techno', text: '*glitches happily*' },
   ];
 
   const handleExportPNG = async (dogName: string, DogComponent: React.FC<{ className?: string }>) => {
@@ -177,8 +177,8 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
   };
 
   const handleShare = (platform: string, dogName: string) => {
-    const dogEmoji = dogEmojis.find(e => e.name === dogName);
-    const shareText = `Check out this ${dogName} Dog from techno.dog! ${dogEmoji?.emoji || '🐕'} ${dogEmoji?.text || ''}\n\nJoin the pack at techno.dog 🎵`;
+    const dogText = dogTexts.find(e => e.name === dogName);
+    const shareText = `Check out this ${dogName} Dog from techno.dog! ${dogText?.text || ''}\n\nJoin the pack at techno.dog`;
     const shareUrl = 'https://techno.dog';
 
     let shareLink = '';
@@ -204,8 +204,8 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
   };
 
   const copyToClipboard = async (dogName: string) => {
-    const dogEmoji = dogEmojis.find(e => e.name === dogName);
-    const copyText = `${dogEmoji?.emoji || '🐕'} ${dogEmoji?.text || ''} — from techno.dog`;
+    const dogText = dogTexts.find(e => e.name === dogName);
+    const copyText = `${dogText?.text || ''} — from techno.dog`;
     
     try {
       await navigator.clipboard.writeText(copyText);
@@ -225,10 +225,10 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
   };
 
   const handleSendDoggie = (dogName: string) => {
-    const dogEmoji = dogEmojis.find(e => e.name === dogName);
+    const dogText = dogTexts.find(e => e.name === dogName);
     toast({
-      title: `${dogEmoji?.emoji} Sending ${dogName} Dog!`,
-      description: dogEmoji?.text || "On their way!",
+      title: `Sending ${dogName} Dog!`,
+      description: dogText?.text || "On their way!",
     });
   };
 
@@ -308,7 +308,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {dogVariants.map((dog) => {
                 const DogComponent = dog.Component;
-                const dogEmoji = dogEmojis.find(e => e.name === dog.name);
+                const dogText = dogTexts.find(e => e.name === dog.name);
                 return (
                   <div 
                     key={dog.name}
@@ -318,7 +318,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
                     <div className="flex-1 min-w-0">
                       <p className="font-mono text-sm font-bold">{dog.name}</p>
                       <p className="font-mono text-[10px] text-muted-foreground truncate">
-                        {dogEmoji?.emoji} {dogEmoji?.text}
+                        {dogText?.text}
                       </p>
                     </div>
                     <div className="flex gap-1">
@@ -445,7 +445,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
               className="font-mono text-xs"
               onClick={() => handleSendDoggie('Happy')}
             >
-              🐕✨ Send Happy
+              Send Happy
             </Button>
             <Button 
               variant="outline" 
@@ -453,7 +453,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
               className="font-mono text-xs"
               onClick={() => handleSendDoggie('Excited')}
             >
-              🐕🎉 Send Excited
+              Send Excited
             </Button>
             <Button 
               variant="outline" 
@@ -461,7 +461,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
               className="font-mono text-xs"
               onClick={() => handleSendDoggie('Sleepy')}
             >
-              🐕💤 Send Sleepy
+              Send Sleepy
             </Button>
             <Button 
               variant="outline" 
@@ -469,7 +469,7 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
               className="font-mono text-xs"
               onClick={() => handleSendDoggie('Party')}
             >
-              🐕🎊 Send Party
+              Send Party
             </Button>
           </div>
         </div>

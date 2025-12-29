@@ -29,7 +29,7 @@ const FloatingDogButton = () => {
         
         {/* Tooltip */}
         <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-background/95 border border-logo-green/40 text-foreground text-xs font-mono px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
-          Ask Techno Dog 🐕
+          Ask Techno Dog
         </span>
       </button>
 

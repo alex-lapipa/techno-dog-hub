@@ -101,7 +101,7 @@ const CustomDoggyCreator = ({ onDoggyCreated }: CustomDoggyCreatorProps) => {
   const shareImage = async () => {
     if (!generatedImage) return;
     
-    const shareText = `Check out my custom Techno Doggy! 🐕 "${prompt}" - Create yours at techno.dog/doggies`;
+    const shareText = `Check out my custom Techno Doggy! "${prompt}" - Create yours at techno.dog/doggies`;
     const shareUrl = "https://techno.dog/doggies";
     
     // Try native share first
@@ -140,7 +140,7 @@ const CustomDoggyCreator = ({ onDoggyCreated }: CustomDoggyCreatorProps) => {
           Create Your Own Techno Doggy
         </CardTitle>
         <CardDescription className="font-mono text-xs">
-          Describe your dream doggy. Only positive, happy, musical vibes allowed! 🐕
+          Describe your dream doggy. Only positive, happy, musical vibes allowed!
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

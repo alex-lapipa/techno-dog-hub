@@ -21,7 +21,7 @@ interface ReferralWidgetProps {
   compact?: boolean;
 }
 
-const SHARE_TEXT = "Join the techno.dog community - the global techno knowledge base! 🐕🎛️";
+const SHARE_TEXT = "Join the techno.dog community - the global techno knowledge base!";
 
 export const ReferralWidget = ({ profileId, compact = false }: ReferralWidgetProps) => {
   const [stats, setStats] = useState<ReferralStats | null>(null);

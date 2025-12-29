@@ -93,12 +93,12 @@ const TechnoDoggies = () => {
       actionType: "share_email",
     });
     
-    const subject = encodeURIComponent("Check out these Techno Doggies! 🐕");
+    const subject = encodeURIComponent("Check out these Techno Doggies!");
     const body = encodeURIComponent(
       `I found these awesome Techno Doggies at techno.dog!\n\n` +
       `My favorite is the ${currentDog?.name} Dog - ${currentDog?.personality}\n\n` +
       `Create your own pack: https://techno.dog/doggies\n\n` +
-      `🐕 Bork bork!`
+      `Bork bork!`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     toast.success("Opening email client...");
@@ -146,7 +146,7 @@ const TechnoDoggies = () => {
   };
 
   const shareUrl = "https://techno.dog/doggies";
-  const shareText = `Check out the ${currentDog?.name} Techno Dog! 🐕 Create your own pack at techno.dog`;
+  const shareText = `Check out the ${currentDog?.name} Techno Dog! Create your own pack at techno.dog`;
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
@@ -168,7 +168,7 @@ const TechnoDoggies = () => {
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://techno.dog/doggies" />
-        <meta property="og:title" content="Techno Doggies - Create & Share Your Pack 🐕" />
+        <meta property="og:title" content="Techno Doggies - Create & Share Your Pack" />
         <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the borks!" />
         <meta property="og:image" content="https://techno.dog/og-doggies.png" />
         <meta property="og:image:width" content="1200" />
@@ -178,7 +178,7 @@ const TechnoDoggies = () => {
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content="https://techno.dog/doggies" />
-        <meta name="twitter:title" content="Techno Doggies - Create & Share Your Pack 🐕" />
+        <meta name="twitter:title" content="Techno Doggies - Create & Share Your Pack" />
         <meta name="twitter:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community." />
         <meta name="twitter:image" content="https://techno.dog/og-doggies.png" />
       </Helmet>
@@ -210,7 +210,7 @@ const TechnoDoggies = () => {
             </h1>
             <p className="text-muted-foreground font-mono text-sm max-w-md mx-auto">
               Create and share your own pack of techno doggies. 
-              Spread the borks across the internet! 🐕
+              Spread the borks across the internet!
             </p>
           </div>
 
@@ -349,7 +349,7 @@ const TechnoDoggies = () => {
           {/* Fun Facts */}
           <div className="max-w-md mx-auto mt-12 text-center">
             <p className="font-mono text-xs text-muted-foreground">
-              🐕 All doggies are free to share and spread joy across the techno community
+              All doggies are free to share and spread joy across the techno community
             </p>
             <p className="font-mono text-xs text-muted-foreground mt-2">
               Made with 🖤 by the <Link to="/" className="text-logo-green hover:underline">techno.dog</Link> pack
