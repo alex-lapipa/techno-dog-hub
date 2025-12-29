@@ -17,13 +17,13 @@ const DOG_VOICES = {
   it: "kPtEHAvRnjUJFv7SK9WI"
 };
 
-// Dog sounds to occasionally sprinkle in
+// Realistic dog sounds - phonetic representations that sound natural when spoken
 const DOG_SOUNDS = {
-  excited: ["Woof!", "Arf arf!", "Yip yip!", "*happy panting*", "Awoo!"],
-  thinking: ["Hmm... *sniff sniff*", "*tilts head*", "Rrrruff..."],
-  agreeing: ["Woof woof!", "Arf!", "*tail wagging sounds*"],
-  laughing: ["*happy panting* heh heh", "Woof haha!", "*playful growl*"],
-  ending: ["Woof!", "*happy tippy taps*", "Arf! 🐾", "*tail wagging*"]
+  excited: ["Woof woof!", "Ruff!", "Yip yip!", "Aroo!", "Bork bork!"],
+  thinking: ["Hmm, rrruff...", "Huh, woof...", "Mmm, arf..."],
+  agreeing: ["Woof!", "Arf arf!", "Ruff ruff!"],
+  laughing: ["Heh heh heh, ruff!", "Hah, woof woof!", "Hehe, arf!"],
+  ending: ["Woof!", "Arf!", "Ruff!", "Bork!"]
 };
 
 // Inject dog sounds into text occasionally (not too much!)
