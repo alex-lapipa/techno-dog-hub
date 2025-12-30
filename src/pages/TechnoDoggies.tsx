@@ -691,8 +691,8 @@ const TechnoDoggies = () => {
               )}
             </div>
             
-            {/* Share Actions - appears when dog is selected */}
-            <div className={`transition-all duration-300 overflow-hidden ${isDogSelected ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+            {/* Share Actions - always visible */}
+            <div className="transition-all duration-300">
               <div className="px-4 pb-4 pt-2 border-t border-logo-green/20">
                 {/* Primary Share Row */}
                 <div className="grid grid-cols-7 gap-1.5 mb-3">
