@@ -5815,6 +5815,36 @@ export type Database = {
           },
         ]
       }
+      translation_glossary: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           awarded_at: string

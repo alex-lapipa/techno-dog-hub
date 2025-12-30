@@ -303,3 +303,9 @@ verify_jwt = false
 
 [functions.create-admin-user]
 verify_jwt = false
+
+[functions.translation-agent]
+verify_jwt = false
+
+[functions.gear-image-curator]
+verify_jwt = false
