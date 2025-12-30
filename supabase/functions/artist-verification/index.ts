@@ -258,6 +258,17 @@ async function detectContradictions(
   return result.contradictions || [];
 }
 
+// Safe body parser to handle empty/invalid JSON
+async function safeParseBody(req: Request): Promise<any> {
+  try {
+    const text = await req.text();
+    if (!text || text.trim() === '') return {};
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -273,8 +284,8 @@ serve(async (req) => {
     }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const body: VerificationRequest = await req.json();
-    const { action, artist_id, claim_id, limit = 10 } = body;
+    const body: VerificationRequest = await safeParseBody(req);
+    const { action = 'status', artist_id, claim_id, limit = 10 } = body;
 
     console.log(`Artist verification action: ${action}`);
 

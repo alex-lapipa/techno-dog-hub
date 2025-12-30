@@ -264,3 +264,9 @@ verify_jwt = false
 
 [functions.doggy-self-heal]
 verify_jwt = false
+
+[functions.artist-db-architect]
+verify_jwt = false
+
+[functions.audit-actions]
+verify_jwt = false

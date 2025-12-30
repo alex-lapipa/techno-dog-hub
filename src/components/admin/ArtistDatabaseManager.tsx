@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
 import { 
   Brain, 
@@ -18,7 +19,11 @@ import {
   AlertCircle,
   Zap,
   Globe,
-  Bot
+  Bot,
+  Scale,
+  GitMerge,
+  GitFork,
+  Sparkles
 } from 'lucide-react';
 
 interface AgentStatus {
@@ -59,11 +64,43 @@ const MODEL_BADGES: Record<string, { label: string; className: string }> = {
   firecrawl: { label: 'Firecrawl', className: 'bg-crimson/20 text-crimson border-crimson/30' },
 };
 
+interface ArchitectureAudit {
+  openai_analysis: {
+    model: string;
+    recommendation: string;
+    confidence: number;
+    reasoning: string;
+    pros: string[];
+    cons: string[];
+  };
+  anthropic_analysis: {
+    model: string;
+    recommendation: string;
+    confidence: number;
+    reasoning: string;
+    pros: string[];
+    cons: string[];
+  };
+  consensus: {
+    models_agree: boolean;
+    recommendation: string;
+    average_confidence: number;
+    reasoning: string;
+    combined_pros: string[];
+    combined_cons: string[];
+  };
+  action_items: string[];
+  database_stats: Record<string, any>;
+  current_issues: string[];
+}
+
 export const ArtistDatabaseManager = () => {
   const [agents, setAgents] = useState<AgentStatus[]>([]);
   const [stats, setStats] = useState<PipelineStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [runningAgents, setRunningAgents] = useState<Set<string>>(new Set());
+  const [architectureAudit, setArchitectureAudit] = useState<ArchitectureAudit | null>(null);
+  const [auditLoading, setAuditLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -215,6 +252,46 @@ export const ArtistDatabaseManager = () => {
     }
   };
 
+  const runArchitectureAudit = async () => {
+    setAuditLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('artist-db-architect', {
+        body: { action: 'analyze' }
+      });
+      
+      if (error) throw error;
+      
+      setArchitectureAudit(data);
+      toast.success('Architecture audit complete', {
+        description: `Recommendation: ${data.consensus?.recommendation?.toUpperCase()}`
+      });
+    } catch (err) {
+      toast.error('Audit failed', { 
+        description: err instanceof Error ? err.message : 'Unknown error'
+      });
+    } finally {
+      setAuditLoading(false);
+    }
+  };
+
+  const getRecommendationIcon = (rec: string) => {
+    switch (rec) {
+      case 'consolidate': return <GitMerge className="w-4 h-4" />;
+      case 'keep_separate': return <GitFork className="w-4 h-4" />;
+      case 'hybrid': return <Sparkles className="w-4 h-4" />;
+      default: return <Scale className="w-4 h-4" />;
+    }
+  };
+
+  const getRecommendationColor = (rec: string) => {
+    switch (rec) {
+      case 'consolidate': return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
+      case 'keep_separate': return 'text-logo-green bg-logo-green/20 border-logo-green/30';
+      case 'hybrid': return 'text-purple-400 bg-purple-500/20 border-purple-500/30';
+      default: return 'text-muted-foreground';
+    }
+  };
+
   if (loading) {
     return (
       <Card className="border-border">
@@ -226,9 +303,21 @@ export const ArtistDatabaseManager = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <Tabs defaultValue="agents" className="space-y-6">
+      <TabsList className="bg-background border border-border">
+        <TabsTrigger value="agents" className="data-[state=active]:bg-logo-green/20">
+          <Bot className="w-4 h-4 mr-2" />
+          Agents
+        </TabsTrigger>
+        <TabsTrigger value="architecture" className="data-[state=active]:bg-logo-green/20">
+          <Scale className="w-4 h-4 mr-2" />
+          DB Architecture
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="agents" className="space-y-6">
+        {/* Header Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card className="border-border">
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
@@ -402,8 +491,223 @@ export const ArtistDatabaseManager = () => {
             })}
           </div>
         </CardContent>
-      </Card>
-    </div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="architecture" className="space-y-6">
+        {/* Architecture Audit Card */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-mono text-sm uppercase tracking-wider flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-logo-green" />
+                  Database Architecture Audit
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Dual-model analysis: OpenAI GPT-4o + Anthropic Claude for consensus recommendation
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={runArchitectureAudit}
+                disabled={auditLoading}
+                className="gap-2"
+              >
+                {auditLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="w-4 h-4" />
+                    Run Audit
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!architectureAudit ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Scale className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Click "Run Audit" to analyze database architecture</p>
+                <p className="text-xs mt-2">OpenAI and Anthropic will provide recommendations</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Consensus Card */}
+                <Card className={`border-2 ${getRecommendationColor(architectureAudit.consensus?.recommendation)}`}>
+                  <CardContent className="pt-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {getRecommendationIcon(architectureAudit.consensus?.recommendation)}
+                        <div>
+                          <h3 className="font-mono text-lg font-bold uppercase">
+                            {architectureAudit.consensus?.recommendation?.replace('_', ' ')}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            {architectureAudit.consensus?.models_agree 
+                              ? '✓ Both models agree' 
+                              : '⚠ Models disagree'}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-lg px-3 py-1">
+                        {((architectureAudit.consensus?.average_confidence || 0) * 100).toFixed(0)}%
+                      </Badge>
+                    </div>
+                    <p className="text-sm mb-4">{architectureAudit.consensus?.reasoning}</p>
+                    
+                    {/* Pros and Cons */}
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <h4 className="text-xs font-mono uppercase text-logo-green mb-2">Pros</h4>
+                        <ul className="text-xs space-y-1">
+                          {architectureAudit.consensus?.combined_pros?.slice(0, 5).map((pro, i) => (
+                            <li key={i} className="flex items-start gap-1">
+                              <CheckCircle className="w-3 h-3 mt-0.5 text-logo-green shrink-0" />
+                              <span>{pro}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-mono uppercase text-crimson mb-2">Cons</h4>
+                        <ul className="text-xs space-y-1">
+                          {architectureAudit.consensus?.combined_cons?.slice(0, 5).map((con, i) => (
+                            <li key={i} className="flex items-start gap-1">
+                              <AlertCircle className="w-3 h-3 mt-0.5 text-crimson shrink-0" />
+                              <span>{con}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Model Analyses */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* OpenAI Analysis */}
+                  <Card className="border-border">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                          GPT-4o
+                        </Badge>
+                        OpenAI Analysis
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-mono uppercase">
+                          {architectureAudit.openai_analysis?.recommendation?.replace('_', ' ')}
+                        </span>
+                        <Badge variant="outline">
+                          {((architectureAudit.openai_analysis?.confidence || 0) * 100).toFixed(0)}%
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {architectureAudit.openai_analysis?.reasoning}
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Anthropic Analysis */}
+                  <Card className="border-border">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                          Claude
+                        </Badge>
+                        Anthropic Analysis
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-mono uppercase">
+                          {architectureAudit.anthropic_analysis?.recommendation?.replace('_', ' ')}
+                        </span>
+                        <Badge variant="outline">
+                          {((architectureAudit.anthropic_analysis?.confidence || 0) * 100).toFixed(0)}%
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {architectureAudit.anthropic_analysis?.reasoning}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Action Items */}
+                {architectureAudit.action_items && architectureAudit.action_items.length > 0 && (
+                  <Card className="border-border">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-mono uppercase">
+                        Recommended Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {architectureAudit.action_items.map((item, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <span className="text-logo-green font-mono">{i + 1}.</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Current Issues */}
+                {architectureAudit.current_issues && architectureAudit.current_issues.length > 0 && (
+                  <Card className="border-crimson/30">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-mono uppercase text-crimson">
+                        Current Issues Detected
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-1">
+                        {architectureAudit.current_issues.map((issue, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs">
+                            <AlertCircle className="w-3 h-3 mt-0.5 text-crimson shrink-0" />
+                            <span>{issue}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Database Stats */}
+                <Card className="border-border">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-mono uppercase">
+                      Database Statistics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {Object.entries(architectureAudit.database_stats || {}).map(([key, value]) => (
+                        <div key={key} className="text-center">
+                          <div className="text-xl font-mono">{String(value)}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">
+                            {key.replace(/_/g, ' ')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 };
 

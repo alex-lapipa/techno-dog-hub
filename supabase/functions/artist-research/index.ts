@@ -195,6 +195,17 @@ async function storeRawDocument(
   return data.raw_doc_id;
 }
 
+// Safe body parser to handle empty/invalid JSON
+async function safeParseBody(req: Request): Promise<any> {
+  try {
+    const text = await req.text();
+    if (!text || text.trim() === '') return {};
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -210,8 +221,8 @@ serve(async (req) => {
     }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const body: ResearchRequest = await req.json();
-    const { action, artist_id, artist_name, aliases = [], seed_urls = [], objectives = ['bio', 'discography'], limit = 20 } = body;
+    const body: ResearchRequest = await safeParseBody(req);
+    const { action = 'search', artist_id, artist_name, aliases = [], seed_urls = [], objectives = ['bio', 'discography'], limit = 20 } = body;
 
     console.log(`Artist research action: ${action}`, { artist_id, artist_name });
 
