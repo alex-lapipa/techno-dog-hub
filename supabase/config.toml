@@ -315,3 +315,6 @@ verify_jwt = false
 
 [functions.gear-image-scraper]
 verify_jwt = false
+
+[functions.artist-image-scraper]
+verify_jwt = false
