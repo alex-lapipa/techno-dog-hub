@@ -362,6 +362,10 @@ const TechnoDoggies = () => {
     });
   };
 
+  // Detect platform for platform-specific instructions
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
+
   // Download sticker-ready version for WhatsApp (512x512 WebP, no text, transparent)
   const downloadForWhatsApp = async () => {
     const svg = document.querySelector('#current-dog-display svg');
@@ -373,9 +377,9 @@ const TechnoDoggies = () => {
     logAction.mutate({
       variantId: currentDbData?.id,
       variantName: currentDog?.name || "Unknown",
-      actionType: "download_whatsapp",
+      actionType: "download_whatsapp_sticker",
     });
-    trackDoggyEvent('main_page', 'download_whatsapp', undefined, currentDog?.name);
+    trackDoggyEvent('main_page', 'download_whatsapp_sticker', undefined, currentDog?.name);
 
     toast.loading("Creating WhatsApp sticker...");
     
@@ -396,11 +400,9 @@ const TechnoDoggies = () => {
     canvas.height = 512;
     
     img.onload = () => {
-      // Clear for transparency
       ctx!.clearRect(0, 0, 512, 512);
       ctx!.drawImage(img, 0, 0, 512, 512);
       
-      // Convert to WebP for WhatsApp (smaller file size, transparent background)
       canvas.toBlob((blob) => {
         if (blob) {
           const link = document.createElement('a');
@@ -412,10 +414,22 @@ const TechnoDoggies = () => {
           URL.revokeObjectURL(link.href);
           
           toast.dismiss();
-          toast.success(`Sticker ready! Save to Photos, then add to WhatsApp`, {
-            description: "Open WhatsApp > Stickers > Create > Add from Photos",
-            duration: 6000,
-          });
+          if (isIOS) {
+            toast.success("Sticker downloaded!", {
+              description: "Save to Photos → Open Sticker Maker app → Import → Add to WhatsApp",
+              duration: 8000,
+            });
+          } else if (isAndroid) {
+            toast.success("Sticker downloaded!", {
+              description: "Open Sticker Maker → Import from Gallery → Add to WhatsApp",
+              duration: 8000,
+            });
+          } else {
+            toast.success("Sticker downloaded!", {
+              description: "Transfer to phone → Use Sticker Maker app → Add to WhatsApp",
+              duration: 6000,
+            });
+          }
         } else {
           toast.dismiss();
           toast.error("Failed to create sticker");
@@ -430,6 +444,114 @@ const TechnoDoggies = () => {
     
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     img.src = URL.createObjectURL(svgBlob);
+  };
+
+  // Download full sticker pack as ZIP with all doggies
+  const downloadStickerPack = async () => {
+    toast.loading("Creating your sticker pack... This may take a moment");
+    trackDoggyEvent('main_page', 'download_sticker_pack', undefined, 'all');
+    
+    const stickers: { name: string; blob: Blob }[] = [];
+    const maxStickers = Math.min(activeVariants.length, 30); // WhatsApp packs max 30 stickers
+    
+    for (let i = 0; i < maxStickers; i++) {
+      const dog = activeVariants[i];
+      if (!dog) continue;
+      
+      // Temporarily switch to render this dog
+      const originalIndex = currentDogIndex;
+      setCurrentDogIndex(i);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const svg = document.querySelector('#current-dog-display svg');
+      if (!svg) continue;
+      
+      try {
+        const resolvedSvg = resolveCssVariables(svg as SVGElement);
+        resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+        resolvedSvg.setAttribute('width', '512');
+        resolvedSvg.setAttribute('height', '512');
+        resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        
+        const svgData = new XMLSerializer().serializeToString(resolvedSvg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        canvas.width = 512;
+        canvas.height = 512;
+        
+        const blob = await new Promise<Blob | null>((resolve) => {
+          img.onload = () => {
+            ctx!.clearRect(0, 0, 512, 512);
+            ctx!.drawImage(img, 0, 0, 512, 512);
+            canvas.toBlob(resolve, 'image/webp', 0.9);
+          };
+          img.onerror = () => resolve(null);
+          const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+          img.src = URL.createObjectURL(svgBlob);
+        });
+        
+        if (blob) {
+          stickers.push({ 
+            name: `${String(i + 1).padStart(2, '0')}-techno-${dog.name.toLowerCase().replace(/\s+/g, '-')}.webp`,
+            blob 
+          });
+        }
+      } catch (e) {
+        console.error(`Failed to generate sticker for ${dog.name}`, e);
+      }
+      
+      setCurrentDogIndex(originalIndex);
+    }
+    
+    if (stickers.length === 0) {
+      toast.dismiss();
+      toast.error("Failed to create sticker pack");
+      return;
+    }
+    
+    // Create a simple download of all stickers (without ZIP library for simplicity)
+    // Download them sequentially with a delay
+    toast.dismiss();
+    toast.success(`Downloading ${stickers.length} stickers...`, {
+      description: "Files will download one by one",
+      duration: 3000,
+    });
+    
+    for (let i = 0; i < stickers.length; i++) {
+      const sticker = stickers[i];
+      const link = document.createElement('a');
+      link.download = sticker.name;
+      link.href = URL.createObjectURL(sticker.blob);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      
+      // Small delay between downloads to prevent browser blocking
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    // Show final instructions
+    setTimeout(() => {
+      if (isIOS) {
+        toast.info("How to add stickers to WhatsApp (iOS)", {
+          description: "1. Download 'Sticker Maker' from App Store\n2. Create new pack → Import images\n3. Tap 'Add to WhatsApp'\n4. Open any chat → Tap sticker icon → Find your pack!",
+          duration: 15000,
+        });
+      } else if (isAndroid) {
+        toast.info("How to add stickers to WhatsApp (Android)", {
+          description: "1. Download 'Sticker Maker' from Play Store\n2. Create new pack → Add stickers from Gallery\n3. Tap 'Add to WhatsApp'\n4. Open any chat → Tap sticker icon → Enjoy!",
+          duration: 15000,
+        });
+      } else {
+        toast.info("How to use on WhatsApp", {
+          description: "Transfer stickers to your phone, then use 'Sticker Maker' app to create a WhatsApp sticker pack",
+          duration: 10000,
+        });
+      }
+    }, 1000);
   };
 
   // Download all doggies as individual files
@@ -844,15 +966,56 @@ const TechnoDoggies = () => {
                     Share on WhatsApp
                   </Button>
 
-                  {/* Sticker Download for WhatsApp */}
+                  {/* Individual Sticker Download */}
                   <Button 
                     variant="outline"
                     onClick={downloadForWhatsApp}
                     className="w-full font-mono text-xs h-10 border-[#25D366]/50 text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]"
                   >
                     <Smartphone className="w-4 h-4 mr-2" />
-                    Download as WhatsApp Sticker (512x512 WebP)
+                    Download This Sticker (512x512)
                   </Button>
+
+                  {/* Full Pack Download */}
+                  <Button 
+                    variant="outline"
+                    onClick={downloadStickerPack}
+                    className="w-full font-mono text-xs h-10 border-logo-green/50 text-logo-green hover:bg-logo-green/10 hover:border-logo-green"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Full Sticker Pack (30 Doggies)
+                  </Button>
+                </div>
+
+                {/* Platform-specific instructions */}
+                <div className="mt-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <p className="font-mono text-[10px] text-muted-foreground text-center mb-2">
+                    <span className="text-logo-green font-bold">How to add stickers to WhatsApp:</span>
+                  </p>
+                  <ol className="font-mono text-[9px] text-muted-foreground space-y-1 list-decimal list-inside">
+                    {isIOS ? (
+                      <>
+                        <li>Download "Sticker Maker" from App Store (free)</li>
+                        <li>Create new pack → Import downloaded stickers</li>
+                        <li>Tap "Add to WhatsApp"</li>
+                        <li>Open any chat → Sticker icon → Your pack is ready!</li>
+                      </>
+                    ) : isAndroid ? (
+                      <>
+                        <li>Download "Sticker Maker" from Play Store (free)</li>
+                        <li>Create new pack → Add from Gallery</li>
+                        <li>Tap "Add to WhatsApp"</li>
+                        <li>Open any chat → Sticker icon → Enjoy!</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>Transfer stickers to your phone</li>
+                        <li>Download "Sticker Maker" app</li>
+                        <li>Create pack → Import stickers</li>
+                        <li>Add to WhatsApp → Use in chats!</li>
+                      </>
+                    )}
+                  </ol>
                 </div>
 
                 {/* Secondary Actions */}
