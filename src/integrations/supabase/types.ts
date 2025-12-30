@@ -1646,6 +1646,388 @@ export type Database = {
           },
         ]
       }
+      collective_activities: {
+        Row: {
+          activity_type: string | null
+          collective_id: string | null
+          created_at: string | null
+          description: string | null
+          event_platforms_json: Json | null
+          frequency: string | null
+          id: string
+          last_verified_at: string | null
+          main_venues_json: Json | null
+          recurring_event_names_json: Json | null
+          source_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activity_type?: string | null
+          collective_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_platforms_json?: Json | null
+          frequency?: string | null
+          id?: string
+          last_verified_at?: string | null
+          main_venues_json?: Json | null
+          recurring_event_names_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activity_type?: string | null
+          collective_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_platforms_json?: Json | null
+          frequency?: string | null
+          id?: string
+          last_verified_at?: string | null
+          main_venues_json?: Json | null
+          recurring_event_names_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_activities_collective_id_fkey"
+            columns: ["collective_id"]
+            isOneToOne: false
+            referencedRelation: "collectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_agent_runs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          run_type: string
+          started_at: string | null
+          stats: Json | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type?: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      collective_key_people: {
+        Row: {
+          collective_id: string | null
+          created_at: string | null
+          email: string | null
+          enrichment_confidence: number | null
+          id: string
+          last_verified_at: string | null
+          location_city: string | null
+          location_country: string | null
+          notes_on_how_to_approach: string | null
+          person_name: string
+          phone: string | null
+          preferred_contact_method: string | null
+          role_title: string | null
+          social_links_json: Json | null
+          source_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          collective_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          notes_on_how_to_approach?: string | null
+          person_name: string
+          phone?: string | null
+          preferred_contact_method?: string | null
+          role_title?: string | null
+          social_links_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          collective_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          notes_on_how_to_approach?: string | null
+          person_name?: string
+          phone?: string | null
+          preferred_contact_method?: string | null
+          role_title?: string | null
+          social_links_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_key_people_collective_id_fkey"
+            columns: ["collective_id"]
+            isOneToOne: false
+            referencedRelation: "collectives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_outreach_history: {
+        Row: {
+          collective_id: string | null
+          created_at: string | null
+          date: string | null
+          id: string
+          key_person_id: string | null
+          message_summary: string | null
+          next_action_date: string | null
+          outreach_type: string | null
+          response_notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          collective_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          key_person_id?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          outreach_type?: string | null
+          response_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          collective_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          key_person_id?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          outreach_type?: string | null
+          response_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_outreach_history_collective_id_fkey"
+            columns: ["collective_id"]
+            isOneToOne: false
+            referencedRelation: "collectives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_outreach_history_key_person_id_fkey"
+            columns: ["key_person_id"]
+            isOneToOne: false
+            referencedRelation: "collective_key_people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_scrape_audit: {
+        Row: {
+          action: string
+          created_at: string | null
+          data_extracted: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          source_url: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          data_extracted?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          source_url?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          data_extracted?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      collective_segments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          filters_json: Json | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      collectives: {
+        Row: {
+          activity_evidence: string | null
+          activity_score: number | null
+          anti_harassment_policy_url: string | null
+          base_locations_json: Json | null
+          booking_email: string | null
+          city: string | null
+          collaboration_email: string | null
+          collaboration_preferences_summary: string | null
+          collective_aliases: Json | null
+          collective_name: string
+          collective_type: string[] | null
+          contact_email: string | null
+          contact_form_url: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string | null
+          credibility_score: number | null
+          founded_year: number | null
+          id: string
+          inclusivity_policy_url: string | null
+          last_verified_at: string | null
+          manifesto_url: string | null
+          philosophy_summary: string | null
+          physical_address: string | null
+          press_email: string | null
+          primary_platforms_json: Json | null
+          region: string | null
+          sources_json: Json | null
+          status: string | null
+          techno_doc_fit_score: number | null
+          updated_at: string | null
+          verification_confidence: number | null
+          website_url: string | null
+          what_they_dislike: string | null
+          what_they_like: string | null
+        }
+        Insert: {
+          activity_evidence?: string | null
+          activity_score?: number | null
+          anti_harassment_policy_url?: string | null
+          base_locations_json?: Json | null
+          booking_email?: string | null
+          city?: string | null
+          collaboration_email?: string | null
+          collaboration_preferences_summary?: string | null
+          collective_aliases?: Json | null
+          collective_name: string
+          collective_type?: string[] | null
+          contact_email?: string | null
+          contact_form_url?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          credibility_score?: number | null
+          founded_year?: number | null
+          id?: string
+          inclusivity_policy_url?: string | null
+          last_verified_at?: string | null
+          manifesto_url?: string | null
+          philosophy_summary?: string | null
+          physical_address?: string | null
+          press_email?: string | null
+          primary_platforms_json?: Json | null
+          region?: string | null
+          sources_json?: Json | null
+          status?: string | null
+          techno_doc_fit_score?: number | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+          website_url?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Update: {
+          activity_evidence?: string | null
+          activity_score?: number | null
+          anti_harassment_policy_url?: string | null
+          base_locations_json?: Json | null
+          booking_email?: string | null
+          city?: string | null
+          collaboration_email?: string | null
+          collaboration_preferences_summary?: string | null
+          collective_aliases?: Json | null
+          collective_name?: string
+          collective_type?: string[] | null
+          contact_email?: string | null
+          contact_form_url?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          created_at?: string | null
+          credibility_score?: number | null
+          founded_year?: number | null
+          id?: string
+          inclusivity_policy_url?: string | null
+          last_verified_at?: string | null
+          manifesto_url?: string | null
+          philosophy_summary?: string | null
+          physical_address?: string | null
+          press_email?: string | null
+          primary_platforms_json?: Json | null
+          region?: string | null
+          sources_json?: Json | null
+          status?: string | null
+          techno_doc_fit_score?: number | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+          website_url?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Relationships: []
+      }
       community_profiles: {
         Row: {
           city: string | null
@@ -2534,6 +2916,71 @@ export type Database = {
           provider_message_id?: string | null
         }
         Relationships: []
+      }
+      events_livecoding: {
+        Row: {
+          city: string | null
+          collective_id: string | null
+          contact_email: string | null
+          country: string | null
+          created_at: string | null
+          event_name: string
+          event_url: string | null
+          id: string
+          last_verified_at: string | null
+          platform: string | null
+          recurring: boolean | null
+          region: string | null
+          schedule_notes: string | null
+          source_url: string | null
+          updated_at: string | null
+          venue: string | null
+        }
+        Insert: {
+          city?: string | null
+          collective_id?: string | null
+          contact_email?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_name: string
+          event_url?: string | null
+          id?: string
+          last_verified_at?: string | null
+          platform?: string | null
+          recurring?: boolean | null
+          region?: string | null
+          schedule_notes?: string | null
+          source_url?: string | null
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Update: {
+          city?: string | null
+          collective_id?: string | null
+          contact_email?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_name?: string
+          event_url?: string | null
+          id?: string
+          last_verified_at?: string | null
+          platform?: string | null
+          recurring?: boolean | null
+          region?: string | null
+          schedule_notes?: string | null
+          source_url?: string | null
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_livecoding_collective_id_fkey"
+            columns: ["collective_id"]
+            isOneToOne: false
+            referencedRelation: "collectives"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gear_agent_runs: {
         Row: {

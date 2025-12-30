@@ -291,6 +291,7 @@ const AdminDashboard = () => {
     { name: "PR & Media", description: "Journalist contacts", path: "/admin/pr-media", frameNumber: "20" },
     { name: "Gear Brands", description: "Manufacturer relations", path: "/admin/gear-manufacturer", frameNumber: "21" },
     { name: "Artist Relations", description: "Management & labels", path: "/admin/artist-label-agent", frameNumber: "22" },
+    { name: "Collectives", description: "Scene intelligence", path: "/admin/collectives-agent", frameNumber: "23" },
   ];
 
   return (
