@@ -466,6 +466,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the La Pipa Dog",
     quote: "Beyond the obvious. Something stranger. Always questioning.",
     packInvite: "Question everything"
+  },
+  'ron': {
+    intro: "I'm the Ron Dog",
+    quote: "Open source everything. Build in public. Studio sessions til sunrise.",
+    packInvite: "Fork the future"
   }
 };
 

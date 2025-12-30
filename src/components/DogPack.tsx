@@ -1958,6 +1958,60 @@ export const AntainDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Ron Dog - LA mad technologist, guitar player, open source legend, studio wizard
+export const RonDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Floppy ears - slightly wild */}
+      <path d="M12 28 Q6 20 10 10 Q16 14 18 26" />
+      <path d="M52 28 Q58 20 54 10 Q48 14 46 26" />
+      {/* Wild crazy hair - mad scientist style */}
+      <path d="M20 14 Q18 8 22 6" strokeWidth="2" />
+      <path d="M26 12 Q25 4 29 2" strokeWidth="2" />
+      <path d="M32 10 Q32 2 35 0" strokeWidth="2" />
+      <path d="M38 12 Q39 4 35 2" strokeWidth="2" />
+      <path d="M44 14 Q46 8 42 6" strokeWidth="2" />
+      {/* Extra wild strands */}
+      <path d="M24 10 L22 4" strokeWidth="1.5" opacity="0.7" />
+      <path d="M40 10 L42 4" strokeWidth="1.5" opacity="0.7" />
+      {/* Head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Headphones - one side with studio vibes */}
+      <path d="M12 32 Q8 32 8 36 Q8 42 12 42" strokeWidth="2.5" />
+      <path d="M52 32 Q56 32 56 36 Q56 42 52 42" strokeWidth="2.5" />
+      <path d="M12 36 L16 36" strokeWidth="1.5" />
+      <path d="M52 36 L48 36" strokeWidth="1.5" />
+      {/* Excited wide eyes - techno enthusiasm */}
+      <circle cx="24" cy="32" r="4" strokeWidth="2" />
+      <circle cx="40" cy="32" r="4" strokeWidth="2" />
+      <circle cx="24" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="23" cy="31" r="0.8" fill="hsl(var(--background))" />
+      <circle cx="40" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="31" r="0.8" fill="hsl(var(--background))" />
+      {/* Crazy eyebrows - intense focus */}
+      <path d="M18 26 Q24 22 28 26" strokeWidth="1.5" />
+      <path d="M36 26 Q40 22 46 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Big excited smile */}
+      <path d="M22 46 Q32 54 42 46" strokeWidth="2.5" />
+      {/* Guitar neck on side - minimalist */}
+      <path d="M54 48 L60 54 L62 52 L56 46" strokeWidth="1.5" opacity="0.8" />
+      <path d="M58 50 L59 51" strokeWidth="1" opacity="0.6" />
+      <path d="M57 51 L58 52" strokeWidth="1" opacity="0.6" />
+      <path d="M56 52 L57 53" strokeWidth="1" opacity="0.6" />
+      {/* Open source / code symbol on forehead - git branch */}
+      <circle cx="32" cy="22" r="1.5" strokeWidth="1" opacity="0.6" />
+      <path d="M32 24 L32 26" strokeWidth="1" opacity="0.6" />
+      <path d="M29 20 L32 22 L35 20" strokeWidth="1" opacity="0.6" />
+      {/* Fader/slider marks near ear - studio gear */}
+      <path d="M6 44 L6 50" strokeWidth="1" opacity="0.5" />
+      <path d="M4 46 L8 46" strokeWidth="1" opacity="0.5" />
+      <path d="M4 48 L8 48" strokeWidth="1" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -2052,4 +2106,5 @@ export const dogVariants = [
   { name: 'Dolly', Component: DollyDog, personality: 'Bookish nature lover with long locks', status: 'studying' },
   { name: 'Antain', Component: AntainDog, personality: 'Irish-Asturian artist with curly soul', status: 'creating' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
+  { name: 'Ron', Component: RonDog, personality: 'LA tech mad scientist, guitar hero, open source legend', status: 'shipping code' },
 ];
