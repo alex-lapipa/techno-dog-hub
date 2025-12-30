@@ -258,3 +258,9 @@ verify_jwt = false
 
 [functions.doggy-analytics-insights]
 verify_jwt = false
+
+[functions.doggy-orchestrator]
+verify_jwt = false
+
+[functions.doggy-self-heal]
+verify_jwt = false
