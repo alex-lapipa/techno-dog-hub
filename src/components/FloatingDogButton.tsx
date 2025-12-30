@@ -28,7 +28,7 @@ const FloatingDogButton = () => {
     <>
       <button
         onClick={() => setDogChatOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-background/90 backdrop-blur-md border-2 border-logo-green/60 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-background hover:border-logo-green hover:shadow-[0_0_30px_hsl(100_100%_60%/0.5)] group ${isPulsing ? 'animate-pulse' : ''}`}
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-16 h-16 rounded-full bg-background/90 backdrop-blur-md border-2 border-logo-green/60 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-background hover:border-logo-green hover:shadow-[0_0_30px_hsl(100_100%_60%/0.5)] group ${isPulsing ? 'animate-pulse' : ''}`}
         aria-label="Open Techno Dog"
       >
         {/* Outer glow ring */}
