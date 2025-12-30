@@ -220,6 +220,9 @@ const App = () => (
                     <Route path="/admin/pr-media" element={<PRMediaAgentAdmin />} />
                     <Route path="/admin/gear-manufacturer" element={<GearManufacturerAdmin />} />
                     <Route path="/admin/artist-label-agent" element={<ArtistLabelAgentAdmin />} />
+                    <Route path="/admin/collectives-agent" element={<CollectivesAgentAdmin />} />
+                    <Route path="/admin/outreach-engine" element={<OutreachEngineAdmin />} />
+                    <Route path="/admin/playbook-agent" element={<PlaybookAgentAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
