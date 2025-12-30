@@ -139,6 +139,35 @@ const TechnoDoggies = () => {
     return () => clearInterval(interval);
   }, [isCarouselPaused, activeVariants.length]);
 
+  // Auto-rotate main doggy every 10 seconds in random order
+  useEffect(() => {
+    if (activeVariants.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        // Pick a random index different from current
+        let newIndex = Math.floor(Math.random() * activeVariants.length);
+        if (newIndex === currentDogIndex && activeVariants.length > 1) {
+          newIndex = (newIndex + 1) % activeVariants.length;
+        }
+        setCurrentDogIndex(newIndex);
+        setIsAnimating(false);
+        
+        const randomDog = activeVariants[newIndex];
+        if (randomDog) {
+          logAction.mutate({
+            variantId: (randomDog as any)?.dbData?.id,
+            variantName: randomDog.name,
+            actionType: "auto_rotate",
+          });
+        }
+      }, 150);
+    }, 10000);
+    
+    return () => clearInterval(interval);
+  }, [activeVariants, currentDogIndex, logAction]);
+
   const nextDog = () => {
     setIsAnimating(true);
     setTimeout(() => {
