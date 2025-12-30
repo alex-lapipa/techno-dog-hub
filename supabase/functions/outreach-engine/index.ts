@@ -273,8 +273,8 @@ async function sendEmail(to: string, subject: string, bodyHtml: string, bodyText
   console.log(`Sending email to ${to} with subject: ${subject}`);
   
   const emailResponse = await resend.emails.send({
-    from: "ringleader@techno.dog <alex@rmtb.io>",
-    reply_to: "alex@rmtb.io",
+    from: "ringleader@techno.dog <alex@rmtv.io>",
+    reply_to: "alex@rmtv.io",
     to: [to],
     subject: subject,
     html: bodyHtml,
