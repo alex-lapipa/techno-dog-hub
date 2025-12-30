@@ -682,6 +682,441 @@ export const ThugDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Hypnotic Dog - spiral eyes, trance state
+export const HypnoticDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .spiral { animation: spin 3s linear infinite; transform-origin: center; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <g className={animated ? "spiral" : ""}>
+        <circle cx="25" cy="36" r="4" />
+        <path d="M25 32 Q27 34 25 36 Q23 38 25 40" />
+      </g>
+      <g className={animated ? "spiral" : ""}>
+        <circle cx="39" cy="36" r="4" />
+        <path d="M39 32 Q41 34 39 36 Q37 38 39 40" />
+      </g>
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 52 Q32 50 36 52" />
+    </g>
+  </svg>
+);
+
+// Vinyl Dog - record collector vibes
+export const VinylDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      <path d="M24 34 Q26 30 28 34" />
+      <path d="M36 34 Q38 30 40 34" />
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 48 Q32 52 36 48" />
+      <circle cx="10" cy="42" r="8" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <circle cx="10" cy="42" r="5" opacity="0.5" />
+      <circle cx="10" cy="42" r="2" fill="hsl(var(--logo-green))" />
+    </g>
+  </svg>
+);
+
+// Synth Dog - keyboard player
+export const SynthDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      <path d="M24 32 Q26 28 28 32" />
+      <path d="M36 32 Q38 28 40 32" />
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 46 Q32 50 38 46" />
+      <rect x="4" y="50" width="20" height="8" rx="1" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <line x1="8" y1="50" x2="8" y2="58" />
+      <line x1="12" y1="50" x2="12" y2="58" />
+      <line x1="16" y1="50" x2="16" y2="58" />
+      <line x1="20" y1="50" x2="20" y2="58" />
+    </g>
+  </svg>
+);
+
+// Acid Dog - trippy 303 vibes
+export const AcidDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes acid { 0%, 100% { transform: skewX(-3deg); } 50% { transform: skewX(3deg); } }
+      .acid-warp { animation: acid 0.5s ease-in-out infinite; transform-origin: center; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "acid-warp" : ""}>
+      <path d="M16 28 Q10 16 18 10 Q24 14 24 24" />
+      <path d="M48 28 Q54 16 46 10 Q40 14 40 24" />
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      <circle cx="26" cy="34" r="4" />
+      <circle cx="38" cy="34" r="4" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M24 50 Q32 56 40 50" />
+      <text x="4" y="18" fontSize="12" fill="hsl(var(--logo-green))">~</text>
+      <text x="52" y="16" fontSize="12" fill="hsl(var(--logo-green))">~</text>
+    </g>
+  </svg>
+);
+
+// Industrial Dog - hard and mechanical
+export const IndustrialDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      <rect x="22" y="32" width="6" height="4" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <rect x="36" y="32" width="6" height="4" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 L30 48 L34 50 L38 48" />
+      <circle cx="8" cy="32" r="4" opacity="0.4" />
+      <path d="M6 32 L10 32" />
+      <path d="M8 30 L8 34" />
+    </g>
+  </svg>
+);
+
+// Minimal Dog - less is more
+export const MinimalDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M18 30 Q16 24 20 20" />
+      <path d="M46 30 Q48 24 44 20" />
+      <circle cx="32" cy="40" r="14" />
+      <circle cx="27" cy="37" r="1" fill="hsl(var(--logo-green))" />
+      <circle cx="37" cy="37" r="1" fill="hsl(var(--logo-green))" />
+      <path d="M30 44 L34 44" />
+    </g>
+  </svg>
+);
+
+// Dub Dog - deep and dubby
+export const DubDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q10 22 16 14 Q22 18 22 26" />
+      <path d="M48 30 Q54 22 48 14 Q42 18 42 26" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 L28 36" />
+      <path d="M36 36 L40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <path d="M4 30 Q8 34 4 38" opacity="0.4" />
+      <path d="M8 28 Q14 34 8 40" opacity="0.3" />
+      <path d="M60 30 Q56 34 60 38" opacity="0.4" />
+    </g>
+  </svg>
+);
+
+// Gabber Dog - hardcore intensity
+export const GabberDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes gabber { 0%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
+      .gabber-bounce { animation: gabber 0.15s ease-in-out infinite; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "gabber-bounce" : ""}>
+      <path d="M14 26 Q6 10 18 4 Q26 10 26 22" />
+      <path d="M50 26 Q58 10 46 4 Q38 10 38 22" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <circle cx="26" cy="36" r="3" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="36" r="3" fill="hsl(var(--logo-green))" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M24 52 Q32 58 40 52" strokeWidth="3" />
+    </g>
+  </svg>
+);
+
+// Berghain Dog - dark and exclusive
+export const BerghainDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <line x1="22" y1="36" x2="28" y2="36" />
+      <line x1="36" y1="36" x2="42" y2="36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <line x1="28" y1="50" x2="36" y2="50" />
+      <rect x="4" y="28" width="3" height="24" fill="hsl(var(--logo-green))" opacity="0.3" />
+    </g>
+  </svg>
+);
+
+// Afterhours Dog - sunrise survivor
+export const AfterhoursDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 32 Q10 26 14 18 Q20 22 22 28" />
+      <path d="M48 32 Q54 26 50 18 Q44 22 42 28" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 L28 36" />
+      <path d="M36 36 L40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <circle cx="52" cy="10" r="8" opacity="0.2" />
+      <path d="M52 2 L52 6" opacity="0.5" />
+      <path d="M58 10 L62 10" opacity="0.5" />
+      <text x="2" y="18" fontSize="8" fill="hsl(var(--logo-green))">z</text>
+    </g>
+  </svg>
+);
+
+// Promoter Dog - knows everyone
+export const PromoterDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 Q32 54 38 50" />
+      <rect x="48" y="32" width="12" height="8" rx="1" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <line x1="50" y1="36" x2="58" y2="36" opacity="0.6" />
+      <text x="6" y="20" fontSize="8" fill="hsl(var(--logo-green))">✓</text>
+    </g>
+  </svg>
+);
+
+// Bouncer Dog - tough but fair
+export const BouncerDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M14 30 Q10 20 16 14 Q22 18 22 26" />
+      <path d="M50 30 Q54 20 48 14 Q42 18 42 26" />
+      <ellipse cx="32" cy="40" rx="18" ry="16" />
+      <line x1="22" y1="34" x2="26" y2="36" />
+      <line x1="38" y1="36" x2="42" y2="34" />
+      <circle cx="27" cy="38" r="2" />
+      <circle cx="37" cy="38" r="2" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <line x1="28" y1="52" x2="36" y2="52" />
+    </g>
+  </svg>
+);
+
+// Producer Dog - laptop warrior
+export const ProducerDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      <path d="M24 32 Q26 28 28 32" />
+      <path d="M36 32 Q38 28 40 32" />
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 46 Q32 50 38 46" />
+      <rect x="18" y="52" width="28" height="4" rx="1" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <rect x="20" y="48" width="24" height="4" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// Resident Dog - knows every corner
+export const ResidentDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <path d="M32 6 L30 12 L34 12 Z" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="32" cy="4" r="2" fill="hsl(var(--logo-green))" opacity="0.7" />
+    </g>
+  </svg>
+);
+
+// Warm Up Dog - setting the vibe
+export const WarmUpDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 22 18 16 Q22 18 24 26" />
+      <path d="M48 30 Q52 22 46 16 Q42 18 40 26" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 34 28 36" />
+      <path d="M36 36 Q38 34 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <path d="M6 36 Q10 32 6 28" opacity="0.3" />
+      <path d="M10 38 Q16 32 10 26" opacity="0.4" />
+    </g>
+  </svg>
+);
+
+// Peak Time Dog - maximum energy
+export const PeakTimeDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes peak { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+      .peak-pulse { animation: peak 0.3s ease-in-out infinite; transform-origin: center; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "peak-pulse" : ""}>
+      <path d="M14 26 Q8 12 18 6 Q24 12 24 22" />
+      <path d="M50 26 Q56 12 46 6 Q40 12 40 22" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <circle cx="26" cy="34" r="4" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <circle cx="38" cy="34" r="4" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M24 52 Q32 60 40 52" />
+      <text x="4" y="14" fontSize="12" fill="hsl(var(--logo-green))">!</text>
+      <text x="52" y="14" fontSize="12" fill="hsl(var(--logo-green))">!</text>
+    </g>
+  </svg>
+);
+
+// Closing Dog - last track energy
+export const ClosingDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 32 Q10 26 14 18 Q20 22 22 28" />
+      <path d="M48 32 Q54 26 50 18 Q44 22 42 28" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 34 28 36" />
+      <path d="M36 36 Q38 34 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 54 36 50" />
+      <text x="50" y="16" fontSize="8" fill="hsl(var(--logo-green))">☀</text>
+      <path d="M4 40 L12 40" opacity="0.4" />
+      <path d="M6 36 L10 36" opacity="0.3" />
+    </g>
+  </svg>
+);
+
+// Modular Dog - patch cables everywhere
+export const ModularDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      <circle cx="26" cy="34" r="2" />
+      <circle cx="38" cy="34" r="2" />
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 48 Q32 50 36 48" />
+      <path d="M4 20 Q20 30 32 20" opacity="0.4" />
+      <path d="M60 24 Q44 34 32 24" opacity="0.4" />
+      <circle cx="4" cy="20" r="2" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <circle cx="60" cy="24" r="2" fill="hsl(var(--logo-green))" opacity="0.6" />
+    </g>
+  </svg>
+);
+
+// Analog Dog - no digital allowed
+export const AnalogDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <circle cx="8" cy="36" r="4" opacity="0.4" />
+      <path d="M6 34 L10 38" />
+    </g>
+  </svg>
+);
+
+// VJ Dog - visual artist
+export const VJDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes vj { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+      .vj-flash { animation: vj 0.5s ease-in-out infinite; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <rect x="22" y="32" width="8" height="6" fill="hsl(var(--logo-green))" opacity="0.4" className={animated ? "vj-flash" : ""} />
+      <rect x="34" y="32" width="8" height="6" fill="hsl(var(--logo-green))" opacity="0.4" className={animated ? "vj-flash" : ""} />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 52 Q32 54 36 52" />
+    </g>
+  </svg>
+);
+
+// Underground Dog - knows the secret spots
+export const UndergroundDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      <path d="M4 58 L60 58" opacity="0.3" />
+      <path d="M8 54 L12 58" opacity="0.2" />
+      <path d="M52 54 L56 58" opacity="0.2" />
+    </g>
+  </svg>
+);
+
+// Purist Dog - only real techno
+export const PuristDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <line x1="24" y1="36" x2="28" y2="36" />
+      <line x1="36" y1="36" x2="40" y2="36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 50 36 50" />
+    </g>
+  </svg>
+);
+
+// Tourist Dog - first time at the club
+export const TouristDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="42" rx="16" ry="14" />
+      <circle cx="26" cy="38" r="4" />
+      <circle cx="38" cy="38" r="4" />
+      <ellipse cx="32" cy="48" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 54 Q32 56 36 54" />
+      <rect x="20" y="6" width="24" height="16" rx="2" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <circle cx="32" cy="14" r="4" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// Legend Dog - true OG
+export const LegendDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 32 Q10 24 16 16 Q22 20 22 28" />
+      <path d="M48 32 Q54 24 48 16 Q42 20 42 28" />
+      <ellipse cx="32" cy="42" rx="16" ry="14" />
+      <path d="M24 38 Q26 34 28 38" />
+      <path d="M36 38 Q38 34 40 38" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 52 Q32 54 36 52" />
+      <path d="M26 8 L32 2 L38 8 L32 6 Z" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="32" cy="6" r="2" fill="hsl(var(--logo-green))" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -717,4 +1152,28 @@ export const dogVariants = [
   { name: 'Birthday', Component: BirthdayDog, personality: 'Every day is a party', status: 'making wishes' },
   { name: 'Disco', Component: DiscoDog, personality: 'Stayin alive on the floor', status: 'funky' },
   { name: 'Thug', Component: ThugDog, personality: 'Too cool for the mainstream', status: 'gangsta' },
+  { name: 'Hypnotic', Component: HypnoticDog, personality: 'Lost in the trance', status: 'mesmerized' },
+  { name: 'Vinyl', Component: VinylDog, personality: 'Only spins wax', status: 'crate digging' },
+  { name: 'Synth', Component: SynthDog, personality: 'Analog soul in digital times', status: 'patching' },
+  { name: 'Acid', Component: AcidDog, personality: 'Squelchy and proud', status: '303 mode' },
+  { name: 'Industrial', Component: IndustrialDog, personality: 'Hard as steel', status: 'grinding' },
+  { name: 'Minimal', Component: MinimalDog, personality: 'Less is more, woof is woof', status: 'reduced' },
+  { name: 'Dub', Component: DubDog, personality: 'Deep in the echo chamber', status: 'dubbed out' },
+  { name: 'Gabber', Component: GabberDog, personality: 'Harder faster louder', status: 'hakken' },
+  { name: 'Berghain', Component: BerghainDog, personality: 'Maybe you get in, maybe not', status: 'queueing' },
+  { name: 'Afterhours', Component: AfterhoursDog, personality: 'Sunrise is just the beginning', status: 'surviving' },
+  { name: 'Promoter', Component: PromoterDog, personality: 'List + 1 always', status: 'networking' },
+  { name: 'Bouncer', Component: BouncerDog, personality: 'Reads energy not outfits', status: 'selecting' },
+  { name: 'Producer', Component: ProducerDog, personality: 'Ableton is life', status: 'rendering' },
+  { name: 'Resident', Component: ResidentDog, personality: 'This is my house', status: 'at home' },
+  { name: 'Warm Up', Component: WarmUpDog, personality: 'Building the vibe slowly', status: 'setting mood' },
+  { name: 'Peak Time', Component: PeakTimeDog, personality: 'Maximum energy unlocked', status: 'banging' },
+  { name: 'Closing', Component: ClosingDog, personality: 'Last track best track', status: 'emotional' },
+  { name: 'Modular', Component: ModularDog, personality: 'Patch cables are life', status: 'euroracked' },
+  { name: 'Analog', Component: AnalogDog, personality: 'Warm and fuzzy signals', status: 'no laptops' },
+  { name: 'VJ', Component: VJDog, personality: 'Visuals on point', status: 'projecting' },
+  { name: 'Underground', Component: UndergroundDog, personality: 'Knows the secret spots', status: 'hidden' },
+  { name: 'Purist', Component: PuristDog, personality: 'Only real techno allowed', status: 'gatekeeping' },
+  { name: 'Tourist', Component: TouristDog, personality: 'First time at the club', status: 'amazed' },
+  { name: 'Legend', Component: LegendDog, personality: 'Been there since day one', status: 'iconic' },
 ];
