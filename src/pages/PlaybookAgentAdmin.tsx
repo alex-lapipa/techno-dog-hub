@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import PageSEO from '@/components/PageSEO';
+import { AdminPageLayout } from '@/components/admin/AdminPageLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -39,9 +35,6 @@ const TEMPLATE_TYPES = [
 ];
 
 const PlaybookAgentAdmin = () => {
-  const { isAdmin, loading: authLoading } = useAdminAuth();
-  const navigate = useNavigate();
-
   // State
   const [activeTab, setActiveTab] = useState('overview');
   const [sections, setSections] = useState<any[]>([]);
@@ -65,16 +58,8 @@ const PlaybookAgentAdmin = () => {
   const [selectedContent, setSelectedContent] = useState<any>(null);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate('/admin');
-    }
-  }, [isAdmin, authLoading, navigate]);
-
-  useEffect(() => {
-    if (isAdmin) {
-      fetchData();
-    }
-  }, [isAdmin]);
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -211,50 +196,23 @@ const PlaybookAgentAdmin = () => {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <PageSEO 
-        title="Playbook Agent | Admin"
-        description="Open-Source Operating System Playbook for Techno.doc"
-        path="/admin/playbook-agent"
-      />
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8 mt-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Book className="h-8 w-8 text-primary" />
-              Open-Source Playbook Agent
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Living handbook for community governance, contribution workflows, and open-source culture
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={exportPlaybook}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button onClick={refreshPlaybook} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh All
-            </Button>
-          </div>
-        </div>
-
+    <AdminPageLayout
+      title="Open-Source Playbook Agent"
+      description="Living handbook for community governance, contribution workflows, and open-source culture"
+      icon={Book}
+      iconColor="text-logo-green"
+      onRefresh={fetchData}
+      onRunAgent={refreshPlaybook}
+      isLoading={loading}
+      runButtonText="Refresh All"
+      actions={
+        <Button variant="outline" size="sm" className="font-mono text-xs uppercase" onClick={exportPlaybook}>
+          <Download className="w-3.5 h-3.5 mr-1.5" />
+          Export
+        </Button>
+      }
+    >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-9 mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -866,10 +824,7 @@ const PlaybookAgentAdmin = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </main>
-
-      <Footer />
-    </div>
+    </AdminPageLayout>
   );
 };
 

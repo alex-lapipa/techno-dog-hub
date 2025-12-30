@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import PageSEO from '@/components/PageSEO';
+import { AdminPageLayout } from '@/components/admin/AdminPageLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -56,9 +52,6 @@ const TONES = [
 ];
 
 const OutreachEngineAdmin = () => {
-  const { isAdmin, loading: authLoading } = useAdminAuth();
-  const navigate = useNavigate();
-
   // State
   const [activeTab, setActiveTab] = useState('dashboard');
   const [contacts, setContacts] = useState<any[]>([]);
@@ -102,16 +95,8 @@ const OutreachEngineAdmin = () => {
   });
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate('/admin');
-    }
-  }, [isAdmin, authLoading, navigate]);
-
-  useEffect(() => {
-    if (isAdmin) {
-      fetchData();
-    }
-  }, [isAdmin]);
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -301,42 +286,16 @@ const OutreachEngineAdmin = () => {
     c.organization_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) return null;
-
   return (
-    <div className="min-h-screen bg-background">
-      <PageSEO 
-        title="Outreach Engine | Admin"
-        description="PR + CRM Agent for Techno.doc community outreach"
-        path="/admin/outreach-engine"
-      />
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8 mt-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Mail className="h-8 w-8 text-primary" />
-              Outreach Engine
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              PR + CRM Agent for respectful, high-quality community outreach
-            </p>
-          </div>
-          <Button onClick={fetchData} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
-
+    <AdminPageLayout
+      title="Outreach Engine"
+      description="PR + CRM Agent for respectful, high-quality community outreach"
+      icon={Mail}
+      iconColor="text-logo-green"
+      onRefresh={fetchData}
+      isLoading={loading}
+      runButtonText="Run Agent"
+    >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-8 mb-6">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -1030,10 +989,7 @@ const OutreachEngineAdmin = () => {
             </div>
           </TabsContent>
         </Tabs>
-      </main>
-
-      <Footer />
-    </div>
+    </AdminPageLayout>
   );
 };
 
