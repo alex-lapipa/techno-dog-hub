@@ -1859,6 +1859,54 @@ export const CharlieDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Dolly Doggy - Long-haired bookish nature lover with glasses and warm smile
+export const DollyDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Long flowing ears - like long hair */}
+      <path d="M12 28 Q4 32 6 48 Q10 52 14 46 Q16 38 16 30" />
+      <path d="M52 28 Q60 32 58 48 Q54 52 50 46 Q48 38 48 30" />
+      {/* Extra long hair strands flowing down */}
+      <path d="M8 40 Q4 44 6 50" strokeWidth="1.5" opacity="0.6" />
+      <path d="M10 44 Q6 48 8 54" strokeWidth="1.5" opacity="0.6" />
+      <path d="M56 40 Q60 44 58 50" strokeWidth="1.5" opacity="0.6" />
+      <path d="M54 44 Q58 48 56 54" strokeWidth="1.5" opacity="0.6" />
+      {/* Soft bangs/fringe at top */}
+      <path d="M22 18 Q24 14 28 16" strokeWidth="1.5" />
+      <path d="M28 16 Q32 12 36 16" strokeWidth="1.5" />
+      <path d="M36 16 Q40 14 42 18" strokeWidth="1.5" />
+      {/* Head - soft round shape */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Reading glasses - slightly oval/rectangular */}
+      <rect x="18" y="28" width="10" height="8" rx="2" strokeWidth="1.5" />
+      <rect x="36" y="28" width="10" height="8" rx="2" strokeWidth="1.5" />
+      {/* Bridge of glasses */}
+      <path d="M28 32 L36 32" strokeWidth="1.5" />
+      {/* Arms of glasses */}
+      <path d="M18 30 L12 28" strokeWidth="1.5" />
+      <path d="M46 30 L52 28" strokeWidth="1.5" />
+      {/* Kind eyes behind glasses */}
+      <circle cx="23" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="22" cy="31" r="0.8" fill="hsl(var(--background))" />
+      <circle cx="41" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="40" cy="31" r="0.8" fill="hsl(var(--background))" />
+      {/* Gentle eyebrows - thoughtful */}
+      <path d="M19 26 Q23 24 27 26" strokeWidth="1" />
+      <path d="M37 26 Q41 24 45 26" strokeWidth="1" />
+      {/* Small nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Very warm, big smile */}
+      <path d="M24 46 Q32 54 40 46" strokeWidth="2.5" />
+      {/* Rosy cheeks */}
+      <circle cx="18" cy="40" r="2" opacity="0.3" fill="hsl(var(--logo-green))" />
+      <circle cx="46" cy="40" r="2" opacity="0.3" fill="hsl(var(--logo-green))" />
+      {/* Small leaf/nature detail near ear */}
+      <path d="M6 34 Q4 32 6 30 Q8 32 6 34" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <path d="M58 34 Q60 32 58 30 Q56 32 58 34" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1950,5 +1998,6 @@ export const dogVariants = [
   { name: 'Alex', Component: AlexDog, personality: 'Scruffy Irish madman with big ideas', status: 'building' },
   { name: 'Paloma', Component: PalomaDog, personality: 'Alien soul with a warm heart', status: 'dreaming' },
   { name: 'Charlie', Component: CharlieDog, personality: 'Mohawk philosopher with specs', status: 'grinning' },
+  { name: 'Dolly', Component: DollyDog, personality: 'Bookish nature lover with long locks', status: 'studying' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
 ];
