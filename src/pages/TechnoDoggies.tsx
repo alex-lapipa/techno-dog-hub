@@ -6,7 +6,7 @@ import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart, Package } from "lucide-react";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart, Package, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
@@ -176,6 +176,67 @@ const TechnoDoggies = () => {
     
     toast.dismiss();
     toast.success(`Downloaded ${currentDog?.name} Dog!`);
+  };
+
+  // Download sticker-ready version for WhatsApp (512x512 WebP)
+  const downloadForWhatsApp = async () => {
+    const svg = document.querySelector('#current-dog-display svg');
+    if (!svg) {
+      toast.error("Couldn't find the doggy!");
+      return;
+    }
+
+    logAction.mutate({
+      variantId: currentDbData?.id,
+      variantName: currentDog?.name || "Unknown",
+      actionType: "download_whatsapp",
+    });
+    trackDoggyEvent('main_page', 'download_whatsapp', undefined, currentDog?.name);
+
+    toast.loading("Creating WhatsApp sticker...");
+    
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    // WhatsApp stickers must be 512x512
+    canvas.width = 512;
+    canvas.height = 512;
+    
+    img.onload = () => {
+      ctx!.clearRect(0, 0, 512, 512);
+      ctx!.drawImage(img, 0, 0, 512, 512);
+      
+      // Convert to WebP for WhatsApp (smaller file size, better quality)
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const link = document.createElement('a');
+          link.download = `techno-${currentDog?.name.toLowerCase().replace(/\s+/g, '-')}-sticker.webp`;
+          link.href = URL.createObjectURL(blob);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          toast.dismiss();
+          toast.success(`Sticker ready! Save to Photos, then add to WhatsApp`, {
+            description: "Open WhatsApp > Stickers > Create > Add from Photos",
+            duration: 6000,
+          });
+        } else {
+          toast.dismiss();
+          toast.error("Failed to create sticker");
+        }
+      }, 'image/webp', 0.9);
+    };
+    
+    img.onerror = () => {
+      toast.dismiss();
+      toast.error("Failed to generate sticker");
+    };
+    
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    img.src = URL.createObjectURL(svgBlob);
   };
 
   // Download all doggies as individual files
@@ -435,17 +496,31 @@ const TechnoDoggies = () => {
                 </Button>
                 <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8">
                   <Download className="w-3 h-3 mr-1" />
-                  Save This
+                  Save PNG
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={downloadAllDoggies} 
-                  className="font-mono text-[10px] h-8 border-logo-green/50 text-logo-green hover:bg-logo-green/10"
+                  className="font-mono text-[10px] h-8"
                 >
                   <Package className="w-3 h-3 mr-1" />
-                  Download Pack
+                  Pack
                 </Button>
+              </div>
+              
+              {/* WhatsApp Sticker Button - Prominent for Mobile */}
+              <div className="mt-3 pt-3 border-t border-border/30">
+                <Button 
+                  onClick={downloadForWhatsApp}
+                  className="w-full font-mono text-xs h-10 bg-[#25D366] hover:bg-[#25D366]/90 text-white shadow-[0_0_15px_hsl(142_70%_49%/0.3)]"
+                >
+                  <Smartphone className="w-4 h-4 mr-2" />
+                  Add to Phone for WhatsApp
+                </Button>
+                <p className="text-[9px] text-muted-foreground text-center mt-2 font-mono">
+                  Downloads 512×512 sticker • Save to Photos • Add to WhatsApp
+                </p>
               </div>
             </CardContent>
           </Card>
