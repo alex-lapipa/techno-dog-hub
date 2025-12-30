@@ -158,6 +158,11 @@ const AdminDashboard = () => {
     { name: "Analytics", category: "Growth", description: "Usage insights and trends", status: "idle" as const, frameNumber: "06", functionName: "analytics-reporter", path: "/admin/analytics-reporter" },
     { name: "Knowledge", category: "Growth", description: "Missing artists and content gaps", status: "idle" as const, frameNumber: "07", functionName: "knowledge-gap-detector", path: "/admin/knowledge-gap" },
     { name: "Gear", category: "Content", description: "Equipment database management", status: "idle" as const, frameNumber: "08", functionName: "gear-expert-agent", path: "/admin/gear-agent" },
+    { name: "Artist Enrichment", category: "Content", description: "Artist data orchestration", status: "idle" as const, frameNumber: "09", functionName: "artist-enrichment-orchestrator", path: "/admin/artist-enrichment" },
+    { name: "Media Curator", category: "Content", description: "Photo pipeline & assets", status: "idle" as const, frameNumber: "10", functionName: "media-curator", path: "/admin/media-curator" },
+    { name: "Content Audit", category: "Content", description: "Entity audit & enrichment", status: "idle" as const, frameNumber: "11", functionName: "content-orchestrator", path: "/admin/content-orchestrator" },
+    { name: "AI Orchestrator", category: "Operations", description: "Central agent coordination", status: "idle" as const, frameNumber: "12", functionName: "ai-orchestration", path: "/admin/ai-orchestrator" },
+    { name: "Doggy System", category: "Growth", description: "Doggy pack orchestration", status: "idle" as const, frameNumber: "13", functionName: "doggy-orchestrator", path: "/admin/doggy-orchestrator" },
   ];
 
   const runnableAgents = agents.filter(a => a.functionName);
@@ -294,6 +299,11 @@ const AdminDashboard = () => {
     { name: "Collectives", description: "Scene intelligence", path: "/admin/collectives-agent", frameNumber: "23" },
     { name: "Outreach CRM", description: "PR & email campaigns", path: "/admin/outreach-engine", frameNumber: "24" },
     { name: "Playbook", description: "Open-source OS guide", path: "/admin/playbook-agent", frameNumber: "25" },
+    { name: "Artist Enrichment", description: "Artist data pipeline", path: "/admin/artist-enrichment", frameNumber: "26" },
+    { name: "Media Curator", description: "Photo assets", path: "/admin/media-curator", frameNumber: "27" },
+    { name: "Content Audit", description: "Entity enrichment", path: "/admin/content-orchestrator", frameNumber: "28" },
+    { name: "AI Agents", description: "Central orchestration", path: "/admin/ai-orchestrator", frameNumber: "29" },
+    { name: "Doggy System", description: "Pack orchestration", path: "/admin/doggy-orchestrator", frameNumber: "30" },
   ];
 
   return (

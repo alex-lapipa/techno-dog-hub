@@ -223,6 +223,10 @@ const App = () => (
                     <Route path="/admin/collectives-agent" element={<CollectivesAgentAdmin />} />
                     <Route path="/admin/outreach-engine" element={<OutreachEngineAdmin />} />
                     <Route path="/admin/playbook-agent" element={<PlaybookAgentAdmin />} />
+                    <Route path="/admin/media-curator" element={<MediaCuratorAdmin />} />
+                    <Route path="/admin/content-orchestrator" element={<ContentOrchestratorAdmin />} />
+                    <Route path="/admin/doggy-orchestrator" element={<DoggyOrchestratorAdmin />} />
+                    <Route path="/admin/ai-orchestrator" element={<AIOrchestratorAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
