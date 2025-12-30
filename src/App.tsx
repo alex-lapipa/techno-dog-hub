@@ -69,6 +69,10 @@ const ArtistLabelAgentAdmin = lazy(() => import("./pages/ArtistLabelAgentAdmin")
 const CollectivesAgentAdmin = lazy(() => import("./pages/CollectivesAgentAdmin"));
 const OutreachEngineAdmin = lazy(() => import("./pages/OutreachEngineAdmin"));
 const PlaybookAgentAdmin = lazy(() => import("./pages/PlaybookAgentAdmin"));
+const MediaCuratorAdmin = lazy(() => import("./pages/MediaCuratorAdmin"));
+const ContentOrchestratorAdmin = lazy(() => import("./pages/ContentOrchestratorAdmin"));
+const DoggyOrchestratorAdmin = lazy(() => import("./pages/DoggyOrchestratorAdmin"));
+const AIOrchestratorAdmin = lazy(() => import("./pages/AIOrchestratorAdmin"));
 
 // Agent Admin Pages
 const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
