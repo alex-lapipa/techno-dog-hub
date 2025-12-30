@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import LazyImage from "./LazyImage";
+import { useDoggyPlaceholder } from "@/hooks/useDoggyPlaceholder";
 
 interface EntityImageProps {
   entityType: string;
@@ -22,6 +23,9 @@ const EntityImage = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [jobEnqueued, setJobEnqueued] = useState(false);
+  
+  // Check for doggy placeholder
+  const { data: doggyPlaceholder } = useDoggyPlaceholder(entityType, entityId);
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -71,6 +75,22 @@ const EntityImage = ({
   // If provided fallback image, use it
   if (fallbackImage) {
     return <LazyImage src={fallbackImage} alt={entityName} className={className} />;
+  }
+
+  // Check for doggy placeholder
+  if (doggyPlaceholder?.DogComponent) {
+    const DogComponent = doggyPlaceholder.DogComponent;
+    return (
+      <div 
+        className={`relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-logo-green/10 to-background ${className}`}
+        title={`Placeholder: ${doggyPlaceholder.placeholder.doggy_variant} - ${doggyPlaceholder.personality}`}
+      >
+        <DogComponent className="w-3/4 h-3/4 opacity-70" />
+        <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-background/80 font-mono text-[8px] text-logo-green uppercase">
+          Placeholder
+        </div>
+      </div>
+    );
   }
 
   // Show gradient with initials

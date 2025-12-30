@@ -16,6 +16,7 @@ import DogSilhouette from "@/components/DogSilhouette";
 import { dogVariants, GrumpyDog } from "@/components/DogPack";
 import DoggyExport from "@/components/DoggyExport";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
+import DoggyPlaceholderManager from "@/components/admin/DoggyPlaceholderManager";
 import { useDoggyVariants, useDoggyAnalytics, useUpdateDoggyVariant } from "@/hooks/useDoggyData";
 import useDoggyAgent from "@/hooks/useDoggyAgent";
 import { Link } from "react-router-dom";
@@ -449,6 +450,9 @@ const DoggiesAdmin = () => {
 
           {/* Doggie Export & Sharing Station */}
           <DoggyExport selectedDog={selectedDog} generatedDogs={generatedDogs} />
+
+          {/* Doggy Placeholder System */}
+          <DoggyPlaceholderManager />
 
           {/* Embeddable Widget */}
           <DoggyEmbedCode />
