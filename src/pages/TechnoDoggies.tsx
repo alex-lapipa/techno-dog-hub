@@ -193,15 +193,13 @@ const TechnoDoggies = () => {
     trackDoggyEvent('main_page', 'share', 'email', currentDog?.name);
     await recordShare();
     
-    const dogNames = activeVariants.slice(0, 5).map((d: any) => d.name).join(', ');
-    const subject = encodeURIComponent(`Join the Techno Dog Pack! - ${currentDog?.name} Dog`);
+    // Doggies leave nameless - just the pack, no individual names
+    const subject = encodeURIComponent("Join the techno.dog pack!");
     const body = encodeURIComponent(
-      `Woof woof! Check out my Techno Doggy!\n\n` +
-      `Meet the ${currentDog?.name} Dog: ${currentDog?.personality}\n\n` +
-      `The full pack includes: ${dogNames} and more!\n\n` +
-      `Create your own pack & download your favorite doggies:\n` +
+      `Woof woof! Check out the techno.dog pack!\n\n` +
+      `${activeVariants.length}+ unique doggies waiting to be adopted.\n\n` +
+      `Create your own pack & download your favorites:\n` +
       `https://techno.dog/doggies\n\n` +
-      `Each doggy is available for individual download as a high-quality PNG.\n\n` +
       `Spread the barks!`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
@@ -394,7 +392,8 @@ const TechnoDoggies = () => {
   };
 
   const shareUrl = "https://techno.dog/doggies";
-  const shareText = `Check out the ${currentDog?.name} Techno Dog! Create your own pack at techno.dog`;
+  // Doggies leave nameless - the techno.dog pack philosophy
+  const shareText = "Join the techno.dog pack! Create your own doggies at techno.dog";
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
@@ -516,8 +515,9 @@ const TechnoDoggies = () => {
                 onClick={async () => {
                   if (navigator.share) {
                     try {
+                      // Doggies leave nameless when shared externally
                       await navigator.share({
-                        title: `${currentDog?.name === 'Techno' ? 'Techno Dog' : `${currentDog?.name} Doggy`}`,
+                        title: "techno.dog pack",
                         text: shareText,
                         url: shareUrl,
                       });
