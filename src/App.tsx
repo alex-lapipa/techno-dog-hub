@@ -65,6 +65,7 @@ const DataAudit = lazy(() => import("./pages/DataAudit"));
 const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
 const PRMediaAgentAdmin = lazy(() => import("./pages/PRMediaAgentAdmin"));
 const GearManufacturerAdmin = lazy(() => import("./pages/GearManufacturerAdmin"));
+const ArtistLabelAgentAdmin = lazy(() => import("./pages/ArtistLabelAgentAdmin"));
 
 // Agent Admin Pages
 const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
@@ -215,6 +216,7 @@ const App = () => (
                     <Route path="/admin/gear-agent" element={<GearAgentAdmin />} />
                     <Route path="/admin/pr-media" element={<PRMediaAgentAdmin />} />
                     <Route path="/admin/gear-manufacturer" element={<GearManufacturerAdmin />} />
+                    <Route path="/admin/artist-label-agent" element={<ArtistLabelAgentAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
