@@ -3,6 +3,9 @@ project_id = "bshyeweljerupobpmmes"
 [functions.youtube-verify-artist]
 verify_jwt = false
 
+[functions.youtube-batch-verify]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
