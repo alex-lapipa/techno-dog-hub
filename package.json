@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@elevenlabs/react": "^0.12.3",
     "@hookform/resolvers": "^3.10.0",
     "@nivo/bar": "^0.99.0",
     "@nivo/core": "^0.99.0",
