@@ -2451,6 +2451,51 @@ export type Database = {
         }
         Relationships: []
       }
+      data_imports: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          entity_type: string
+          error_log: Json | null
+          id: string
+          import_name: string
+          import_status: string | null
+          imported_by: string | null
+          records_failed: number | null
+          records_imported: number | null
+          source_file: string | null
+          started_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          entity_type: string
+          error_log?: Json | null
+          id?: string
+          import_name: string
+          import_status?: string | null
+          imported_by?: string | null
+          records_failed?: number | null
+          records_imported?: number | null
+          source_file?: string | null
+          started_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          entity_type?: string
+          error_log?: Json | null
+          id?: string
+          import_name?: string
+          import_status?: string | null
+          imported_by?: string | null
+          records_failed?: number | null
+          records_imported?: number | null
+          source_file?: string | null
+          started_at?: string | null
+        }
+        Relationships: []
+      }
       decision_records: {
         Row: {
           consequences: string | null
@@ -5335,6 +5380,93 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      techno_journalists: {
+        Row: {
+          bio: string | null
+          city: string | null
+          contact_form_url: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          focus_areas: Json | null
+          id: string
+          imported_at: string | null
+          journalist_name: string
+          journalist_name_citation: string | null
+          last_verified_at: string | null
+          linkedin_url: string | null
+          location: string | null
+          location_citation: string | null
+          notes: string | null
+          publications: Json | null
+          region: string | null
+          relationship_status: string | null
+          sources_json: Json | null
+          stakeholder_type: string | null
+          techno_doc_fit_score: number | null
+          twitter_handle: string | null
+          updated_at: string
+          verification_confidence: number | null
+          website_url: string | null
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          contact_form_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          focus_areas?: Json | null
+          id?: string
+          imported_at?: string | null
+          journalist_name: string
+          journalist_name_citation?: string | null
+          last_verified_at?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          location_citation?: string | null
+          notes?: string | null
+          publications?: Json | null
+          region?: string | null
+          relationship_status?: string | null
+          sources_json?: Json | null
+          stakeholder_type?: string | null
+          techno_doc_fit_score?: number | null
+          twitter_handle?: string | null
+          updated_at?: string
+          verification_confidence?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          contact_form_url?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          focus_areas?: Json | null
+          id?: string
+          imported_at?: string | null
+          journalist_name?: string
+          journalist_name_citation?: string | null
+          last_verified_at?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          location_citation?: string | null
+          notes?: string | null
+          publications?: Json | null
+          region?: string | null
+          relationship_status?: string | null
+          sources_json?: Json | null
+          stakeholder_type?: string | null
+          techno_doc_fit_score?: number | null
+          twitter_handle?: string | null
+          updated_at?: string
+          verification_confidence?: number | null
+          website_url?: string | null
         }
         Relationships: []
       }

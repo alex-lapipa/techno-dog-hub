@@ -73,6 +73,7 @@ export default function PRMediaAgentAdmin() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [outlets, setOutlets] = useState<MediaOutlet[]>([]);
   const [contacts, setContacts] = useState<JournalistContact[]>([]);
+  const [technoJournalists, setTechnoJournalists] = useState<any[]>([]);
   const [segments, setSegments] = useState<any[]>([]);
   const [outreachHistory, setOutreachHistory] = useState<any[]>([]);
   const [auditLog, setAuditLog] = useState<any[]>([]);
@@ -164,13 +165,27 @@ export default function PRMediaAgentAdmin() {
     }
   }, [callAgent]);
 
+  const fetchTechnoJournalists = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('techno_journalists')
+        .select('*')
+        .order('verification_confidence', { ascending: false });
+      if (error) throw error;
+      setTechnoJournalists(data || []);
+    } catch (error) {
+      console.error('Failed to fetch techno journalists:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDashboard();
     fetchOutlets();
     fetchContacts();
     fetchSegments();
     fetchOutreachHistory();
-  }, [fetchDashboard, fetchOutlets, fetchContacts, fetchSegments, fetchOutreachHistory]);
+    fetchTechnoJournalists();
+  }, [fetchDashboard, fetchOutlets, fetchContacts, fetchSegments, fetchOutreachHistory, fetchTechnoJournalists]);
 
   const runDiscovery = async () => {
     setIsLoading(true);
@@ -344,8 +359,9 @@ export default function PRMediaAgentAdmin() {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-7 w-full">
+          <TabsList className="grid grid-cols-8 w-full">
             <TabsTrigger value="dashboard"><BarChart3 className="h-4 w-4 mr-1" /> Dashboard</TabsTrigger>
+            <TabsTrigger value="journalists"><Newspaper className="h-4 w-4 mr-1" /> Journalists</TabsTrigger>
             <TabsTrigger value="discover"><Search className="h-4 w-4 mr-1" /> Discover</TabsTrigger>
             <TabsTrigger value="contacts"><Users className="h-4 w-4 mr-1" /> Contacts</TabsTrigger>
             <TabsTrigger value="outlets"><Building2 className="h-4 w-4 mr-1" /> Outlets</TabsTrigger>
@@ -445,6 +461,116 @@ export default function PRMediaAgentAdmin() {
                           <TableCell>{run.outlets_processed}</TableCell>
                           <TableCell>{run.contacts_processed}</TableCell>
                           <TableCell>{new Date(run.started_at).toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* JOURNALISTS DB TAB */}
+          <TabsContent value="journalists" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Newspaper className="h-5 w-5 text-logo-green" />
+                  Techno Journalists Database
+                  <Badge className="ml-2 bg-logo-green/20 text-logo-green">{technoJournalists.length} journalists</Badge>
+                </CardTitle>
+                <CardDescription>
+                  Curated database of techno journalists, writers, and critics for outreach and PR campaigns.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <Card className="bg-card/50">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold">{technoJournalists.filter(j => j.region === 'UK').length}</div>
+                      <div className="text-xs text-muted-foreground">UK Based</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-card/50">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold">{technoJournalists.filter(j => j.region === 'Europe').length}</div>
+                      <div className="text-xs text-muted-foreground">Europe Based</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-card/50">
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold">{technoJournalists.filter(j => j.region === 'North America').length}</div>
+                      <div className="text-xs text-muted-foreground">North America</div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <ScrollArea className="h-[500px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Publications</TableHead>
+                        <TableHead>Focus Areas</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead>Confidence</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {technoJournalists.map((journalist) => (
+                        <TableRow key={journalist.id}>
+                          <TableCell className="font-medium">
+                            <div>{journalist.journalist_name}</div>
+                            {journalist.journalist_name_citation && (
+                              <a 
+                                href={journalist.journalist_name_citation} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-muted-foreground hover:text-logo-green flex items-center gap-1"
+                              >
+                                <ExternalLink className="h-3 w-3" /> Source
+                              </a>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {(journalist.publications || []).slice(0, 3).map((pub: any, i: number) => (
+                                <Badge key={i} variant="outline" className="text-xs">
+                                  {pub.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {(journalist.focus_areas || []).slice(0, 2).map((area: any, i: number) => (
+                                <Badge key={i} className="text-xs bg-primary/20 text-primary">
+                                  {area.area}
+                                </Badge>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-sm">{journalist.city || journalist.country || journalist.region}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={journalist.verification_confidence >= 80 ? 'bg-green-500/20 text-green-400' : journalist.verification_confidence >= 60 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}>
+                              {journalist.verification_confidence}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                <Eye className="h-3 w-3" />
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                <Mail className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
