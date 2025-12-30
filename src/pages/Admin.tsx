@@ -288,6 +288,9 @@ const AdminDashboard = () => {
     { name: "Training", description: "Onboarding & docs", path: "/admin/training", frameNumber: "17" },
     { name: "Dog Agent", description: "AI Orchestrator", path: "/admin/dog-agent", frameNumber: "18" },
     { name: "Doggies", description: "Pack management", path: "/admin/doggies", frameNumber: "19" },
+    { name: "PR & Media", description: "Journalist contacts", path: "/admin/pr-media", frameNumber: "20" },
+    { name: "Gear Brands", description: "Manufacturer relations", path: "/admin/gear-manufacturer", frameNumber: "21" },
+    { name: "Artist Relations", description: "Management & labels", path: "/admin/artist-label-agent", frameNumber: "22" },
   ];
 
   return (
