@@ -80,15 +80,18 @@ Return JSON:
   ]
 }`;
 
-async function callOpenAI(prompt: string, apiKey: string): Promise<any> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callAI(prompt: string): Promise<any> {
+  const apiKey = Deno.env.get('LOVABLE_API_KEY');
+  if (!apiKey) throw new Error('LOVABLE_API_KEY not configured');
+  
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'google/gemini-2.5-flash',
       messages: [
         {
           role: 'system',
@@ -100,18 +103,17 @@ async function callOpenAI(prompt: string, apiKey: string): Promise<any> {
         }
       ],
       temperature: 0.3,
-      max_tokens: 2000
     }),
   });
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('OpenAI API error:', error);
-    throw new Error(`OpenAI API error: ${response.status}`);
+    console.error('AI API error:', error);
+    throw new Error(`AI API error: ${response.status}`);
   }
 
   const data = await response.json();
-  const text = data.choices[0]?.message?.content || '';
+  const text = data.choices?.[0]?.message?.content || '';
   
   // Extract JSON from response
   const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -119,7 +121,7 @@ async function callOpenAI(prompt: string, apiKey: string): Promise<any> {
     return JSON.parse(jsonMatch[0]);
   }
   
-  throw new Error('Failed to extract JSON from OpenAI response');
+  throw new Error('Failed to extract JSON from AI response');
 }
 
 async function getKnownFacts(supabase: any, artistId: string): Promise<string> {
@@ -168,8 +170,7 @@ async function getClaimSources(supabase: any, claimId: string): Promise<string> 
 
 async function verifyClaim(
   supabase: any,
-  claimId: string,
-  openaiKey: string
+  claimId: string
 ): Promise<VerificationResult> {
   // Get claim
   const { data: claim, error: claimError } = await supabase
@@ -192,8 +193,8 @@ async function verifyClaim(
     .replace('{claim}', `[${claim.claim_type}] ${claim.claim_text}`)
     .replace('{sources}', sources);
   
-  // Call OpenAI
-  const result = await callOpenAI(prompt, openaiKey);
+  // Call AI
+  const result = await callAI(prompt);
   
   // Update claim with verification
   await supabase
@@ -201,7 +202,7 @@ async function verifyClaim(
     .update({
       verification_status: result.verification_status,
       confidence_score: result.confidence_score,
-      verification_model: 'gpt-4o-mini',
+      verification_model: 'gemini-2.5-flash',
       verified_at: new Date().toISOString()
     })
     .eq('claim_id', claimId);
@@ -220,8 +221,7 @@ async function verifyClaim(
 
 async function detectContradictions(
   supabase: any,
-  artistId: string,
-  openaiKey: string
+  artistId: string
 ): Promise<any[]> {
   // Get all claims for artist
   const { data: claims } = await supabase
@@ -241,7 +241,7 @@ async function detectContradictions(
     .join('\n\n');
   
   const prompt = CONTRADICTION_PROMPT.replace('{claims}', claimsText);
-  const result = await callOpenAI(prompt, openaiKey);
+  const result = await callAI(prompt);
   
   // Update contradicting claims
   for (const contradiction of result.contradictions || []) {
@@ -277,11 +277,6 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const openaiKey = Deno.env.get('OPENAI_API_KEY');
-    
-    if (!openaiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
-    }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     const body: VerificationRequest = await safeParseBody(req);
@@ -294,7 +289,7 @@ serve(async (req) => {
         throw new Error('claim_id required');
       }
       
-      const result = await verifyClaim(supabase, claim_id, openaiKey);
+      const result = await verifyClaim(supabase, claim_id);
       
       return new Response(JSON.stringify({
         success: true,
@@ -322,7 +317,7 @@ serve(async (req) => {
       
       for (const claim of claims || []) {
         try {
-          const result = await verifyClaim(supabase, claim.claim_id, openaiKey);
+          const result = await verifyClaim(supabase, claim.claim_id);
           results.push(result);
           
           // Rate limit
@@ -361,7 +356,7 @@ serve(async (req) => {
         throw new Error('artist_id required');
       }
       
-      const contradictions = await detectContradictions(supabase, artist_id, openaiKey);
+      const contradictions = await detectContradictions(supabase, artist_id);
       
       return new Response(JSON.stringify({
         success: true,
@@ -390,7 +385,7 @@ serve(async (req) => {
       
       for (const claim of unverifiedClaims || []) {
         try {
-          const result = await verifyClaim(supabase, claim.claim_id, openaiKey);
+          const result = await verifyClaim(supabase, claim.claim_id);
           verificationResults.push(result);
           await new Promise(r => setTimeout(r, 1000));
         } catch (err) {
@@ -399,7 +394,7 @@ serve(async (req) => {
       }
       
       // Step 2: Detect contradictions
-      const contradictions = await detectContradictions(supabase, artist_id, openaiKey);
+      const contradictions = await detectContradictions(supabase, artist_id);
       
       // Step 3: Update enrichment run if exists
       const { data: latestRun } = await supabase
