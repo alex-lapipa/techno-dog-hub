@@ -12,6 +12,7 @@ import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
 import { DoggyPageFooter, trackDoggyEvent } from "@/components/doggy";
+import ParticleBackground from "@/components/ParticleBackground";
 
 const TechnoDoggies = () => {
   const { data: dbVariants, isLoading } = useActiveDoggyVariants();
@@ -387,7 +388,8 @@ const TechnoDoggies = () => {
         <meta name="twitter:image" content="https://techno.dog/og-doggies.png" />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <ParticleBackground />
         {/* Minimal Mobile Header */}
         <header className="border-b border-border/30 bg-background/90 backdrop-blur-md sticky top-0 z-50">
           <div className="px-4 py-3 flex items-center justify-between">
