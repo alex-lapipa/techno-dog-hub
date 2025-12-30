@@ -1821,6 +1821,44 @@ export const PalomaDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Charlie Dog - Glasses, mohawk hair, and big friendly smile
+export const CharlieDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-bounce" : ""}>
+      {/* Floppy ears */}
+      <path d="M14 30 Q8 22 12 12 Q18 18 20 28" />
+      <path d="M50 30 Q56 22 52 12 Q46 18 44 28" />
+      {/* Epic mohawk hair - spiky center strip */}
+      <path d="M28 12 L30 4 L32 10 L34 2 L36 12" strokeWidth="2.5" />
+      <path d="M26 16 L27 10" strokeWidth="2" />
+      <path d="M38 16 L37 10" strokeWidth="2" />
+      <path d="M30 14 L31 6" strokeWidth="1.5" opacity="0.7" />
+      <path d="M34 14 L33 6" strokeWidth="1.5" opacity="0.7" />
+      {/* Head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Glasses - round frames */}
+      <circle cx="24" cy="32" r="6" strokeWidth="1.5" />
+      <circle cx="40" cy="32" r="6" strokeWidth="1.5" />
+      {/* Bridge of glasses */}
+      <path d="M30 32 L34 32" strokeWidth="1.5" />
+      {/* Arms of glasses going to ears */}
+      <path d="M18 32 L14 30" strokeWidth="1.5" />
+      <path d="M46 32 L50 30" strokeWidth="1.5" />
+      {/* Eyes behind glasses */}
+      <circle cx="24" cy="32" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="23" cy="31" r="1" fill="hsl(var(--background))" />
+      <circle cx="40" cy="32" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="31" r="1" fill="hsl(var(--background))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* BIG friendly smile - wide and happy */}
+      <path d="M22 46 Q32 56 42 46" strokeWidth="2.5" />
+      {/* Tongue sticking out slightly */}
+      <ellipse cx="32" cy="50" rx="3" ry="2" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1911,5 +1949,6 @@ export const dogVariants = [
   // FOUNDERS
   { name: 'Alex', Component: AlexDog, personality: 'Scruffy Irish madman with big ideas', status: 'building' },
   { name: 'Paloma', Component: PalomaDog, personality: 'Alien soul with a warm heart', status: 'dreaming' },
+  { name: 'Charlie', Component: CharlieDog, personality: 'Mohawk philosopher with specs', status: 'grinning' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
 ];
