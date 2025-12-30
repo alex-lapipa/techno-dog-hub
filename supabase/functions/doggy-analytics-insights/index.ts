@@ -194,12 +194,12 @@ async function callOpenAI(prompt: string, systemPrompt: string): Promise<ModelRe
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini-2025-08-07',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
       ],
-      max_tokens: 1000,
+      max_completion_tokens: 1000,
     }),
   });
   
@@ -207,7 +207,7 @@ async function callOpenAI(prompt: string, systemPrompt: string): Promise<ModelRe
   if (!response.ok) throw new Error(data.error?.message || 'OpenAI API error');
   
   return {
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     provider: 'openai',
     analysis: data.choices[0].message.content,
     confidence: 0.85,

@@ -490,7 +490,7 @@ Return JSON array of labels found:
               const extractedLabels = await callLovableAI([
                 { role: 'system', content: 'Extract only verified label info. Return valid JSON array.' },
                 { role: 'user', content: extractionPrompt }
-              ], 'openai/gpt-4o-mini');
+              ], 'google/gemini-2.5-flash');
 
               try {
                 const labels = JSON.parse(extractedLabels.match(/\[[\s\S]*\]/)?.[0] || '[]');
@@ -589,7 +589,7 @@ Return JSON array:
                 const contacts = await callLovableAI([
                   { role: 'system', content: 'Extract verified contacts only. Return JSON array.' },
                   { role: 'user', content: extractionPrompt }
-                ], 'openai/gpt-4o-mini');
+                ], 'google/gemini-2.5-flash');
 
                 try {
                   const parsedContacts = JSON.parse(contacts.match(/\[[\s\S]*\]/)?.[0] || '[]');

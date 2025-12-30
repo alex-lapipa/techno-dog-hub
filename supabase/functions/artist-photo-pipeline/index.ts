@@ -43,7 +43,7 @@ Return format: ["url1", "url2", ...]`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [{ role: 'user', content: searchPrompt }],
         temperature: 0.3,
       }),
@@ -97,7 +97,7 @@ Respond in JSON format:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-5-2025-08-07',
         messages: [{
           role: 'user',
           content: [
@@ -105,7 +105,7 @@ Respond in JSON format:
             { type: 'image_url', image_url: { url: imageUrl } }
           ]
         }],
-        max_tokens: 500,
+        max_completion_tokens: 500,
       }),
     });
 

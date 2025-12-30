@@ -36,13 +36,13 @@ async function callOpenAI(prompt: string, systemPrompt: string): Promise<string>
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini-2025-08-07',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
     }),
   });
 
@@ -63,7 +63,7 @@ async function callAnthropic(prompt: string, systemPrompt: string): Promise<stri
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-sonnet-4-5',
       max_tokens: 4000,
       system: systemPrompt,
       messages: [{ role: 'user', content: prompt }],
