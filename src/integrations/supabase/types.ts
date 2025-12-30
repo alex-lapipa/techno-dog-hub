@@ -2028,6 +2028,39 @@ export type Database = {
         }
         Relationships: []
       }
+      community_health_metrics: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          how_to_measure: string | null
+          id: string
+          interventions_when_low: string | null
+          metric_name: string
+          recommended_thresholds: Json | null
+          sources_json: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          how_to_measure?: string | null
+          id?: string
+          interventions_when_low?: string | null
+          metric_name: string
+          recommended_thresholds?: Json | null
+          sources_json?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          how_to_measure?: string | null
+          id?: string
+          interventions_when_low?: string | null
+          metric_name?: string
+          recommended_thresholds?: Json | null
+          sources_json?: Json | null
+        }
+        Relationships: []
+      }
       community_profiles: {
         Row: {
           city: string | null
@@ -2295,6 +2328,45 @@ export type Database = {
           status?: string
           tier?: string | null
           vat_number?: string | null
+        }
+        Relationships: []
+      }
+      decision_records: {
+        Row: {
+          consequences: string | null
+          context: string | null
+          created_at: string | null
+          decision: string | null
+          decision_type: string | null
+          id: string
+          sources_json: Json | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          decision_type?: string | null
+          id?: string
+          sources_json?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          consequences?: string | null
+          context?: string | null
+          created_at?: string | null
+          decision?: string | null
+          decision_type?: string | null
+          id?: string
+          sources_json?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -3443,6 +3515,45 @@ export type Database = {
         }
         Relationships: []
       }
+      governance_models: {
+        Row: {
+          best_for: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          model_name: string
+          pros_cons: Json | null
+          recommended_for_techno_doc: boolean | null
+          recommended_variant_notes: string | null
+          risks: string | null
+          sources_json: Json | null
+        }
+        Insert: {
+          best_for?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          model_name: string
+          pros_cons?: Json | null
+          recommended_for_techno_doc?: boolean | null
+          recommended_variant_notes?: string | null
+          risks?: string | null
+          sources_json?: Json | null
+        }
+        Update: {
+          best_for?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          model_name?: string
+          pros_cons?: Json | null
+          recommended_for_techno_doc?: boolean | null
+          recommended_variant_notes?: string | null
+          risks?: string | null
+          sources_json?: Json | null
+        }
+        Relationships: []
+      }
       health_alerts: {
         Row: {
           alert_type: string
@@ -4189,6 +4300,81 @@ export type Database = {
         }
         Relationships: []
       }
+      playbook_agent_runs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          run_type: string
+          started_at: string | null
+          stats: Json | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type?: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      playbook_sections: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_updated_at: string | null
+          section_content_markdown: string | null
+          section_description: string | null
+          section_key: string
+          section_title: string
+          sources_json: Json | null
+          status: string | null
+          updated_by: string | null
+          version_number: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_updated_at?: string | null
+          section_content_markdown?: string | null
+          section_description?: string | null
+          section_key: string
+          section_title: string
+          sources_json?: Json | null
+          status?: string | null
+          updated_by?: string | null
+          version_number?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_updated_at?: string | null
+          section_content_markdown?: string | null
+          section_description?: string | null
+          section_key?: string
+          section_title?: string
+          sources_json?: Json | null
+          status?: string | null
+          updated_by?: string | null
+          version_number?: number | null
+        }
+        Relationships: []
+      }
       point_transactions: {
         Row: {
           action_type: string
@@ -4236,6 +4422,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      policies: {
+        Row: {
+          created_at: string | null
+          enforcement_process: string | null
+          escalation_path: string | null
+          id: string
+          last_verified_at: string | null
+          policy_content_markdown: string | null
+          policy_name: string
+          policy_type: string | null
+          sources_json: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          enforcement_process?: string | null
+          escalation_path?: string | null
+          id?: string
+          last_verified_at?: string | null
+          policy_content_markdown?: string | null
+          policy_name: string
+          policy_type?: string | null
+          sources_json?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          enforcement_process?: string | null
+          escalation_path?: string | null
+          id?: string
+          last_verified_at?: string | null
+          policy_content_markdown?: string | null
+          policy_name?: string
+          policy_type?: string | null
+          sources_json?: Json | null
+        }
+        Relationships: []
       }
       pr_agent_runs: {
         Row: {
@@ -4360,6 +4582,93 @@ export type Database = {
           records_affected?: number | null
           source_url?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      principles_values: {
+        Row: {
+          created_at: string | null
+          do_list: Json | null
+          dont_list: Json | null
+          id: string
+          last_verified_at: string | null
+          practical_examples: Json | null
+          principle_name: string
+          principle_summary: string | null
+          related_policies: Json | null
+          sources_json: Json | null
+          why_it_matters: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          do_list?: Json | null
+          dont_list?: Json | null
+          id?: string
+          last_verified_at?: string | null
+          practical_examples?: Json | null
+          principle_name: string
+          principle_summary?: string | null
+          related_policies?: Json | null
+          sources_json?: Json | null
+          why_it_matters?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          do_list?: Json | null
+          dont_list?: Json | null
+          id?: string
+          last_verified_at?: string | null
+          practical_examples?: Json | null
+          principle_name?: string
+          principle_summary?: string | null
+          related_policies?: Json | null
+          sources_json?: Json | null
+          why_it_matters?: string | null
+        }
+        Relationships: []
+      }
+      processes_workflows: {
+        Row: {
+          common_failure_modes: string | null
+          created_at: string | null
+          id: string
+          last_verified_at: string | null
+          required_roles_json: Json | null
+          sources_json: Json | null
+          steps_json: Json | null
+          success_metrics: string | null
+          templates_linked: Json | null
+          tools_needed_json: Json | null
+          workflow_category: string | null
+          workflow_name: string
+        }
+        Insert: {
+          common_failure_modes?: string | null
+          created_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          required_roles_json?: Json | null
+          sources_json?: Json | null
+          steps_json?: Json | null
+          success_metrics?: string | null
+          templates_linked?: Json | null
+          tools_needed_json?: Json | null
+          workflow_category?: string | null
+          workflow_name: string
+        }
+        Update: {
+          common_failure_modes?: string | null
+          created_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          required_roles_json?: Json | null
+          sources_json?: Json | null
+          steps_json?: Json | null
+          success_metrics?: string | null
+          templates_linked?: Json | null
+          tools_needed_json?: Json | null
+          workflow_category?: string | null
+          workflow_name?: string
         }
         Relationships: []
       }
@@ -4727,6 +5036,39 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      templates_assets: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_verified_at: string | null
+          sources_json: Json | null
+          template_content_markdown: string | null
+          template_name: string
+          template_type: string | null
+          usage_instructions: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          sources_json?: Json | null
+          template_content_markdown?: string | null
+          template_name: string
+          template_type?: string | null
+          usage_instructions?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          sources_json?: Json | null
+          template_content_markdown?: string | null
+          template_name?: string
+          template_type?: string | null
+          usage_instructions?: string | null
         }
         Relationships: []
       }
