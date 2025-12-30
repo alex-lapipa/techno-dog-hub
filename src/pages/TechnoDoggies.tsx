@@ -14,6 +14,7 @@ import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData"
 import { DoggyPageFooter, trackDoggyEvent, DoggyShareLeaderboard, recordShare } from "@/components/doggy";
 import ParticleBackground from "@/components/ParticleBackground";
 import { trackShareEvent, trackClickThrough } from "@/hooks/useShareTracking";
+import DoggyEmbedCode from "@/components/DoggyEmbedCode";
 
 // Doggies that should NEVER be shown first - too grumpy or confusing for first impressions
 const excludedFirstImpressionDogs = ['grumpy', 'sven marquardt', 'bouncer', 'security'];
@@ -1001,7 +1002,12 @@ const TechnoDoggies = () => {
             </p>
           </div>
 
-          {/* 5. SHARE LEADERBOARD */}
+          {/* 5. EMBED WIDGET - For developers & fans */}
+          <div className="mb-8">
+            <DoggyEmbedCode />
+          </div>
+
+          {/* 6. SHARE LEADERBOARD */}
           <div className="mb-8">
             <DoggyShareLeaderboard />
           </div>
