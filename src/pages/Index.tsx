@@ -70,7 +70,36 @@ const Index = () => {
 
   const combinedSchema = [organizationSchema, websiteSchema, faqSchema];
 
-  const featuredSections = [
+  // Primary Archive sections - aligned with top nav
+  const archiveSections = [
+    {
+      title: 'Technopedia',
+      description: 'The complete techno encyclopedia',
+      path: '/technopedia',
+      icon: '📚'
+    },
+    {
+      title: 'Artists',
+      description: 'Producers & DJs shaping the sound',
+      path: '/artists',
+      icon: '🎧'
+    },
+    {
+      title: 'Gear',
+      description: 'Machines, synths & studio equipment',
+      path: '/gear',
+      icon: '⚙️'
+    },
+    {
+      title: 'Scenes',
+      description: 'Venues, festivals & global hubs',
+      path: '/venues',
+      icon: '🌍'
+    }
+  ];
+
+  // Secondary content sections
+  const contentSections = [
     {
       title: 'News',
       description: 'Latest transmissions from the underground',
@@ -83,28 +112,50 @@ const Index = () => {
       path: '/festivals'
     },
     {
-      title: 'Artists',
-      description: 'The producers and DJs shaping the sound',
-      path: '/artists'
+      title: 'Labels',
+      description: 'The imprints defining the sound',
+      path: '/labels'
     },
     {
       title: 'Releases',
       description: 'The records that define techno',
       path: '/releases'
+    }
+  ];
+
+  // Tools & Services - aligned with colored nav tabs
+  const toolsSections = [
+    {
+      title: 'Audio Lab',
+      description: 'Synth experiments & sound design',
+      path: '/sound-machine',
+      color: 'bg-purple-500/20 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white'
     },
     {
-      title: 'Mad Stuff',
-      description: 'Deep cuts, history, venues, crews',
-      path: '/venues'
+      title: 'Developer API',
+      description: 'Build with our techno database',
+      path: '/developer',
+      color: 'bg-blue-500/20 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white'
+    },
+    {
+      title: 'Support',
+      description: 'Help & community resources',
+      path: '/support',
+      color: 'bg-orange-500/20 border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white'
+    },
+    {
+      title: 'Store',
+      description: 'Merch & gear from the underground',
+      path: '/store',
+      color: 'bg-logo-green/20 border-logo-green text-logo-green hover:bg-logo-green hover:text-background'
     }
   ];
 
   const quickLinks = [
-    { label: 'Venues', path: '/venues' },
-    { label: 'Labels', path: '/labels' },
     { label: 'Crews', path: '/crews' },
-    { label: 'Gear', path: '/gear' },
-    { label: 'User Stories', path: '/mad/stories' },
+    { label: 'Community', path: '/community' },
+    { label: 'Submit', path: '/submit' },
+    { label: 'Doggies', path: '/doggies' },
   ];
 
   return (
@@ -165,24 +216,24 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Main navigation grid */}
+        {/* Primary Archive Grid - matches top nav */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredSections.map((section) => (
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-8">
+              // The Archive
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {archiveSections.map((section) => (
                 <Link
                   key={section.path}
                   to={section.path}
-                  className={`group block border p-8 transition-colors ${
-                    section.accent 
-                      ? 'border-foreground bg-card hover:bg-foreground hover:text-background' 
-                      : 'border-border hover:bg-card'
-                  }`}
+                  className="group block border border-foreground p-6 hover:bg-foreground hover:text-background transition-colors"
                 >
-                  <h2 className="font-mono text-3xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
+                  <div className="text-3xl mb-4">{section.icon}</div>
+                  <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
                     {section.title}
                   </h2>
-                  <p className="font-mono text-sm text-muted-foreground group-hover:text-current mb-6">
+                  <p className="font-mono text-sm text-muted-foreground group-hover:text-current mb-4">
                     {section.description}
                   </p>
                   <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
@@ -195,8 +246,72 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Content Highlights - News, Festivals, Labels, Releases */}
+        <section className="border-b border-border">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-8">
+              // Latest & Featured
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {contentSections.map((section) => (
+                <Link
+                  key={section.path}
+                  to={section.path}
+                  className={`group block border p-6 transition-colors ${
+                    section.accent 
+                      ? 'border-foreground bg-card hover:bg-foreground hover:text-background' 
+                      : 'border-border hover:bg-card hover:border-foreground'
+                  }`}
+                >
+                  <h3 className="font-mono text-xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
+                    {section.title}
+                  </h3>
+                  <p className="font-mono text-xs text-muted-foreground group-hover:text-current mb-4">
+                    {section.description}
+                  </p>
+                  <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
+                    <span>View</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Daily Spotlight */}
         <DailySpotlight />
+
+        {/* Tools & Services - matches colored nav tabs */}
+        <section className="border-b border-border">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-8">
+              // Tools & Services
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {toolsSections.map((section) => (
+                <Link
+                  key={section.path}
+                  to={section.path}
+                  className={`group block border p-6 transition-all ${section.color}`}
+                >
+                  <h3 className="font-mono text-xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
+                    {section.title}
+                  </h3>
+                  <p className="font-mono text-xs opacity-80 group-hover:opacity-100 mb-4">
+                    {section.description}
+                  </p>
+                  <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
+                    <span>Open</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Quick Links */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12">
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -216,26 +331,10 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Featured content teasers */}
+        {/* Quote + Doggies Teaser */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Latest article teaser */}
-              <Link to="/news" className="group block border border-border p-6 hover:bg-card transition-colors">
-                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
-                  // Latest
-                </div>
-                <h3 className="font-mono text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                  News & Features
-                </h3>
-                <p className="font-mono text-sm text-muted-foreground mb-4">
-                  The latest transmissions from the underground.
-                </p>
-                <span className="font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                  Read →
-                </span>
-              </Link>
-
               {/* Quote */}
               <div className="border border-border p-6 flex flex-col justify-center">
                 <blockquote className="font-mono text-xl md:text-2xl uppercase leading-tight tracking-tight mb-4">
@@ -245,40 +344,26 @@ const Index = () => {
                   — Jeff Mills
                 </cite>
               </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Meet the Pack */}
-        <section className="border-b border-border">
-          <div className="container mx-auto px-4 md:px-8 py-16">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
-                  // Meet the full pack
+              {/* Doggies teaser */}
+              <Link to="/doggies" className="group block border border-logo-green/50 p-6 hover:bg-logo-green/10 transition-colors">
+                <div className="font-mono text-xs text-logo-green uppercase tracking-[0.3em] mb-4">
+                  // Meet the pack
                 </div>
-                <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight">
+                <h3 className="font-mono text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
                   Techno Doggies
-                </h2>
-              </div>
-              <Link 
-                to="/doggies" 
-                className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Get them all →
+                </h3>
+                <div className="flex gap-2 mb-4">
+                  {dogVariants.slice(0, 6).map((dog, index) => (
+                    <div key={dog.name + index} className="w-10 h-10">
+                      <dog.Component className="w-full h-full" />
+                    </div>
+                  ))}
+                </div>
+                <span className="font-mono text-xs text-muted-foreground group-hover:text-foreground">
+                  Get them all →
+                </span>
               </Link>
-            </div>
-            <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-4">
-              {dogVariants.slice(0, 20).map((dog, index) => (
-                <Link
-                  key={dog.name + index}
-                  to="/doggies"
-                  className="group aspect-square border border-border p-2 hover:bg-card hover:border-foreground transition-colors flex items-center justify-center"
-                  title={dog.name}
-                >
-                  <dog.Component className="w-full h-full" />
-                </Link>
-              ))}
             </div>
           </div>
         </section>
