@@ -1117,6 +1117,33 @@ export const LegendDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Nerdy Dog - glasses, bowtie, knows all the BPMs
+export const NerdyDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      {/* Glasses */}
+      <rect x="20" y="34" width="10" height="8" rx="2" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <rect x="34" y="34" width="10" height="8" rx="2" fill="hsl(var(--logo-green))" opacity="0.2" />
+      <path d="M30 38 L34 38" />
+      <path d="M20 38 L16 36" />
+      <path d="M44 38 L48 36" />
+      {/* Eyes behind glasses */}
+      <circle cx="25" cy="38" r="1.5" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="38" r="1.5" fill="hsl(var(--logo-green))" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 52 Q32 54 36 52" />
+      {/* Bowtie */}
+      <path d="M26 56 L32 54 L38 56 L32 58 Z" fill="hsl(var(--logo-green))" opacity="0.4" />
+      {/* Binary/code floating */}
+      <text x="4" y="16" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6">01</text>
+      <text x="52" y="12" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6">10</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1176,4 +1203,5 @@ export const dogVariants = [
   { name: 'Purist', Component: PuristDog, personality: 'Only real techno allowed', status: 'gatekeeping' },
   { name: 'Tourist', Component: TouristDog, personality: 'First time at the club', status: 'amazed' },
   { name: 'Legend', Component: LegendDog, personality: 'Been there since day one', status: 'iconic' },
+  { name: 'Nerdy', Component: NerdyDog, personality: 'Knows every BPM by heart', status: 'calculating' },
 ];
