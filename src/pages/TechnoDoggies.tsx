@@ -715,7 +715,7 @@ const TechnoDoggies = () => {
               </div>
 
               <p className="mt-4 font-mono text-[10px] text-muted-foreground italic text-center">
-                "Life's too short to be NPC :: Become a techno dog."
+                "Life's too short for NPCs :: Become a techno dog."
               </p>
             </CardContent>
           </Card>
