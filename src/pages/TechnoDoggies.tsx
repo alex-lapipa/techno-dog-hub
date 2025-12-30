@@ -715,7 +715,10 @@ const TechnoDoggies = () => {
                   <button 
                     onClick={() => {
                       navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-                      toast.success("Link copied!");
+                      toast.success("Copied! Now paste in Instagram", {
+                        description: "Open Instagram → Create Story or DM → Paste",
+                        duration: 4000,
+                      });
                       handleSocialShare("instagram");
                     }}
                     className="flex flex-col items-center p-2 rounded-lg hover:bg-logo-green/20 transition-colors group"
