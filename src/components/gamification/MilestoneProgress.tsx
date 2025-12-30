@@ -3,14 +3,14 @@ import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 
 const MILESTONES = [
-  { points: 100, name: "First Hundred", icon: "💯" },
-  { points: 500, name: "Rising Star", icon: "⭐" },
-  { points: 1000, name: "Thousand Club", icon: "🌟" },
-  { points: 2500, name: "Scene Veteran", icon: "🎖️" },
-  { points: 5000, name: "Techno Elite", icon: "🏅" },
-  { points: 10000, name: "Legend", icon: "🏆" },
-  { points: 25000, name: "Hall of Fame", icon: "👑" },
-  { points: 50000, name: "Founding Pillar", icon: "💎" },
+  { points: 100, name: "First Hundred", icon: "100" },
+  { points: 500, name: "Rising Star", icon: "star" },
+  { points: 1000, name: "Thousand Club", icon: "star-filled" },
+  { points: 2500, name: "Scene Veteran", icon: "medal" },
+  { points: 5000, name: "Techno Elite", icon: "award" },
+  { points: 10000, name: "Legend", icon: "trophy" },
+  { points: 25000, name: "Hall of Fame", icon: "crown" },
+  { points: 50000, name: "Founding Pillar", icon: "gem" },
 ];
 
 interface MilestoneProgressProps {

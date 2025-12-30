@@ -134,7 +134,7 @@ function generateSuccessPage(): string {
 </head>
 <body>
   <div class="container">
-    <div class="icon">✅</div>
+    <div class="icon" style="color: #22c55e; font-size: 32px; font-weight: bold;">[OK]</div>
     <h1>You've been unsubscribed</h1>
     <p>You will no longer receive weekly digest emails from Techno Dog. You can re-subscribe anytime from your profile settings.</p>
     <a href="https://techno.dog" class="button">Go to Techno Dog</a>
@@ -194,7 +194,7 @@ function generateErrorPage(message: string): string {
 </head>
 <body>
   <div class="container">
-    <div class="icon">❌</div>
+    <div class="icon" style="color: #ef4444; font-size: 32px; font-weight: bold;">[X]</div>
     <h1>Something went wrong</h1>
     <p>${message}</p>
     <a href="https://techno.dog" class="button">Go to Techno Dog</a>

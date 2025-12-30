@@ -158,7 +158,7 @@ const handler = async (req: Request): Promise<Response> => {
         const { error: emailError } = await resend.emails.send({
           from: "Techno Dog <digest@resend.dev>",
           to: [user.email],
-          subject: `🎧 Your Weekly Techno Dog Digest | ${weeklyPoints} XP earned`,
+          subject: `Your Weekly Techno Dog Digest | ${weeklyPoints} XP earned`,
           html: emailHtml,
         });
 
@@ -227,8 +227,8 @@ function generateDigestEmail(params: DigestEmailParams): string {
   } = params;
 
   const displayName = user.display_name || "Techno Enthusiast";
-  const streakEmoji = user.current_streak >= 7 ? "🔥" : user.current_streak >= 3 ? "⚡" : "✨";
-  const positionEmoji = leaderboardPosition <= 3 ? "🏆" : leaderboardPosition <= 10 ? "🥇" : "📊";
+  const streakLevel = user.current_streak >= 7 ? "HOT" : user.current_streak >= 3 ? "ACTIVE" : "NEW";
+  const positionLevel = leaderboardPosition <= 3 ? "TOP 3" : leaderboardPosition <= 10 ? "TOP 10" : `#${leaderboardPosition}`;
   const recentActivityHtml = weeklyActivity.slice(0, 5).map(a => `
     <tr>
       <td style="padding: 8px 0; border-bottom: 1px solid #333;">
@@ -241,7 +241,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
   const eventsHtml = upcomingEvents.length > 0 
     ? upcomingEvents.map(e => `
       <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #8b5cf6;">
-        <div style="font-weight: bold; color: #fff; margin-bottom: 4px;">${e.icon || "🎉"} ${e.name}</div>
+        <div style="font-weight: bold; color: #fff; margin-bottom: 4px;">${e.name}</div>
         <div style="color: #a3a3a3; font-size: 14px;">${e.multiplier}x XP Multiplier</div>
         <div style="color: #737373; font-size: 12px; margin-top: 4px;">
           ${new Date(e.start_at).toLocaleDateString()} - ${new Date(e.end_at).toLocaleDateString()}
@@ -266,7 +266,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
           <!-- Header -->
           <tr>
             <td style="text-align: center; padding-bottom: 32px;">
-              <h1 style="color: #fff; font-size: 28px; margin: 0;">🐕 Techno Dog</h1>
+              <h1 style="color: #fff; font-size: 28px; margin: 0;">Techno Dog</h1>
               <p style="color: #737373; margin: 8px 0 0 0;">Weekly Digest</p>
             </td>
           </tr>
@@ -274,7 +274,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
           <!-- Greeting -->
           <tr>
             <td style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-              <h2 style="color: #fff; margin: 0 0 8px 0;">Hey ${displayName}! 👋</h2>
+              <h2 style="color: #fff; margin: 0 0 8px 0;">Hey ${displayName}</h2>
               <p style="color: #a3a3a3; margin: 0;">Here's your weekly community roundup.</p>
             </td>
           </tr>
@@ -292,7 +292,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
                   <td width="4%"></td>
                   <!-- Streak -->
                   <td width="48%" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 12px; padding: 20px; text-align: center;">
-                    <div style="font-size: 32px; font-weight: bold; color: #fff;">${streakEmoji} ${user.current_streak}</div>
+                    <div style="font-size: 32px; font-weight: bold; color: #fff;">${user.current_streak} ${streakLevel}</div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Day Streak</div>
                   </td>
                 </tr>
@@ -307,14 +307,14 @@ function generateDigestEmail(params: DigestEmailParams): string {
                 <tr>
                   <!-- Level -->
                   <td width="48%" style="background: #1a1a2e; border-radius: 12px; padding: 20px; text-align: center;">
-                    <div style="font-size: 24px;">${levelInfo?.icon || "⭐"}</div>
+                    <div style="font-size: 18px; color: #a3a3a3;">LEVEL</div>
                     <div style="color: #fff; font-weight: bold; margin-top: 8px;">Level ${user.current_level}</div>
                     <div style="color: #a3a3a3; font-size: 14px;">${levelInfo?.name || "Contributor"}</div>
                   </td>
                   <td width="4%"></td>
                   <!-- Leaderboard Position -->
                   <td width="48%" style="background: #1a1a2e; border-radius: 12px; padding: 20px; text-align: center;">
-                    <div style="font-size: 24px;">${positionEmoji}</div>
+                    <div style="font-size: 18px; color: #a3a3a3;">${positionLevel}</div>
                     <div style="color: #fff; font-weight: bold; margin-top: 8px;">#${leaderboardPosition || "—"}</div>
                     <div style="color: #a3a3a3; font-size: 14px;">of ${totalUsers} contributors</div>
                   </td>
@@ -335,7 +335,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
           ${activityCount > 0 ? `
           <tr>
             <td style="padding: 24px 0;">
-              <h3 style="color: #fff; margin: 0 0 16px 0;">📝 Recent Activity</h3>
+              <h3 style="color: #fff; margin: 0 0 16px 0;">Recent Activity</h3>
               <table width="100%" style="background: #1a1a2e; border-radius: 12px; padding: 16px;">
                 ${recentActivityHtml}
               </table>
@@ -346,7 +346,7 @@ function generateDigestEmail(params: DigestEmailParams): string {
           <!-- Upcoming Events -->
           <tr>
             <td style="padding-bottom: 24px;">
-              <h3 style="color: #fff; margin: 0 0 16px 0;">🎉 Upcoming XP Events</h3>
+              <h3 style="color: #fff; margin: 0 0 16px 0;">Upcoming XP Events</h3>
               ${eventsHtml}
             </td>
           </tr>

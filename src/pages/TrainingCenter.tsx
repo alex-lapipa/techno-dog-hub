@@ -421,7 +421,7 @@ const TechnicalOverviewSection = () => {
                 </p>
                 <div className="p-3 bg-logo-green/10 border border-logo-green/20 rounded-lg">
                   <p className="text-sm font-medium text-logo-green">
-                    💡 In simple terms: {component.simple}
+                    In simple terms: {component.simple}
                   </p>
                 </div>
               </CardContent>

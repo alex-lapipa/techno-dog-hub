@@ -523,8 +523,8 @@ export default function TicketingAdmin() {
                             {event.organization?.name} / {event.slug}
                           </p>
                           <p className="text-sm text-muted-foreground mt-2">
-                            📅 {format(new Date(event.start_date), 'PPP p')}
-                            {event.venue_name && ` • 📍 ${event.venue_name}`}
+                            {format(new Date(event.start_date), 'PPP p')}
+                            {event.venue_name && ` | ${event.venue_name}`}
                           </p>
 
                           {/* Ticket Types */}

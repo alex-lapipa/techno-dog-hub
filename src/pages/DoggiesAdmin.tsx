@@ -72,7 +72,7 @@ const DoggiesAdmin = () => {
       setPackHealth(prev => Math.min(100, prev + Math.floor(Math.random() * 5)));
       setCohesionScore(prev => Math.min(100, prev + Math.floor(Math.random() * 8)));
       toast({
-        title: "✅ Pack Check Complete",
+        title: "Pack Check Complete",
         description: "All doggies accounted for. Good boys confirmed.",
       });
     }, 2000);
@@ -80,7 +80,7 @@ const DoggiesAdmin = () => {
 
   const shufflePack = () => {
     toast({
-      title: "🔀 Shuffling Pack Formation",
+      title: "Shuffling Pack Formation",
       description: "Reorganizing doggies for optimal cuteness...",
     });
   };

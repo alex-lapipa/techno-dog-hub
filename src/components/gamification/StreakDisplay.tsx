@@ -99,12 +99,12 @@ export function StreakCard({
     return "Your streak has reset. Start fresh!";
   };
 
-  const getStreakEmoji = () => {
-    if (currentStreak >= 100) return "💎";
-    if (currentStreak >= 30) return "🌟";
-    if (currentStreak >= 7) return "⚡";
-    if (currentStreak >= 1) return "🔥";
-    return "✨";
+  const getStreakLevel = () => {
+    if (currentStreak >= 100) return "legendary";
+    if (currentStreak >= 30) return "epic";
+    if (currentStreak >= 7) return "hot";
+    if (currentStreak >= 1) return "active";
+    return "new";
   };
 
   return (
@@ -116,7 +116,7 @@ export function StreakCard({
         <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Activity Streak
         </h3>
-        <span className="text-lg">{getStreakEmoji()}</span>
+        <span className="text-xs font-mono uppercase text-logo-green">{getStreakLevel()}</span>
       </div>
 
       <div className="flex items-baseline gap-2 mb-2">

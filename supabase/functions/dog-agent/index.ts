@@ -162,7 +162,7 @@ Remember: You're the spirit of the underground with four paws, impeccable taste,
 CURRENT KNOWLEDGE CONTEXT:
 ${knowledgeContext || "No specific context loaded for this query."}
 
-Now go fetch those answers, bestie! 🐾🖤`;
+Now go fetch those answers, bestie!`;
 }
 
 Deno.serve(async (req: Request) => {
