@@ -1730,6 +1730,49 @@ export const AlexDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// La Pipa Dog - Eclectic, brutalist, confusing living question with UFO/skull vibes
+export const LaPipaDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Asymmetric ears - one up, one sideways - confusing */}
+      <path d="M16 24 Q8 12 14 4 Q20 10 22 20" />
+      <path d="M48 30 Q58 26 60 18 Q52 22 46 28" />
+      {/* Head - slightly irregular shape */}
+      <ellipse cx="32" cy="36" rx="15" ry="14" />
+      {/* One eye is a question mark - living question */}
+      <circle cx="25" cy="32" r="4" />
+      <text x="23" y="35" fontSize="8" fill="hsl(var(--logo-green))" fontWeight="bold">?</text>
+      {/* Other eye is a star/asterisk - beyond the obvious */}
+      <circle cx="39" cy="32" r="4" />
+      <path d="M39 28 L39 36 M35 32 L43 32 M36 29 L42 35 M42 29 L36 35" strokeWidth="1" />
+      {/* Nose - small UFO shape */}
+      <ellipse cx="32" cy="41" rx="4" ry="2" />
+      <path d="M30 40 Q32 38 34 40" strokeWidth="1" />
+      <circle cx="32" cy="39" r="0.5" fill="hsl(var(--logo-green))" />
+      {/* Enigmatic non-smile - is it happy? confused? who knows */}
+      <path d="M27 47 L32 45 L37 47" />
+      {/* Floating skull icon on one side */}
+      <circle cx="10" cy="20" r="4" opacity="0.6" />
+      <path d="M8 19 L8 18 M12 19 L12 18" strokeWidth="1" opacity="0.6" />
+      <path d="M8 22 L10 21 L12 22" strokeWidth="1" opacity="0.6" />
+      {/* Floating UFO icon on other side */}
+      <ellipse cx="54" cy="18" rx="5" ry="2" opacity="0.6" />
+      <path d="M51 16 Q54 12 57 16" opacity="0.6" />
+      <circle cx="54" cy="14" r="0.5" fill="hsl(var(--logo-green))" opacity="0.6" />
+      {/* Random geometric elements - brutalist */}
+      <rect x="4" cy="40" width="4" height="4" opacity="0.3" transform="rotate(15 6 42)" />
+      <path d="M56 44 L60 44 L58 48 Z" opacity="0.3" />
+      {/* "North of the South" - star burst */}
+      <path d="M32 6 L32 2" strokeWidth="1" opacity="0.5" />
+      <path d="M28 7 L26 4" strokeWidth="1" opacity="0.5" />
+      <path d="M36 7 L38 4" strokeWidth="1" opacity="0.5" />
+      {/* Eccentric collar with symbols */}
+      <rect x="22" y="52" width="20" height="6" rx="2" opacity="0.4" />
+      <text x="24" y="57" fontSize="4" fill="hsl(var(--logo-green))" opacity="0.7">★?★</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1819,4 +1862,5 @@ export const dogVariants = [
   { name: 'M.E.N', Component: MENDog, personality: 'Moog Barcelona basement dweller', status: 'deep hypnotic' },
   // FOUNDERS
   { name: 'Alex', Component: AlexDog, personality: 'Scruffy Irish madman with big ideas', status: 'building' },
+  { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
 ];
