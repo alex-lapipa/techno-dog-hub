@@ -312,3 +312,6 @@ verify_jwt = false
 
 [functions.gear-image-verify]
 verify_jwt = false
+
+[functions.gear-image-scraper]
+verify_jwt = false
