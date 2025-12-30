@@ -243,13 +243,40 @@ const TechnoDoggies = () => {
     );
   };
 
+  // Resolve CSS variables in SVG for proper export
+  const resolveCssVariables = (svgElement: SVGElement): SVGElement => {
+    const clone = svgElement.cloneNode(true) as SVGElement;
+    const computedStyle = getComputedStyle(document.documentElement);
+    
+    // Get the actual color value for --logo-green
+    const logoGreen = computedStyle.getPropertyValue('--logo-green').trim();
+    const resolvedColor = logoGreen ? `hsl(${logoGreen})` : '#22c55e';
+    
+    // Replace all instances of hsl(var(--logo-green)) with the actual color
+    const serialized = new XMLSerializer().serializeToString(clone);
+    const resolved = serialized
+      .replace(/hsl\(var\(--logo-green\)\)/g, resolvedColor)
+      .replace(/hsl\(var\(--foreground\)\)/g, computedStyle.getPropertyValue('--foreground').trim() ? `hsl(${computedStyle.getPropertyValue('--foreground').trim()})` : '#ffffff')
+      .replace(/hsl\(var\(--background\)\)/g, computedStyle.getPropertyValue('--background').trim() ? `hsl(${computedStyle.getPropertyValue('--background').trim()})` : '#000000');
+    
+    // Parse back to SVG element
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resolved, 'image/svg+xml');
+    return doc.documentElement as unknown as SVGElement;
+  };
+
   // Generate a proper base64 PNG from SVG
   const generateDoggyImage = async (): Promise<string | null> => {
     const svg = document.querySelector('#current-dog-display svg');
     if (!svg) return null;
 
     return new Promise((resolve) => {
-      const svgData = new XMLSerializer().serializeToString(svg);
+      const resolvedSvg = resolveCssVariables(svg as SVGElement);
+      resolvedSvg.setAttribute('width', '512');
+      resolvedSvg.setAttribute('height', '512');
+      resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      
+      const svgData = new XMLSerializer().serializeToString(resolvedSvg);
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
@@ -312,14 +339,14 @@ const TechnoDoggies = () => {
     });
     trackDoggyEvent('main_page', 'download_svg', undefined, currentDog?.name);
 
-    // Clone and clean the SVG (remove text, optimize)
-    const svgClone = svg.cloneNode(true) as SVGElement;
-    svgClone.querySelectorAll('text').forEach(t => t.remove());
-    svgClone.setAttribute('width', '512');
-    svgClone.setAttribute('height', '512');
-    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    // Clone, resolve CSS variables, and clean the SVG
+    const resolvedSvg = resolveCssVariables(svg as SVGElement);
+    resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+    resolvedSvg.setAttribute('width', '512');
+    resolvedSvg.setAttribute('height', '512');
+    resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     
-    const svgData = new XMLSerializer().serializeToString(svgClone);
+    const svgData = new XMLSerializer().serializeToString(resolvedSvg);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
     
     const link = document.createElement('a');
@@ -328,6 +355,7 @@ const TechnoDoggies = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
     
     toast.success(`Downloaded ${currentDog?.name} Dog!`, {
       description: "~2KB SVG • Transparent • Perfect quality",
@@ -351,11 +379,14 @@ const TechnoDoggies = () => {
 
     toast.loading("Creating WhatsApp sticker...");
     
-    // Clone SVG and remove text elements for clean sticker
-    const svgClone = svg.cloneNode(true) as SVGElement;
-    svgClone.querySelectorAll('text').forEach(t => t.remove());
+    // Clone SVG, resolve CSS variables, and remove text elements for clean sticker
+    const resolvedSvg = resolveCssVariables(svg as SVGElement);
+    resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+    resolvedSvg.setAttribute('width', '512');
+    resolvedSvg.setAttribute('height', '512');
+    resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     
-    const svgData = new XMLSerializer().serializeToString(svgClone);
+    const svgData = new XMLSerializer().serializeToString(resolvedSvg);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -378,6 +409,7 @@ const TechnoDoggies = () => {
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
           
           toast.dismiss();
           toast.success(`Sticker ready! Save to Photos, then add to WhatsApp`, {
