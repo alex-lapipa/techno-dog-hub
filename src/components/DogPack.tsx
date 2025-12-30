@@ -1601,7 +1601,7 @@ export const AquiaRealRaverDog = ({ className, animated = false }: DogVariantPro
   </svg>
 );
 
-// Eulogio Dog - Asturian legend with beard, bald head with 3 hairs, "E" collar
+// Eulogio Dog - Asturian legend with sideburns, bald head with 3 hairs, Ray-Ban Wayfarers
 export const EulogioDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
@@ -1619,20 +1619,28 @@ export const EulogioDog = ({ className, animated = false }: DogVariantProps) => 
       <circle cx="38" cy="32" r="2" />
       <circle cx="26.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
       <circle cx="38.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
-      {/* Glasses - scholarly crate digger */}
-      <circle cx="26" cy="32" r="4" opacity="0.6" />
-      <circle cx="38" cy="32" r="4" opacity="0.6" />
-      <line x1="30" y1="32" x2="34" y2="32" opacity="0.6" />
+      {/* Ray-Ban Wayfarer glasses - rectangular, thicker top frame */}
+      <rect x="21" y="29" width="10" height="7" rx="1" strokeWidth="1" opacity="0.7" />
+      <rect x="33" y="29" width="10" height="7" rx="1" strokeWidth="1" opacity="0.7" />
+      <line x1="31" y1="32" x2="33" y2="32" strokeWidth="1" opacity="0.7" />
+      {/* Wayfarer thick top edge */}
+      <line x1="21" y1="29" x2="31" y2="29" strokeWidth="1.5" opacity="0.8" />
+      <line x1="33" y1="29" x2="43" y2="29" strokeWidth="1.5" opacity="0.8" />
+      {/* Temple arms going to ears */}
+      <line x1="21" y1="30" x2="17" y2="28" strokeWidth="1" opacity="0.5" />
+      <line x1="43" y1="30" x2="47" y2="28" strokeWidth="1" opacity="0.5" />
       {/* Nose */}
       <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
       {/* Slight knowing smile */}
       <path d="M27 46 Q32 50 37 46" />
-      {/* Beard - full and distinguished */}
-      <path d="M22 46 Q20 52 24 56 Q28 58 32 58 Q36 58 40 56 Q44 52 42 46" opacity="0.5" />
-      <path d="M26 50 Q28 54 32 55 Q36 54 38 50" opacity="0.3" />
+      {/* Sideburns/cheek beard - thin lines */}
+      <path d="M17 36 Q15 40 16 44 Q17 46 18 44" strokeWidth="1" opacity="0.5" />
+      <path d="M18 38 Q16 42 17 45" strokeWidth="1" opacity="0.4" />
+      <path d="M47 36 Q49 40 48 44 Q47 46 46 44" strokeWidth="1" opacity="0.5" />
+      <path d="M46 38 Q48 42 47 45" strokeWidth="1" opacity="0.4" />
       {/* "E" collar tag - iconic */}
-      <rect x="28" y="58" width="8" height="5" rx="1" opacity="0.3" />
-      <text x="30.5" y="62" fontSize="4" fill="hsl(var(--logo-green))" fontWeight="bold">E</text>
+      <rect x="28" y="52" width="8" height="5" rx="1" opacity="0.3" />
+      <text x="30.5" y="56" fontSize="4" fill="hsl(var(--logo-green))" fontWeight="bold">E</text>
       {/* Crate of vinyl records */}
       <rect x="4" y="52" width="10" height="8" opacity="0.4" />
       <line x1="6" y1="52" x2="6" y2="60" opacity="0.3" />
