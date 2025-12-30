@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
-  ArrowLeft, Users, MapPin, Globe, Search, RefreshCw, Download, 
+  Users, MapPin, Globe, Search, RefreshCw, Download, 
   Mail, MessageSquare, Activity, Building, Music, Code, Radio,
   CheckCircle, AlertCircle, Clock, Zap, Filter, Plus
 } from "lucide-react";
@@ -30,7 +30,6 @@ const COLLECTIVE_TYPES = [
 const REGIONS = ['Europe', 'UK', 'North America'];
 
 export default function CollectivesAgentAdmin() {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -200,24 +199,25 @@ export default function CollectivesAgentAdmin() {
     return <Badge className="bg-red-500/20 text-red-400">{score}</Badge>;
   };
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/admin')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="font-mono text-2xl uppercase tracking-tight">Collectives Intelligence Agent</h1>
-            <p className="text-sm text-muted-foreground">EU/UK + North America Scene Discovery</p>
-          </div>
-          <Badge variant="outline" className="ml-auto">
-            {isRunning ? <RefreshCw className="h-3 w-3 animate-spin mr-1" /> : null}
-            {isRunning ? 'Running...' : 'Ready'}
-          </Badge>
-        </div>
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['collectives'] });
+    queryClient.invalidateQueries({ queryKey: ['collective_key_people'] });
+    queryClient.invalidateQueries({ queryKey: ['collective_activities'] });
+    queryClient.invalidateQueries({ queryKey: ['collective_agent_runs'] });
+  };
 
+  return (
+    <AdminPageLayout
+      title="Collectives Intelligence Agent"
+      description="EU/UK + North America Scene Discovery"
+      icon={Users}
+      iconColor="text-logo-green"
+      onRefresh={handleRefresh}
+      onRunAgent={() => discoverMutation.mutate()}
+      isLoading={collectivesLoading}
+      isRunning={isRunning}
+      runButtonText="Discover"
+    >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-8 w-full mb-6">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -782,7 +782,6 @@ export default function CollectivesAgentAdmin() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+    </AdminPageLayout>
   );
 }
