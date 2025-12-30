@@ -503,6 +503,7 @@ const TechnoDoggies = () => {
   const dogName = currentDog?.name || 'Techno Dog';
   const shareText = `I'm ${dogName} 🐕 Join the techno.dog pack! Find your spirit doggy at`;
   const twitterShareText = `I'm ${dogName} 🖤 No NPCs allowed. Find your spirit doggy #Techno #TechnoDog`;
+  const telegramShareText = `🐕 I'm ${dogName}!\n\nJoin the techno.dog pack and find your spirit doggy. 70+ unique doggies waiting for you.`;
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
@@ -752,7 +753,7 @@ const TechnoDoggies = () => {
                   
                   <button 
                     onClick={() => {
-                      window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+                      window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(telegramShareText)}`, '_blank');
                       handleSocialShare("telegram");
                     }}
                     className="flex flex-col items-center p-2 rounded-lg hover:bg-logo-green/20 transition-colors group"
