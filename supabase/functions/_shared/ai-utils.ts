@@ -58,7 +58,7 @@ export async function generateChatCompletion(
   } = {}
 ): Promise<string | null> {
   const {
-    model = 'gpt-4o-mini',
+    model = 'google/gemini-2.5-flash',
     temperature = 0.7,
     maxTokens = 1000,
     apiKey,
@@ -111,7 +111,7 @@ export async function streamChatCompletion(
   } = {}
 ): Promise<ReadableStream | null> {
   const {
-    model = 'gpt-4o-mini',
+    model = 'google/gemini-2.5-flash',
     temperature = 0.7,
     maxTokens = 1000,
     apiKey,

@@ -85,7 +85,7 @@ Only include artists relevant to techno/electronic scene in EU, UK, or North Ame
   const result = await callLovableAI([
     { role: 'system', content: 'You are a music industry data specialist. Return only valid JSON.' },
     { role: 'user', content: prompt }
-  ], 'openai/gpt-4o-mini');
+  ], 'google/gemini-2.5-flash');
 
   try {
     const jsonMatch = result.match(/\[[\s\S]*\]/);
@@ -201,7 +201,7 @@ Return JSON:
   const result = await callLovableAI([
     { role: 'system', content: 'You are a fast intelligence scanner. Be quick and accurate. Return valid JSON.' },
     { role: 'user', content: prompt }
-  ], 'openai/gpt-4o-mini'); // Using fast model for Grok-like speed
+  ], 'google/gemini-2.5-flash-lite'); // Using fast model for Grok-like speed
 
   try {
     const jsonMatch = result.match(/\{[\s\S]*\}/);
@@ -285,7 +285,7 @@ Return JSON:
   const result = await callLovableAI([
     { role: 'system', content: 'You are a music industry PR professional. Write authentic, non-spammy outreach. Return valid JSON.' },
     { role: 'user', content: prompt }
-  ], 'openai/gpt-4o');
+  ], 'openai/gpt-5');
 
   try {
     const jsonMatch = result.match(/\{[\s\S]*\}/);
@@ -414,7 +414,7 @@ Return JSON array of managers found:
               const extractedManagers = await callLovableAI([
                 { role: 'system', content: 'Extract only verified manager info. Return valid JSON array.' },
                 { role: 'user', content: extractionPrompt }
-              ], 'openai/gpt-4o-mini');
+              ], 'google/gemini-2.5-flash');
 
               try {
                 const managers = JSON.parse(extractedManagers.match(/\[[\s\S]*\]/)?.[0] || '[]');
