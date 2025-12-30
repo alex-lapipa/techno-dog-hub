@@ -482,17 +482,11 @@ const TechnoDoggies = () => {
                 isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
               }`}
             >
-              {/* Enhanced glow effects like floating button */}
-              <div className="relative group">
-                {/* Outer pulsing glow ring */}
-                <div className="absolute inset-0 rounded-full bg-logo-green/30 animate-ping" style={{ animationDuration: '2.5s' }} />
-                {/* Inner soft glow */}
-                <div className="absolute inset-0 bg-logo-green/25 rounded-full blur-3xl animate-pulse" />
-                {/* Secondary glow layer */}
-                <div className="absolute -inset-4 bg-logo-green/10 rounded-full blur-2xl" />
-                {/* The dog with drop shadow */}
+              {/* Subtle halo effect */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-logo-green/15 rounded-full blur-2xl" />
                 <DogComponent 
-                  className="w-36 h-36 sm:w-44 sm:h-44 relative z-10 drop-shadow-[0_0_20px_hsl(100_100%_60%/0.6)] transition-transform duration-300 hover:scale-105 hover:rotate-3" 
+                  className="w-36 h-36 sm:w-44 sm:h-44 relative z-10" 
                   animated 
                 />
               </div>
