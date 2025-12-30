@@ -14,25 +14,56 @@ import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData"
 import { DoggyPageFooter, trackDoggyEvent, DoggyShareLeaderboard, recordShare } from "@/components/doggy";
 import ParticleBackground from "@/components/ParticleBackground";
 
-// Get initial dog index based on visit history and popularity
+// Doggies that should NEVER be shown first - too grumpy or confusing for first impressions
+const excludedFirstImpressionDogs = ['grumpy', 'sven marquardt', 'bouncer', 'security'];
+
+// Positive, fun, easy-to-understand doggies that make great first impressions
+const preferredFirstImpressionDogs = [
+  'techno', 'happy', 'dj', 'vinyl', 'headphones', 'dancer', 'rave', 
+  'sunrise', 'festival', 'party', 'love', 'peace', 'bartender'
+];
+
+// Get initial dog index based on visit history, analytics, and positivity
 const getInitialDogIndex = (variants: typeof dogVariants): number => {
   const visitCount = parseInt(localStorage.getItem('doggy_visit_count') || '0', 10);
   const lastVisitedDog = localStorage.getItem('doggy_last_shown');
   
   // TODO: When analytics mature, fetch most popular dogs from doggy_analytics
-  // Default: Techno dog for first visit, random different dog for returning visitors
-  const technoIndex = variants.findIndex(d => d.name.toLowerCase() === 'techno');
+  // For now, use curated positive doggies list
+  
+  // Find preferred doggies that exist in current variants
+  const preferredIndices = variants
+    .map((d, i) => ({ name: d.name.toLowerCase(), index: i }))
+    .filter(d => preferredFirstImpressionDogs.includes(d.name))
+    .map(d => d.index);
+  
+  // Find excluded doggies
+  const excludedNames = excludedFirstImpressionDogs;
   
   if (visitCount === 0) {
     // First visit: show Techno dog (our official mascot)
-    return technoIndex >= 0 ? technoIndex : 0;
+    const technoIndex = variants.findIndex(d => d.name.toLowerCase() === 'techno');
+    return technoIndex >= 0 ? technoIndex : (preferredIndices[0] ?? 0);
   } else {
-    // Returning visitor: show a different dog than last time
-    let newIndex = Math.floor(Math.random() * variants.length);
+    // Returning visitor: pick from preferred list, avoiding excluded and last shown
     const lastIndex = variants.findIndex(d => d.name === lastVisitedDog);
     
-    // Ensure we don't show the same dog twice in a row
-    if (newIndex === lastIndex && variants.length > 1) {
+    // Filter to get safe indices (not excluded, not last shown)
+    const safeIndices = preferredIndices.length > 0 
+      ? preferredIndices.filter(i => i !== lastIndex)
+      : variants
+          .map((d, i) => ({ name: d.name.toLowerCase(), index: i }))
+          .filter(d => !excludedNames.includes(d.name) && d.index !== lastIndex)
+          .map(d => d.index);
+    
+    if (safeIndices.length > 0) {
+      return safeIndices[Math.floor(Math.random() * safeIndices.length)];
+    }
+    
+    // Fallback: any dog except excluded ones
+    let newIndex = Math.floor(Math.random() * variants.length);
+    const variant = variants[newIndex];
+    if (variant && excludedNames.includes(variant.name.toLowerCase())) {
       newIndex = (newIndex + 1) % variants.length;
     }
     return newIndex;
