@@ -440,7 +440,7 @@ const TechnoDoggies = () => {
               </Button>
               
               <p className="mt-3 font-mono text-[9px] text-muted-foreground italic">
-                "Life's too short for boring profiles. Be a techno dog."
+                "Life's too short to be NPC :: Become a techno dog."
               </p>
             </div>
           </div>
