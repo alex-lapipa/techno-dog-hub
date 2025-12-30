@@ -97,9 +97,14 @@ export const DoggyShareLeaderboard = () => {
   return (
     <div className="bg-card/50 border border-logo-green/20 rounded-xl p-4">
       {/* Header */}
-      <div className="flex items-center justify-center gap-2 mb-4">
-        <Trophy className="w-4 h-4 text-logo-green" />
-        <h3 className="font-mono text-sm font-bold text-foreground">Top Sharers</h3>
+      <div className="text-center mb-4">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <Trophy className="w-5 h-5 text-logo-green" />
+          <h3 className="font-mono text-base font-bold text-foreground">Techno Dog Hall of Fame</h3>
+        </div>
+        <p className="font-mono text-[10px] text-muted-foreground">
+          Sign up to Techno Dog Community and become a legend
+        </p>
       </div>
 
       {/* Leaderboard List */}
@@ -168,9 +173,14 @@ export const DoggyShareLeaderboard = () => {
       )}
 
       {/* CTA */}
-      <p className="font-mono text-[9px] text-center text-muted-foreground mt-3">
-        Share more to climb the leaderboard!
-      </p>
+      <div className="mt-4 pt-3 border-t border-border/30 text-center">
+        <a 
+          href="/community" 
+          className="inline-block font-mono text-xs text-logo-green hover:text-logo-green/80 underline underline-offset-2 transition-colors"
+        >
+          Join the Community →
+        </a>
+      </div>
     </div>
   );
 };
