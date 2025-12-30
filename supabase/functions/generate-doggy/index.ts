@@ -96,7 +96,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
+        model: 'google/gemini-2.5-flash-image-preview', // Nano banana - fastest, most cost-effective image model
         messages: [
           {
             role: 'user',
