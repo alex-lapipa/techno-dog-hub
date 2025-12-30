@@ -1585,6 +1585,111 @@ export type Database = {
         }
         Relationships: []
       }
+      doggy_agent_issues: {
+        Row: {
+          affected_component: string | null
+          affected_doggy: string | null
+          auto_fixable: boolean | null
+          created_at: string
+          description: string
+          detection_source: string
+          fix_applied: boolean | null
+          fix_applied_at: string | null
+          fix_description: string | null
+          hq_approved: boolean | null
+          hq_approved_at: string | null
+          hq_suggestion: string | null
+          id: string
+          issue_type: string
+          metadata: Json | null
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          affected_component?: string | null
+          affected_doggy?: string | null
+          auto_fixable?: boolean | null
+          created_at?: string
+          description: string
+          detection_source: string
+          fix_applied?: boolean | null
+          fix_applied_at?: string | null
+          fix_description?: string | null
+          hq_approved?: boolean | null
+          hq_approved_at?: string | null
+          hq_suggestion?: string | null
+          id?: string
+          issue_type: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Update: {
+          affected_component?: string | null
+          affected_doggy?: string | null
+          auto_fixable?: boolean | null
+          created_at?: string
+          description?: string
+          detection_source?: string
+          fix_applied?: boolean | null
+          fix_applied_at?: string | null
+          fix_description?: string | null
+          hq_approved?: boolean | null
+          hq_approved_at?: string | null
+          hq_suggestion?: string | null
+          id?: string
+          issue_type?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      doggy_agent_runs: {
+        Row: {
+          error_message: string | null
+          finished_at: string | null
+          health_report: Json | null
+          hq_suggestions_created: number | null
+          id: string
+          issues_auto_fixed: number | null
+          issues_detected: number | null
+          performance_score: number | null
+          run_type: string
+          started_at: string
+          status: string
+          virality_score: number | null
+        }
+        Insert: {
+          error_message?: string | null
+          finished_at?: string | null
+          health_report?: Json | null
+          hq_suggestions_created?: number | null
+          id?: string
+          issues_auto_fixed?: number | null
+          issues_detected?: number | null
+          performance_score?: number | null
+          run_type: string
+          started_at?: string
+          status?: string
+          virality_score?: number | null
+        }
+        Update: {
+          error_message?: string | null
+          finished_at?: string | null
+          health_report?: Json | null
+          hq_suggestions_created?: number | null
+          id?: string
+          issues_auto_fixed?: number | null
+          issues_detected?: number | null
+          performance_score?: number | null
+          run_type?: string
+          started_at?: string
+          status?: string
+          virality_score?: number | null
+        }
+        Relationships: []
+      }
       doggy_analytics: {
         Row: {
           action_type: string
@@ -1616,6 +1721,92 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      doggy_auto_fixes: {
+        Row: {
+          after_state: Json | null
+          applied_at: string
+          before_state: Json | null
+          fix_type: string
+          id: string
+          issue_id: string | null
+          rollback_at: string | null
+          rollback_reason: string | null
+          success: boolean | null
+          target_component: string
+        }
+        Insert: {
+          after_state?: Json | null
+          applied_at?: string
+          before_state?: Json | null
+          fix_type: string
+          id?: string
+          issue_id?: string | null
+          rollback_at?: string | null
+          rollback_reason?: string | null
+          success?: boolean | null
+          target_component: string
+        }
+        Update: {
+          after_state?: Json | null
+          applied_at?: string
+          before_state?: Json | null
+          fix_type?: string
+          id?: string
+          issue_id?: string | null
+          rollback_at?: string | null
+          rollback_reason?: string | null
+          success?: boolean | null
+          target_component?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doggy_auto_fixes_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "doggy_agent_issues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doggy_error_logs: {
+        Row: {
+          action_attempted: string | null
+          created_at: string
+          doggy_name: string | null
+          error_message: string
+          error_type: string
+          id: string
+          page_source: string | null
+          session_id: string | null
+          stack_trace: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_attempted?: string | null
+          created_at?: string
+          doggy_name?: string | null
+          error_message: string
+          error_type: string
+          id?: string
+          page_source?: string | null
+          session_id?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_attempted?: string | null
+          created_at?: string
+          doggy_name?: string | null
+          error_message?: string
+          error_type?: string
+          id?: string
+          page_source?: string | null
+          session_id?: string | null
+          stack_trace?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       doggy_page_analytics: {
         Row: {
