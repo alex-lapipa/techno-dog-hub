@@ -11,7 +11,7 @@ export const GlitchImage = ({ src, alt, className = "", frameNumber = "01", size
   const sprocketCount = isThumbnail ? 2 : 4;
   
   return (
-    <div className={`relative bg-zinc-800 p-1 ${className}`}>
+    <div className={`relative bg-zinc-800 p-1 h-full ${className}`}>
       {/* Sprocket holes left */}
       <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-1">
         {[...Array(sprocketCount)].map((_, i) => (
