@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
@@ -778,18 +778,22 @@ export default function ArtistLabelAgentAdmin() {
                       <SelectValue placeholder="Choose a manager or label contact" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="" disabled>-- Managers --</SelectItem>
-                      {managers.slice(0, 20).map(m => (
-                        <SelectItem key={m.id} value={m.id}>
-                          {m.manager_name} ({m.artists_active?.artist_name || 'Unknown artist'})
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="" disabled>-- Label Contacts --</SelectItem>
-                      {labelContacts.slice(0, 20).map(c => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.contact_person_name} ({c.labels?.label_name || 'Unknown label'})
-                        </SelectItem>
-                      ))}
+                      <SelectGroup>
+                        <SelectLabel>Managers</SelectLabel>
+                        {managers.slice(0, 20).map(m => (
+                          <SelectItem key={`manager-${m.id}`} value={`manager-${m.id}`}>
+                            {m.manager_name} ({m.artists_active?.artist_name || 'Unknown artist'})
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>Label Contacts</SelectLabel>
+                        {labelContacts.slice(0, 20).map(c => (
+                          <SelectItem key={`contact-${c.id}`} value={`contact-${c.id}`}>
+                            {c.contact_person_name} ({c.labels?.label_name || 'Unknown label'})
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
