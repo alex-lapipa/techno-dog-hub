@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 
 import DailySpotlight from "@/components/DailySpotlight";
 import PageSEO from "@/components/PageSEO";
+import { dogVariants } from "@/components/DogPack";
 
 const Index = () => {
   useScrollDepth({ pageName: 'index' });
@@ -237,6 +238,40 @@ const Index = () => {
                   — Jeff Mills
                 </cite>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Meet the Pack */}
+        <section className="border-b border-border">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-2">
+                  // Meet the full pack
+                </div>
+                <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight">
+                  Techno Doggies
+                </h2>
+              </div>
+              <Link 
+                to="/doggies" 
+                className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Get them all →
+              </Link>
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-4">
+              {dogVariants.slice(0, 20).map((dog, index) => (
+                <Link
+                  key={dog.name + index}
+                  to="/doggies"
+                  className="group aspect-square border border-border p-2 hover:bg-card hover:border-foreground transition-colors flex items-center justify-center"
+                  title={dog.name}
+                >
+                  <dog.Component className="w-full h-full" />
+                </Link>
+              ))}
             </div>
           </div>
         </section>
