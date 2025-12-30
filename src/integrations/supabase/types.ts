@@ -1722,6 +1722,60 @@ export type Database = {
           },
         ]
       }
+      doggy_analytics_insights: {
+        Row: {
+          confidence_score: number | null
+          consensus_models: string[] | null
+          created_at: string
+          data_snapshot: Json | null
+          detailed_analysis: string | null
+          expires_at: string | null
+          id: string
+          insight_type: string
+          model_name: string | null
+          model_used: string
+          recommendations: Json | null
+          summary: string
+          time_period_end: string | null
+          time_period_start: string | null
+          title: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          consensus_models?: string[] | null
+          created_at?: string
+          data_snapshot?: Json | null
+          detailed_analysis?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          model_name?: string | null
+          model_used: string
+          recommendations?: Json | null
+          summary: string
+          time_period_end?: string | null
+          time_period_start?: string | null
+          title: string
+        }
+        Update: {
+          confidence_score?: number | null
+          consensus_models?: string[] | null
+          created_at?: string
+          data_snapshot?: Json | null
+          detailed_analysis?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          model_name?: string | null
+          model_used?: string
+          recommendations?: Json | null
+          summary?: string
+          time_period_end?: string | null
+          time_period_start?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       doggy_auto_fixes: {
         Row: {
           after_state: Json | null
@@ -1846,6 +1900,93 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      doggy_share_events: {
+        Row: {
+          chain_depth: number | null
+          click_through: boolean | null
+          click_through_at: string | null
+          country_code: string | null
+          created_at: string
+          device_type: string | null
+          doggy_name: string
+          doggy_slug: string | null
+          id: string
+          parent_share_id: string | null
+          platform: string
+          referrer: string | null
+          referrer_platform: string | null
+          session_id: string | null
+          share_type: string
+          share_url: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          chain_depth?: number | null
+          click_through?: boolean | null
+          click_through_at?: string | null
+          country_code?: string | null
+          created_at?: string
+          device_type?: string | null
+          doggy_name: string
+          doggy_slug?: string | null
+          id?: string
+          parent_share_id?: string | null
+          platform: string
+          referrer?: string | null
+          referrer_platform?: string | null
+          session_id?: string | null
+          share_type?: string
+          share_url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          chain_depth?: number | null
+          click_through?: boolean | null
+          click_through_at?: string | null
+          country_code?: string | null
+          created_at?: string
+          device_type?: string | null
+          doggy_name?: string
+          doggy_slug?: string | null
+          id?: string
+          parent_share_id?: string | null
+          platform?: string
+          referrer?: string | null
+          referrer_platform?: string | null
+          session_id?: string | null
+          share_type?: string
+          share_url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doggy_share_events_parent_share_id_fkey"
+            columns: ["parent_share_id"]
+            isOneToOne: false
+            referencedRelation: "doggy_share_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doggy_share_events_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "doggy_variants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       doggy_share_leaderboard: {
         Row: {

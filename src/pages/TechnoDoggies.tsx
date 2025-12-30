@@ -13,6 +13,7 @@ import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
 import { DoggyPageFooter, trackDoggyEvent, DoggyShareLeaderboard, recordShare } from "@/components/doggy";
 import ParticleBackground from "@/components/ParticleBackground";
+import { trackShareEvent, trackClickThrough } from "@/hooks/useShareTracking";
 
 // Doggies that should NEVER be shown first - too grumpy or confusing for first impressions
 const excludedFirstImpressionDogs = ['grumpy', 'sven marquardt', 'bouncer', 'security'];
@@ -115,6 +116,9 @@ const TechnoDoggies = () => {
           d => d.name.toLowerCase().replace(/\s+/g, '-') === sharedDogSlug.toLowerCase()
         );
         initialIndex = sharedIndex >= 0 ? sharedIndex : getInitialDogIndex(activeVariants);
+        
+        // Track click-through from shared link
+        trackClickThrough();
       } else {
         initialIndex = getInitialDogIndex(activeVariants);
       }
@@ -504,12 +508,22 @@ const TechnoDoggies = () => {
   };
 
   const handleSocialShare = async (platform: string) => {
+    // Legacy tracking
     logAction.mutate({
       variantId: currentDbData?.id,
       variantName: currentDog?.name || "Unknown",
       actionType: `share_${platform}`,
     });
     trackDoggyEvent('main_page', 'share', platform, currentDog?.name);
+    
+    // Enhanced share tracking with full metadata
+    await trackShareEvent({
+      doggyName: currentDog?.name || 'Unknown',
+      doggySlug: currentDog?.name?.toLowerCase().replace(/\s+/g, '-'),
+      variantId: currentDbData?.id,
+      platform,
+      shareUrl: `https://techno.dog/doggies?dog=${currentDog?.name?.toLowerCase().replace(/\s+/g, '-') || 'techno'}`,
+    });
     
     // Record share for leaderboard
     await recordShare();
