@@ -9,9 +9,9 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { 
-  Dog, Database, Mic, Globe, BookOpen, Zap, Shield, 
-  CheckCircle, AlertCircle, Clock, Volume2, Brain, 
-  Sparkles, RefreshCw, Settings, MessageSquare, Users
+  Database, Mic, Globe, BookOpen, Zap, Shield, 
+  CheckCircle, AlertCircle, Clock, Volume2, 
+  RefreshCw, Settings, MessageSquare, Users
 } from 'lucide-react';
 import DogSilhouette from '@/components/DogSilhouette';
 
@@ -99,7 +99,7 @@ const DogAgentAdmin = () => {
       name: 'Conversation Memory', 
       description: 'Maintains context within session for coherent multi-turn dialogues',
       status: 'active',
-      icon: <Brain className="w-4 h-4" />
+      icon: <MessageSquare className="w-4 h-4" />
     },
     { 
       name: 'Read-Only Safety Mode', 
@@ -267,7 +267,7 @@ const DogAgentAdmin = () => {
       <AdminPageLayout
         title="Dog Agent"
         description="Access denied"
-        icon={Dog}
+        icon={DogSilhouette}
         iconColor="text-crimson"
       >
         <p className="text-muted-foreground">You need admin access to view this page.</p>
@@ -279,7 +279,7 @@ const DogAgentAdmin = () => {
     <AdminPageLayout
       title="Dog Agent"
       description="Orchestrator & Knowledge Interface"
-      icon={Dog}
+      icon={DogSilhouette}
       iconColor="text-logo-green"
       actions={
         <div className="flex items-center gap-3">

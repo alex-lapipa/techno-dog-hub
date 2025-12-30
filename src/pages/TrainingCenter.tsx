@@ -27,8 +27,12 @@ import {
   GitBranch,
   Target,
   Rocket,
-  Bot
 } from "lucide-react";
+
+// Wrapper to make DogSilhouette work as an icon in the components array
+const DogSilhouetteIcon = ({ className }: { className?: string }) => (
+  <DogSilhouette className={className} />
+);
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
 
@@ -287,10 +291,10 @@ const TechnicalOverviewSection = () => {
       simple: "Like a super-organized filing cabinet for techno knowledge"
     },
     {
-      title: "AI Assistants",
-      icon: Bot,
-      description: "We use artificial intelligence to help verify information, write news articles, and keep data accurate. AI can't replace human knowledge, but it helps us work faster and catch errors.",
-      simple: "Robot helpers that double-check facts and write drafts"
+      title: "Pack Helpers",
+      icon: DogSilhouetteIcon,
+      description: "We use automated systems to help verify information, write news articles, and keep data accurate. Automation can't replace human knowledge, but it helps us work faster and catch errors.",
+      simple: "Automated helpers that double-check facts and write drafts"
     },
     {
       title: "Community Verification",
