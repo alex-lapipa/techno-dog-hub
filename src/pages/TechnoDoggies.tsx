@@ -469,7 +469,7 @@ const TechnoDoggies = () => {
             <p className="text-sm sm:text-base text-logo-green font-mono font-semibold mb-1">
               Join the Doggy Movement
             </p>
-            <p className="text-xs text-muted-foreground font-mono max-w-xs mx-auto">
+            <p className="text-xs text-muted-foreground font-mono whitespace-nowrap">
               {activeVariants.length} unique doggies. Infinite barks. Zero NPCs.
             </p>
           </div>
