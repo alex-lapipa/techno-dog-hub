@@ -141,14 +141,20 @@ export const SocialShareButtons = ({
 
   const handleShare = (platform: Platform) => {
     if (!directSharePlatforms.includes(platform.id)) {
-      // For platforms without direct sharing, copy to clipboard
-      navigator.clipboard.writeText(`${text} ${url}`);
-      toast.success(`Copied! Paste in ${platform.name}`);
+      // For platforms without direct sharing (Instagram, TikTok, Discord, Twitch)
+      const shareContent = `${text} ${url}`;
+      navigator.clipboard.writeText(shareContent);
+      toast.success(`Copied to clipboard! Now paste in ${platform.name}`, {
+        description: "Open the app and paste to share",
+        duration: 4000,
+      });
       return;
     }
     
     const shareUrl = platform.getUrl(url, text);
-    window.open(shareUrl, '_blank', 'width=600,height=400');
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=500,scrollbars=yes');
+    }
   };
 
   const copyLink = async () => {
