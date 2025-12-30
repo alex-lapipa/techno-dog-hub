@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Dog } from "lucide-react";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -152,6 +152,13 @@ const Index = () => {
                   className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-border px-6 py-3 hover:border-foreground transition-colors"
                 >
                   Contribute
+                </Link>
+                <Link 
+                  to="/doggies" 
+                  className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-logo-green bg-logo-green/10 text-logo-green px-6 py-3 hover:bg-logo-green hover:text-background transition-colors"
+                >
+                  <Dog className="w-4 h-4" />
+                  Doggies
                 </Link>
               </div>
             </div>
