@@ -6,7 +6,7 @@ import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart } from "lucide-react";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart, Package } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
@@ -89,24 +89,59 @@ const TechnoDoggies = () => {
     );
   };
 
-  const shareViaEmail = () => {
+  // Generate a proper base64 PNG from SVG
+  const generateDoggyImage = async (): Promise<string | null> => {
+    const svg = document.querySelector('#current-dog-display svg');
+    if (!svg) return null;
+
+    return new Promise((resolve) => {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      canvas.width = 512;
+      canvas.height = 512;
+      
+      img.onload = () => {
+        // Fill with transparent background
+        ctx!.clearRect(0, 0, 512, 512);
+        ctx!.drawImage(img, 0, 0, 512, 512);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      
+      img.onerror = () => {
+        console.error('Failed to load SVG image');
+        resolve(null);
+      };
+      
+      // Use blob URL instead of base64 for better Unicode support
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      img.src = URL.createObjectURL(svgBlob);
+    });
+  };
+
+  const shareViaEmail = async () => {
     logAction.mutate({
       variantId: currentDbData?.id,
       variantName: currentDog?.name || "Unknown",
       actionType: "share_email",
     });
-    // Track in new analytics
     trackDoggyEvent('main_page', 'share', 'email', currentDog?.name);
     
-    const subject = encodeURIComponent("Check out these Techno Doggies!");
+    const dogNames = activeVariants.slice(0, 5).map((d: any) => d.name).join(', ');
+    const subject = encodeURIComponent(`Join the Techno Dog Pack! - ${currentDog?.name} Dog`);
     const body = encodeURIComponent(
-      `I found these awesome Techno Doggies at techno.dog!\n\n` +
-      `My favorite is the ${currentDog?.name} Dog - ${currentDog?.personality}\n\n` +
-      `Create your own pack: https://techno.dog/doggies\n\n` +
-      `Bork bork!`
+      `Woof woof! Check out my Techno Doggy!\n\n` +
+      `Meet the ${currentDog?.name} Dog: ${currentDog?.personality}\n\n` +
+      `The full pack includes: ${dogNames} and more!\n\n` +
+      `Create your own pack & download your favorite doggies:\n` +
+      `https://techno.dog/doggies\n\n` +
+      `Each doggy is available for individual download as a high-quality PNG.\n\n` +
+      `Spread the borks!`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-    toast.success("Opening email client...");
+    toast.success("Opening email...");
   };
 
   const downloadDog = async () => {
@@ -121,27 +156,96 @@ const TechnoDoggies = () => {
       variantName: currentDog?.name || "Unknown",
       actionType: "download",
     });
-    // Track in new analytics
     trackDoggyEvent('main_page', 'download', undefined, currentDog?.name);
 
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+    toast.loading("Generating your doggy...");
     
-    canvas.width = 512;
-    canvas.height = 512;
+    const imageData = await generateDoggyImage();
+    if (!imageData) {
+      toast.dismiss();
+      toast.error("Failed to generate image. Try again!");
+      return;
+    }
     
-    img.onload = () => {
-      ctx?.drawImage(img, 0, 0, 512, 512);
-      const link = document.createElement('a');
-      link.download = `techno-${currentDog?.name.toLowerCase()}-dog.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      toast.success(`Downloaded ${currentDog?.name} Dog!`);
-    };
+    const link = document.createElement('a');
+    link.download = `techno-${currentDog?.name.toLowerCase().replace(/\s+/g, '-')}-dog.png`;
+    link.href = imageData;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     
-    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    toast.dismiss();
+    toast.success(`Downloaded ${currentDog?.name} Dog!`);
+  };
+
+  // Download all doggies as individual files
+  const downloadAllDoggies = async () => {
+    toast.loading("Generating your pack...");
+    trackDoggyEvent('main_page', 'download_pack', undefined, 'all');
+    
+    let downloadCount = 0;
+    for (let i = 0; i < Math.min(activeVariants.length, 10); i++) {
+      const dog = activeVariants[i];
+      const Dog = dog.Component;
+      
+      // Create a temporary container to render each dog
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      document.body.appendChild(container);
+      
+      // Render the SVG
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('width', '512');
+      svg.setAttribute('height', '512');
+      svg.setAttribute('viewBox', '0 0 100 100');
+      container.appendChild(svg);
+      
+      // Get the current dog's SVG from the main display temporarily
+      const originalIndex = currentDogIndex;
+      setCurrentDogIndex(i);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const currentSvg = document.querySelector('#current-dog-display svg');
+      if (currentSvg) {
+        const svgData = new XMLSerializer().serializeToString(currentSvg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        canvas.width = 512;
+        canvas.height = 512;
+        
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            ctx!.clearRect(0, 0, 512, 512);
+            ctx!.drawImage(img, 0, 0, 512, 512);
+            
+            const link = document.createElement('a');
+            link.download = `techno-${dog.name.toLowerCase().replace(/\s+/g, '-')}-dog.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            downloadCount++;
+            resolve();
+          };
+          
+          img.onerror = () => resolve();
+          
+          const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+          img.src = URL.createObjectURL(svgBlob);
+        });
+      }
+      
+      document.body.removeChild(container);
+    }
+    
+    setCurrentDogIndex(0);
+    toast.dismiss();
+    toast.success(`Downloaded ${downloadCount} doggies to your device!`);
   };
 
   const handleSocialShare = (platform: string) => {
@@ -150,7 +254,6 @@ const TechnoDoggies = () => {
       variantName: currentDog?.name || "Unknown",
       actionType: `share_${platform}`,
     });
-    // Also track in the new analytics system
     trackDoggyEvent('main_page', 'share', platform, currentDog?.name);
   };
 
@@ -325,14 +428,23 @@ const TechnoDoggies = () => {
                 <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
               </div>
 
-              <div className="flex gap-2 justify-center">
+              <div className="flex flex-wrap gap-2 justify-center">
                 <Button variant="outline" size="sm" onClick={shareViaEmail} className="font-mono text-[10px] h-8">
                   <Mail className="w-3 h-3 mr-1" />
-                  Email a Friend
+                  Email
                 </Button>
                 <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8">
                   <Download className="w-3 h-3 mr-1" />
-                  Save Doggy
+                  Save This
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={downloadAllDoggies} 
+                  className="font-mono text-[10px] h-8 border-logo-green/50 text-logo-green hover:bg-logo-green/10"
+                >
+                  <Package className="w-3 h-3 mr-1" />
+                  Download Pack
                 </Button>
               </div>
             </CardContent>
