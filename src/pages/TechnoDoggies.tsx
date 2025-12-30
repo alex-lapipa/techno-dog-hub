@@ -445,24 +445,24 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* 3. MEET THE PACK - One by One with Download */}
+          {/* 3. MEET THE PACK - Horizontal Scroll Gallery */}
           <div className="mb-8">
             <div className="text-center mb-4">
               <h2 className="font-mono text-base font-bold text-foreground mb-1">
                 Meet the Full Pack
               </h2>
               <p className="font-mono text-[10px] text-muted-foreground">
-                {activeVariants.length} doggies • Tap to download for WhatsApp
+                {activeVariants.length} doggies • Swipe to explore
               </p>
             </div>
             
-            {/* One by One Carousel with Download */}
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 scrollbar-thin">
+            {/* Horizontal Scroll Gallery */}
+            <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-thin">
               {activeVariants.map((dog: any, index: number) => {
                 const Dog = dog.Component;
                 const isFeatured = dog.dbData?.is_featured;
                 
-                // Download as ultra-light SVG (~1-3KB) - best for sharing
+                // Download as ultra-light SVG (~1-3KB)
                 const downloadSingleDog = async () => {
                   const svgElement = document.querySelector(`#dog-${index} svg`);
                   if (!svgElement) {
@@ -470,14 +470,12 @@ const TechnoDoggies = () => {
                     return;
                   }
                   
-                  // Clone and clean the SVG
                   const svgClone = svgElement.cloneNode(true) as SVGElement;
-                  svgClone.querySelectorAll('text').forEach(t => t.remove()); // Remove text
+                  svgClone.querySelectorAll('text').forEach(t => t.remove());
                   svgClone.setAttribute('width', '512');
                   svgClone.setAttribute('height', '512');
                   svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
                   
-                  // Serialize to minimal SVG string
                   const svgData = new XMLSerializer().serializeToString(svgClone);
                   const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
                   
@@ -494,13 +492,10 @@ const TechnoDoggies = () => {
                     actionType: "download_svg",
                   });
                   
-                  toast.success(`${dog.name} downloaded!`, {
-                    description: "~2KB SVG • Perfect for sharing",
-                    duration: 3000,
-                  });
+                  toast.success(`${dog.name} downloaded!`);
                 };
                 
-                // WhatsApp needs WebP - offer as secondary option
+                // WhatsApp WebP download
                 const downloadForWhatsAppSingle = async () => {
                   const svgElement = document.querySelector(`#dog-${index} svg`);
                   if (!svgElement) {
@@ -527,7 +522,6 @@ const TechnoDoggies = () => {
                     ctx!.clearRect(0, 0, 512, 512);
                     ctx!.drawImage(img, 0, 0, 512, 512);
                     
-                    // Lower quality for smaller file (0.7 = ~15-25KB)
                     canvas.toBlob((blob) => {
                       if (blob) {
                         const link = document.createElement('a');
@@ -544,15 +538,12 @@ const TechnoDoggies = () => {
                         });
                         
                         toast.dismiss();
-                        toast.success(`${dog.name} sticker ready!`, {
-                          description: "Add via WhatsApp > Stickers > Create",
-                          duration: 3000,
-                        });
+                        toast.success(`${dog.name} sticker ready!`);
                       } else {
                         toast.dismiss();
                         toast.error("Failed");
                       }
-                    }, 'image/webp', 0.7); // Lower quality = smaller file
+                    }, 'image/webp', 0.7);
                   };
                   
                   img.onerror = () => {
@@ -567,47 +558,45 @@ const TechnoDoggies = () => {
                 return (
                   <div
                     key={dog.name}
-                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                    className={`flex-shrink-0 w-36 snap-center rounded-xl border p-3 transition-all ${
                       isFeatured 
                         ? 'border-logo-green/50 bg-logo-green/10' 
-                        : 'border-border/30 hover:border-logo-green/30 bg-card/50'
+                        : 'border-border/30 bg-card/50'
                     }`}
                   >
-                    {/* Dog Icon */}
-                    <div id={`dog-${index}`} className="flex-shrink-0">
-                      <Dog className="w-12 h-12" animated />
+                    {/* Large Dog Image */}
+                    <div id={`dog-${index}`} className="flex justify-center mb-2">
+                      <Dog className="w-24 h-24" animated />
                     </div>
                     
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-mono text-sm font-bold text-foreground truncate">
+                    {/* Name */}
+                    <div className="text-center mb-2">
+                      <div className="flex items-center justify-center gap-1">
+                        <h3 className="font-mono text-xs font-bold text-foreground">
                           {dog.name}
                         </h3>
-                        {isFeatured && <Star className="w-3 h-3 text-logo-green flex-shrink-0" />}
+                        {isFeatured && <Star className="w-3 h-3 text-logo-green" />}
                       </div>
-                      <p className="font-mono text-[10px] text-muted-foreground truncate">
-                        {dog.dbData?.personality || dog.personality}
-                      </p>
                     </div>
                     
-                    {/* Download Buttons */}
-                    <div className="flex gap-1 flex-shrink-0">
+                    {/* Buttons Under Image */}
+                    <div className="flex gap-1 justify-center">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={downloadSingleDog}
-                        className="h-8 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
-                        title="SVG ~2KB"
+                        className="h-7 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
+                        title="SVG"
                       >
-                        <Download className="w-3 h-3" />
+                        <Download className="w-3 h-3 mr-1" />
+                        SVG
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={downloadForWhatsAppSingle}
-                        className="h-8 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
-                        title="WhatsApp sticker"
+                        className="h-7 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
+                        title="WhatsApp"
                       >
                         <Smartphone className="w-3 h-3" />
                       </Button>
