@@ -159,7 +159,7 @@ export async function trackClickThrough(): Promise<void> {
  */
 export async function getShareAnalytics(timeRange: '1h' | '24h' | '7d' | '30d' = '24h') {
   try {
-    const { data, error } = await supabase.functions.invoke('doggy-analytics-insights', {
+    const { data, error } = await supabase.functions.invoke('doggy-orchestrator', {
       body: { action: 'platform-performance', timeRange }
     });
     
@@ -176,8 +176,8 @@ export async function getShareAnalytics(timeRange: '1h' | '24h' | '7d' | '30d' =
  */
 export async function triggerShareAnalysis(timeRange: '1h' | '24h' | '7d' | '30d' = '24h') {
   try {
-    const { data, error } = await supabase.functions.invoke('doggy-analytics-insights', {
-      body: { action: 'consensus', timeRange }
+    const { data, error } = await supabase.functions.invoke('doggy-orchestrator', {
+      body: { action: 'share-analysis', timeRange }
     });
     
     if (error) throw error;

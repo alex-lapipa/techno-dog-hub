@@ -38,7 +38,7 @@ class DoggyErrorBoundary extends Component<Props, State> {
     try {
       const session_id = sessionStorage.getItem('doggy_session_id');
       
-      await supabase.functions.invoke('doggy-self-heal', {
+      await supabase.functions.invoke('doggy-orchestrator', {
         body: {
           action: 'report-error',
           data: {

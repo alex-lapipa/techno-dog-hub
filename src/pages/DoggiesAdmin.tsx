@@ -11,12 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield, Eye, EyeOff, Star, TrendingUp, Share2, Download, ExternalLink } from "lucide-react";
+import { RefreshCw, Shuffle, Heart, AlertTriangle, CheckCircle2, Zap, Shield, Eye, EyeOff, Star, TrendingUp, Share2, Download, ExternalLink, Activity } from "lucide-react";
 import DogSilhouette from "@/components/DogSilhouette";
 import { dogVariants, GrumpyDog } from "@/components/DogPack";
 import DoggyExport from "@/components/DoggyExport";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
 import { useDoggyVariants, useDoggyAnalytics, useUpdateDoggyVariant } from "@/hooks/useDoggyData";
+import useDoggyAgent from "@/hooks/useDoggyAgent";
 import { Link } from "react-router-dom";
 
 const packQuotes = [
@@ -38,6 +39,7 @@ const DoggiesAdmin = () => {
   const { data: dbVariants, isLoading: variantsLoading } = useDoggyVariants();
   const { data: analyticsData, isLoading: analyticsLoading } = useDoggyAnalytics();
   const updateVariant = useUpdateDoggyVariant();
+  const { runAnalysis, isRunning: agentRunning, lastAnalysis } = useDoggyAgent();
   
   const [packHealth, setPackHealth] = useState(94);
   const [cohesionScore, setCohesionScore] = useState(87);
@@ -179,9 +181,22 @@ const DoggiesAdmin = () => {
                 <Shuffle className="w-4 h-4 mr-2" />
                 Shuffle Pack
               </Button>
-              <Button variant="brutalist" onClick={runPackCheck}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Pack Check
+              <Button 
+                variant="brutalist" 
+                onClick={runAnalysis}
+                disabled={agentRunning}
+              >
+                {agentRunning ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Activity className="w-4 h-4 mr-2" />
+                    Analyze Pack
+                  </>
+                )}
               </Button>
             </div>
           </div>

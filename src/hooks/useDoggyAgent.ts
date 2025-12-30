@@ -73,7 +73,7 @@ export const useDoggyAgent = () => {
   const runAnalysis = useCallback(async (): Promise<AnalysisResult | null> => {
     setIsRunning(true);
     try {
-      const { data, error } = await supabase.functions.invoke('doggy-self-heal', {
+      const { data, error } = await supabase.functions.invoke('doggy-orchestrator', {
         body: { action: 'analyze' }
       });
 
@@ -106,7 +106,7 @@ export const useDoggyAgent = () => {
 
   const getStatus = useCallback(async (): Promise<AgentStatus | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('doggy-self-heal', {
+      const { data, error } = await supabase.functions.invoke('doggy-orchestrator', {
         body: { action: 'get-status' }
       });
 
@@ -132,7 +132,7 @@ export const useDoggyAgent = () => {
       // Get session info
       const session_id = sessionStorage.getItem('doggy_session_id');
       
-      await supabase.functions.invoke('doggy-self-heal', {
+      await supabase.functions.invoke('doggy-orchestrator', {
         body: { 
           action: 'report-error',
           data: {
@@ -151,7 +151,7 @@ export const useDoggyAgent = () => {
   const applyFix = useCallback(async (issueId: string) => {
     setIsRunning(true);
     try {
-      const { data, error } = await supabase.functions.invoke('doggy-self-heal', {
+      const { data, error } = await supabase.functions.invoke('doggy-orchestrator', {
         body: { action: 'auto-fix', data: { issueId } }
       });
 
