@@ -43,6 +43,8 @@ export const useDoggyVariants = () => {
       if (error) throw error;
       return data as DoggyVariant[];
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes - variants rarely change
+    gcTime: 10 * 60 * 1000,   // 10 minutes cache retention
   });
 };
 
@@ -59,6 +61,8 @@ export const useActiveDoggyVariants = () => {
       if (error) throw error;
       return data as DoggyVariant[];
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes - active variants rarely change
+    gcTime: 10 * 60 * 1000,   // 10 minutes cache retention
   });
 };
 
@@ -108,6 +112,8 @@ export const useDoggyAnalytics = () => {
 
       return { analytics, stats };
     },
+    staleTime: 60 * 1000,     // 1 minute - analytics can be slightly stale
+    gcTime: 5 * 60 * 1000,    // 5 minutes cache retention
   });
 };
 
