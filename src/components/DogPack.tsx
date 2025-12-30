@@ -1565,6 +1565,42 @@ export const DawlessDog = ({ className, animated = false }: DogVariantProps) => 
     </g>
   </svg>
 );
+
+// Aquia Real Raver Dog - La Real + Aquasella hybrid, party legend, hands in the air
+export const AquiaRealRaverDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ shapeRendering: 'geometricPrecision' }}>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-bounce" : ""}>
+      {/* Ears UP - maximum excitement */}
+      <path d="M18 24 Q14 6 22 4 Q26 10 26 20" />
+      <path d="M46 24 Q50 6 42 4 Q38 10 38 20" />
+      {/* Face - slightly tilted from dancing */}
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      {/* Star eyes - starstruck by the music */}
+      <path d="M26 32 L24 34 L26 36 L28 34 Z" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <path d="M38 32 L36 34 L38 36 L40 34 Z" fill="hsl(var(--logo-green))" opacity="0.8" />
+      {/* Nose */}
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* HUGE smile - living the best life */}
+      <path d="M24 48 Q32 58 40 48" />
+      {/* Tongue out from dancing */}
+      <path d="M30 50 Q32 56 34 50" fill="hsl(var(--logo-green))" opacity="0.5" />
+      {/* Arms/paws up - hands in the air */}
+      <path d="M4 28 L8 18 L12 24" strokeWidth="3" />
+      <path d="M52 28 L56 18 L60 24" strokeWidth="3" />
+      {/* Sweat drops - been dancing for hours */}
+      <circle cx="14" cy="36" r="1.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="50" cy="36" r="1.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      {/* LA REAL text on collar */}
+      <rect x="22" y="52" width="20" height="5" rx="1" opacity="0.3" />
+      <text x="24" y="56" fontSize="3.5" fill="hsl(var(--logo-green))" fontWeight="bold">LA REAL</text>
+      {/* Mountain silhouette - Asturias */}
+      <path d="M2 62 L8 54 L14 60 L20 52 L26 58" opacity="0.3" />
+      {/* River wave - Sella */}
+      <path d="M38 58 Q44 54 50 58 Q56 62 62 58" opacity="0.3" />
+    </g>
+  </svg>
+);
+
 // Eulogio Dog - Asturian legend with "E" collar and crate of records
 export const EulogioDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1718,6 +1754,7 @@ export const dogVariants = [
   { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'You shall not pass', status: 'judging' },
   // FESTIVAL DOGS
   { name: 'Aquasella', Component: AquasellaDog, personality: 'River raving in Asturias', status: 'outdoor vibes' },
+  { name: 'Aquia Real Raver', Component: AquiaRealRaverDog, personality: 'La Real til sunrise, hands up always', status: 'peak festival mode' },
   // GEAR/STYLE DOGS
   { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, just hardware', status: 'patching' },
   // SPANISH LEGENDS
