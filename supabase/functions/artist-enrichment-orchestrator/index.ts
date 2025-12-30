@@ -179,6 +179,17 @@ async function enrichArtist(
   return results;
 }
 
+// Safe body parser to handle empty/invalid JSON
+async function safeParseBody(req: Request): Promise<any> {
+  try {
+    const text = await req.text();
+    if (!text || text.trim() === '') return {};
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -189,8 +200,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const body: OrchestrationRequest = await req.json();
-    const { action, artist_id, priority = 0, reason, limit = 5, objectives } = body;
+    const body: OrchestrationRequest = await safeParseBody(req);
+    const { action = 'status', artist_id, priority = 0, reason, limit = 5, objectives } = body;
 
     console.log(`Orchestrator action: ${action}`);
 

@@ -461,6 +461,17 @@ async function createGearDocument(
   };
 }
 
+// Safe body parser to handle empty/invalid JSON
+async function safeParseBody(req: Request): Promise<any> {
+  try {
+    const text = await req.text();
+    if (!text || text.trim() === '') return {};
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -471,8 +482,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const body: ConsolidationRequest = await req.json();
-    const { action, limit = 10, dry_run = false } = body;
+    const body: ConsolidationRequest = await safeParseBody(req);
+    const { action = 'status', limit = 10, dry_run = false } = body;
 
     console.log(`Consolidation action: ${action}, limit: ${limit}, dry_run: ${dry_run}`);
 

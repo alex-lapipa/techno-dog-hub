@@ -200,6 +200,17 @@ async function extractFromDocument(
   };
 }
 
+// Safe body parser to handle empty/invalid JSON
+async function safeParseBody(req: Request): Promise<any> {
+  try {
+    const text = await req.text();
+    if (!text || text.trim() === '') return {};
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -215,8 +226,8 @@ serve(async (req) => {
     }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const body: ExtractionRequest = await req.json();
-    const { action, artist_id, raw_doc_id, limit = 10 } = body;
+    const body: ExtractionRequest = await safeParseBody(req);
+    const { action = 'status', artist_id, raw_doc_id, limit = 10 } = body;
 
     console.log(`Artist extraction action: ${action}`);
 
