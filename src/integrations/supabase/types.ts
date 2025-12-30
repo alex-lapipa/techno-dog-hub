@@ -1065,6 +1065,92 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_contacts: {
+        Row: {
+          brand_id: string | null
+          contact_form_url: string | null
+          contact_person_name: string | null
+          contact_relevance_score: number | null
+          contact_type: string
+          created_at: string | null
+          created_by: string | null
+          department: string | null
+          do_not_do: string | null
+          email: string | null
+          enrichment_confidence: number | null
+          id: string
+          last_verified_at: string | null
+          mailing_address: string | null
+          notes_on_how_to_approach: string | null
+          phone: string | null
+          preferred_contact_method: string | null
+          region_coverage: string | null
+          role_title: string | null
+          social_links_json: Json | null
+          source_url: string | null
+          updated_at: string | null
+          what_they_care_about: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          contact_form_url?: string | null
+          contact_person_name?: string | null
+          contact_relevance_score?: number | null
+          contact_type: string
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          do_not_do?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          mailing_address?: string | null
+          notes_on_how_to_approach?: string | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          region_coverage?: string | null
+          role_title?: string | null
+          social_links_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+          what_they_care_about?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          contact_form_url?: string | null
+          contact_person_name?: string | null
+          contact_relevance_score?: number | null
+          contact_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          department?: string | null
+          do_not_do?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          mailing_address?: string | null
+          notes_on_how_to_approach?: string | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          region_coverage?: string | null
+          role_title?: string | null
+          social_links_json?: Json | null
+          source_url?: string | null
+          updated_at?: string | null
+          what_they_care_about?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_contacts_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "gear_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       canonical_artists: {
         Row: {
           active_years: string | null
@@ -1136,6 +1222,65 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      collaboration_programs: {
+        Row: {
+          brand_id: string | null
+          created_at: string | null
+          decision_timeline_notes: string | null
+          do_not_do: string | null
+          id: string
+          is_active: boolean | null
+          last_verified_at: string | null
+          program_name: string | null
+          program_type: string
+          requirements_summary: string | null
+          source_url: string | null
+          submission_url: string | null
+          updated_at: string | null
+          what_they_care_about: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string | null
+          decision_timeline_notes?: string | null
+          do_not_do?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          program_name?: string | null
+          program_type: string
+          requirements_summary?: string | null
+          source_url?: string | null
+          submission_url?: string | null
+          updated_at?: string | null
+          what_they_care_about?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string | null
+          decision_timeline_notes?: string | null
+          do_not_do?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          program_name?: string | null
+          program_type?: string
+          requirements_summary?: string | null
+          source_url?: string | null
+          submission_url?: string | null
+          updated_at?: string | null
+          what_they_care_about?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaboration_programs_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "gear_brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       community_profiles: {
         Row: {
@@ -2026,6 +2171,132 @@ export type Database = {
         }
         Relationships: []
       }
+      gear_agent_runs: {
+        Row: {
+          brands_processed: number | null
+          completed_at: string | null
+          contacts_found: number | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          models_used: string[] | null
+          parameters: Json | null
+          results: Json | null
+          run_type: string
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          brands_processed?: number | null
+          completed_at?: string | null
+          contacts_found?: number | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          results?: Json | null
+          run_type: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          brands_processed?: number | null
+          completed_at?: string | null
+          contacts_found?: number | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          results?: Json | null
+          run_type?: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      gear_brands: {
+        Row: {
+          brand_aliases: Json | null
+          brand_name: string
+          brand_website_url: string | null
+          collaboration_friendliness_score: number | null
+          collaboration_policy_summary: string | null
+          collaboration_policy_url: string | null
+          created_at: string | null
+          created_by: string | null
+          headquarters_city: string | null
+          headquarters_country: string | null
+          id: string
+          last_verified_at: string | null
+          official_contact_page_url: string | null
+          official_press_page_url: string | null
+          ownership_notes: string | null
+          parent_company_name: string | null
+          parent_company_website: string | null
+          primary_language: string | null
+          sources_json: Json | null
+          status: string | null
+          support_policy_summary: string | null
+          support_url: string | null
+          updated_at: string | null
+          verification_confidence: number | null
+        }
+        Insert: {
+          brand_aliases?: Json | null
+          brand_name: string
+          brand_website_url?: string | null
+          collaboration_friendliness_score?: number | null
+          collaboration_policy_summary?: string | null
+          collaboration_policy_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          headquarters_city?: string | null
+          headquarters_country?: string | null
+          id?: string
+          last_verified_at?: string | null
+          official_contact_page_url?: string | null
+          official_press_page_url?: string | null
+          ownership_notes?: string | null
+          parent_company_name?: string | null
+          parent_company_website?: string | null
+          primary_language?: string | null
+          sources_json?: Json | null
+          status?: string | null
+          support_policy_summary?: string | null
+          support_url?: string | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Update: {
+          brand_aliases?: Json | null
+          brand_name?: string
+          brand_website_url?: string | null
+          collaboration_friendliness_score?: number | null
+          collaboration_policy_summary?: string | null
+          collaboration_policy_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          headquarters_city?: string | null
+          headquarters_country?: string | null
+          id?: string
+          last_verified_at?: string | null
+          official_contact_page_url?: string | null
+          official_press_page_url?: string | null
+          ownership_notes?: string | null
+          parent_company_name?: string | null
+          parent_company_website?: string | null
+          primary_language?: string | null
+          sources_json?: Json | null
+          status?: string | null
+          support_policy_summary?: string | null
+          support_url?: string | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Relationships: []
+      }
       gear_catalog: {
         Row: {
           brand: string
@@ -2179,6 +2450,185 @@ export type Database = {
           timbrality?: string | null
           updated_at?: string | null
           youtube_videos?: Json | null
+        }
+        Relationships: []
+      }
+      gear_outreach_history: {
+        Row: {
+          brand_id: string | null
+          campaign_name: string | null
+          contact_id: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          message_content: string | null
+          message_summary: string | null
+          next_action_date: string | null
+          next_action_note: string | null
+          outreach_date: string | null
+          outreach_type: string
+          response_notes: string | null
+          status: string | null
+          subject_line: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          campaign_name?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message_content?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          next_action_note?: string | null
+          outreach_date?: string | null
+          outreach_type: string
+          response_notes?: string | null
+          status?: string | null
+          subject_line?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          campaign_name?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message_content?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          next_action_note?: string | null
+          outreach_date?: string | null
+          outreach_type?: string
+          response_notes?: string | null
+          status?: string | null
+          subject_line?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gear_outreach_history_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "gear_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gear_outreach_history_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "brand_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gear_products: {
+        Row: {
+          brand_id: string | null
+          created_at: string | null
+          id: string
+          key_tech_tags: string[] | null
+          last_verified_at: string | null
+          notable_artists_in_project: Json | null
+          notes: string | null
+          original_gear_id: string | null
+          product_name: string
+          product_page_url: string | null
+          product_status: string | null
+          product_type: string | null
+          sources_json: Json | null
+          synthesis_type: string | null
+          updated_at: string | null
+          year_introduced: number | null
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          key_tech_tags?: string[] | null
+          last_verified_at?: string | null
+          notable_artists_in_project?: Json | null
+          notes?: string | null
+          original_gear_id?: string | null
+          product_name: string
+          product_page_url?: string | null
+          product_status?: string | null
+          product_type?: string | null
+          sources_json?: Json | null
+          synthesis_type?: string | null
+          updated_at?: string | null
+          year_introduced?: number | null
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          key_tech_tags?: string[] | null
+          last_verified_at?: string | null
+          notable_artists_in_project?: Json | null
+          notes?: string | null
+          original_gear_id?: string | null
+          product_name?: string
+          product_page_url?: string | null
+          product_status?: string | null
+          product_type?: string | null
+          sources_json?: Json | null
+          synthesis_type?: string | null
+          updated_at?: string | null
+          year_introduced?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gear_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "gear_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gear_scrape_audit_log: {
+        Row: {
+          action: string
+          brand_name: string | null
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          models_used: string[] | null
+          parameters: Json | null
+          records_affected: number | null
+          source_url: string | null
+          status: string | null
+        }
+        Insert: {
+          action: string
+          brand_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          records_affected?: number | null
+          source_url?: string | null
+          status?: string | null
+        }
+        Update: {
+          action?: string
+          brand_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          records_affected?: number | null
+          source_url?: string | null
+          status?: string | null
         }
         Relationships: []
       }
