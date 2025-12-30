@@ -28,7 +28,7 @@ export const GlitchImage = ({ src, alt, className = "", frameNumber = "01", size
       
       {/* Image container */}
       <div 
-        className="group/film relative overflow-hidden mx-2 border transition-all duration-500"
+        className="group/film relative overflow-hidden mx-2 border transition-all duration-500 h-full"
         style={{ 
           borderColor: 'rgba(220,38,38,0.2)',
           width: 'calc(100% - 16px)'
