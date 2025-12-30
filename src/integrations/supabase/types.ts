@@ -680,6 +680,313 @@ export type Database = {
           },
         ]
       }
+      artist_label_agent_runs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          run_type: string
+          started_at: string | null
+          stats: Json | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type?: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      artist_label_outreach_history: {
+        Row: {
+          artist_id: string | null
+          created_at: string | null
+          date: string | null
+          id: string
+          label_contact_id: string | null
+          label_id: string | null
+          manager_id: string | null
+          message_summary: string | null
+          next_action_date: string | null
+          outreach_type: string | null
+          response_notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          artist_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          label_contact_id?: string | null
+          label_id?: string | null
+          manager_id?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          outreach_type?: string | null
+          response_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          artist_id?: string | null
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          label_contact_id?: string | null
+          label_id?: string | null
+          manager_id?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          outreach_type?: string | null
+          response_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_label_outreach_history_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_label_outreach_history_label_contact_id_fkey"
+            columns: ["label_contact_id"]
+            isOneToOne: false
+            referencedRelation: "label_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_label_outreach_history_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_label_outreach_history_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "artist_managers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_label_scrape_audit: {
+        Row: {
+          action: string
+          created_at: string | null
+          data_extracted: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          source_url: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          data_extracted?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          source_url?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          data_extracted?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      artist_label_segments: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          filters_json: Json | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      artist_labels: {
+        Row: {
+          artist_id: string | null
+          created_at: string | null
+          evidence_url: string | null
+          id: string
+          label_id: string | null
+          notes: string | null
+          relationship_type: string | null
+        }
+        Insert: {
+          artist_id?: string | null
+          created_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          label_id?: string | null
+          notes?: string | null
+          relationship_type?: string | null
+        }
+        Update: {
+          artist_id?: string | null
+          created_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          label_id?: string | null
+          notes?: string | null
+          relationship_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_labels_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_active"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_labels_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      artist_managers: {
+        Row: {
+          address: string | null
+          artist_id: string | null
+          best_approach_notes: string | null
+          collaboration_policy_summary: string | null
+          company_website: string | null
+          contact_form_url: string | null
+          created_at: string | null
+          data_source_url: string | null
+          email: string | null
+          enrichment_confidence: number | null
+          id: string
+          last_verified_at: string | null
+          location_city: string | null
+          location_country: string | null
+          management_company: string | null
+          manager_name: string
+          manager_role: string | null
+          outreach_channel_preference: string | null
+          phone: string | null
+          professional_social_links_json: Json | null
+          region_coverage: string | null
+          relationship_status: string | null
+          updated_at: string | null
+          what_they_dislike: string | null
+          what_they_like: string | null
+        }
+        Insert: {
+          address?: string | null
+          artist_id?: string | null
+          best_approach_notes?: string | null
+          collaboration_policy_summary?: string | null
+          company_website?: string | null
+          contact_form_url?: string | null
+          created_at?: string | null
+          data_source_url?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          management_company?: string | null
+          manager_name: string
+          manager_role?: string | null
+          outreach_channel_preference?: string | null
+          phone?: string | null
+          professional_social_links_json?: Json | null
+          region_coverage?: string | null
+          relationship_status?: string | null
+          updated_at?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Update: {
+          address?: string | null
+          artist_id?: string | null
+          best_approach_notes?: string | null
+          collaboration_policy_summary?: string | null
+          company_website?: string | null
+          contact_form_url?: string | null
+          created_at?: string | null
+          data_source_url?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          management_company?: string | null
+          manager_name?: string
+          manager_role?: string | null
+          outreach_channel_preference?: string | null
+          phone?: string | null
+          professional_social_links_json?: Json | null
+          region_coverage?: string | null
+          relationship_status?: string | null
+          updated_at?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_managers_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists_active"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_merge_candidates: {
         Row: {
           artist_a_id: string
@@ -1022,6 +1329,63 @@ export type Database = {
             referencedColumns: ["raw_doc_id"]
           },
         ]
+      }
+      artists_active: {
+        Row: {
+          active_status: string | null
+          artist_aliases: Json | null
+          artist_name: string
+          artist_website_url: string | null
+          canonical_artist_id: string | null
+          city_base: string | null
+          country_base: string | null
+          created_at: string | null
+          evidence_of_activity: string | null
+          id: string
+          last_verified_at: string | null
+          main_social_links_json: Json | null
+          region_focus: string | null
+          source_urls_json: Json | null
+          updated_at: string | null
+          verification_confidence: number | null
+        }
+        Insert: {
+          active_status?: string | null
+          artist_aliases?: Json | null
+          artist_name: string
+          artist_website_url?: string | null
+          canonical_artist_id?: string | null
+          city_base?: string | null
+          country_base?: string | null
+          created_at?: string | null
+          evidence_of_activity?: string | null
+          id?: string
+          last_verified_at?: string | null
+          main_social_links_json?: Json | null
+          region_focus?: string | null
+          source_urls_json?: Json | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Update: {
+          active_status?: string | null
+          artist_aliases?: Json | null
+          artist_name?: string
+          artist_website_url?: string | null
+          canonical_artist_id?: string | null
+          city_base?: string | null
+          country_base?: string | null
+          created_at?: string | null
+          evidence_of_activity?: string | null
+          id?: string
+          last_verified_at?: string | null
+          main_social_links_json?: Json | null
+          region_focus?: string | null
+          source_urls_json?: Json | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Relationships: []
       }
       badges: {
         Row: {
@@ -2798,6 +3162,152 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      label_contacts: {
+        Row: {
+          best_approach_notes: string | null
+          collaboration_preferences_summary: string | null
+          contact_form_url: string | null
+          contact_person_name: string | null
+          created_at: string | null
+          department: string | null
+          email: string | null
+          enrichment_confidence: number | null
+          id: string
+          label_id: string | null
+          last_verified_at: string | null
+          location_city: string | null
+          location_country: string | null
+          phone: string | null
+          professional_social_links_json: Json | null
+          role_title: string | null
+          source_url: string | null
+          updated_at: string | null
+          what_they_dislike: string | null
+          what_they_like: string | null
+        }
+        Insert: {
+          best_approach_notes?: string | null
+          collaboration_preferences_summary?: string | null
+          contact_form_url?: string | null
+          contact_person_name?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          label_id?: string | null
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          phone?: string | null
+          professional_social_links_json?: Json | null
+          role_title?: string | null
+          source_url?: string | null
+          updated_at?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Update: {
+          best_approach_notes?: string | null
+          collaboration_preferences_summary?: string | null
+          contact_form_url?: string | null
+          contact_person_name?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          id?: string
+          label_id?: string | null
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          phone?: string | null
+          professional_social_links_json?: Json | null
+          role_title?: string | null
+          source_url?: string | null
+          updated_at?: string | null
+          what_they_dislike?: string | null
+          what_they_like?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "label_contacts_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels: {
+        Row: {
+          address: string | null
+          collaborations_policy_url: string | null
+          contact_form_url: string | null
+          created_at: string | null
+          general_email: string | null
+          headquarters_city: string | null
+          headquarters_country: string | null
+          id: string
+          label_name: string
+          label_type: string | null
+          label_website_url: string | null
+          last_verified_at: string | null
+          notes: string | null
+          parent_company: string | null
+          phone: string | null
+          roster_url: string | null
+          sources_json: Json | null
+          submissions_policy_url: string | null
+          updated_at: string | null
+          verification_confidence: number | null
+        }
+        Insert: {
+          address?: string | null
+          collaborations_policy_url?: string | null
+          contact_form_url?: string | null
+          created_at?: string | null
+          general_email?: string | null
+          headquarters_city?: string | null
+          headquarters_country?: string | null
+          id?: string
+          label_name: string
+          label_type?: string | null
+          label_website_url?: string | null
+          last_verified_at?: string | null
+          notes?: string | null
+          parent_company?: string | null
+          phone?: string | null
+          roster_url?: string | null
+          sources_json?: Json | null
+          submissions_policy_url?: string | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Update: {
+          address?: string | null
+          collaborations_policy_url?: string | null
+          contact_form_url?: string | null
+          created_at?: string | null
+          general_email?: string | null
+          headquarters_city?: string | null
+          headquarters_country?: string | null
+          id?: string
+          label_name?: string
+          label_type?: string | null
+          label_website_url?: string | null
+          last_verified_at?: string | null
+          notes?: string | null
+          parent_company?: string | null
+          phone?: string | null
+          roster_url?: string | null
+          sources_json?: Json | null
+          submissions_policy_url?: string | null
+          updated_at?: string | null
+          verification_confidence?: number | null
+        }
+        Relationships: []
       }
       launch_notifications: {
         Row: {

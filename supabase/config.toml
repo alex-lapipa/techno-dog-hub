@@ -276,3 +276,6 @@ verify_jwt = false
 
 [functions.gear-manufacturer-agent]
 verify_jwt = false
+
+[functions.artist-label-agent]
+verify_jwt = false
