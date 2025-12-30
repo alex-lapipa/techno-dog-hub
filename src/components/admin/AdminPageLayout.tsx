@@ -35,6 +35,14 @@ export const AdminPageLayout = ({
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAdminAuth();
 
+  // CRITICAL: All hooks must be called before any early returns
+  useEffect(() => {
+    if (!authLoading && !isLoading && !isAdmin) {
+      navigate('/admin');
+    }
+  }, [isAdmin, authLoading, isLoading, navigate]);
+
+  // Early returns AFTER all hooks
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -45,12 +53,6 @@ export const AdminPageLayout = ({
       </div>
     );
   }
-
-  useEffect(() => {
-    if (!authLoading && !isLoading && !isAdmin) {
-      navigate('/admin');
-    }
-  }, [isAdmin, authLoading, isLoading, navigate]);
 
   if (!isAdmin) {
     return null;
