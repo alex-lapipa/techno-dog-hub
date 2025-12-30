@@ -12,15 +12,85 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+// Manufacturer site mappings for direct product page scraping
+const MANUFACTURER_URLS: Record<string, string> = {
+  'ableton-live': 'https://www.ableton.com/en/live/',
+  'pioneer-rekordbox': 'https://rekordbox.com/en/',
+  'apple-logic-pro': 'https://www.apple.com/logic-pro/',
+  'cycling-74-max': 'https://cycling74.com/products/max',
+  'native-instruments-traktor': 'https://www.native-instruments.com/en/products/traktor/dj-software/traktor-pro-4/',
+  'nord-lead-series': 'https://www.nordkeyboards.com/products/nord-lead-4',
+  'oberheim-sem': 'https://oberheim.com/product/sem/',
+  'pioneer-djm-s11': 'https://www.pioneerdj.com/en/product/mixer/djm-s11/black/overview/',
+  'pioneer-djm-v10': 'https://www.pioneerdj.com/en/product/mixer/djm-v10/black/overview/',
+  'pioneer-cdj-3000': 'https://www.pioneerdj.com/en/product/player/cdj-3000/black/overview/',
+  'rane-mp2015': 'https://www.rane.com/mp2015',
+  'rane-seventy-two': 'https://www.rane.com/seventy-two',
+  'roland-jx-3p': 'https://www.roland.com/global/promos/roland_classic/jx-3p/',
+  'roland-re-501': 'https://www.roland.com/global/promos/roland_classic/',
+  'roland-system-100m': 'https://www.roland.com/global/promos/roland_classic/',
+  'roland-system-700': 'https://www.roland.com/global/promos/roland_classic/',
+  'sequential-prophet-rev2': 'https://www.sequential.com/product/prophet-rev2/',
+  'sequential-prophet-6': 'https://www.sequential.com/product/prophet-6/',
+  'ssl-g-series-bus': 'https://www.solidstatelogic.com/products/500-series',
+  'strymon-timeline': 'https://www.strymon.net/product/timeline/',
+  'strymon-bigsky': 'https://www.strymon.net/product/bigsky/',
+  'tc-electronic-flashback': 'https://www.tcelectronic.com/product.html?modelCode=0648',
+  'technics-sl-1200-series': 'https://www.technics.com/global/products/1200-series.html',
+  'technics-sl-1200gr': 'https://www.technics.com/global/products/sl-1200gr.html',
+  'technics-sl-1200mk7': 'https://www.technics.com/global/products/sl-1200mk7.html',
+  'teletronix-la2a': 'https://www.uaudio.com/hardware/la-2a.html',
+  'urei-1176': 'https://www.uaudio.com/hardware/1176ln.html',
+  'waldorf-blofeld': 'https://waldorfmusic.com/en/blofeld-overview',
+  'waldorf-pulse-2': 'https://waldorfmusic.com/en/pulse-2-overview',
+  'mutable-instruments-modules': 'https://pichenettes.github.io/mutable-instruments-documentation/',
+  'api-500-series': 'https://apiaudio.com/500-series/',
+  'serge-modular-4u': 'https://www.serge-fans.com/',
+};
+
 // Use Firecrawl web search to find product images
-async function searchForProductImages(gearName: string, gearBrand: string): Promise<{ success: boolean; results?: any[]; error?: string }> {
+async function searchForProductImages(gearName: string, gearBrand: string, gearId: string): Promise<{ success: boolean; results?: any[]; error?: string }> {
   if (!FIRECRAWL_API_KEY) {
     return { success: false, error: 'Firecrawl API key not configured' };
   }
 
   try {
-    // Search for the product with image focus
-    const query = `${gearBrand} ${gearName} synth drum machine official product image`;
+    // Try manufacturer URL first if available
+    const manufacturerUrl = MANUFACTURER_URLS[gearId];
+    if (manufacturerUrl) {
+      console.log('Scraping manufacturer URL:', manufacturerUrl);
+      const scrapeResponse = await fetch('https://api.firecrawl.dev/v1/scrape', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${FIRECRAWL_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: manufacturerUrl,
+          formats: ['markdown', 'html'],
+          onlyMainContent: true,
+          waitFor: 2000,
+        }),
+      });
+      
+      if (scrapeResponse.ok) {
+        const scrapeData = await scrapeResponse.json();
+        if (scrapeData.success || scrapeData.data) {
+          return { 
+            success: true, 
+            results: [{
+              url: manufacturerUrl,
+              html: scrapeData.data?.html || scrapeData.html || '',
+              markdown: scrapeData.data?.markdown || scrapeData.markdown || '',
+              title: `${gearBrand} ${gearName} - Official`
+            }]
+          };
+        }
+      }
+    }
+
+    // Fallback to search with manufacturer focus
+    const query = `${gearBrand} ${gearName} official product image`;
     console.log('Searching:', query);
     
     const response = await fetch('https://api.firecrawl.dev/v1/search', {
@@ -333,7 +403,7 @@ serve(async (req) => {
       }
 
       // Search for images
-      const searchResult = await searchForProductImages(gear.name, gear.brand);
+      const searchResult = await searchForProductImages(gear.name, gear.brand, gear.id);
       
       if (!searchResult.success || !searchResult.results?.length) {
         return new Response(JSON.stringify({
@@ -470,7 +540,7 @@ serve(async (req) => {
         }
 
         // Search for images
-        const searchResult = await searchForProductImages(gear.name, gear.brand);
+        const searchResult = await searchForProductImages(gear.name, gear.brand, gear.id);
         
         if (!searchResult.success || !searchResult.results?.length) {
           results.push({
