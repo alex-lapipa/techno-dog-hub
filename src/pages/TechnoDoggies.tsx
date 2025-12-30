@@ -879,7 +879,7 @@ const TechnoDoggies = () => {
                   <Mail className="w-3 h-3 mr-1" />
                   Email
                 </Button>
-                <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8">
+                <Button size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8 bg-logo-green hover:bg-logo-green/90 text-background">
                   <Download className="w-3 h-3 mr-1" />
                   Save PNG
                 </Button>
