@@ -724,43 +724,25 @@ const TechnoDoggies = () => {
                 </p>
               </div>
 
-              {/* Fun Stats */}
-              <div className="flex justify-center gap-4 mb-4">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Users className="w-3 h-3 text-logo-green" />
-                    <span className="font-mono text-sm font-bold text-foreground">{activeVariants.length}</span>
-                  </div>
-                  <span className="font-mono text-[9px] text-muted-foreground">Doggies</span>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Heart className="w-3 h-3 text-logo-green" />
-                    <span className="font-mono text-sm font-bold text-foreground">∞</span>
-                  </div>
-                  <span className="font-mono text-[9px] text-muted-foreground">Barks</span>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Sparkles className="w-3 h-3 text-logo-green" />
-                    <span className="font-mono text-sm font-bold text-foreground">∞</span>
-                  </div>
-                  <span className="font-mono text-[9px] text-muted-foreground">Tail Wags</span>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Share2 className="w-3 h-3 text-logo-green" />
-                    <span className="font-mono text-sm font-bold text-foreground">4ever</span>
-                  </div>
-                  <span className="font-mono text-[9px] text-muted-foreground">Vibes</span>
-                </div>
-              </div>
-              
-              <div className="flex justify-center mb-3" onClick={() => handleSocialShare("social")}>
+              {/* WhatsApp - FIRST and most prominent */}
+              <Button 
+                onClick={downloadForWhatsApp}
+                className="w-full font-mono text-sm h-12 bg-[#25D366] hover:bg-[#25D366]/90 text-white shadow-[0_0_20px_hsl(142_70%_49%/0.4)] mb-4"
+              >
+                <Smartphone className="w-5 h-5 mr-2" />
+                Share on WhatsApp
+              </Button>
+              <p className="text-[9px] text-muted-foreground text-center mb-4 font-mono -mt-2">
+                Downloads sticker • Save to Photos • Send to friends
+              </p>
+
+              {/* Other social options */}
+              <div className="flex justify-center mb-4" onClick={() => handleSocialShare("social")}>
                 <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
               </div>
 
-              <div className="flex flex-wrap gap-2 justify-center mb-4">
+              {/* Secondary actions */}
+              <div className="flex flex-wrap gap-2 justify-center pt-3 border-t border-border/30">
                 <Button variant="outline" size="sm" onClick={shareViaEmail} className="font-mono text-[10px] h-8">
                   <Mail className="w-3 h-3 mr-1" />
                   Email
@@ -778,20 +760,6 @@ const TechnoDoggies = () => {
                   <Package className="w-3 h-3 mr-1" />
                   Full Pack
                 </Button>
-              </div>
-              
-              {/* WhatsApp Sticker Button - Prominent for Mobile */}
-              <div className="pt-3 border-t border-border/30">
-                <Button 
-                  onClick={downloadForWhatsApp}
-                  className="w-full font-mono text-xs h-10 bg-[#25D366] hover:bg-[#25D366]/90 text-white shadow-[0_0_15px_hsl(142_70%_49%/0.3)]"
-                >
-                  <Smartphone className="w-4 h-4 mr-2" />
-                  Add to Phone for WhatsApp
-                </Button>
-                <p className="text-[9px] text-muted-foreground text-center mt-2 font-mono">
-                  Downloads 512×512 sticker • Save to Photos • Share everywhere
-                </p>
               </div>
 
               <p className="mt-4 font-mono text-[10px] text-muted-foreground italic text-center">
