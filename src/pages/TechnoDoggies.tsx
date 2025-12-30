@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageSEO from "@/components/PageSEO";
 import { Link } from "react-router-dom";
@@ -20,6 +20,8 @@ const TechnoDoggies = () => {
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedDogs, setSelectedDogs] = useState<number[]>([]);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   // Get the active variants from DB, fallback to static if loading
   const activeVariants = dbVariants?.map(dbDog => {
@@ -43,6 +45,27 @@ const TechnoDoggies = () => {
       trackDoggyEvent('main_page', 'page_view', undefined, currentDog.name);
     }
   }, []);
+
+  // Auto-scroll carousel every 2 seconds
+  useEffect(() => {
+    if (isCarouselPaused || !carouselRef.current) return;
+    
+    const interval = setInterval(() => {
+      const carousel = carouselRef.current;
+      if (!carousel) return;
+      
+      const cardWidth = 144 + 16; // w-36 (144px) + gap-4 (16px)
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      
+      if (carousel.scrollLeft >= maxScroll - 10) {
+        carousel.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        carousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [isCarouselPaused, activeVariants.length]);
 
   const nextDog = () => {
     setIsAnimating(true);
@@ -445,19 +468,26 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* 3. MEET THE PACK - Horizontal Scroll Gallery */}
+          {/* 3. MEET THE PACK - Auto-Scrolling Carousel */}
           <div className="mb-8">
             <div className="text-center mb-4">
               <h2 className="font-mono text-base font-bold text-foreground mb-1">
                 Meet the Full Pack
               </h2>
               <p className="font-mono text-[10px] text-muted-foreground">
-                {activeVariants.length} doggies • Swipe to explore
+                {activeVariants.length} doggies • Auto-scrolling
               </p>
             </div>
             
-            {/* Horizontal Scroll Gallery */}
-            <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-thin">
+            {/* Auto-Scrolling Carousel */}
+            <div 
+              ref={carouselRef}
+              onMouseEnter={() => setIsCarouselPaused(true)}
+              onMouseLeave={() => setIsCarouselPaused(false)}
+              onTouchStart={() => setIsCarouselPaused(true)}
+              onTouchEnd={() => setTimeout(() => setIsCarouselPaused(false), 3000)}
+              className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-thin scroll-smooth"
+            >
               {activeVariants.map((dog: any, index: number) => {
                 const Dog = dog.Component;
                 const isFeatured = dog.dbData?.is_featured;
