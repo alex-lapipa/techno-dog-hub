@@ -66,6 +66,7 @@ const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
 const PRMediaAgentAdmin = lazy(() => import("./pages/PRMediaAgentAdmin"));
 const GearManufacturerAdmin = lazy(() => import("./pages/GearManufacturerAdmin"));
 const ArtistLabelAgentAdmin = lazy(() => import("./pages/ArtistLabelAgentAdmin"));
+const CollectivesAgentAdmin = lazy(() => import("./pages/CollectivesAgentAdmin"));
 
 // Agent Admin Pages
 const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
