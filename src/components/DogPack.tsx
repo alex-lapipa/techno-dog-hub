@@ -1533,6 +1533,39 @@ export const AquasellaDog = ({ className, animated = false }: DogVariantProps) =
   </svg>
 );
 
+// Dawless Dog - hardware only, no DAW, pure analog/digital synths and drum machines
+export const DawlessDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ shapeRendering: 'geometricPrecision' }}>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Ears */}
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      {/* Face */}
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      {/* Focused eyes - dialing in patches */}
+      <circle cx="26" cy="34" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="34" r="2" fill="hsl(var(--logo-green))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Slight smile - in the zone */}
+      <path d="M28 48 Q32 51 36 48" />
+      {/* Patch cables - modular synth */}
+      <path d="M4 8 Q8 14 12 8" opacity="0.5" />
+      <path d="M52 8 Q56 14 60 8" opacity="0.5" />
+      <circle cx="8" cy="8" r="2" opacity="0.6" />
+      <circle cx="56" cy="8" r="2" opacity="0.6" />
+      {/* Sequencer grid */}
+      <rect x="22" y="54" width="4" height="4" opacity="0.4" />
+      <rect x="28" y="54" width="4" height="4" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <rect x="34" y="54" width="4" height="4" opacity="0.4" />
+      <rect x="40" y="54" width="4" height="4" opacity="0.4" />
+      {/* Knobs */}
+      <circle cx="10" cy="56" r="3" opacity="0.3" />
+      <circle cx="54" cy="56" r="3" opacity="0.3" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1614,4 +1647,6 @@ export const dogVariants = [
   { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'You shall not pass', status: 'judging' },
   // FESTIVAL DOGS
   { name: 'Aquasella', Component: AquasellaDog, personality: 'River raving in Asturias', status: 'outdoor vibes' },
+  // GEAR/STYLE DOGS
+  { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, just hardware', status: 'patching' },
 ];
