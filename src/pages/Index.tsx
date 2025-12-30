@@ -119,13 +119,13 @@ const Index = () => {
       
       <main className="pt-24 lg:pt-16">
         {/* Hero */}
-        <section className="border-b border-border">
+        <section className="border-b border-border pt-4 sm:pt-0">
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
             <div className="max-w-4xl">
               <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
                 // Global Techno Knowledge Hub
               </div>
-              <h1 className="font-mono text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight mb-6">
+              <h1 className="font-mono text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase tracking-tight mb-6">
                 <span className="hover:animate-glitch inline-block">techno</span>
                 <span className="text-muted-foreground">.</span>
                 <span className="hover:animate-glitch inline-block">dog</span>
@@ -268,7 +268,7 @@ const Index = () => {
                 Get them all →
               </Link>
             </div>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-4">
+            <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-4">
               {dogVariants.slice(0, 20).map((dog, index) => (
                 <Link
                   key={dog.name + index}
