@@ -15,6 +15,7 @@ import { DoggyPageFooter, trackDoggyEvent, DoggyShareLeaderboard, recordShare } 
 import ParticleBackground from "@/components/ParticleBackground";
 import { trackShareEvent, trackClickThrough } from "@/hooks/useShareTracking";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
+import { getWhatsAppShareText } from "@/data/doggyWhatsAppMessages";
 
 // Doggies that should NEVER be shown first - too grumpy or confusing for first impressions
 const excludedFirstImpressionDogs = ['grumpy', 'sven marquardt', 'bouncer', 'security'];
@@ -535,6 +536,10 @@ const TechnoDoggies = () => {
   const shareUrl = `https://techno.dog/doggies?dog=${dogSlug}`;
   // Dynamic share message based on selected dog
   const dogName = currentDog?.name || 'Techno Dog';
+  
+  // Personalized WhatsApp message with unique quote per doggy
+  const whatsAppShareText = getWhatsAppShareText(currentDog?.name || 'Techno');
+  
   const shareText = `I'm ${dogName} 🖤 Join the techno.dog pack! Find your spirit doggy at`;
   const twitterShareText = `I'm ${dogName} 🖤 No NPCs allowed. Find your spirit doggy #Techno #TechnoDog`;
   const telegramShareText = `🖤 I'm ${dogName}!\n\nJoin the techno.dog pack and find your spirit doggy. 70+ unique doggies waiting for you.`;
@@ -794,7 +799,7 @@ const TechnoDoggies = () => {
                           await navigator.share({
                             files: [file],
                             title: `I'm ${currentDog?.name || 'a Techno Dog'}!`,
-                            text: `Join the techno.dog pack! ${shareUrl}`,
+                            text: whatsAppShareText,
                           });
                           
                           toast.dismiss();
@@ -824,8 +829,8 @@ const TechnoDoggies = () => {
                       } catch (error) {
                         toast.dismiss();
                         if ((error as Error).name !== 'AbortError') {
-                          // User cancelled - try text fallback
-                          window.open(`https://wa.me/?text=${encodeURIComponent(`I'm ${currentDog?.name || 'a Techno Dog'}! Join the pack: ${shareUrl}`)}`, '_blank');
+                          // User cancelled - try text fallback with personalized message
+                          window.open(`https://wa.me/?text=${encodeURIComponent(whatsAppShareText)}`, '_blank');
                           handleSocialShare("whatsapp_text");
                           await recordShare();
                         }
