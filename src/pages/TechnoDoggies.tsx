@@ -119,55 +119,20 @@ const TechnoDoggies = () => {
     }
   }, []);
 
-  // Auto-scroll carousel every 2 seconds
+  // Auto-cycle through dogs every 3 seconds (for focus carousel)
   useEffect(() => {
-    if (isCarouselPaused || !carouselRef.current) return;
-    
-    const interval = setInterval(() => {
-      const carousel = carouselRef.current;
-      if (!carousel) return;
-      
-      const cardWidth = 144 + 16; // w-36 (144px) + gap-4 (16px)
-      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-      
-      if (carousel.scrollLeft >= maxScroll - 10) {
-        carousel.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        carousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
-      }
-    }, 2000);
-    
-    return () => clearInterval(interval);
-  }, [isCarouselPaused, activeVariants.length]);
-
-  // Auto-rotate main doggy every 10 seconds in random order (stops when dog is selected)
-  useEffect(() => {
-    if (activeVariants.length <= 1 || isDogSelected) return;
+    if (isCarouselPaused || isDogSelected) return;
     
     const interval = setInterval(() => {
       setIsAnimating(true);
       setTimeout(() => {
-        // Pick a random index different from current
-        let newIndex = Math.floor(Math.random() * activeVariants.length);
-        if (newIndex === currentDogIndex && activeVariants.length > 1) {
-          newIndex = (newIndex + 1) % activeVariants.length;
-        }
-        setCurrentDogIndex(newIndex);
+        setCurrentDogIndex((prev) => (prev + 1) % activeVariants.length);
         setIsAnimating(false);
-        
-        const randomDog = activeVariants[newIndex];
-        if (randomDog) {
-          logAction.mutate({
-            variantId: (randomDog as any)?.dbData?.id,
-            variantName: randomDog.name,
-            actionType: "auto_rotate",
-          });
-        }
       }, 150);
-    }, 10000);
+    }, 3000);
     
     return () => clearInterval(interval);
-  }, [activeVariants, currentDogIndex, logAction, isDogSelected]);
+  }, [isCarouselPaused, isDogSelected, activeVariants.length]);
 
   // Select a dog and stop auto-rotation
   const selectDog = (index: number) => {
@@ -584,7 +549,7 @@ const TechnoDoggies = () => {
         <main className="px-4 py-6 max-w-lg mx-auto relative z-10">
           
           {/* 1. HERO HEADER - Brand Identity */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="flex justify-center gap-1 mb-2">
               <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
               <span className="font-mono text-[10px] uppercase tracking-widest text-logo-green">
@@ -592,149 +557,126 @@ const TechnoDoggies = () => {
               </span>
               <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground font-mono mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold text-foreground font-mono mb-1">
               techno.dog
             </h1>
-            <p className="text-sm sm:text-base text-logo-green font-mono font-semibold mb-1">
-              Join the Doggy Movement
-            </p>
-            <p className="text-xs text-muted-foreground font-mono whitespace-nowrap">
+            <p className="text-xs text-muted-foreground font-mono">
               {activeVariants.length} unique doggies. Infinite barks. Zero NPCs.
             </p>
           </div>
 
-          {/* 2. FEATURED DOGGY - The Star */}
-          <div className="mb-8">
-            <div 
-              id="current-dog-display"
-              onClick={() => !isDogSelected && selectDog(currentDogIndex)}
-              className={`flex flex-col items-center transition-all duration-150 cursor-pointer ${
-                isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
-              } ${isDogSelected ? 'ring-2 ring-logo-green ring-offset-2 ring-offset-background rounded-2xl p-4' : ''}`}
-            >
-              {/* Selected indicator */}
-              {isDogSelected && (
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-logo-green text-background text-[10px] font-mono rounded-full z-20">
-                  Selected! Now share below
-                </div>
-              )}
-              
-              {/* Subtle halo effect */}
-              <div className="relative">
-                <div className={`absolute inset-0 rounded-full blur-2xl transition-all ${isDogSelected ? 'bg-logo-green/30' : 'bg-logo-green/15'}`} />
-                <DogComponent 
-                  className="w-36 h-36 sm:w-44 sm:h-44 relative z-10" 
-                  animated 
-                />
-              </div>
-              <h2 className="mt-5 text-2xl sm:text-3xl font-bold text-foreground font-mono drop-shadow-[0_0_10px_hsl(100_100%_60%/0.3)]">
-                {currentDog?.name === 'Techno' ? 'Techno Dog' : `${currentDog?.name} Doggy`}
-              </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center mt-1 font-mono px-4">
-                "{currentDbData?.personality || currentDog?.personality}"
-              </p>
-              <span className="mt-3 px-4 py-1.5 text-[10px] uppercase tracking-wider rounded-full border border-logo-green/50 text-logo-green font-mono bg-logo-green/10 shadow-[0_0_15px_hsl(100_100%_60%/0.2)]">
-                {currentDbData?.status || currentDog?.status}
-              </span>
-              {currentDbData?.is_featured && (
-                <Badge variant="secondary" className="mt-2 text-[10px]">
-                  <Star className="w-3 h-3 mr-1" /> Featured
-                </Badge>
-              )}
-              
-              {/* Tap to select hint */}
-              {!isDogSelected && (
-                <p className="mt-3 text-[10px] text-muted-foreground font-mono animate-pulse">
-                  Tap to select & share
-                </p>
-              )}
-            </div>
-
-            {/* Quick Controls */}
-            <div className="flex gap-2 justify-center mt-4">
-              {isDogSelected ? (
-                <Button variant="outline" size="sm" onClick={deselectDog} className="font-mono text-xs h-9 px-4">
-                  <RefreshCw className="w-3 h-3 mr-1" />
-                  Pick Another
-                </Button>
-              ) : (
-                <>
-                  <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs h-9 px-4">
-                    Next Doggy
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    onClick={() => selectDog(currentDogIndex)}
-                    className="font-mono text-xs h-9 px-4 bg-logo-green hover:bg-logo-green/90 text-background"
-                  >
-                    <Share2 className="w-3 h-3 mr-1" />
-                    Select & Share
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs h-9 px-4">
-                    <RefreshCw className="w-3 h-3 mr-1" />
-                    Surprise Me!
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* 3. UNIFIED PACK SELECTOR & SHARE */}
+          {/* 2. UNIFIED FOCUS CAROUSEL - Hero + Selector + Share in one */}
           <div 
             id="share-section" 
             className="mb-8 rounded-2xl bg-gradient-to-br from-logo-green/15 via-logo-green/5 to-transparent border border-logo-green/30 overflow-hidden"
           >
-            {/* Header */}
-            <div className="text-center py-4 px-4 border-b border-logo-green/20">
-              <h2 className="font-mono text-base font-bold text-foreground">
-                {isDogSelected ? `Share ${currentDog?.name} Doggy` : 'Pick & Share Your Doggy'}
-              </h2>
-              <p className="font-mono text-[10px] text-muted-foreground mt-1">
-                {isDogSelected ? 'Spread the barks • Make friends jealous' : `${activeVariants.length} doggies ready to share`}
-              </p>
-            </div>
-            
-            {/* Carousel - stops when dog is selected */}
+            {/* Focus Carousel - Center dog is hero, sides are smaller */}
             <div 
               ref={carouselRef}
               onMouseEnter={() => setIsCarouselPaused(true)}
               onMouseLeave={() => !isDogSelected && setIsCarouselPaused(false)}
               onTouchStart={() => setIsCarouselPaused(true)}
               onTouchEnd={() => !isDogSelected && setTimeout(() => setIsCarouselPaused(false), 3000)}
-              className="flex gap-3 overflow-x-auto py-4 px-3 snap-x snap-mandatory scroll-smooth"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="relative py-6 px-4"
             >
-              {activeVariants.map((dog: any, index: number) => {
-                const Dog = dog.Component;
-                const isSelected = currentDogIndex === index && isDogSelected;
-                const isFeatured = dog.dbData?.is_featured;
+              {/* Carousel Container */}
+              <div className="flex items-center justify-center gap-2 sm:gap-4 overflow-hidden">
+                {/* Previous Dogs (smaller) */}
+                {[-2, -1].map((offset) => {
+                  const index = (currentDogIndex + offset + activeVariants.length) % activeVariants.length;
+                  const dog = activeVariants[index];
+                  if (!dog) return null;
+                  const Dog = dog.Component;
+                  const scale = offset === -1 ? 'w-16 h-16 sm:w-20 sm:h-20 opacity-60' : 'w-10 h-10 sm:w-14 sm:h-14 opacity-30 hidden sm:block';
+                  
+                  return (
+                    <div
+                      key={`prev-${offset}`}
+                      onClick={() => selectDog(index)}
+                      className={`flex-shrink-0 cursor-pointer transition-all duration-300 hover:opacity-80 hover:scale-110 ${offset === -2 ? 'hidden sm:block' : ''}`}
+                    >
+                      <Dog className={scale} />
+                    </div>
+                  );
+                })}
                 
-                return (
-                  <div
-                    key={dog.name}
-                    onClick={() => selectDog(index)}
-                    className={`flex-shrink-0 snap-center rounded-xl p-3 transition-all duration-200 cursor-pointer ${
-                      isSelected
-                        ? 'bg-logo-green/30 ring-2 ring-logo-green scale-105 shadow-[0_0_20px_hsl(100_100%_60%/0.3)]'
-                        : isFeatured 
-                          ? 'bg-logo-green/10 hover:bg-logo-green/20' 
-                          : 'bg-background/50 hover:bg-logo-green/10'
-                    } ${index === 0 && !isDogSelected ? 'animate-pulse' : ''}`}
-                  >
-                    <div id={`dog-${index}`} className="flex justify-center">
-                      <Dog className="w-20 h-20 sm:w-24 sm:h-24" animated={isSelected} />
-                    </div>
-                    <div className="text-center mt-2">
-                      <div className="flex items-center justify-center gap-1">
-                        <span className={`font-mono text-xs font-bold ${isSelected ? 'text-logo-green' : 'text-foreground'}`}>
-                          {dog.name}
-                        </span>
-                        {isFeatured && <Star className="w-2.5 h-2.5 text-logo-green" />}
-                      </div>
-                    </div>
+                {/* CENTER HERO DOG */}
+                <div 
+                  id="current-dog-display"
+                  onClick={() => !isDogSelected && selectDog(currentDogIndex)}
+                  className={`flex-shrink-0 flex flex-col items-center transition-all duration-300 cursor-pointer ${
+                    isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+                  } ${isDogSelected ? 'scale-105' : 'hover:scale-105'}`}
+                >
+                  {/* Halo effect */}
+                  <div className="relative">
+                    <div className={`absolute inset-0 rounded-full blur-3xl transition-all ${isDogSelected ? 'bg-logo-green/40 scale-125' : 'bg-logo-green/20'}`} />
+                    <DogComponent 
+                      className="w-32 h-32 sm:w-44 sm:h-44 relative z-10" 
+                      animated 
+                    />
                   </div>
-                );
-              })}
+                  
+                  {/* Dog info */}
+                  <h2 className="mt-3 text-xl sm:text-2xl font-bold text-foreground font-mono text-center">
+                    {currentDog?.name === 'Techno' ? 'Techno Dog' : `${currentDog?.name}`}
+                  </h2>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground text-center font-mono px-2 max-w-[200px]">
+                    "{currentDbData?.personality || currentDog?.personality}"
+                  </p>
+                  
+                  {/* Status badge */}
+                  {isDogSelected && (
+                    <span className="mt-2 px-3 py-1 text-[9px] uppercase tracking-wider rounded-full bg-logo-green text-background font-mono">
+                      Selected • Share below!
+                    </span>
+                  )}
+                </div>
+                
+                {/* Next Dogs (smaller) */}
+                {[1, 2].map((offset) => {
+                  const index = (currentDogIndex + offset) % activeVariants.length;
+                  const dog = activeVariants[index];
+                  if (!dog) return null;
+                  const Dog = dog.Component;
+                  const scale = offset === 1 ? 'w-16 h-16 sm:w-20 sm:h-20 opacity-60' : 'w-10 h-10 sm:w-14 sm:h-14 opacity-30 hidden sm:block';
+                  
+                  return (
+                    <div
+                      key={`next-${offset}`}
+                      onClick={() => selectDog(index)}
+                      className={`flex-shrink-0 cursor-pointer transition-all duration-300 hover:opacity-80 hover:scale-110 ${offset === 2 ? 'hidden sm:block' : ''}`}
+                    >
+                      <Dog className={scale} />
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Navigation Arrows */}
+              <div className="absolute inset-y-0 left-2 flex items-center">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); const newIndex = (currentDogIndex - 1 + activeVariants.length) % activeVariants.length; selectDog(newIndex); }}
+                  className="w-8 h-8 rounded-full bg-background/80 border border-logo-green/30 flex items-center justify-center hover:bg-logo-green/20 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-logo-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+              </div>
+              <div className="absolute inset-y-0 right-2 flex items-center">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); nextDog(); }}
+                  className="w-8 h-8 rounded-full bg-background/80 border border-logo-green/30 flex items-center justify-center hover:bg-logo-green/20 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-logo-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+              
+              {/* Swipe hint */}
+              {!isDogSelected && (
+                <p className="text-center mt-3 text-[10px] text-muted-foreground font-mono animate-pulse">
+                  ← Swipe or tap arrows • Tap center to select →
+                </p>
+              )}
             </div>
             
             {/* Share Actions - appears when dog is selected */}
@@ -902,7 +844,35 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* 6. SHARE LEADERBOARD */}
+          {/* 4. SHOWCASE GRID - Tiny dogs, not downloadable, just for browsing */}
+          <div className="mb-8">
+            <div className="text-center mb-4">
+              <h3 className="font-mono text-sm font-bold text-foreground">The Full Pack</h3>
+              <p className="font-mono text-[10px] text-muted-foreground">Tap any doggy to share</p>
+            </div>
+            <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+              {activeVariants.map((dog: any, index: number) => {
+                const Dog = dog.Component;
+                const isActive = currentDogIndex === index;
+                
+                return (
+                  <div
+                    key={`grid-${dog.name}`}
+                    onClick={() => selectDog(index)}
+                    className={`aspect-square rounded-lg p-1.5 cursor-pointer transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-logo-green/30 ring-1 ring-logo-green scale-105' 
+                        : 'bg-background/30 hover:bg-logo-green/10 hover:scale-105'
+                    }`}
+                  >
+                    <Dog className="w-full h-full" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 5. SHARE LEADERBOARD */}
           <div className="mb-8">
             <DoggyShareLeaderboard />
           </div>
