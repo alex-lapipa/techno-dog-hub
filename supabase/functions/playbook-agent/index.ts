@@ -356,8 +356,8 @@ async function askPlaybook(question: string, supabase: any): Promise<any> {
     3. Recommended actions or next steps
     4. Any caveats or considerations
     
-    Be practical and specific to our techno culture documentation context.
-  `, "You are the playbook assistant for a techno culture documentation project. Provide helpful, actionable guidance based on our open-source operating system.");
+    Be practical and specific to our techno.dog culture documentation context.
+  `, "You are the playbook assistant for techno.dog, a techno culture documentation project. Provide helpful, actionable guidance based on our open-source operating system.");
 
   return {
     question,

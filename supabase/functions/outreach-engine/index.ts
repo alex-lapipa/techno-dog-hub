@@ -87,8 +87,8 @@ async function callGrok(prompt: string): Promise<string> {
 }
 
 // Core narrative and value propositions
-const TECHNO_DOC_NARRATIVE = {
-  mission: "Techno.doc is building the world's most comprehensive, community-driven archive of global techno culture — preserving the knowledge, stories, and connections that define this music and movement.",
+const TECHNO_DOG_NARRATIVE = {
+  mission: "Techno.dog is building the world's most comprehensive, community-driven archive of global techno culture — preserving the knowledge, stories, and connections that define this music and movement.",
   
   valueProps: {
     journalists: "Access to deep stories, verified data, artist archives, and a credible platform for techno journalism and cultural preservation.",
@@ -110,16 +110,16 @@ const TECHNO_DOC_NARRATIVE = {
     ]
   },
   
-  optOutFooter: "\n\n---\nIf you'd prefer not to receive emails from Techno.doc, reply with 'unsubscribe' and we'll remove you immediately."
+  optOutFooter: "\n\n---\nIf you'd prefer not to receive emails from Techno.dog, reply with 'unsubscribe' and we'll remove you immediately."
 };
 
 // Generate campaign strategy
 async function generateCampaignStrategy(objective: string, stakeholderType: string, theme: string, tone: string): Promise<any> {
-  const systemPrompt = `You are a world-class PR strategist for Techno.doc, a cultural preservation platform for global techno.
+  const systemPrompt = `You are a world-class PR strategist for Techno.dog, a cultural preservation platform for global techno.
   
-Tone principles: ${TECHNO_DOC_NARRATIVE.tone.principles.join(', ')}
+Tone principles: ${TECHNO_DOG_NARRATIVE.tone.principles.join(', ')}
 
-Value proposition for ${stakeholderType}: ${TECHNO_DOC_NARRATIVE.valueProps[stakeholderType as keyof typeof TECHNO_DOC_NARRATIVE.valueProps] || 'Cultural collaboration and mutual benefit'}`;
+Value proposition for ${stakeholderType}: ${TECHNO_DOG_NARRATIVE.valueProps[stakeholderType as keyof typeof TECHNO_DOG_NARRATIVE.valueProps] || 'Cultural collaboration and mutual benefit'}`;
 
   const prompt = `Create a campaign strategy for:
 - Objective: ${objective}
@@ -148,13 +148,13 @@ Return JSON with:
 
 // Compose personalized email
 async function composeEmail(contact: any, campaign: any, template?: any): Promise<any> {
-  const systemPrompt = `You are a world-class email writer for Techno.doc.
+  const systemPrompt = `You are a world-class email writer for Techno.dog.
 
-Mission: ${TECHNO_DOC_NARRATIVE.mission}
+Mission: ${TECHNO_DOG_NARRATIVE.mission}
 
-Tone principles: ${TECHNO_DOC_NARRATIVE.tone.principles.join(', ')}
+Tone principles: ${TECHNO_DOG_NARRATIVE.tone.principles.join(', ')}
 
-Value proposition: ${TECHNO_DOC_NARRATIVE.valueProps[contact.stakeholder_type as keyof typeof TECHNO_DOC_NARRATIVE.valueProps] || 'Collaboration opportunity'}
+Value proposition: ${TECHNO_DOG_NARRATIVE.valueProps[contact.stakeholder_type as keyof typeof TECHNO_DOG_NARRATIVE.valueProps] || 'Collaboration opportunity'}
 
 RULES:
 - Be concise (under 200 words for body)
@@ -200,7 +200,7 @@ Return JSON:
   "whyNow": "..."
 }
 
-Remember to include: ${TECHNO_DOC_NARRATIVE.optOutFooter}`;
+Remember to include: ${TECHNO_DOG_NARRATIVE.optOutFooter}`;
 
   const result = await callOpenAI(prompt, systemPrompt);
   return tryParseJSON(result);

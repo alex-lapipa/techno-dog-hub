@@ -53,7 +53,7 @@ export default function CollectivesAgentAdmin() {
       const { data, error } = await supabase
         .from('collectives')
         .select('*')
-        .order('techno_doc_fit_score', { ascending: false });
+        .order('techno_dog_fit_score', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -181,7 +181,7 @@ export default function CollectivesAgentAdmin() {
     northAmerica: collectives?.filter(c => c.region === 'North America').length || 0,
     keyPeopleCount: keyPeople?.length || 0,
     avgFitScore: collectives?.length 
-      ? Math.round(collectives.reduce((sum, c) => sum + (c.techno_doc_fit_score || 0), 0) / collectives.length) 
+      ? Math.round(collectives.reduce((sum, c) => sum + (c.techno_dog_fit_score || 0), 0) / collectives.length) 
       : 0,
   };
 
@@ -492,7 +492,7 @@ export default function CollectivesAgentAdmin() {
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(collective.status)}</TableCell>
-                        <TableCell>{getScoreBadge(collective.techno_doc_fit_score || 0)}</TableCell>
+                        <TableCell>{getScoreBadge(collective.techno_dog_fit_score || 0)}</TableCell>
                         <TableCell>{getScoreBadge(collective.verification_confidence || 0)}</TableCell>
                         <TableCell>
                           <div className="flex gap-1">

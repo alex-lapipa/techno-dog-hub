@@ -91,7 +91,7 @@ export default function ArtistLabelAgentAdmin() {
   const [selectedContact, setSelectedContact] = useState<string>('');
   const [collaborationType, setCollaborationType] = useState('interview');
   const [outreachTone, setOutreachTone] = useState('scene-native');
-  const [projectContext, setProjectContext] = useState('techno.doc - underground techno knowledge and archive platform');
+  const [projectContext, setProjectContext] = useState('techno.dog - underground techno knowledge and archive platform');
   const [outreachGoal, setOutreachGoal] = useState('');
   const [generatedOutreach, setGeneratedOutreach] = useState<any>(null);
 

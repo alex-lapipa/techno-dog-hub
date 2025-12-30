@@ -1990,7 +1990,7 @@ export type Database = {
           region: string | null
           sources_json: Json | null
           status: string | null
-          techno_doc_fit_score: number | null
+          techno_dog_fit_score: number | null
           updated_at: string | null
           verification_confidence: number | null
           website_url: string | null
@@ -2027,7 +2027,7 @@ export type Database = {
           region?: string | null
           sources_json?: Json | null
           status?: string | null
-          techno_doc_fit_score?: number | null
+          techno_dog_fit_score?: number | null
           updated_at?: string | null
           verification_confidence?: number | null
           website_url?: string | null
@@ -2064,7 +2064,7 @@ export type Database = {
           region?: string | null
           sources_json?: Json | null
           status?: string | null
-          techno_doc_fit_score?: number | null
+          techno_dog_fit_score?: number | null
           updated_at?: string | null
           verification_confidence?: number | null
           website_url?: string | null
@@ -3735,7 +3735,7 @@ export type Database = {
           id: string
           model_name: string
           pros_cons: Json | null
-          recommended_for_techno_doc: boolean | null
+          recommended_for_techno_dog: boolean | null
           recommended_variant_notes: string | null
           risks: string | null
           sources_json: Json | null
@@ -3747,7 +3747,7 @@ export type Database = {
           id?: string
           model_name: string
           pros_cons?: Json | null
-          recommended_for_techno_doc?: boolean | null
+          recommended_for_techno_dog?: boolean | null
           recommended_variant_notes?: string | null
           risks?: string | null
           sources_json?: Json | null
@@ -3759,7 +3759,7 @@ export type Database = {
           id?: string
           model_name?: string
           pros_cons?: Json | null
-          recommended_for_techno_doc?: boolean | null
+          recommended_for_techno_dog?: boolean | null
           recommended_variant_notes?: string | null
           risks?: string | null
           sources_json?: Json | null
@@ -5406,7 +5406,7 @@ export type Database = {
           relationship_status: string | null
           sources_json: Json | null
           stakeholder_type: string | null
-          techno_doc_fit_score: number | null
+          techno_dog_fit_score: number | null
           twitter_handle: string | null
           updated_at: string
           verification_confidence: number | null
@@ -5434,7 +5434,7 @@ export type Database = {
           relationship_status?: string | null
           sources_json?: Json | null
           stakeholder_type?: string | null
-          techno_doc_fit_score?: number | null
+          techno_dog_fit_score?: number | null
           twitter_handle?: string | null
           updated_at?: string
           verification_confidence?: number | null
@@ -5462,7 +5462,7 @@ export type Database = {
           relationship_status?: string | null
           sources_json?: Json | null
           stakeholder_type?: string | null
-          techno_doc_fit_score?: number | null
+          techno_dog_fit_score?: number | null
           twitter_handle?: string | null
           updated_at?: string
           verification_confidence?: number | null

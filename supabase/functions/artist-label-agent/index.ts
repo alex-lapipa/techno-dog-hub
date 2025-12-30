@@ -151,7 +151,7 @@ Evaluate:
 2. Preferred collaboration types
 3. What they value in partners
 4. What to avoid
-5. Best approach for techno.doc (a knowledge/archive/documentary platform)
+5. Best approach for techno.dog (a knowledge/archive/documentary platform)
 
 Return JSON:
 {
@@ -254,7 +254,7 @@ async function generateOutreach(context: {
   projectContext: string;
   goal: string;
 }) {
-  const prompt = `You are an expert PR professional for techno.doc, an underground techno knowledge platform.
+  const prompt = `You are an expert PR professional for techno.dog, an underground techno knowledge platform.
 
 Generate outreach content for:
 Target: ${JSON.stringify(context.target, null, 2)}
@@ -685,7 +685,7 @@ Return JSON array:
             targetType,
             collaborationType: collaborationType || 'interview',
             tone: tone || 'scene-native',
-            projectContext: projectContext || 'techno.doc - underground techno knowledge platform',
+            projectContext: projectContext || 'techno.dog - underground techno knowledge platform',
             goal: goal || 'collaboration'
           });
 
