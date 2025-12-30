@@ -1601,13 +1601,17 @@ export const AquiaRealRaverDog = ({ className, animated = false }: DogVariantPro
   </svg>
 );
 
-// Eulogio Dog - Asturian legend with "E" collar and crate of records
+// Eulogio Dog - Asturian legend with beard, bald head with 3 hairs, "E" collar
 export const EulogioDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
       {/* Floppy ears - wise old selector */}
       <path d="M16 34 Q8 30 10 20 Q16 22 20 28" />
       <path d="M48 34 Q56 30 54 20 Q48 22 44 28" />
+      {/* Three tiny hairs on bald head - iconic */}
+      <path d="M30 22 Q30 18 29 14" strokeWidth="1.5" />
+      <path d="M32 22 Q32 16 32 12" strokeWidth="1.5" />
+      <path d="M34 22 Q34 18 35 14" strokeWidth="1.5" />
       {/* Head - round and friendly */}
       <ellipse cx="32" cy="36" rx="16" ry="14" />
       {/* Eyes - knowing, experienced */}
@@ -1615,22 +1619,25 @@ export const EulogioDog = ({ className, animated = false }: DogVariantProps) => 
       <circle cx="38" cy="32" r="2" />
       <circle cx="26.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
       <circle cx="38.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
-      {/* Nose */}
-      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
-      {/* Slight knowing smile */}
-      <path d="M27 46 Q32 50 37 46" />
-      {/* "E" collar tag - iconic */}
-      <rect x="28" y="52" width="8" height="6" rx="1" opacity="0.3" />
-      <text x="30.5" y="57" fontSize="5" fill="hsl(var(--logo-green))" fontWeight="bold">E</text>
-      {/* Crate of vinyl records */}
-      <rect x="4" y="50" width="10" height="8" opacity="0.4" />
-      <line x1="6" y1="50" x2="6" y2="58" opacity="0.3" />
-      <line x1="9" y1="50" x2="9" y2="58" opacity="0.3" />
-      <line x1="12" y1="50" x2="12" y2="58" opacity="0.3" />
       {/* Glasses - scholarly crate digger */}
       <circle cx="26" cy="32" r="4" opacity="0.6" />
       <circle cx="38" cy="32" r="4" opacity="0.6" />
       <line x1="30" y1="32" x2="34" y2="32" opacity="0.6" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Slight knowing smile */}
+      <path d="M27 46 Q32 50 37 46" />
+      {/* Beard - full and distinguished */}
+      <path d="M22 46 Q20 52 24 56 Q28 58 32 58 Q36 58 40 56 Q44 52 42 46" opacity="0.5" />
+      <path d="M26 50 Q28 54 32 55 Q36 54 38 50" opacity="0.3" />
+      {/* "E" collar tag - iconic */}
+      <rect x="28" y="58" width="8" height="5" rx="1" opacity="0.3" />
+      <text x="30.5" y="62" fontSize="4" fill="hsl(var(--logo-green))" fontWeight="bold">E</text>
+      {/* Crate of vinyl records */}
+      <rect x="4" y="52" width="10" height="8" opacity="0.4" />
+      <line x1="6" y1="52" x2="6" y2="60" opacity="0.3" />
+      <line x1="9" y1="52" x2="9" y2="60" opacity="0.3" />
+      <line x1="12" y1="52" x2="12" y2="60" opacity="0.3" />
       {/* Small sidra bottle (Asturian cider) */}
       <path d="M52 54 L54 54 L54 60 Q53 62 52 60 L52 54" opacity="0.5" />
       <ellipse cx="53" cy="53" rx="1.5" ry="1" opacity="0.3" />
