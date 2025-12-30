@@ -1907,6 +1907,57 @@ export const DollyDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Antain Dog - Irish-Asturian founder with freckles, round ears, and curly hair
+export const AntainDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Round floppy ears - distinctly round */}
+      <circle cx="12" cy="24" r="8" />
+      <circle cx="52" cy="24" r="8" />
+      {/* Curly hair on top - wild Irish curls */}
+      <path d="M22 14 Q20 10 24 8 Q28 6 26 12" />
+      <path d="M26 12 Q24 8 28 6 Q32 4 30 10" />
+      <path d="M30 10 Q28 6 32 4 Q36 2 34 8" />
+      <path d="M34 8 Q32 4 36 6 Q40 8 38 12" />
+      <path d="M38 12 Q36 8 40 10 Q44 12 42 16" />
+      {/* Extra curl wisps */}
+      <path d="M20 18 Q18 14 22 12" strokeWidth="1.5" opacity="0.7" />
+      <path d="M44 18 Q46 14 42 12" strokeWidth="1.5" opacity="0.7" />
+      {/* Head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Friendly eyes */}
+      <circle cx="25" cy="32" r="4" />
+      <circle cx="25" cy="31" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="24" cy="30" r="0.8" fill="hsl(var(--background))" />
+      <circle cx="39" cy="32" r="4" />
+      <circle cx="39" cy="31" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="30" r="0.8" fill="hsl(var(--background))" />
+      {/* Raised happy eyebrows */}
+      <path d="M21 26 Q25 24 28 26" strokeWidth="1.5" />
+      <path d="M36 26 Q39 24 43 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Warm smile */}
+      <path d="M25 46 Q32 52 39 46" strokeWidth="2" />
+      {/* Irish freckles - scattered across face */}
+      <circle cx="18" cy="34" r="0.8" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="20" cy="36" r="0.6" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="17" cy="38" r="0.7" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="21" cy="40" r="0.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="19" cy="42" r="0.6" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="46" cy="34" r="0.8" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="44" cy="36" r="0.6" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="47" cy="38" r="0.7" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="43" cy="40" r="0.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="45" cy="42" r="0.6" fill="hsl(var(--logo-green))" opacity="0.5" />
+      {/* Nose bridge freckles */}
+      <circle cx="29" cy="38" r="0.5" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <circle cx="35" cy="38" r="0.5" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <circle cx="32" cy="37" r="0.4" fill="hsl(var(--logo-green))" opacity="0.3" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1999,5 +2050,6 @@ export const dogVariants = [
   { name: 'Paloma', Component: PalomaDog, personality: 'Alien soul with a warm heart', status: 'dreaming' },
   { name: 'Charlie', Component: CharlieDog, personality: 'Mohawk philosopher with specs', status: 'grinning' },
   { name: 'Dolly', Component: DollyDog, personality: 'Bookish nature lover with long locks', status: 'studying' },
+  { name: 'Antain', Component: AntainDog, personality: 'Irish-Asturian artist with curly soul', status: 'creating' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
 ];
