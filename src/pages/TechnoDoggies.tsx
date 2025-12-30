@@ -173,6 +173,7 @@ const TechnoDoggies = () => {
       <Helmet>
         <title>Techno Doggies - Create & Share Your Pack | techno.dog</title>
         <meta name="description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bork bork!" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
@@ -193,50 +194,95 @@ const TechnoDoggies = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Minimal Mobile Header */}
+        <header className="border-b border-border/30 bg-background/90 backdrop-blur-md sticky top-0 z-50">
+          <div className="px-4 py-3 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2 group">
-              <HexagonLogo className="w-8 h-8 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
-              <span className="font-mono text-sm tracking-[0.2em] text-foreground group-hover:animate-glitch">
+              <HexagonLogo className="w-7 h-7 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
+              <span className="font-mono text-xs tracking-[0.15em] text-foreground">
                 techno.dog
               </span>
             </Link>
             <Link to="/">
-              <Button variant="ghost" size="sm" className="font-mono text-xs">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
+              <Button variant="ghost" size="sm" className="font-mono text-[10px] h-8 px-2">
+                <ArrowLeft className="w-3 h-3 mr-1" />
+                Home
               </Button>
             </Link>
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-12">
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-mono">
-              Techno Doggies
-            </h1>
-            <p className="text-muted-foreground font-mono text-sm max-w-md mx-auto">
-              Create and share your own pack of techno doggies. 
-              Spread the borks across the internet!
-            </p>
+        <main className="px-4 py-6 max-w-lg mx-auto">
+          {/* Hero - Current Dog Display (Most Engaging First) */}
+          <div className="mb-6">
+            <div 
+              id="current-dog-display"
+              className={`flex flex-col items-center transition-all duration-150 ${
+                isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+              }`}
+            >
+              <DogComponent className="w-28 h-28 sm:w-36 sm:h-36" animated />
+              <h1 className="mt-3 text-2xl sm:text-3xl font-bold text-foreground font-mono">
+                {currentDog?.name} Dog
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground text-center mt-1 font-mono px-4">
+                {currentDbData?.personality || currentDog?.personality}
+              </p>
+              <span className="mt-2 px-3 py-1 text-[10px] uppercase tracking-wider rounded-full border border-logo-green/30 text-logo-green font-mono">
+                {currentDbData?.status || currentDog?.status}
+              </span>
+              {currentDbData?.is_featured && (
+                <Badge variant="secondary" className="mt-2 text-[10px]">
+                  <Star className="w-3 h-3 mr-1" /> Featured
+                </Badge>
+              )}
+            </div>
+
+            {/* Quick Controls */}
+            <div className="flex gap-2 justify-center mt-4">
+              <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs h-9 px-4">
+                Next
+              </Button>
+              <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs h-9 px-4">
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Random
+              </Button>
+            </div>
           </div>
 
-          {/* Custom Doggy Creator */}
-          <div className="max-w-lg mx-auto mb-12">
-            <CustomDoggyCreator />
-          </div>
-
-          {/* Featured Dogs */}
-          {featuredDogs.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Star className="w-4 h-4 text-logo-green" />
-                <span className="font-mono text-xs uppercase tracking-wider text-logo-green">Featured Doggies</span>
+          {/* Share Section (High Priority for Virality) */}
+          <Card className="mb-6 border-logo-green/30 bg-card/50">
+            <CardContent className="p-4">
+              <h2 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-3 text-center">
+                Share This Doggy
+              </h2>
+              
+              <div className="flex justify-center mb-3" onClick={() => handleSocialShare("social")}>
+                <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
               </div>
-              <div className="flex justify-center gap-4 flex-wrap">
-                {featuredDogs.map((dog: any, index: number) => {
+
+              <div className="flex gap-2 justify-center">
+                <Button variant="outline" size="sm" onClick={shareViaEmail} className="font-mono text-[10px] h-8">
+                  <Mail className="w-3 h-3 mr-1" />
+                  Email
+                </Button>
+                <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8">
+                  <Download className="w-3 h-3 mr-1" />
+                  Download
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Featured Dogs (Quick Access) */}
+          {featuredDogs.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Star className="w-3 h-3 text-logo-green" />
+                <span className="font-mono text-[10px] uppercase tracking-wider text-logo-green">Featured</span>
+              </div>
+              <div className="flex justify-center gap-3 flex-wrap">
+                {featuredDogs.map((dog: any) => {
                   const Dog = dog.Component;
                   return (
                     <button
@@ -245,10 +291,10 @@ const TechnoDoggies = () => {
                         const fullIndex = activeVariants.findIndex(v => v.name === dog.name);
                         setCurrentDogIndex(fullIndex >= 0 ? fullIndex : 0);
                       }}
-                      className="p-3 rounded-lg border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 transition-all"
+                      className="p-2 rounded-lg border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 transition-all active:scale-95"
                     >
-                      <Dog className="w-10 h-10 mx-auto" />
-                      <p className="text-[10px] font-mono text-logo-green mt-1">{dog.name}</p>
+                      <Dog className="w-8 h-8 mx-auto" />
+                      <p className="text-[9px] font-mono text-logo-green mt-1">{dog.name}</p>
                     </button>
                   );
                 })}
@@ -256,78 +302,21 @@ const TechnoDoggies = () => {
             </div>
           )}
 
-          {/* Main Dog Display */}
-          <Card className="max-w-md mx-auto mb-8 border-logo-green/30 bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <div 
-                id="current-dog-display"
-                className={`flex flex-col items-center transition-all duration-150 ${
-                  isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
-                }`}
-              >
-                <DogComponent className="w-32 h-32" animated />
-                <h2 className="mt-4 text-2xl font-bold text-foreground font-mono">
-                  {currentDog?.name} Dog
-                </h2>
-                <p className="text-sm text-muted-foreground text-center mt-2 font-mono">
-                  {currentDbData?.personality || currentDog?.personality}
-                </p>
-                <span className="mt-3 px-3 py-1 text-xs uppercase tracking-wider rounded-full border border-logo-green/30 text-logo-green font-mono">
-                  {currentDbData?.status || currentDog?.status}
-                </span>
-                {currentDbData?.is_featured && (
-                  <Badge variant="secondary" className="mt-2 text-[10px]">
-                    <Star className="w-3 h-3 mr-1" /> Featured
-                  </Badge>
-                )}
-              </div>
-
-              {/* Controls */}
-              <div className="flex gap-2 justify-center mt-6">
-                <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs">
-                  Next
-                </Button>
-                <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs">
-                  <RefreshCw className="w-3 h-3 mr-1" />
-                  Random
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Share Section */}
-          <Card className="max-w-md mx-auto mb-8 border-border/50">
-            <CardContent className="p-6">
-              <h3 className="font-mono text-sm uppercase tracking-wider text-muted-foreground mb-4 text-center">
-                Share This Doggy
-              </h3>
-              
-              <div className="flex justify-center mb-4" onClick={() => handleSocialShare("social")}>
-                <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
-              </div>
-
-              <div className="flex gap-2 justify-center">
-                <Button variant="outline" size="sm" onClick={shareViaEmail} className="font-mono text-xs">
-                  <Mail className="w-3 h-3 mr-1" />
-                  Email
-                </Button>
-                <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-xs">
-                  <Download className="w-3 h-3 mr-1" />
-                  Download
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Custom Doggy Creator */}
+          <div className="mb-6">
+            <CustomDoggyCreator />
+          </div>
 
           {/* Full Pack Grid */}
-          <div className="max-w-4xl mx-auto">
-            <h3 className="font-mono text-lg text-center mb-6 text-foreground">
+          <div className="mb-6">
+            <h2 className="font-mono text-sm text-center mb-4 text-foreground">
               Meet the Full Pack
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3">
               {activeVariants.map((dog: any, index: number) => {
                 const Dog = dog.Component;
                 const isSelected = selectedDogs.includes(index);
+                const isCurrent = index === currentDogIndex;
                 const isFeatured = dog.dbData?.is_featured;
                 return (
                   <button
@@ -335,25 +324,34 @@ const TechnoDoggies = () => {
                     onClick={() => {
                       setCurrentDogIndex(index);
                       toggleDogSelection(index);
+                      // Scroll to top on mobile to show selected dog
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`p-4 rounded-lg border transition-all hover:scale-105 ${
-                      isSelected 
-                        ? 'border-logo-green bg-logo-green/10' 
-                        : isFeatured 
-                          ? 'border-logo-green/50 hover:border-logo-green'
-                          : 'border-border/50 hover:border-logo-green/50'
+                    className={`p-2 sm:p-3 rounded-lg border transition-all active:scale-95 ${
+                      isCurrent
+                        ? 'border-logo-green bg-logo-green/20 ring-2 ring-logo-green/50'
+                        : isSelected 
+                          ? 'border-logo-green bg-logo-green/10' 
+                          : isFeatured 
+                            ? 'border-logo-green/50 hover:border-logo-green'
+                            : 'border-border/50 hover:border-logo-green/50'
                     }`}
                   >
-                    <Dog className="w-12 h-12 mx-auto" />
-                    <p className="text-xs font-mono text-muted-foreground mt-2 text-center">
+                    <Dog className="w-8 h-8 sm:w-10 sm:h-10 mx-auto" />
+                    <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground mt-1 text-center truncate">
                       {dog.name}
                     </p>
-                    {isFeatured && <Star className="w-3 h-3 mx-auto mt-1 text-logo-green" />}
+                    {isFeatured && <Star className="w-2 h-2 sm:w-3 sm:h-3 mx-auto mt-0.5 text-logo-green" />}
                   </button>
                 );
               })}
             </div>
           </div>
+
+          {/* Info Text */}
+          <p className="text-center text-muted-foreground font-mono text-[10px] mb-6">
+            Tap any doggy to select • Share your favorites
+          </p>
 
         </main>
         
