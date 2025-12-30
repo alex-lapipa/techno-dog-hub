@@ -176,7 +176,7 @@ const PlaybookAgentAdmin = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `techno-doc-playbook-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `techno-dog-playbook-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     toast.success('Playbook exported');
   };
@@ -539,7 +539,7 @@ const PlaybookAgentAdmin = () => {
                         <div key={g.id} className="border border-border rounded-lg p-4">
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium">{g.model_name}</h4>
-                            {g.recommended_for_techno_doc && (
+                            {g.recommended_for_techno_dog && (
                               <Badge className="bg-green-500/20 text-green-400">Recommended</Badge>
                             )}
                           </div>

@@ -62,7 +62,7 @@ const StatusDot = ({ status }: { status: 'ok' | 'warning' | 'error' }) => {
   );
 };
 
-export default function TechnoDocAuditAgent() {
+export default function TechnoDogAuditAgent() {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedIssues, setExpandedIssues] = useState(new Set<string>());
   const [selectedProposals, setSelectedProposals] = useState(new Set<string>());
@@ -171,7 +171,7 @@ export default function TechnoDocAuditAgent() {
               </div>
               <div>
                 <h1 className="text-lg font-bold tracking-[0.3em] text-foreground uppercase">
-                  TECHNODOC
+                  TECHNODOG
                 </h1>
                 <p className="text-[10px] tracking-[0.2em] text-[hsl(var(--logo-green))] uppercase">
                   DATA INTEGRITY AGENT v1.0
@@ -821,7 +821,7 @@ export default function TechnoDocAuditAgent() {
       {/* Footer */}
       <footer className="border-t border-[hsl(var(--crimson))]/20 bg-background/80 mt-16">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-[9px] text-foreground/30 tracking-wider uppercase">
-          <span>TECHNODOC AUDIT AGENT • NON-DESTRUCTIVE BY DESIGN</span>
+          <span>TECHNODOG AUDIT AGENT • NON-DESTRUCTIVE BY DESIGN</span>
           <span>LAST AUDIT: {auditData?.timestamp ? new Date(auditData.timestamp).toLocaleString() : '—'}</span>
         </div>
       </footer>

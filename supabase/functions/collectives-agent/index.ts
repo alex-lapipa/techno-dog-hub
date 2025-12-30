@@ -17,7 +17,7 @@ interface CollectiveRecord {
   philosophy_summary?: string;
   activity_evidence?: string;
   status?: string;
-  techno_doc_fit_score?: number;
+  techno_dog_fit_score?: number;
   credibility_score?: number;
   activity_score?: number;
   verification_confidence?: number;
@@ -164,7 +164,7 @@ function calculateScores(data: any): { activityScore: number; credibilityScore: 
   if (data.establishedHistory) credibilityScore += 15;
   if (data.pressFeatures) credibilityScore += 15;
 
-  // Fit score for techno.doc
+  // Fit score for techno.dog
   if (data.openSourceFocus) fitScore += 20;
   if (data.communityDriven) fitScore += 15;
   if (data.educationalContent) fitScore += 15;
@@ -316,7 +316,7 @@ Deno.serve(async (req) => {
                 ...collective,
                 activity_score: scores.activityScore,
                 credibility_score: scores.credibilityScore,
-                techno_doc_fit_score: scores.fitScore,
+                techno_dog_fit_score: scores.fitScore,
                 verification_confidence: scores.confidence,
               });
 
@@ -422,7 +422,7 @@ Deno.serve(async (req) => {
 
           updateData.activity_score = scores.activityScore;
           updateData.credibility_score = scores.credibilityScore;
-          updateData.techno_doc_fit_score = scores.fitScore;
+          updateData.techno_dog_fit_score = scores.fitScore;
           updateData.verification_confidence = scores.confidence;
 
           await supabase
@@ -562,7 +562,7 @@ Deno.serve(async (req) => {
         `;
 
         const outreachResult = await callOpenAI(outreachPrompt,
-          'You are a professional partnership development specialist for techno.doc, a cultural archive and documentation platform. Write compelling, respectful outreach that resonates with underground electronic music communities.'
+          'You are a professional partnership development specialist for techno.dog, a cultural archive and documentation platform. Write compelling, respectful outreach that resonates with underground electronic music communities.'
         );
 
         let outreach: any = {};
@@ -650,7 +650,7 @@ Deno.serve(async (req) => {
 
         if (filters.region) query = query.eq('region', filters.region);
         if (filters.status) query = query.eq('status', filters.status);
-        if (filters.minFitScore) query = query.gte('techno_doc_fit_score', filters.minFitScore);
+        if (filters.minFitScore) query = query.gte('techno_dog_fit_score', filters.minFitScore);
 
         const { data: collectives } = await query;
 
