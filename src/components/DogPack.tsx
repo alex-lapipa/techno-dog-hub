@@ -951,6 +951,38 @@ export const BartenderDog = ({ className, animated = false }: DogVariantProps) =
   </svg>
 );
 
+// Sven Marquardt Dog - legendary Berghain doorman with tattoos
+export const SvenMarquardtDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Ears */}
+      <path d="M14 30 Q10 20 16 14 Q22 18 22 26" />
+      <path d="M50 30 Q54 20 48 14 Q42 18 42 26" />
+      {/* Head */}
+      <ellipse cx="32" cy="40" rx="18" ry="16" />
+      {/* Intense piercing eyes */}
+      <circle cx="25" cy="36" r="3" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="36" r="3" fill="hsl(var(--logo-green))" />
+      <circle cx="25" cy="36" r="1.5" fill="hsl(var(--background))" />
+      <circle cx="39" cy="36" r="1.5" fill="hsl(var(--background))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Stern mouth */}
+      <line x1="28" y1="50" x2="36" y2="50" strokeWidth="2" />
+      {/* Facial tattoos - tribal lines */}
+      <path d="M18 34 L22 32" strokeWidth="1.5" opacity="0.7" />
+      <path d="M18 38 L21 37" strokeWidth="1.5" opacity="0.7" />
+      <path d="M46 34 L42 32" strokeWidth="1.5" opacity="0.7" />
+      <path d="M46 38 L43 37" strokeWidth="1.5" opacity="0.7" />
+      {/* Eyebrow piercings */}
+      <circle cx="22" cy="32" r="1" fill="hsl(var(--logo-green))" />
+      <circle cx="42" cy="32" r="1" fill="hsl(var(--logo-green))" />
+      {/* Lip piercing */}
+      <circle cx="32" cy="52" r="1" fill="hsl(var(--logo-green))" />
+    </g>
+  </svg>
+);
+
 // Producer Dog - laptop warrior
 export const ProducerDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1549,4 +1581,5 @@ export const dogVariants = [
   { name: 'Sub Club', Component: SubClubDog, personality: 'Melbourne underground', status: 'australian' },
   { name: 'Security', Component: SecurityDog, personality: 'Eyes on the floor always', status: 'watching' },
   { name: 'Bartender', Component: BartenderDog, personality: 'Shaken not stirred', status: 'mixing' },
+  { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'You shall not pass', status: 'judging' },
 ];
