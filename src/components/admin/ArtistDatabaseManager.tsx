@@ -23,7 +23,10 @@ import {
   Scale,
   GitMerge,
   GitFork,
-  Sparkles
+  Sparkles,
+  Link,
+  Unlink,
+  RefreshCw
 } from 'lucide-react';
 
 interface AgentStatus {
@@ -94,6 +97,16 @@ interface ArchitectureAudit {
   current_issues: string[];
 }
 
+interface LinkingStats {
+  total_canonical: number;
+  total_rag: number;
+  linked_count: number;
+  canonical_only: number;
+  rag_only: number;
+  link_percentage: number;
+  missing_photos: number;
+}
+
 export const ArtistDatabaseManager = () => {
   const [agents, setAgents] = useState<AgentStatus[]>([]);
   const [stats, setStats] = useState<PipelineStats | null>(null);
@@ -101,6 +114,8 @@ export const ArtistDatabaseManager = () => {
   const [runningAgents, setRunningAgents] = useState<Set<string>>(new Set());
   const [architectureAudit, setArchitectureAudit] = useState<ArchitectureAudit | null>(null);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [linkingStats, setLinkingStats] = useState<LinkingStats | null>(null);
+  const [photoLoading, setPhotoLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -124,7 +139,7 @@ export const ArtistDatabaseManager = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    await Promise.all([fetchAgents(), fetchStats()]);
+    await Promise.all([fetchAgents(), fetchStats(), fetchLinkingStats()]);
     setLoading(false);
   };
 
@@ -163,6 +178,47 @@ export const ArtistDatabaseManager = () => {
       pendingEnrichment: queue.count || 0,
       recentErrors: agents.filter(a => a.status === 'error').length,
     });
+  };
+
+  const fetchLinkingStats = async () => {
+    const { data, error } = await supabase.rpc('get_source_map_stats');
+    if (!error && data && data.length > 0) {
+      const mapStats = data[0];
+      // Get missing photos count
+      const { count: missingPhotos } = await supabase
+        .from('canonical_artists')
+        .select('*', { count: 'exact', head: true })
+        .or('photo_url.is.null,photo_url.eq.');
+      
+      setLinkingStats({
+        ...mapStats,
+        missing_photos: missingPhotos || 0
+      });
+    }
+  };
+
+  const runPhotoPipeline = async (limit: number = 5) => {
+    setPhotoLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('artist-photo-pipeline', {
+        body: { action: 'batch_process', limit }
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Photo pipeline started', {
+        description: `Processing ${limit} artists for photos`
+      });
+      
+      // Refresh stats after a short delay
+      setTimeout(fetchLinkingStats, 3000);
+    } catch (err) {
+      toast.error('Photo pipeline failed', {
+        description: err instanceof Error ? err.message : 'Unknown error'
+      });
+    } finally {
+      setPhotoLoading(false);
+    }
   };
 
   const runAgent = async (agent: AgentStatus) => {
@@ -308,6 +364,10 @@ export const ArtistDatabaseManager = () => {
         <TabsTrigger value="agents" className="data-[state=active]:bg-logo-green/20">
           <Bot className="w-4 h-4 mr-2" />
           Agents
+        </TabsTrigger>
+        <TabsTrigger value="remediation" className="data-[state=active]:bg-logo-green/20">
+          <Link className="w-4 h-4 mr-2" />
+          Remediation
         </TabsTrigger>
         <TabsTrigger value="architecture" className="data-[state=active]:bg-logo-green/20">
           <Scale className="w-4 h-4 mr-2" />
@@ -491,6 +551,166 @@ export const ArtistDatabaseManager = () => {
             })}
           </div>
         </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="remediation" className="space-y-6">
+        {/* Linking Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <Card className="border-border">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-muted-foreground" />
+                <span className="text-2xl font-mono">{linkingStats?.total_canonical || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Canonical</p>
+            </CardContent>
+          </Card>
+          <Card className="border-border">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <span className="text-2xl font-mono">{linkingStats?.total_rag || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">RAG</p>
+            </CardContent>
+          </Card>
+          <Card className="border-logo-green/50">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Link className="w-4 h-4 text-logo-green" />
+                <span className="text-2xl font-mono text-logo-green">{linkingStats?.linked_count || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Linked</p>
+            </CardContent>
+          </Card>
+          <Card className="border-border">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Unlink className="w-4 h-4 text-orange-400" />
+                <span className="text-2xl font-mono">{linkingStats?.canonical_only || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Canonical Only</p>
+            </CardContent>
+          </Card>
+          <Card className="border-border">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Unlink className="w-4 h-4 text-blue-400" />
+                <span className="text-2xl font-mono">{linkingStats?.rag_only || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">RAG Only</p>
+            </CardContent>
+          </Card>
+          <Card className="border-crimson/50">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2">
+                <Image className="w-4 h-4 text-crimson" />
+                <span className="text-2xl font-mono text-crimson">{linkingStats?.missing_photos || 0}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Missing Photos</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Link Progress */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-mono text-sm uppercase tracking-wider flex items-center gap-2">
+              <Link className="w-4 h-4 text-logo-green" />
+              Database Linking Status
+            </CardTitle>
+            <CardDescription>
+              {linkingStats?.link_percentage?.toFixed(1) || 0}% of RAG artists linked to canonical records
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Progress 
+              value={linkingStats?.link_percentage || 0} 
+              className="h-3"
+            />
+            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+              <span>{linkingStats?.linked_count || 0} linked</span>
+              <span>{linkingStats?.rag_only || 0} orphaned</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Photo Pipeline Action */}
+        <Card className="border-border">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="font-mono text-sm uppercase tracking-wider flex items-center gap-2">
+                  <Image className="w-4 h-4 text-logo-green" />
+                  Photo Pipeline
+                </CardTitle>
+                <CardDescription>
+                  Multi-model verification: GPT-4o + Claude + Gemini consensus
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => fetchLinkingStats()}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+                <Button 
+                  onClick={() => runPhotoPipeline(5)}
+                  disabled={photoLoading}
+                  className="gap-2"
+                >
+                  {photoLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Image className="w-4 h-4" />
+                      Run (5 artists)
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  variant="secondary"
+                  onClick={() => runPhotoPipeline(20)}
+                  disabled={photoLoading}
+                >
+                  Run (20)
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-xs font-mono uppercase text-muted-foreground mb-2">Photo Coverage</h4>
+                <div className="text-3xl font-mono">
+                  {linkingStats?.total_canonical ? 
+                    (((linkingStats.total_canonical - (linkingStats.missing_photos || 0)) / linkingStats.total_canonical) * 100).toFixed(1) 
+                    : 0}%
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {(linkingStats?.total_canonical || 0) - (linkingStats?.missing_photos || 0)} of {linkingStats?.total_canonical || 0} artists have photos
+                </p>
+              </div>
+              <div>
+                <h4 className="text-xs font-mono uppercase text-muted-foreground mb-2">Verification Models</h4>
+                <div className="flex flex-wrap gap-1">
+                  <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">GPT-4o</Badge>
+                  <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">Claude</Badge>
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">Gemini Flash</Badge>
+                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">Gemini Pro</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Requires 2+ models to agree with 75%+ confidence
+                </p>
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </TabsContent>
 

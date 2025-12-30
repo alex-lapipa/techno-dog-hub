@@ -344,13 +344,6 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
-          {
-            foreignKeyName: "artist_aliases_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
         ]
       }
       artist_assets: {
@@ -422,13 +415,6 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
-          {
-            foreignKeyName: "artist_assets_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
         ]
       }
       artist_claims: {
@@ -489,13 +475,6 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_claims_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
           {
@@ -561,13 +540,6 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
-          {
-            foreignKeyName: "artist_documents_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
         ]
       }
       artist_enrichment_queue: {
@@ -613,13 +585,6 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_enrichment_queue_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -672,13 +637,6 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
-          {
-            foreignKeyName: "artist_enrichment_runs_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
         ]
       }
       artist_gear: {
@@ -718,13 +676,6 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_gear_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -772,24 +723,10 @@ export type Database = {
             referencedColumns: ["artist_id"]
           },
           {
-            foreignKeyName: "artist_merge_candidates_artist_a_id_fkey"
-            columns: ["artist_a_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
-          {
             foreignKeyName: "artist_merge_candidates_artist_b_id_fkey"
             columns: ["artist_b_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_merge_candidates_artist_b_id_fkey"
-            columns: ["artist_b_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -917,13 +854,6 @@ export type Database = {
             referencedRelation: "canonical_artists"
             referencedColumns: ["artist_id"]
           },
-          {
-            foreignKeyName: "artist_profiles_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
         ]
       }
       artist_raw_documents: {
@@ -969,13 +899,6 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_raw_documents_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
@@ -1032,24 +955,10 @@ export type Database = {
             referencedColumns: ["artist_id"]
           },
           {
-            foreignKeyName: "artist_source_map_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
-            referencedColumns: ["artist_id"]
-          },
-          {
             foreignKeyName: "artist_source_map_merged_into_artist_id_fkey"
             columns: ["merged_into_artist_id"]
             isOneToOne: false
             referencedRelation: "canonical_artists"
-            referencedColumns: ["artist_id"]
-          },
-          {
-            foreignKeyName: "artist_source_map_merged_into_artist_id_fkey"
-            columns: ["merged_into_artist_id"]
-            isOneToOne: false
-            referencedRelation: "unified_artist_view"
             referencedColumns: ["artist_id"]
           },
         ]
