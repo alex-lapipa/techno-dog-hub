@@ -608,9 +608,9 @@ const TechnoDoggies = () => {
                     isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
                   } ${isDogSelected ? 'scale-105' : 'hover:scale-105'}`}
                 >
-                  {/* Halo effect */}
+                  {/* Subtle halo effect - reduced opacity for better visibility */}
                   <div className="relative">
-                    <div className={`absolute inset-0 rounded-full blur-3xl transition-all ${isDogSelected ? 'bg-logo-green/40 scale-125' : 'bg-logo-green/20'}`} />
+                    <div className={`absolute inset-0 rounded-full blur-2xl transition-all ${isDogSelected ? 'bg-logo-green/15 scale-110' : 'bg-logo-green/8'}`} />
                     <DogComponent 
                       className="w-32 h-32 sm:w-44 sm:h-44 relative z-10" 
                       animated 
