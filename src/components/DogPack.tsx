@@ -1688,6 +1688,48 @@ export const MENDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Alex Dog - Scruffy Irish madman founder with wild hair, big eyes, and friendly smile
+export const AlexDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Wild scruffy ears - floppy and Irish */}
+      <path d="M16 28 Q10 18 12 8 Q16 12 20 20 Q18 24 18 28" />
+      <path d="M48 28 Q54 18 52 8 Q48 12 44 20 Q46 24 46 28" />
+      {/* Messy wild hair on top - proper scruffy madman */}
+      <path d="M22 14 Q24 8 28 12" />
+      <path d="M26 12 Q30 4 34 10" />
+      <path d="M32 8 Q36 2 40 8" />
+      <path d="M38 10 Q42 6 44 14" />
+      <path d="M20 18 Q18 12 22 10" />
+      <path d="M44 18 Q46 12 42 10" />
+      {/* Head - slightly elongated for character */}
+      <ellipse cx="32" cy="36" rx="16" ry="15" />
+      {/* BIG expressive eyes - wide open and friendly */}
+      <circle cx="25" cy="32" r="5" />
+      <circle cx="25" cy="31" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="24" cy="30" r="1" fill="hsl(var(--background))" />
+      <circle cx="39" cy="32" r="5" />
+      <circle cx="39" cy="31" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="30" r="1" fill="hsl(var(--background))" />
+      {/* Eyebrows - expressive and slightly raised */}
+      <path d="M20 26 Q25 24 28 26" strokeWidth="1.5" />
+      <path d="M36 26 Q39 24 44 26" strokeWidth="1.5" />
+      {/* Irish nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Big friendly smile - proper Irish grin */}
+      <path d="M24 46 Q32 54 40 46" strokeWidth="2.5" />
+      {/* Slight stubble dots - scruffy */}
+      <circle cx="22" cy="44" r="0.5" opacity="0.3" />
+      <circle cx="24" cy="48" r="0.5" opacity="0.3" />
+      <circle cx="42" cy="44" r="0.5" opacity="0.3" />
+      <circle cx="40" cy="48" r="0.5" opacity="0.3" />
+      {/* Extra scruff tufts */}
+      <path d="M14 32 Q12 30 14 28" opacity="0.5" />
+      <path d="M50 32 Q52 30 50 28" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1775,4 +1817,6 @@ export const dogVariants = [
   // SPANISH LEGENDS
   { name: 'Eulogio', Component: EulogioDog, personality: 'Asturian crate-digger, Wayfarers on, sideburns fresh', status: 'la real forever' },
   { name: 'M.E.N', Component: MENDog, personality: 'Moog Barcelona basement dweller', status: 'deep hypnotic' },
+  // FOUNDERS
+  { name: 'Alex', Component: AlexDog, personality: 'Scruffy Irish madman with big ideas', status: 'building' },
 ];
