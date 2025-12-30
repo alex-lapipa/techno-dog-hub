@@ -178,7 +178,7 @@ const TechnoDoggies = () => {
     toast.success(`Downloaded ${currentDog?.name} Dog!`);
   };
 
-  // Download sticker-ready version for WhatsApp (512x512 WebP)
+  // Download sticker-ready version for WhatsApp (512x512 WebP, no text, transparent)
   const downloadForWhatsApp = async () => {
     const svg = document.querySelector('#current-dog-display svg');
     if (!svg) {
@@ -195,7 +195,11 @@ const TechnoDoggies = () => {
 
     toast.loading("Creating WhatsApp sticker...");
     
-    const svgData = new XMLSerializer().serializeToString(svg);
+    // Clone SVG and remove text elements for clean sticker
+    const svgClone = svg.cloneNode(true) as SVGElement;
+    svgClone.querySelectorAll('text').forEach(t => t.remove());
+    
+    const svgData = new XMLSerializer().serializeToString(svgClone);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -205,10 +209,11 @@ const TechnoDoggies = () => {
     canvas.height = 512;
     
     img.onload = () => {
+      // Clear for transparency
       ctx!.clearRect(0, 0, 512, 512);
       ctx!.drawImage(img, 0, 0, 512, 512);
       
-      // Convert to WebP for WhatsApp (smaller file size, better quality)
+      // Convert to WebP for WhatsApp (smaller file size, transparent background)
       canvas.toBlob((blob) => {
         if (blob) {
           const link = document.createElement('a');
@@ -227,7 +232,7 @@ const TechnoDoggies = () => {
           toast.dismiss();
           toast.error("Failed to create sticker");
         }
-      }, 'image/webp', 0.9);
+      }, 'image/webp', 0.95);
     };
     
     img.onerror = () => {
@@ -438,76 +443,146 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* 3. MEET THE PACK - Browse All */}
+          {/* 3. MEET THE PACK - One by One with Download */}
           <div className="mb-8">
             <div className="text-center mb-4">
               <h2 className="font-mono text-base font-bold text-foreground mb-1">
                 Meet the Full Pack
               </h2>
               <p className="font-mono text-[10px] text-muted-foreground">
-                Tap any doggy to see them shine
+                {activeVariants.length} doggies • Tap to download for WhatsApp
               </p>
             </div>
             
-            {/* Featured Row */}
-            {featuredDogs.length > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Star className="w-3 h-3 text-logo-green" />
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-logo-green">Fan Favorites</span>
-                </div>
-                <div className="flex justify-center gap-3 flex-wrap">
-                  {featuredDogs.map((dog: any) => {
-                    const Dog = dog.Component;
-                    return (
-                      <button
-                        key={dog.name}
-                        onClick={() => {
-                          const fullIndex = activeVariants.findIndex(v => v.name === dog.name);
-                          setCurrentDogIndex(fullIndex >= 0 ? fullIndex : 0);
-                          window.scrollTo({ top: 200, behavior: 'smooth' });
-                        }}
-                        className="p-2 rounded-lg border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 transition-all active:scale-95"
-                      >
-                        <Dog className="w-10 h-10 mx-auto" />
-                        <p className="text-[9px] font-mono text-logo-green mt-1">{dog.name}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Full Grid */}
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+            {/* One by One Carousel with Download */}
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1 scrollbar-thin">
               {activeVariants.map((dog: any, index: number) => {
                 const Dog = dog.Component;
-                const isSelected = selectedDogs.includes(index);
-                const isCurrent = index === currentDogIndex;
                 const isFeatured = dog.dbData?.is_featured;
+                
+                const downloadSingleDog = async () => {
+                  toast.loading(`Creating ${dog.name} sticker...`);
+                  
+                  // Create a temporary container to render the dog without text
+                  const tempDiv = document.createElement('div');
+                  tempDiv.style.position = 'absolute';
+                  tempDiv.style.left = '-9999px';
+                  tempDiv.innerHTML = `
+                    <svg viewBox="0 0 64 64" width="512" height="512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      ${document.querySelector(`#dog-${index} svg`)?.innerHTML || ''}
+                    </svg>
+                  `;
+                  document.body.appendChild(tempDiv);
+                  
+                  const svg = tempDiv.querySelector('svg');
+                  if (!svg) {
+                    document.body.removeChild(tempDiv);
+                    toast.dismiss();
+                    toast.error("Couldn't generate sticker");
+                    return;
+                  }
+                  
+                  // Copy the stroke styles
+                  svg.querySelectorAll('g, path, ellipse, circle, rect, line, text').forEach(el => {
+                    if (!el.getAttribute('stroke')) {
+                      el.setAttribute('stroke', 'hsl(100, 100%, 65%)');
+                    }
+                    el.setAttribute('stroke-width', el.getAttribute('stroke-width') || '2');
+                    el.setAttribute('stroke-linecap', 'round');
+                    el.setAttribute('stroke-linejoin', 'round');
+                  });
+                  
+                  // Remove any text elements (clean sticker)
+                  svg.querySelectorAll('text').forEach(t => t.remove());
+                  
+                  const svgData = new XMLSerializer().serializeToString(svg);
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const img = new Image();
+                  
+                  canvas.width = 512;
+                  canvas.height = 512;
+                  
+                  img.onload = () => {
+                    ctx!.clearRect(0, 0, 512, 512);
+                    ctx!.drawImage(img, 0, 0, 512, 512);
+                    
+                    canvas.toBlob((blob) => {
+                      document.body.removeChild(tempDiv);
+                      if (blob) {
+                        const link = document.createElement('a');
+                        link.download = `techno-${dog.name.toLowerCase().replace(/\s+/g, '-')}-sticker.webp`;
+                        link.href = URL.createObjectURL(blob);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        logAction.mutate({
+                          variantId: dog.dbData?.id,
+                          variantName: dog.name,
+                          actionType: "download_whatsapp",
+                        });
+                        
+                        toast.dismiss();
+                        toast.success(`${dog.name} sticker ready!`, {
+                          description: "Add to WhatsApp via Stickers > Create",
+                          duration: 4000,
+                        });
+                      } else {
+                        toast.dismiss();
+                        toast.error("Failed to create sticker");
+                      }
+                    }, 'image/webp', 0.95);
+                  };
+                  
+                  img.onerror = () => {
+                    document.body.removeChild(tempDiv);
+                    toast.dismiss();
+                    toast.error("Failed to generate sticker");
+                  };
+                  
+                  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                  img.src = URL.createObjectURL(svgBlob);
+                };
+                
                 return (
-                  <button
+                  <div
                     key={dog.name}
-                    onClick={() => {
-                      setCurrentDogIndex(index);
-                      toggleDogSelection(index);
-                      window.scrollTo({ top: 200, behavior: 'smooth' });
-                    }}
-                    className={`p-2 rounded-lg border transition-all active:scale-95 ${
-                      isCurrent
-                        ? 'border-logo-green bg-logo-green/20 ring-2 ring-logo-green/50'
-                        : isSelected 
-                          ? 'border-logo-green bg-logo-green/10' 
-                          : isFeatured 
-                            ? 'border-logo-green/50 hover:border-logo-green'
-                            : 'border-border/50 hover:border-logo-green/50'
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                      isFeatured 
+                        ? 'border-logo-green/50 bg-logo-green/10' 
+                        : 'border-border/30 hover:border-logo-green/30 bg-card/50'
                     }`}
                   >
-                    <Dog className="w-8 h-8 mx-auto" />
-                    <p className="text-[8px] font-mono text-muted-foreground mt-1 text-center truncate">
-                      {dog.name}
-                    </p>
-                  </button>
+                    {/* Dog Icon */}
+                    <div id={`dog-${index}`} className="flex-shrink-0">
+                      <Dog className="w-12 h-12" animated />
+                    </div>
+                    
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-mono text-sm font-bold text-foreground truncate">
+                          {dog.name}
+                        </h3>
+                        {isFeatured && <Star className="w-3 h-3 text-logo-green flex-shrink-0" />}
+                      </div>
+                      <p className="font-mono text-[10px] text-muted-foreground truncate">
+                        {dog.dbData?.personality || dog.personality}
+                      </p>
+                    </div>
+                    
+                    {/* Download Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={downloadSingleDog}
+                      className="flex-shrink-0 h-8 px-3 font-mono text-[10px] border-logo-green/30 hover:bg-logo-green/20"
+                    >
+                      <Smartphone className="w-3 h-3 mr-1" />
+                      Get
+                    </Button>
+                  </div>
                 );
               })}
             </div>
