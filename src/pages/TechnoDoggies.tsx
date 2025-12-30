@@ -540,25 +540,25 @@ const TechnoDoggies = () => {
   return (
     <>
       <Helmet>
-        <title>Techno Doggies - Create & Share Your Pack | techno.dog</title>
-        <meta name="description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bark bark!" />
+        <title>{sharedDogSlug ? `I'm ${dogName}! | techno.dog` : 'Techno Doggies - Create & Share Your Pack | techno.dog'}</title>
+        <meta name="description" content={sharedDogSlug ? `${dogName} from the techno.dog pack — ${activeVariants.length}+ unique doggies for the underground.` : 'Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bark bark!'} />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://techno.dog/doggies" />
-        <meta property="og:title" content="Techno Doggies - Create & Share Your Pack" />
-        <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the barks!" />
+        <meta property="og:url" content={shareUrl} />
+        <meta property="og:title" content={sharedDogSlug ? `I'm ${dogName}! 🖤` : 'Techno Doggies - Create & Share Your Pack'} />
+        <meta property="og:description" content={sharedDogSlug ? `Join the techno.dog pack — ${activeVariants.length}+ unique doggies for the underground. Find yours!` : 'Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the barks!'} />
         <meta property="og:image" content="https://techno.dog/og-doggies.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Techno Dog DJ with headphones and turntables" />
+        <meta property="og:image:alt" content={sharedDogSlug ? `${dogName} - Techno Dog` : 'Techno Dog - Happy dog face icon'} />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content="https://techno.dog/doggies" />
-        <meta name="twitter:title" content="Techno Doggies - Create & Share Your Pack" />
-        <meta name="twitter:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community." />
+        <meta name="twitter:url" content={shareUrl} />
+        <meta name="twitter:title" content={sharedDogSlug ? `I'm ${dogName}! 🖤` : 'Techno Doggies - Create & Share Your Pack'} />
+        <meta name="twitter:description" content={sharedDogSlug ? `Join the techno.dog pack — ${activeVariants.length}+ unique doggies for the underground.` : 'Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community.'} />
         <meta name="twitter:image" content="https://techno.dog/og-doggies.png" />
       </Helmet>
 
