@@ -214,8 +214,12 @@ export default function ArtistLabelAgentAdmin() {
       return;
     }
     
+    // Parse the prefixed contact value (e.g., "manager-123" or "contact-456")
+    const [contactType, contactId] = selectedContact.split('-');
+    
     const result = await runAgentAction('generate_outreach', {
-      contactId: selectedContact,
+      contactId,
+      contactType: contactType === 'manager' ? 'manager' : 'label_contact',
       collaborationType,
       tone: outreachTone,
       projectContext,
