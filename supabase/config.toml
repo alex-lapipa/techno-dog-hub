@@ -294,3 +294,6 @@ verify_jwt = false
 
 [functions.dog-transcribe]
 verify_jwt = false
+
+[functions.create-admin-user]
+verify_jwt = false
