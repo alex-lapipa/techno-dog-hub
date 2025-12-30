@@ -293,8 +293,9 @@ async function sendEmailNotification(
   
   try {
     await resend.emails.send({
-      from: "techno.dog Alerts <onboarding@resend.dev>",
-      to: ["admin@techno.dog"], // Change to actual admin email
+      from: "ringleader@techno.dog <alex@rmtb.io>",
+      reply_to: "alex@rmtb.io",
+      to: ["alex@rmtb.io"],
       subject: `${severity} System Health Alert - techno.dog`,
       html: `
         <div style="font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff;">

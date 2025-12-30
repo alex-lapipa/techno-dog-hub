@@ -36,7 +36,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification to project team
     const notificationResponse = await resend.emails.send({
-      from: "T:DOG Sound Engine <onboarding@resend.dev>",
+      from: "ringleader@techno.dog <alex@rmtb.io>",
+      reply_to: "alex@rmtb.io",
       to: ["hello@technolog.club"],
       subject: `New Contributor: ${name} - ${skillsList}`,
       html: `
@@ -63,9 +64,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to contributor
     await resend.emails.send({
-      from: "T:DOG Sound Engine <onboarding@resend.dev>",
+      from: "ringleader@techno.dog <alex@rmtb.io>",
+      reply_to: "alex@rmtb.io",
       to: [email],
-      subject: "Thanks for reaching out to T:DOG Sound Engine!",
+      subject: "Thanks for reaching out to techno.dog!",
       html: `
         <div style="font-family: monospace; background: #0a0a0a; color: #e5e5e5; padding: 32px;">
           <h1 style="color: #00d084; margin-bottom: 24px;">🎛 T:DOG Sound Engine</h1>
