@@ -147,7 +147,7 @@ export const DoggyShareLeaderboard = () => {
             No sharers yet!
           </p>
           <p className="font-mono text-[10px] text-logo-green">
-            Be the first to share 🐕
+            Be the first to share
           </p>
         </div>
       )}

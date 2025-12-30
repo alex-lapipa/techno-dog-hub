@@ -77,11 +77,11 @@ async function sendSlackNotification(
   webhookUrl: string,
   alert: AlertPayload
 ): Promise<{ success: boolean; statusCode?: number; error?: string }> {
-  const severityEmojis: Record<string, string> = {
-    critical: "🔴",
-    error: "🟠",
-    warning: "🟡",
-    info: "🟢",
+  const severityLabels: Record<string, string> = {
+    critical: "[CRITICAL]",
+    error: "[ERROR]",
+    warning: "[WARNING]",
+    info: "[INFO]",
   };
 
   const blocks = [
@@ -89,8 +89,8 @@ async function sendSlackNotification(
       type: "header",
       text: {
         type: "plain_text",
-        text: `${severityEmojis[alert.severity] || "⚪"} ${alert.title}`,
-        emoji: true,
+        text: `${severityLabels[alert.severity] || "[ALERT]"} ${alert.title}`,
+        emoji: false,
       },
     },
     {

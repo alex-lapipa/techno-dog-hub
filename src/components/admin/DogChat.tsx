@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Sparkles, Heart, Volume2, Square } from "lucide-react";
+import { Send, Loader2, Heart, Volume2, Square } from "lucide-react";
 import DogSilhouette from "@/components/DogSilhouette";
 
 interface Message {
@@ -18,7 +18,7 @@ const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "*zoomies* Woof! Techno Dog here. The sound, the gear, the community — I sniff it all. Ask anything. Let's dig. 🐕",
+      content: "*zoomies* Woof! Techno Dog here. The sound, the gear, the community — I sniff it all. Ask anything. Let's dig.",
       timestamp: new Date()
     }
   ]);

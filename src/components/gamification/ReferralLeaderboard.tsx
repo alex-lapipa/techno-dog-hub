@@ -94,10 +94,10 @@ export const ReferralLeaderboard = ({ limit = 10, showTitle = true }: ReferralLe
   };
 
   const getRankBadge = (count: number) => {
-    if (count >= 25) return { label: 'Ambassador', variant: 'default' as const, icon: '👑' };
-    if (count >= 10) return { label: 'Network Leader', variant: 'default' as const, icon: '🌟' };
-    if (count >= 5) return { label: 'Community Builder', variant: 'secondary' as const, icon: '🔗' };
-    if (count >= 1) return { label: 'Referrer', variant: 'outline' as const, icon: '🤝' };
+    if (count >= 25) return { label: 'Ambassador', variant: 'default' as const };
+    if (count >= 10) return { label: 'Network Leader', variant: 'default' as const };
+    if (count >= 5) return { label: 'Community Builder', variant: 'secondary' as const };
+    if (count >= 1) return { label: 'Referrer', variant: 'outline' as const };
     return null;
   };
 
@@ -183,7 +183,7 @@ export const ReferralLeaderboard = ({ limit = 10, showTitle = true }: ReferralLe
                 </p>
                 {rankBadge && (
                   <Badge variant={rankBadge.variant} className="text-xs gap-1 mt-1">
-                    {rankBadge.icon} {rankBadge.label}
+                    {rankBadge.label}
                   </Badge>
                 )}
               </div>

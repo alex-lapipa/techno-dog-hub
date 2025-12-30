@@ -49,7 +49,7 @@ function baseTemplate(content: string): string {
 </head>
 <body style="${styles.main}">
   <div style="${styles.container}">
-    <div style="${styles.logo}">🐕 techno.dog</div>
+    <div style="${styles.logo}">techno.dog</div>
     ${content}
   </div>
 </body>

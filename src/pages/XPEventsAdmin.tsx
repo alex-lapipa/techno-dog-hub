@@ -50,10 +50,10 @@ interface XPEvent {
 }
 
 const EVENT_TYPES = [
-  { value: "special", label: "Special Event", icon: "⚡" },
-  { value: "weekend", label: "Weekend Bonus", icon: "🎉" },
-  { value: "holiday", label: "Holiday", icon: "🎆" },
-  { value: "milestone", label: "Milestone", icon: "🏆" },
+  { value: "special", label: "Special Event", icon: "zap" },
+  { value: "weekend", label: "Weekend Bonus", icon: "calendar" },
+  { value: "holiday", label: "Holiday", icon: "star" },
+  { value: "milestone", label: "Milestone", icon: "trophy" },
 ];
 
 const XPEventsAdmin = () => {
@@ -73,7 +73,7 @@ const XPEventsAdmin = () => {
     start_at: "",
     end_at: "",
     event_type: "special",
-    icon: "⚡",
+    icon: "zap",
     is_active: true,
   });
 

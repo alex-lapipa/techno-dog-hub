@@ -126,7 +126,7 @@ const SoundMachine = () => {
                 {/* Core Skills Section */}
                 <div className="space-y-6">
                   <h4 className="font-mono text-base font-bold text-logo-green flex items-center gap-2">
-                    🔥 Core Skills We Need
+                    Core Skills We Need
                   </h4>
 
                   {/* Audio / DSP Engineering */}
@@ -194,7 +194,7 @@ const SoundMachine = () => {
                 {/* Creative + Community Skills */}
                 <div className="space-y-6">
                   <h4 className="font-mono text-base font-bold text-logo-green flex items-center gap-2">
-                    🎛 Creative + Community Skills (Critical)
+                    Creative + Community Skills (Critical)
                   </h4>
 
                   {/* Sound Design + Kit Building */}
@@ -246,7 +246,7 @@ const SoundMachine = () => {
                 <div className="p-5 rounded-lg bg-logo-green/5 border border-logo-green/20">
                   <h4 className="font-mono text-base font-bold mb-3 text-logo-green flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    🚀 Contribution Paths (So Anyone Can Jump In)
+                    Contribution Paths (So Anyone Can Jump In)
                   </h4>
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     Whether you can contribute <span className="text-foreground font-medium">code, sound, design, or testing</span>, you're welcome.
