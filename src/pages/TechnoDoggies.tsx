@@ -434,16 +434,16 @@ const TechnoDoggies = () => {
 
       <div className="min-h-screen bg-background relative">
         <ParticleBackground />
-        {/* Minimal Mobile Header */}
-        <header className="border-b border-border/30 bg-background/90 backdrop-blur-md sticky top-0 z-50">
-          <div className="px-4 py-3 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 group">
+        {/* Minimal Mobile Header - transparent to not clip dog animations */}
+        <header className="border-b border-border/20 bg-transparent sticky top-0 z-40">
+          <div className="px-4 py-3 flex items-center justify-between bg-background/60 backdrop-blur-sm">
+            <Link to="/" className="flex items-center gap-2 group relative z-50">
               <HexagonLogo className="w-7 h-7 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
               <span className="font-mono text-xs tracking-[0.15em] text-foreground">
                 techno.dog
               </span>
             </Link>
-            <Link to="/">
+            <Link to="/" className="relative z-50">
               <Button variant="ghost" size="sm" className="font-mono text-[10px] h-8 px-2">
                 <ArrowLeft className="w-3 h-3 mr-1" />
                 Home
@@ -452,7 +452,7 @@ const TechnoDoggies = () => {
           </div>
         </header>
 
-        <main className="px-4 py-6 max-w-lg mx-auto">
+        <main className="px-4 py-6 max-w-lg mx-auto relative z-10">
           
           {/* 1. HERO HEADER - Brand Identity */}
           <div className="text-center mb-8">
