@@ -36,8 +36,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification to project team
     const notificationResponse = await resend.emails.send({
-      from: "ringleader@techno.dog <alex@rmtb.io>",
-      reply_to: "alex@rmtb.io",
+      from: "ringleader@techno.dog <alex@rmtv.io>",
+      reply_to: "alex@rmtv.io",
       to: ["hello@technolog.club"],
       subject: `New Contributor: ${name} - ${skillsList}`,
       html: `
@@ -64,8 +64,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to contributor
     await resend.emails.send({
-      from: "ringleader@techno.dog <alex@rmtb.io>",
-      reply_to: "alex@rmtb.io",
+      from: "ringleader@techno.dog <alex@rmtv.io>",
+      reply_to: "alex@rmtv.io",
       to: [email],
       subject: "Thanks for reaching out to techno.dog!",
       html: `
