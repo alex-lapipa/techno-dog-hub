@@ -6,7 +6,7 @@ import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft, Smartphone, Copy } from "lucide-react";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Smartphone, Copy, Check, Zap, Shield, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
@@ -16,6 +16,14 @@ import ParticleBackground from "@/components/ParticleBackground";
 import { trackShareEvent, trackClickThrough } from "@/hooks/useShareTracking";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
 import { getWhatsAppShareText } from "@/data/doggyWhatsAppMessages";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Doggies that should NEVER be shown first - too grumpy or confusing for first impressions
 const excludedFirstImpressionDogs = ['grumpy', 'sven marquardt', 'bouncer', 'security'];
@@ -84,6 +92,14 @@ const TechnoDoggies = () => {
   const [isDogSelected, setIsDogSelected] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  
+  // Authorization and installation state
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [hasConsented, setHasConsented] = useState(() => {
+    return localStorage.getItem('technodog_sticker_consent') === 'true';
+  });
+  const [pendingAction, setPendingAction] = useState<'single' | 'pack' | 'share' | null>(null);
+  const [isInstalling, setIsInstalling] = useState(false);
   
   // Mobile-safe platform detection
   const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
@@ -745,6 +761,159 @@ const TechnoDoggies = () => {
     await recordShare();
   };
 
+  // Handle consent acceptance and proceed with pending action
+  const handleConsentAccept = () => {
+    setHasConsented(true);
+    localStorage.setItem('technodog_sticker_consent', 'true');
+    setShowConsentModal(false);
+    
+    // Execute the pending action after consent
+    if (pendingAction === 'single') {
+      executeAutomatedInstall('single');
+    } else if (pendingAction === 'pack') {
+      executeAutomatedInstall('pack');
+    } else if (pendingAction === 'share') {
+      executeDirectWhatsAppShare();
+    }
+    setPendingAction(null);
+  };
+
+  // Request consent before action or proceed if already consented
+  const requestConsentThen = (action: 'single' | 'pack' | 'share') => {
+    if (hasConsented) {
+      if (action === 'share') {
+        executeDirectWhatsAppShare();
+      } else {
+        executeAutomatedInstall(action);
+      }
+    } else {
+      setPendingAction(action);
+      setShowConsentModal(true);
+    }
+  };
+
+  // Execute direct WhatsApp share with image to test number
+  const executeDirectWhatsAppShare = async () => {
+    const testNumber = "34672401050";
+    
+    // Try to share with image first on mobile
+    if ((isIOS || isAndroid) && navigator.canShare) {
+      toast.loading("Preparing sticker for WhatsApp...");
+      
+      try {
+        const svg = document.querySelector('#current-dog-display svg');
+        if (svg) {
+          const resolvedSvg = resolveCssVariables(svg as SVGElement);
+          resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+          resolvedSvg.setAttribute('width', '512');
+          resolvedSvg.setAttribute('height', '512');
+          
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          canvas.width = 512;
+          canvas.height = 512;
+          
+          const svgData = new XMLSerializer().serializeToString(resolvedSvg);
+          const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+          
+          await new Promise<void>((resolve, reject) => {
+            img.onload = async () => {
+              ctx!.clearRect(0, 0, 512, 512);
+              ctx!.drawImage(img, 0, 0, 512, 512);
+              
+              const blob = await new Promise<Blob | null>((res) => {
+                canvas.toBlob(res, 'image/png', 1.0);
+              });
+              
+              if (blob) {
+                const file = new File([blob], `techno-${currentDog?.name?.toLowerCase().replace(/\s+/g, '-') || 'doggy'}.png`, { type: 'image/png' });
+                
+                if (navigator.canShare({ files: [file] })) {
+                  toast.dismiss();
+                  await navigator.share({
+                    files: [file],
+                    title: `${currentDog?.name || 'Techno Dog'} 🖤`,
+                    text: whatsAppShareText,
+                  });
+                  toast.success("Shared! Now open WhatsApp to send.");
+                  handleSocialShare("whatsapp_direct_image");
+                } else {
+                  throw new Error("Cannot share files");
+                }
+              }
+              resolve();
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(svgBlob);
+          });
+          
+          return;
+        }
+      } catch (error) {
+        toast.dismiss();
+        if ((error as Error).name !== 'AbortError') {
+          console.log("Falling back to text share", error);
+        }
+      }
+    }
+    
+    // Fallback: open WhatsApp with text
+    const directUrl = `https://wa.me/${testNumber}?text=${encodeURIComponent(whatsAppShareText)}`;
+    window.open(directUrl, '_blank');
+    handleSocialShare("whatsapp_direct");
+    toast.success("Opening WhatsApp...", {
+      description: "Message pre-filled for 672401050",
+    });
+  };
+
+  // Automated one-click install flow
+  const executeAutomatedInstall = async (type: 'single' | 'pack') => {
+    setIsInstalling(true);
+    
+    const platformLabel = isIOS ? 'iPhone' : isAndroid ? 'Android' : 'your device';
+    toast.loading(`Preparing stickers for ${platformLabel}...`);
+    
+    trackDoggyEvent('main_page', type === 'single' ? 'auto_install_single' : 'auto_install_pack', undefined, currentDog?.name);
+    
+    try {
+      if (type === 'single') {
+        // Single sticker automated flow
+        await downloadForWhatsApp();
+      } else {
+        // Pack automated flow
+        await downloadStickerPack();
+      }
+      
+      // After download, show automated next steps
+      setTimeout(() => {
+        if (isIOS) {
+          toast.info("🎉 Stickers saved! Next steps:", {
+            description: "1. Open 'Sticker Maker' app\n2. Create pack → Import from Photos\n3. Tap 'Add to WhatsApp'\n4. Done! Open any chat to use 🖤",
+            duration: 15000,
+          });
+        } else if (isAndroid) {
+          toast.info("🎉 Stickers downloaded! Next steps:", {
+            description: "1. Open 'Sticker Maker' app\n2. Create pack → Add from Gallery\n3. Tap 'Add to WhatsApp'\n4. Done! Use in any chat 🖤",
+            duration: 15000,
+          });
+        } else {
+          toast.info("🎉 Stickers ready!", {
+            description: "Transfer to your phone, then use 'Sticker Maker' app to add to WhatsApp!",
+            duration: 10000,
+          });
+        }
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Automated install failed:', error);
+      toast.dismiss();
+      toast.error("Installation failed. Please try again.");
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
   // Dynamic share URL with selected dog
   const dogSlug = currentDog?.name?.toLowerCase().replace(/\s+/g, '-') || 'techno';
   const shareUrl = `https://techno.dog/doggies?dog=${dogSlug}`;
@@ -1061,44 +1230,44 @@ const TechnoDoggies = () => {
                   {/* Send Direct to specific contact - for testing */}
                   <Button 
                     variant="outline"
-                    onClick={() => {
-                      // Direct send to test number - opens WhatsApp with pre-filled number and message
-                      const testNumber = "34672401050"; // Spain country code + number
-                      const directUrl = `https://wa.me/${testNumber}?text=${encodeURIComponent(whatsAppShareText)}`;
-                      window.open(directUrl, '_blank');
-                      handleSocialShare("whatsapp_direct");
-                      recordShare();
-                      toast.success("Opening WhatsApp...", {
-                        description: "Message pre-filled for 672401050",
-                      });
-                    }}
+                    onClick={() => requestConsentThen('share')}
+                    disabled={isInstalling}
                     className="w-full font-mono text-xs h-10 border-[#25D366] text-[#25D366] hover:bg-[#25D366]/20 hover:border-[#25D366]"
                   >
                     <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
-                    Send Direct (Test: 672401050)
+                    {isInstalling ? "Preparing..." : "Send Direct (Test: 672401050)"}
                   </Button>
 
-                  {/* Individual Sticker Download */}
+                  {/* One-Click Auto Install - Primary action */}
                   <Button 
-                    variant="outline"
-                    onClick={downloadForWhatsApp}
-                    className="w-full font-mono text-xs h-10 border-[#25D366]/50 text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]"
+                    onClick={() => requestConsentThen('single')}
+                    disabled={isInstalling}
+                    className="w-full font-mono text-xs h-12 bg-logo-green hover:bg-logo-green/90 text-background shadow-lg shadow-logo-green/30"
                   >
-                    <Smartphone className="w-4 h-4 mr-2" />
-                    {isIOS ? "Save This Sticker (512x512)" : "Download This Sticker (512x512)"}
+                    <Zap className="w-4 h-4 mr-2" />
+                    {isInstalling ? "Installing..." : (isIOS ? "⚡ One-Click Install Sticker" : "⚡ Auto-Download Sticker")}
                   </Button>
 
-                  {/* Full Pack Download */}
+                  {/* Full Pack Auto Install */}
                   <Button 
                     variant="outline"
-                    onClick={downloadStickerPack}
-                    className="w-full font-mono text-xs h-10 border-logo-green/50 text-logo-green hover:bg-logo-green/10 hover:border-logo-green"
+                    onClick={() => requestConsentThen('pack')}
+                    disabled={isInstalling}
+                    className="w-full font-mono text-xs h-10 border-logo-green/60 text-logo-green hover:bg-logo-green/10 hover:border-logo-green"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    {isIOS ? "Save Sticker Pack (10 Doggies)" : "Download Full Sticker Pack (30 Doggies)"}
+                    {isInstalling ? "Installing..." : (isIOS ? "⚡ Install Full Pack (10 Doggies)" : "⚡ Auto-Download Pack (30 Doggies)")}
                   </Button>
+
+                  {/* Consent status indicator */}
+                  {hasConsented && (
+                    <div className="flex items-center justify-center gap-1.5 text-logo-green">
+                      <Check className="w-3 h-3" />
+                      <span className="font-mono text-[9px]">Installation authorized</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Platform-specific instructions */}
@@ -1397,6 +1566,87 @@ const TechnoDoggies = () => {
         {/* Doggy Footer with copyright and site links */}
         <DoggyPageFooter pageSource="main_page" currentDoggyName={currentDog?.name} />
       </div>
+
+      {/* Authorization Consent Modal */}
+      <Dialog open={showConsentModal} onOpenChange={setShowConsentModal}>
+        <DialogContent className="max-w-md bg-background border-logo-green/30">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-lg flex items-center gap-2 text-foreground">
+              <Shield className="w-5 h-5 text-logo-green" />
+              Sticker Installation
+            </DialogTitle>
+            <DialogDescription className="font-mono text-xs text-muted-foreground">
+              Before downloading Techno Dog stickers to your device:
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* What happens */}
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-logo-green/10 border border-logo-green/20">
+                <Check className="w-5 h-5 text-logo-green mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-mono text-xs font-medium text-foreground">Files Saved to Device</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    {isIOS ? "Stickers will be saved to your Photos" : "Stickers will download to your device"}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-logo-green/10 border border-logo-green/20">
+                <Zap className="w-5 h-5 text-logo-green mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-mono text-xs font-medium text-foreground">Use Freely Offline</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    Once installed, stickers work forever—no connection needed
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-logo-green/10 border border-logo-green/20">
+                <MessageCircle className="w-5 h-5 text-logo-green mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-mono text-xs font-medium text-foreground">Third-Party App Required</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    {isIOS || isAndroid 
+                      ? "'Sticker Maker' app (free) is needed to add stickers to WhatsApp" 
+                      : "Transfer to phone, then use 'Sticker Maker' app"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
+              <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+                By proceeding, you agree to download Techno Dog sticker files to your device. 
+                These files are for personal use and can be used in any messaging app. 
+                No personal data is collected or transmitted.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowConsentModal(false);
+                setPendingAction(null);
+              }}
+              className="font-mono text-xs"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConsentAccept}
+              className="font-mono text-xs bg-logo-green hover:bg-logo-green/90 text-background"
+            >
+              <Check className="w-4 h-4 mr-1.5" />
+              Accept & Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
