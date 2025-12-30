@@ -1626,23 +1626,24 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 sm:gap-2">
+          <DialogFooter className="flex gap-3 sm:gap-3">
             <Button 
               variant="outline" 
               onClick={() => {
                 setShowConsentModal(false);
                 setPendingAction(null);
+                toast.info("Installation cancelled");
               }}
-              className="font-mono text-xs"
+              className="flex-1 font-mono text-sm h-12 border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive"
             >
-              Cancel
+              Decline
             </Button>
             <Button 
               onClick={handleConsentAccept}
-              className="font-mono text-xs bg-logo-green hover:bg-logo-green/90 text-background"
+              className="flex-1 font-mono text-sm h-12 bg-logo-green hover:bg-logo-green/90 text-background shadow-lg shadow-logo-green/30"
             >
-              <Check className="w-4 h-4 mr-1.5" />
-              Accept & Download
+              <Check className="w-5 h-5 mr-2" />
+              Accept
             </Button>
           </DialogFooter>
         </DialogContent>
