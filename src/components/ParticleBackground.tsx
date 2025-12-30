@@ -18,6 +18,7 @@ const ParticleBackground = () => {
       vy: number;
       size: number;
       opacity: number;
+      isWhite: boolean;
     }> = [];
 
     const resizeCanvas = () => {
@@ -26,19 +27,20 @@ const ParticleBackground = () => {
     };
 
     const createParticles = () => {
-      const particleCount = Math.floor((canvas.width * canvas.height) / 10000); // More particles
+      const particleCount = Math.floor((canvas.width * canvas.height) / 8000);
       particles = [];
       
       for (let i = 0; i < particleCount; i++) {
-        // 30% chance of being a brighter particle
         const isBright = Math.random() < 0.3;
+        const isWhite = Math.random() < 0.4; // 40% white, 60% green
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: (Math.random() - 0.5) * 0.15,
-          size: isBright ? Math.random() * 1.8 + 0.8 : Math.random() * 1.2 + 0.3,
-          opacity: isBright ? Math.random() * 0.5 + 0.4 : Math.random() * 0.4 + 0.1,
+          vx: (Math.random() - 0.5) * 0.12,
+          vy: (Math.random() - 0.5) * 0.12,
+          size: isBright ? Math.random() * 1.5 + 0.6 : Math.random() * 1 + 0.2,
+          opacity: isBright ? Math.random() * 0.4 + 0.3 : Math.random() * 0.3 + 0.08,
+          isWhite,
         });
       }
     };
@@ -58,7 +60,9 @@ const ParticleBackground = () => {
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 255, 136, ${particle.opacity})`;
+        ctx.fillStyle = particle.isWhite 
+          ? `rgba(255, 255, 255, ${particle.opacity})`
+          : `rgba(0, 255, 136, ${particle.opacity})`;
         ctx.fill();
       });
 
