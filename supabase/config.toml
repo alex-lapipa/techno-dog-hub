@@ -270,3 +270,6 @@ verify_jwt = false
 
 [functions.audit-actions]
 verify_jwt = false
+
+[functions.pr-media-agent]
+verify_jwt = false
