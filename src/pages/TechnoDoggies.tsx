@@ -464,7 +464,13 @@ const TechnoDoggies = () => {
       
       const currentSvg = document.querySelector('#current-dog-display svg');
       if (currentSvg) {
-        const svgData = new XMLSerializer().serializeToString(currentSvg);
+        // Use CSS variable resolution for proper export with transparency
+        const resolvedSvg = resolveCssVariables(currentSvg as SVGElement);
+        resolvedSvg.setAttribute('width', '512');
+        resolvedSvg.setAttribute('height', '512');
+        resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        
+        const svgData = new XMLSerializer().serializeToString(resolvedSvg);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const img = new Image();
@@ -474,6 +480,7 @@ const TechnoDoggies = () => {
         
         await new Promise<void>((resolve) => {
           img.onload = () => {
+            // Clear for transparent background
             ctx!.clearRect(0, 0, 512, 512);
             ctx!.drawImage(img, 0, 0, 512, 512);
             
@@ -704,13 +711,14 @@ const TechnoDoggies = () => {
                     return;
                   }
                   
-                  const svgClone = svgElement.cloneNode(true) as SVGElement;
-                  svgClone.querySelectorAll('text').forEach(t => t.remove());
-                  svgClone.setAttribute('width', '512');
-                  svgClone.setAttribute('height', '512');
-                  svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                  // Use CSS variable resolution for proper export
+                  const resolvedSvg = resolveCssVariables(svgElement as SVGElement);
+                  resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+                  resolvedSvg.setAttribute('width', '512');
+                  resolvedSvg.setAttribute('height', '512');
+                  resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
                   
-                  const svgData = new XMLSerializer().serializeToString(svgClone);
+                  const svgData = new XMLSerializer().serializeToString(resolvedSvg);
                   const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
                   
                   const link = document.createElement('a');
@@ -729,7 +737,7 @@ const TechnoDoggies = () => {
                   toast.success(`${dog.name} downloaded!`);
                 };
                 
-                // WhatsApp WebP download
+                // WhatsApp WebP download with transparent background
                 const downloadForWhatsAppSingle = async () => {
                   const svgElement = document.querySelector(`#dog-${index} svg`);
                   if (!svgElement) {
@@ -739,12 +747,14 @@ const TechnoDoggies = () => {
                   
                   toast.loading("Creating sticker...");
                   
-                  const svgClone = svgElement.cloneNode(true) as SVGElement;
-                  svgClone.querySelectorAll('text').forEach(t => t.remove());
-                  svgClone.setAttribute('width', '512');
-                  svgClone.setAttribute('height', '512');
+                  // Use CSS variable resolution for proper export
+                  const resolvedSvg = resolveCssVariables(svgElement as SVGElement);
+                  resolvedSvg.querySelectorAll('text').forEach(t => t.remove());
+                  resolvedSvg.setAttribute('width', '512');
+                  resolvedSvg.setAttribute('height', '512');
+                  resolvedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
                   
-                  const svgData = new XMLSerializer().serializeToString(svgClone);
+                  const svgData = new XMLSerializer().serializeToString(resolvedSvg);
                   const canvas = document.createElement('canvas');
                   const ctx = canvas.getContext('2d');
                   const img = new Image();
@@ -753,6 +763,7 @@ const TechnoDoggies = () => {
                   canvas.height = 512;
                   
                   img.onload = () => {
+                    // Clear for transparent background
                     ctx!.clearRect(0, 0, 512, 512);
                     ctx!.drawImage(img, 0, 0, 512, 512);
                     
@@ -777,7 +788,7 @@ const TechnoDoggies = () => {
                         toast.dismiss();
                         toast.error("Failed");
                       }
-                    }, 'image/webp', 0.7);
+                    }, 'image/webp', 0.9); // Higher quality for transparency
                   };
                   
                   img.onerror = () => {
