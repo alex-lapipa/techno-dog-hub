@@ -33,7 +33,6 @@ const DogChat = () => {
   const [voiceModeActive, setVoiceModeActive] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [partialTranscript, setPartialTranscript] = useState('');
-  const [silenceTimeout, setSilenceTimeout] = useState<NodeJS.Timeout | null>(null);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -46,10 +45,17 @@ const DogChat = () => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const silenceDetectionRef = useRef<number | null>(null);
   
+  // Use refs for VAD loop to avoid stale closures
+  const voiceModeActiveRef = useRef(false);
+  const isSpeakingRef = useRef(false);
+  const isListeningRef = useRef(false);
+  const isLoadingRef = useRef(false);
+  const isProcessingRef = useRef(false); // Prevent double-processing
+  
   const { toast } = useToast();
 
   const SILENCE_THRESHOLD = 2000; // 2 seconds of silence before responding
-  const VOICE_THRESHOLD = 15; // Audio level threshold for detecting speech
+  const VOICE_THRESHOLD = 12; // Audio level threshold for detecting speech (lowered for sensitivity)
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -97,7 +103,13 @@ const DogChat = () => {
     };
   }, [isSpeaking]);
 
-  // Monitor audio levels for voice activity detection
+  // Keep refs in sync with state
+  useEffect(() => { voiceModeActiveRef.current = voiceModeActive; }, [voiceModeActive]);
+  useEffect(() => { isSpeakingRef.current = isSpeaking; }, [isSpeaking]);
+  useEffect(() => { isListeningRef.current = isListening; }, [isListening]);
+  useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
+
+  // Monitor audio levels for voice activity detection (uses refs to avoid stale closures)
   const startVoiceActivityDetection = useCallback(() => {
     if (!analyserRef.current) return;
 
@@ -105,7 +117,11 @@ const DogChat = () => {
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
     const checkAudioLevel = () => {
-      if (!voiceModeActive) return;
+      // Exit if voice mode disabled
+      if (!voiceModeActiveRef.current) {
+        console.log("Voice mode inactive, stopping VAD loop");
+        return;
+      }
 
       analyser.getByteFrequencyData(dataArray);
       const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
@@ -114,33 +130,43 @@ const DogChat = () => {
         // User is speaking
         lastSpeechTimeRef.current = Date.now();
         
-        // If AI is speaking, stop it (barge-in)
-        if (isSpeaking) {
+        // If AI is speaking, stop it immediately (barge-in)
+        if (isSpeakingRef.current) {
           console.log("User barge-in detected, stopping AI speech");
           stopSpeaking();
         }
         
-        setIsListening(true);
+        if (!isListeningRef.current) {
+          setIsListening(true);
+        }
       } else {
         // Silence detected
         const silenceDuration = Date.now() - lastSpeechTimeRef.current;
         
-        if (silenceDuration > SILENCE_THRESHOLD && isListening && !isLoading && !isSpeaking) {
-          // User stopped talking for 2 seconds, process what they said
+        // Check if we should process: user was listening, now silent for 2s, not already processing
+        if (silenceDuration > SILENCE_THRESHOLD && 
+            isListeningRef.current && 
+            !isLoadingRef.current && 
+            !isSpeakingRef.current &&
+            !isProcessingRef.current) {
           console.log("2 seconds of silence detected, processing speech");
           setIsListening(false);
           processRecordedAudio();
         }
       }
 
+      // Continue the loop
       silenceDetectionRef.current = requestAnimationFrame(checkAudioLevel);
     };
 
     checkAudioLevel();
-  }, [voiceModeActive, isSpeaking, isListening, isLoading]);
+  }, []); // No dependencies - uses refs
 
   const processRecordedAudio = async () => {
     if (audioChunksRef.current.length === 0) return;
+    if (isProcessingRef.current) return; // Prevent double-processing
+    
+    isProcessingRef.current = true;
 
     const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
     audioChunksRef.current = [];
@@ -148,6 +174,7 @@ const DogChat = () => {
     // Skip if audio is too short (less than 500ms)
     if (audioBlob.size < 5000) {
       console.log("Audio too short, skipping");
+      isProcessingRef.current = false;
       return;
     }
 
@@ -198,6 +225,9 @@ const DogChat = () => {
       });
     } finally {
       setIsLoading(false);
+      isProcessingRef.current = false;
+      // Reset speech timer so VAD doesn't immediately trigger again
+      lastSpeechTimeRef.current = Date.now();
     }
   };
 
@@ -266,6 +296,7 @@ const DogChat = () => {
 
   const speakMessageAuto = async (text: string) => {
     setIsSpeaking(true);
+    console.log("AI starting to speak...");
 
     try {
       const response = await fetch(
@@ -290,20 +321,28 @@ const DogChat = () => {
       
       audioRef.current = new Audio(audioUrl);
       audioRef.current.onended = () => {
+        console.log("AI finished speaking, ready for user input");
         setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
-        // Reset speech detection timer after AI finishes speaking
+        // Reset speech detection timer so VAD waits for user to speak
+        // This keeps the conversation alive and fluid
         lastSpeechTimeRef.current = Date.now();
+        isProcessingRef.current = false;
       };
       audioRef.current.onerror = () => {
+        console.log("Audio playback error");
         setIsSpeaking(false);
         URL.revokeObjectURL(audioUrl);
+        lastSpeechTimeRef.current = Date.now();
+        isProcessingRef.current = false;
       };
       
       await audioRef.current.play();
     } catch (error) {
       console.error('Voice error:', error);
       setIsSpeaking(false);
+      lastSpeechTimeRef.current = Date.now();
+      isProcessingRef.current = false;
     }
   };
 
@@ -343,15 +382,19 @@ const DogChat = () => {
       // Start recording in chunks
       mediaRecorderRef.current.start(500); // Collect data every 500ms
 
-      setVoiceModeActive(true);
+      // Reset all state for fresh conversation
+      isProcessingRef.current = false;
       lastSpeechTimeRef.current = Date.now();
+      setVoiceModeActive(true);
+      
+      console.log("Voice mode started - continuous conversation active");
 
       toast({
         title: "*perks up ears*",
-        description: "Voice mode active! Speak naturally, I'm listening.",
+        description: "Voice call active! Speak naturally — I'll respond when you pause.",
       });
 
-      // Start voice activity detection
+      // Start voice activity detection loop
       startVoiceActivityDetection();
 
     } catch (error) {
@@ -731,17 +774,33 @@ const DogChat = () => {
         {/* Voice Mode Status Banner */}
         {voiceModeActive && (
           <div className="px-4 py-3 bg-crimson/10 border-t border-crimson/20 shrink-0">
-            <div className="flex items-center justify-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${isListening ? 'bg-crimson animate-pulse' : isSpeaking ? 'bg-logo-green animate-pulse' : 'bg-muted-foreground/50'}`} />
-              <p className="text-xs font-mono text-center">
-                {isSpeaking 
-                  ? "Techno Dog is speaking... (interrupt anytime)" 
-                  : isListening 
-                    ? "Listening..." 
-                    : isLoading 
-                      ? "Processing..." 
-                      : "Waiting for you to speak..."}
-              </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1">
+                <div className={`w-3 h-3 rounded-full shrink-0 ${
+                  isListening ? 'bg-crimson animate-pulse' : 
+                  isSpeaking ? 'bg-logo-green animate-pulse' : 
+                  isLoading ? 'bg-yellow-500 animate-pulse' :
+                  'bg-muted-foreground/30'
+                }`} />
+                <p className="text-xs font-mono">
+                  {isSpeaking 
+                    ? "Speaking... (interrupt anytime)" 
+                    : isListening 
+                      ? "Listening to you..." 
+                      : isLoading 
+                        ? "Thinking..." 
+                        : "Speak when ready — I'm here"}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={stopVoiceMode}
+                className="text-crimson hover:text-crimson hover:bg-crimson/20 text-xs font-mono"
+              >
+                <PhoneOff className="w-3 h-3 mr-1" />
+                End Call
+              </Button>
             </div>
           </div>
         )}
