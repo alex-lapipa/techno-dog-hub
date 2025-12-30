@@ -558,6 +558,7 @@ serve(async (req) => {
 
       case 'preview_email': {
         const { subject, body: emailBody, email: toEmail } = body;
+        if (!subject || !emailBody) throw new Error("subject and body required for preview");
         result = {
           subject,
           body: emailBody,
