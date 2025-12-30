@@ -132,6 +132,28 @@ const DoggyPageFooter = ({ pageSource, currentDoggyName }: DoggyPageFooterProps)
             . Free to share with attribution.
           </p>
           
+          {/* Credits */}
+          <p className="font-mono text-[10px] text-muted-foreground/70">
+            RingLeader:{' '}
+            <a 
+              href="https://alexlawton.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-foreground/80 hover:text-logo-green transition-colors"
+            >
+              Alex Lawton
+            </a>
+            {' '}·{' '}
+            <a 
+              href="https://lapipa.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-foreground/80 hover:text-logo-green transition-colors"
+            >
+              Lapipa
+            </a>
+          </p>
+          
           {isEmbeddedWidget ? (
             <a 
               href="https://techno.dog" 
