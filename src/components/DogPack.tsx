@@ -1565,6 +1565,77 @@ export const DawlessDog = ({ className, animated = false }: DogVariantProps) => 
     </g>
   </svg>
 );
+// Eulogio Dog - Asturian legend with "E" collar and crate of records
+export const EulogioDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Floppy ears - wise old selector */}
+      <path d="M16 34 Q8 30 10 20 Q16 22 20 28" />
+      <path d="M48 34 Q56 30 54 20 Q48 22 44 28" />
+      {/* Head - round and friendly */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Eyes - knowing, experienced */}
+      <circle cx="26" cy="32" r="2" />
+      <circle cx="38" cy="32" r="2" />
+      <circle cx="26.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
+      <circle cx="38.5" cy="31.5" r="0.8" fill="hsl(var(--logo-green))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Slight knowing smile */}
+      <path d="M27 46 Q32 50 37 46" />
+      {/* "E" collar tag - iconic */}
+      <rect x="28" y="52" width="8" height="6" rx="1" opacity="0.3" />
+      <text x="30.5" y="57" fontSize="5" fill="hsl(var(--logo-green))" fontWeight="bold">E</text>
+      {/* Crate of vinyl records */}
+      <rect x="4" y="50" width="10" height="8" opacity="0.4" />
+      <line x1="6" y1="50" x2="6" y2="58" opacity="0.3" />
+      <line x1="9" y1="50" x2="9" y2="58" opacity="0.3" />
+      <line x1="12" y1="50" x2="12" y2="58" opacity="0.3" />
+      {/* Glasses - scholarly crate digger */}
+      <circle cx="26" cy="32" r="4" opacity="0.6" />
+      <circle cx="38" cy="32" r="4" opacity="0.6" />
+      <line x1="30" y1="32" x2="34" y2="32" opacity="0.6" />
+      {/* Small sidra bottle (Asturian cider) */}
+      <path d="M52 54 L54 54 L54 60 Q53 62 52 60 L52 54" opacity="0.5" />
+      <ellipse cx="53" cy="53" rx="1.5" ry="1" opacity="0.3" />
+    </g>
+  </svg>
+);
+
+// M.E.N Dog - Barcelona Moog resident with hypnotic swirl eyes
+export const MENDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-spin-slow" : ""}>
+      {/* Pointed ears - alert and focused */}
+      <path d="M18 26 Q14 10 20 6 Q24 12 26 22" />
+      <path d="M46 26 Q50 10 44 6 Q40 12 38 22" />
+      {/* Head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Hypnotic spiral eyes - deep in the groove */}
+      <circle cx="26" cy="32" r="4" />
+      <path d="M26 28 Q28 30 26 32 Q24 34 26 36" opacity="0.7" />
+      <circle cx="38" cy="32" r="4" />
+      <path d="M38 28 Q40 30 38 32 Q36 34 38 36" opacity="0.7" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Mysterious half-smile */}
+      <path d="M28 46 Q32 48 36 46" />
+      {/* Beard/goatee - distinguished */}
+      <path d="M30 50 Q32 54 34 50" opacity="0.4" />
+      {/* M.E.N text collar */}
+      <rect x="24" y="52" width="16" height="5" rx="1" opacity="0.3" />
+      <text x="25" y="56" fontSize="4" fill="hsl(var(--logo-green))" fontWeight="bold">M.E.N</text>
+      {/* Moog synth knobs around */}
+      <circle cx="8" cy="32" r="3" opacity="0.3" />
+      <circle cx="8" cy="32" r="1" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="56" cy="32" r="3" opacity="0.3" />
+      <circle cx="56" cy="32" r="1" fill="hsl(var(--logo-green))" opacity="0.5" />
+      {/* Bass waves emanating */}
+      <path d="M4 46 Q6 44 8 46" opacity="0.4" />
+      <path d="M56 46 Q58 44 60 46" opacity="0.4" />
+    </g>
+  </svg>
+);
 
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
@@ -1649,4 +1720,7 @@ export const dogVariants = [
   { name: 'Aquasella', Component: AquasellaDog, personality: 'River raving in Asturias', status: 'outdoor vibes' },
   // GEAR/STYLE DOGS
   { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, just hardware', status: 'patching' },
+  // SPANISH LEGENDS
+  { name: 'Eulogio', Component: EulogioDog, personality: 'Asturian crate-digger since 1995', status: 'la real forever' },
+  { name: 'M.E.N', Component: MENDog, personality: 'Moog Barcelona basement dweller', status: 'deep hypnotic' },
 ];
