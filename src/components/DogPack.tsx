@@ -617,6 +617,45 @@ export const BirthdayDog = ({ className, animated = false }: DogVariantProps) =>
   </svg>
 );
 
+// Disco Dog - disco ball and funky vibes
+export const DiscoDog = ({ className, animated = true }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style>{`
+      @keyframes disco { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.02); } }
+      @keyframes sparkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+      .disco-move { animation: disco 0.5s ease-in-out infinite; transform-origin: center bottom; }
+      .sparkle { animation: sparkle 0.3s ease-in-out infinite; }
+    `}</style>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "disco-move" : ""}>
+      {/* Disco ball */}
+      <circle cx="32" cy="8" r="6" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <line x1="32" y1="2" x2="32" y2="0" />
+      <line x1="29" y1="6" x2="35" y2="6" className={animated ? "sparkle" : ""} />
+      <line x1="29" y1="10" x2="35" y2="10" className={animated ? "sparkle" : ""} />
+      <circle cx="30" cy="8" r="1" fill="hsl(var(--logo-green))" className={animated ? "sparkle" : ""} />
+      <circle cx="34" cy="8" r="1" fill="hsl(var(--logo-green))" className={animated ? "sparkle" : ""} />
+      {/* Ears */}
+      <path d="M16 30 Q10 18 18 12 Q24 16 24 26" />
+      <path d="M48 30 Q54 18 46 12 Q40 16 40 26" />
+      {/* Head */}
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      {/* Funky sunglasses */}
+      <ellipse cx="25" cy="36" rx="5" ry="3" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <ellipse cx="39" cy="36" rx="5" ry="3" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <path d="M30 36 L34 36" />
+      {/* Nose */}
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Big smile */}
+      <path d="M24 50 Q32 58 40 50" />
+      {/* Sparkle rays */}
+      <line x1="6" y1="20" x2="10" y2="24" opacity="0.6" className={animated ? "sparkle" : ""} />
+      <line x1="58" y1="20" x2="54" y2="24" opacity="0.6" className={animated ? "sparkle" : ""} />
+      <line x1="4" y1="36" x2="8" y2="36" opacity="0.4" className={animated ? "sparkle" : ""} />
+      <line x1="60" y1="36" x2="56" y2="36" opacity="0.4" className={animated ? "sparkle" : ""} />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -650,4 +689,5 @@ export const dogVariants = [
   { name: 'New Year', Component: NewYearDog, personality: 'Counting down to the drop', status: 'celebrating' },
   { name: 'Easter', Component: EasterDog, personality: 'Hopping through the beats', status: 'egg hunting' },
   { name: 'Birthday', Component: BirthdayDog, personality: 'Every day is a party', status: 'making wishes' },
+  { name: 'Disco', Component: DiscoDog, personality: 'Stayin alive on the floor', status: 'funky' },
 ];
