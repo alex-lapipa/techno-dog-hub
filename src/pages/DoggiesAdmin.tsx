@@ -42,7 +42,7 @@ const DoggiesAdmin = () => {
   const [packHealth, setPackHealth] = useState(94);
   const [cohesionScore, setCohesionScore] = useState(87);
   const [waggingIntensity, setWaggingIntensity] = useState([70]);
-  const [borkMode, setBorkMode] = useState(false);
+  const [barkMode, setBarkMode] = useState(false);
   const [selectedDog, setSelectedDog] = useState<number | null>(null);
   const [packQuote, setPackQuote] = useState(packQuotes[0]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -241,12 +241,12 @@ const DoggiesAdmin = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-mono text-xs text-muted-foreground uppercase">Bork Mode</p>
-                    <p className="font-mono text-sm mt-1">{borkMode ? 'ACTIVATED' : 'Standby'}</p>
+                    <p className="font-mono text-xs text-muted-foreground uppercase">Bark Mode</p>
+                    <p className="font-mono text-sm mt-1">{barkMode ? 'ACTIVATED' : 'Standby'}</p>
                   </div>
-                  <Switch checked={borkMode} onCheckedChange={setBorkMode} />
+                  <Switch checked={barkMode} onCheckedChange={setBarkMode} />
                 </div>
-                {borkMode && <p className="font-mono text-xs text-logo-green mt-2 animate-pulse">WOOF WOOF WOOF</p>}
+                {barkMode && <p className="font-mono text-xs text-logo-green mt-2 animate-pulse">WOOF WOOF WOOF</p>}
               </CardContent>
             </Card>
           </div>
@@ -348,7 +348,7 @@ const DoggiesAdmin = () => {
                       key={dbDog.id}
                       className={`p-4 rounded-lg border transition-all ${!dbDog.is_active ? 'opacity-40' : ''} ${dbDog.is_featured ? 'border-logo-green bg-logo-green/10' : ''}`}
                     >
-                      <DogComponent className="w-16 h-16 mx-auto mb-2" animated={borkMode || waggingIntensity[0] > 80} />
+                      <DogComponent className="w-16 h-16 mx-auto mb-2" animated={barkMode || waggingIntensity[0] > 80} />
                       <p className="font-mono text-xs text-center font-bold">{dbDog.name}</p>
                       <p className="font-mono text-[10px] text-center text-muted-foreground truncate">{dbDog.personality}</p>
                       <Badge variant="outline" className="w-full justify-center mt-1 text-[10px]">{dbDog.status}</Badge>
@@ -388,7 +388,7 @@ const DoggiesAdmin = () => {
                 <Zap className="w-4 h-4 text-logo-green" />
                 Doggie Generator™
               </CardTitle>
-              <CardDescription>Create new pack members using advanced bork technology</CardDescription>
+              <CardDescription>Create new pack members using advanced bark technology</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center gap-4">

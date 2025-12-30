@@ -77,13 +77,13 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
   const dogTexts = [
     { name: 'Happy', text: '*wags tail excitedly*' },
     { name: 'Sleepy', text: '*snoozes peacefully*' },
-    { name: 'Excited', text: '*BORK BORK BORK*' },
+    { name: 'Excited', text: '*BARK BARK BARK*' },
     { name: 'Grumpy', text: '*judges silently*' },
     { name: 'Curious', text: '*tilts head*' },
     { name: 'Party', text: '*celebrates*' },
     { name: 'DJ', text: '*drops the beat*' },
     { name: 'Puppy', text: '*smol excitement*' },
-    { name: 'Old', text: '*wise borking*' },
+    { name: 'Old', text: '*wise barking*' },
     { name: 'Techno', text: '*glitches happily*' },
   ];
 
