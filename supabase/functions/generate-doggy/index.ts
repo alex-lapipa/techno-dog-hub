@@ -83,9 +83,16 @@ serve(async (req) => {
     const safePrompt = buildSafePrompt(prompt);
 
     // Use Lovable AI gateway for image generation
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      throw new Error('Image generation service not configured');
+    }
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -102,7 +109,14 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI gateway error:', errorText);
+      console.error('AI gateway error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        throw new Error('Too many requests! Please wait a moment and try again.');
+      }
+      if (response.status === 402) {
+        throw new Error('Service temporarily unavailable. Please try again later.');
+      }
       throw new Error('Failed to generate doggy image');
     }
 
