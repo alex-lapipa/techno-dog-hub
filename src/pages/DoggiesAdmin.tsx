@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { LoadingState } from "@/components/ui/loading-state";
+import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +32,6 @@ const packQuotes = [
 ];
 
 const DoggiesAdmin = () => {
-  const { isAdmin, loading } = useAdminAuth();
   const { toast } = useToast();
   const { data: dbVariants, isLoading: variantsLoading } = useDoggyVariants();
   const { data: analyticsData, isLoading: analyticsLoading } = useDoggyAnalytics();
@@ -126,84 +122,44 @@ const DoggiesAdmin = () => {
     updateVariant.mutate({ id: variantId, updates: { is_featured: !currentFeatured } });
   };
 
-  if (loading || variantsLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingState message="Herding doggies..." />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="p-8 text-center">
-            <GrumpyDog className="w-16 h-16 mx-auto mb-4" />
-            <h2 className="font-mono text-xl mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">The pack doesn't recognize your scent.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   const stats = analyticsData?.stats;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <AdminPageLayout
+      title="Doggies HQ"
+      description="Manage the techno.dog pack - keep all doggies aligned and happy"
+      icon={DogSilhouette}
+      iconColor="text-logo-green"
+      isLoading={variantsLoading || analyticsLoading}
+      onRunAgent={runAnalysis}
+      isRunning={agentRunning}
+      runButtonText="Analyze Pack"
+      actions={
+        <>
+          <Link to="/doggies">
+            <Button variant="outline" size="sm" className="font-mono text-xs uppercase">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              View Public
+            </Button>
+          </Link>
+          <Button variant="outline" size="sm" onClick={shufflePack} className="font-mono text-xs uppercase">
+            <Shuffle className="w-4 h-4 mr-2" />
+            Shuffle Pack
+          </Button>
+        </>
+      }
+    >
       <PageSEO 
         title="Doggies Pack Manager | Admin"
         description="Manage the techno.dog pack - keep all doggies aligned and happy"
         path="/admin/doggies"
       />
-      <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="font-mono text-[10px] text-logo-green uppercase tracking-[0.3em] mb-2">// pack management</div>
-              <h1 className="font-mono text-3xl md:text-4xl uppercase tracking-tight flex items-center gap-3">
-                <DogSilhouette className="w-10 h-10" />
-                Doggies HQ
-              </h1>
-              <p className="font-mono text-sm text-muted-foreground mt-2 italic">"{packQuote}"</p>
-            </div>
-            <div className="flex gap-2">
-              <Link to="/doggies">
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Public Page
-                </Button>
-              </Link>
-              <Button variant="outline" onClick={shufflePack}>
-                <Shuffle className="w-4 h-4 mr-2" />
-                Shuffle Pack
-              </Button>
-              <Button 
-                variant="brutalist" 
-                onClick={runAnalysis}
-                disabled={agentRunning}
-              >
-                {agentRunning ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Activity className="w-4 h-4 mr-2" />
-                    Analyze Pack
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
+      <div className="space-y-6">
+        <p className="font-mono text-sm text-muted-foreground italic text-center">"{packQuote}"</p>
 
-          {/* Analytics Stats Row */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Analytics Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -475,12 +431,9 @@ const DoggiesAdmin = () => {
               <p className="font-mono text-3xl font-bold text-logo-green">100%</p>
               <p className="font-mono text-xs text-muted-foreground">Good Boy Rate</p>
             </div>
-          </div>
         </div>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+    </AdminPageLayout>
   );
 };
 
