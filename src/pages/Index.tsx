@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Dog } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useScrollDepth } from "@/hooks/useScrollDepth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 import DailySpotlight from "@/components/DailySpotlight";
 import PageSEO from "@/components/PageSEO";
-import { dogVariants } from "@/components/DogPack";
+import { dogVariants, NerdyDog, DJDog, ModularDog, TravellerDog } from "@/components/DogPack";
+import DogSilhouette from "@/components/DogSilhouette";
 
 const Index = () => {
   useScrollDepth({ pageName: 'index' });
@@ -70,31 +71,31 @@ const Index = () => {
 
   const combinedSchema = [organizationSchema, websiteSchema, faqSchema];
 
-  // Primary Archive sections - aligned with top nav
+  // Primary Archive sections - aligned with top nav with doggy icons
   const archiveSections = [
     {
       title: 'Technopedia',
       description: 'The complete techno encyclopedia',
       path: '/technopedia',
-      icon: '📚'
+      DogIcon: NerdyDog
     },
     {
       title: 'Artists',
       description: 'Producers & DJs shaping the sound',
       path: '/artists',
-      icon: '🎧'
+      DogIcon: DJDog
     },
     {
       title: 'Gear',
       description: 'Machines, synths & studio equipment',
       path: '/gear',
-      icon: '⚙️'
+      DogIcon: ModularDog
     },
     {
       title: 'Scenes',
       description: 'Venues, festivals & global hubs',
       path: '/venues',
-      icon: '🌍'
+      DogIcon: TravellerDog
     }
   ];
 
@@ -208,7 +209,7 @@ const Index = () => {
                   to="/doggies" 
                   className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider border border-logo-green bg-logo-green/10 text-logo-green px-6 py-3 hover:bg-logo-green hover:text-background transition-colors"
                 >
-                  <Dog className="w-4 h-4" />
+                  <DogSilhouette className="w-4 h-4" />
                   Doggies
                 </Link>
               </div>
@@ -229,7 +230,9 @@ const Index = () => {
                   to={section.path}
                   className="group block border border-foreground p-6 hover:bg-foreground hover:text-background transition-colors"
                 >
-                  <div className="text-3xl mb-4">{section.icon}</div>
+                  <div className="w-10 h-10 mb-4">
+                    <section.DogIcon className="w-full h-full" />
+                  </div>
                   <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
                     {section.title}
                   </h2>
