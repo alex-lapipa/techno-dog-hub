@@ -200,13 +200,12 @@ async function callOpenAI(prompt: string, openaiKey: string): Promise<any> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-5-2025-08-07',
       messages: [
         { role: 'system', content: 'You are a techno music journalist. Always respond with valid JSON only.' },
         { role: 'user', content: prompt }
       ],
-      temperature: 0.7,
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
     }),
   });
 

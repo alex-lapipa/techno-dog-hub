@@ -64,7 +64,7 @@ Be conservative - if unsure, score lower. Reject obvious mismatches.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt },
           {
@@ -75,7 +75,7 @@ Be conservative - if unsure, score lower. Reject obvious mismatches.`;
             ],
           },
         ],
-        max_tokens: 500,
+        max_completion_tokens: 500,
         response_format: { type: 'json_object' },
       }),
     });

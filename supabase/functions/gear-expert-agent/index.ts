@@ -314,7 +314,7 @@ ${scrapeResult.markdown.slice(0, 7000)}`;
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  model: 'gpt-4o-mini',
+                  model: 'gpt-5-mini-2025-08-07',
                   messages: [
                     { role: 'system', content: 'Extract structured JSON from web content. Focus on techno/electronic music context.' },
                     { role: 'user', content: extractionPrompt }
@@ -351,7 +351,7 @@ Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be 
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'gpt-4o-mini',
+                model: 'gpt-5-mini-2025-08-07',
                 messages: [
                   { role: 'system', content: 'You are a techno gear expert. Generate accurate, technical content.' },
                   { role: 'user', content: generatePrompt }
@@ -527,7 +527,7 @@ Be accurate and specific to this exact model. For samplers/drum machines, adapt 
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
+              model: 'gpt-5-mini-2025-08-07',
               messages: [
                 { role: 'system', content: 'You are a music gear expert. Return accurate technical specifications as valid JSON.' },
                 { role: 'user', content: specPrompt }
@@ -695,7 +695,7 @@ Extract and return JSON with these fields (use null if not found):
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5-mini-2025-08-07',
           messages: [
             { role: 'system', content: 'You extract structured data from web content. Return valid JSON only.' },
             { role: 'user', content: extractionPrompt }
@@ -821,7 +821,7 @@ ${scrapeResult.markdown.slice(0, 6000)}`;
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
+              model: 'gpt-5-mini-2025-08-07',
               messages: [
                 { role: 'system', content: 'Extract structured JSON from web content.' },
                 { role: 'user', content: extractionPrompt }
@@ -922,7 +922,7 @@ Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5-mini-2025-08-07',
           messages: [
             { role: 'system', content: 'You are an expert in electronic music gear, especially synthesizers and drum machines used in techno production.' },
             { role: 'user', content: prompt }
@@ -987,7 +987,7 @@ Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be 
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
+              model: 'gpt-5-mini-2025-08-07',
               messages: [
                 { role: 'system', content: 'You are a techno gear expert. Return only valid JSON.' },
                 { role: 'user', content: prompt }
@@ -1043,7 +1043,7 @@ Focus on warehouse techno, industrial, Detroit, and Berlin-style production. Be 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5-mini-2025-08-07',
           messages: [
             { 
               role: 'system', 
@@ -1216,7 +1216,7 @@ Keep responses focused and technical but accessible. Use specific examples when 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-5-mini-2025-08-07',
           messages: [
             { 
               role: 'system', 
