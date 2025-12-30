@@ -1901,6 +1901,36 @@ export type Database = {
         }
         Relationships: []
       }
+      doggy_placeholders: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          doggy_variant: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          doggy_variant: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          doggy_variant?: string
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       doggy_share_events: {
         Row: {
           chain_depth: number | null
