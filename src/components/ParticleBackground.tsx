@@ -26,17 +26,19 @@ const ParticleBackground = () => {
     };
 
     const createParticles = () => {
-      const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+      const particleCount = Math.floor((canvas.width * canvas.height) / 10000); // More particles
       particles = [];
       
       for (let i = 0; i < particleCount; i++) {
+        // 30% chance of being a brighter particle
+        const isBright = Math.random() < 0.3;
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           vx: (Math.random() - 0.5) * 0.15,
           vy: (Math.random() - 0.5) * 0.15,
-          size: Math.random() * 1.2 + 0.3,
-          opacity: Math.random() * 0.4 + 0.1,
+          size: isBright ? Math.random() * 1.8 + 0.8 : Math.random() * 1.2 + 0.3,
+          opacity: isBright ? Math.random() * 0.5 + 0.4 : Math.random() * 0.4 + 0.1,
         });
       }
     };
