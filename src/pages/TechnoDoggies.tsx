@@ -6,7 +6,7 @@ import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star } from "lucide-react";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
@@ -213,7 +213,68 @@ const TechnoDoggies = () => {
         </header>
 
         <main className="px-4 py-6 max-w-lg mx-auto">
-          {/* Hero - Current Dog Display (Most Engaging First) */}
+          {/* JOIN THE PACK CTA - Fun & Quirky (Top Priority) */}
+          <div className="mb-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-logo-green/10 via-transparent to-logo-green/5 rounded-2xl" />
+            <div className="relative p-4 sm:p-6 text-center border border-logo-green/30 rounded-2xl bg-card/30 backdrop-blur-sm">
+              <div className="flex justify-center gap-1 mb-2">
+                <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-logo-green">
+                  Woof woof!
+                </span>
+                <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
+              </div>
+              
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground font-mono mb-2 leading-tight">
+                Join the Pack!
+              </h1>
+              <p className="text-xs text-muted-foreground font-mono mb-4 max-w-xs mx-auto">
+                Every techno lover deserves a doggy. Find yours. Share the borks. Keep tails wagging worldwide!
+              </p>
+              
+              {/* Fun Stats */}
+              <div className="flex justify-center gap-4 mb-4">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Users className="w-3 h-3 text-logo-green" />
+                    <span className="font-mono text-sm font-bold text-foreground">{activeVariants.length}</span>
+                  </div>
+                  <span className="font-mono text-[9px] text-muted-foreground">Doggies</span>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Heart className="w-3 h-3 text-logo-green" />
+                    <span className="font-mono text-sm font-bold text-foreground">∞</span>
+                  </div>
+                  <span className="font-mono text-[9px] text-muted-foreground">Borks</span>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Share2 className="w-3 h-3 text-logo-green" />
+                    <span className="font-mono text-sm font-bold text-foreground">4ever</span>
+                  </div>
+                  <span className="font-mono text-[9px] text-muted-foreground">Vibes</span>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => {
+                  trackDoggyEvent('main_page', 'cta_click', 'join_pack');
+                  document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="font-mono text-xs h-10 px-6 bg-logo-green text-background hover:bg-logo-green/90 shadow-[0_0_20px_hsl(100_100%_60%/0.3)]"
+              >
+                <Share2 className="w-3 h-3 mr-2" />
+                Share & Spread the Borks
+              </Button>
+              
+              <p className="mt-3 font-mono text-[9px] text-muted-foreground italic">
+                "Life's too short for boring profiles. Be a techno dog."
+              </p>
+            </div>
+          </div>
+
+          {/* Hero - Current Dog Display */}
           <div className="mb-6">
             <div 
               id="current-dog-display"
@@ -222,9 +283,9 @@ const TechnoDoggies = () => {
               }`}
             >
               <DogComponent className="w-28 h-28 sm:w-36 sm:h-36" animated />
-              <h1 className="mt-3 text-2xl sm:text-3xl font-bold text-foreground font-mono">
+              <h2 className="mt-3 text-2xl sm:text-3xl font-bold text-foreground font-mono">
                 {currentDog?.name} Dog
-              </h1>
+              </h2>
               <p className="text-xs sm:text-sm text-muted-foreground text-center mt-1 font-mono px-4">
                 {currentDbData?.personality || currentDog?.personality}
               </p>
@@ -251,11 +312,14 @@ const TechnoDoggies = () => {
           </div>
 
           {/* Share Section (High Priority for Virality) */}
-          <Card className="mb-6 border-logo-green/30 bg-card/50">
+          <Card id="share-section" className="mb-6 border-logo-green/30 bg-card/50">
             <CardContent className="p-4">
-              <h2 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-3 text-center">
-                Share This Doggy
+              <h2 className="font-mono text-xs uppercase tracking-wider text-logo-green mb-1 text-center">
+                Share Your Doggy
               </h2>
+              <p className="font-mono text-[9px] text-muted-foreground text-center mb-3">
+                Make your friends jealous of your new pack member
+              </p>
               
               <div className="flex justify-center mb-3" onClick={() => handleSocialShare("social")}>
                 <SocialShareButtons url={shareUrl} text={shareText} showAll showLabel />
@@ -264,11 +328,11 @@ const TechnoDoggies = () => {
               <div className="flex gap-2 justify-center">
                 <Button variant="outline" size="sm" onClick={shareViaEmail} className="font-mono text-[10px] h-8">
                   <Mail className="w-3 h-3 mr-1" />
-                  Email
+                  Email a Friend
                 </Button>
                 <Button variant="outline" size="sm" onClick={downloadDog} className="font-mono text-[10px] h-8">
                   <Download className="w-3 h-3 mr-1" />
-                  Download
+                  Save Doggy
                 </Button>
               </div>
             </CardContent>
