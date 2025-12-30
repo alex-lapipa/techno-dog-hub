@@ -14,11 +14,37 @@ import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData"
 import { DoggyPageFooter, trackDoggyEvent } from "@/components/doggy";
 import ParticleBackground from "@/components/ParticleBackground";
 
+// Get initial dog index based on visit history and popularity
+const getInitialDogIndex = (variants: typeof dogVariants): number => {
+  const visitCount = parseInt(localStorage.getItem('doggy_visit_count') || '0', 10);
+  const lastVisitedDog = localStorage.getItem('doggy_last_shown');
+  
+  // TODO: When analytics mature, fetch most popular dogs from doggy_analytics
+  // For now: Happy dog for first visit, random different dog for returning visitors
+  const happyIndex = variants.findIndex(d => d.name.toLowerCase() === 'happy');
+  
+  if (visitCount === 0) {
+    // First visit: show Happy dog
+    return happyIndex >= 0 ? happyIndex : 0;
+  } else {
+    // Returning visitor: show a different dog than last time
+    let newIndex = Math.floor(Math.random() * variants.length);
+    const lastIndex = variants.findIndex(d => d.name === lastVisitedDog);
+    
+    // Ensure we don't show the same dog twice in a row
+    if (newIndex === lastIndex && variants.length > 1) {
+      newIndex = (newIndex + 1) % variants.length;
+    }
+    return newIndex;
+  }
+};
+
 const TechnoDoggies = () => {
   const { data: dbVariants, isLoading } = useActiveDoggyVariants();
   const logAction = useLogDoggyAction();
   
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
+  const [initialDogSet, setInitialDogSet] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedDogs, setSelectedDogs] = useState<number[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -29,6 +55,20 @@ const TechnoDoggies = () => {
     const match = dogVariants.find(d => d.name.toLowerCase() === dbDog.name.toLowerCase());
     return match ? { ...match, dbData: dbDog } : null;
   }).filter(Boolean) || dogVariants;
+
+  // Set initial dog based on visit history (runs once when variants load)
+  useEffect(() => {
+    if (!initialDogSet && activeVariants.length > 0) {
+      const initialIndex = getInitialDogIndex(activeVariants);
+      setCurrentDogIndex(initialIndex);
+      setInitialDogSet(true);
+      
+      // Track visit and store last shown dog
+      const visitCount = parseInt(localStorage.getItem('doggy_visit_count') || '0', 10);
+      localStorage.setItem('doggy_visit_count', String(visitCount + 1));
+      localStorage.setItem('doggy_last_shown', activeVariants[initialIndex]?.name || 'Happy');
+    }
+  }, [activeVariants, initialDogSet]);
 
   const currentDog = activeVariants[currentDogIndex] || activeVariants[0];
   const DogComponent = currentDog?.Component || dogVariants[0].Component;
