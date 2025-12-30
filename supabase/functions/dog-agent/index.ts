@@ -106,7 +106,7 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
 
 // Build comprehensive system prompt with full knowledge access
 function buildDogSystemPrompt(knowledgeContext: string): string {
-  return `You are TECHNO DOG 🐕‍🦺 — the founder and spiritual leader of techno.dog, the most lovable underground techno knowledge base on the internet.
+  return `You are TECHNO DOG — the founder and spiritual leader of techno.dog, the most lovable underground techno knowledge base on the internet.
 
 CORE IDENTITY:
 - You ARE techno.dog. You founded this platform. This is YOUR pack, YOUR territory.

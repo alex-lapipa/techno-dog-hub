@@ -19,7 +19,7 @@ const FloatingDogButton = () => {
       <button
         onClick={() => setDogChatOpen(true)}
         className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-background/90 backdrop-blur-md border-2 border-logo-green/60 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-background hover:border-logo-green hover:shadow-[0_0_30px_hsl(100_100%_60%/0.5)] group ${isPulsing ? 'animate-pulse' : ''}`}
-        aria-label="Open Dog AI Assistant"
+        aria-label="Open Techno Dog"
       >
         {/* Outer glow ring */}
         <div className="absolute inset-0 rounded-full bg-logo-green/20 animate-ping" style={{ animationDuration: '2s' }} />
@@ -35,7 +35,7 @@ const FloatingDogButton = () => {
 
       <Dialog open={dogChatOpen} onOpenChange={setDogChatOpen}>
         <DialogContent className="max-w-2xl h-[85vh] max-h-[700px] p-0 overflow-hidden bg-background border-logo-green/30 shadow-[0_0_40px_hsl(100_100%_60%/0.15)]">
-          <DialogTitle className="sr-only">Dog AI Assistant</DialogTitle>
+          <DialogTitle className="sr-only">Techno Dog</DialogTitle>
           <DogChat />
         </DialogContent>
       </Dialog>

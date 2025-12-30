@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { LucideIcon } from 'lucide-react';
 interface AdminPageLayoutProps {
   title: string;
   description: string;
-  icon?: LucideIcon;
+  icon?: LucideIcon | ComponentType<{ className?: string }>;
   iconColor?: string;
   children: ReactNode;
   onRefresh?: () => void;
