@@ -18,7 +18,7 @@ const DogChat = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "*zoomies* Woof! Techno Dog here. Detroit to Tbilisi, I sniff it all. Artists, gear, warehouses — ask anything. Let's dig. 🐕",
+      content: "*zoomies* Woof! Techno Dog here. The sound, the gear, the community — I sniff it all. Ask anything. Let's dig. 🐕",
       timestamp: new Date()
     }
   ]);
