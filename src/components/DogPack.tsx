@@ -1773,6 +1773,54 @@ export const LaPipaDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Paloma Dog - Alien-faced founder with ponytail, freckles, and warm smile
+export const PalomaDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Alien-shaped elongated ears - elegant and otherworldly */}
+      <path d="M14 30 Q6 20 10 8 Q16 14 18 26" />
+      <path d="M50 30 Q58 20 54 8 Q48 14 46 26" />
+      {/* Ponytail flowing to the side */}
+      <path d="M48 18 Q56 14 60 20 Q58 26 54 24" strokeWidth="2.5" />
+      <path d="M52 16 Q58 10 62 16" strokeWidth="1.5" opacity="0.7" />
+      <path d="M54 22 Q60 22 62 26" strokeWidth="1.5" opacity="0.7" />
+      {/* Hair tie */}
+      <circle cx="50" cy="18" r="2" fill="hsl(var(--logo-green))" opacity="0.5" />
+      {/* Alien-shaped head - wider at top, narrower chin */}
+      <path d="M16 36 Q14 24 22 18 Q32 14 42 18 Q50 24 48 36 Q46 48 32 52 Q18 48 16 36" />
+      {/* Large almond-shaped alien eyes */}
+      <ellipse cx="24" cy="32" rx="5" ry="4" />
+      <ellipse cx="24" cy="32" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      <circle cx="23" cy="31" r="1" fill="hsl(var(--background))" />
+      <ellipse cx="40" cy="32" rx="5" ry="4" />
+      <ellipse cx="40" cy="32" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="31" r="1" fill="hsl(var(--background))" />
+      {/* Elegant thin eyebrows */}
+      <path d="M19 27 Q24 25 28 27" strokeWidth="1" />
+      <path d="M36 27 Q40 25 45 27" strokeWidth="1" />
+      {/* Small alien nose */}
+      <path d="M30 38 Q32 40 34 38" strokeWidth="1.5" />
+      {/* Warm friendly smile */}
+      <path d="M26 44 Q32 50 38 44" strokeWidth="2" />
+      {/* Freckles scattered on cheeks */}
+      <circle cx="18" cy="36" r="0.8" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="20" cy="38" r="0.6" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="17" cy="40" r="0.7" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="21" cy="42" r="0.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="46" cy="36" r="0.8" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="44" cy="38" r="0.6" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="47" cy="40" r="0.7" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="43" cy="42" r="0.5" fill="hsl(var(--logo-green))" opacity="0.4" />
+      {/* Extra freckles on nose bridge */}
+      <circle cx="30" cy="36" r="0.5" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <circle cx="34" cy="36" r="0.5" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <circle cx="32" cy="35" r="0.4" fill="hsl(var(--logo-green))" opacity="0.3" />
+      {/* Subtle sparkle near eye - alien glow */}
+      <path d="M14 28 L14 26 M13 27 L15 27" strokeWidth="1" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1862,5 +1910,6 @@ export const dogVariants = [
   { name: 'M.E.N', Component: MENDog, personality: 'Moog Barcelona basement dweller', status: 'deep hypnotic' },
   // FOUNDERS
   { name: 'Alex', Component: AlexDog, personality: 'Scruffy Irish madman with big ideas', status: 'building' },
+  { name: 'Paloma', Component: PalomaDog, personality: 'Alien soul with a warm heart', status: 'dreaming' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'A living question, beyond the obvious', status: 'something stranger' },
 ];
