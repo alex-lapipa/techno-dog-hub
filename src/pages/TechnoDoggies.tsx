@@ -497,7 +497,7 @@ const TechnoDoggies = () => {
                 />
               </div>
               <h2 className="mt-5 text-2xl sm:text-3xl font-bold text-foreground font-mono drop-shadow-[0_0_10px_hsl(100_100%_60%/0.3)]">
-                {currentDog?.name} Dog
+                {currentDog?.name === 'Techno' ? 'Techno Dog' : `${currentDog?.name} Doggy`}
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground text-center mt-1 font-mono px-4">
                 "{currentDbData?.personality || currentDog?.personality}"
