@@ -140,7 +140,7 @@ const TechnoDoggies = () => {
       setTimeout(() => {
         setCurrentDogIndex((prev) => (prev + 1) % activeVariants.length);
         setIsAnimating(false);
-      }, 150);
+      }, 250);
     }, 5000);
     
     return () => clearInterval(interval);
@@ -168,7 +168,7 @@ const TechnoDoggies = () => {
       setTimeout(() => {
         document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 200);
-    }, 150);
+    }, 250);
   };
 
   // Deselect and resume auto-rotation
@@ -605,9 +605,9 @@ const TechnoDoggies = () => {
                     <div
                       key={`prev-${offset}`}
                       onClick={() => selectDog(index)}
-                      className={`flex-shrink-0 cursor-pointer transition-all duration-300 hover:opacity-80 hover:scale-110 ${offset === -2 ? 'hidden sm:block' : ''}`}
+                      className={`flex-shrink-0 cursor-pointer transition-all duration-500 ease-out hover:opacity-80 hover:scale-110 ${offset === -2 ? 'hidden sm:block' : ''}`}
                     >
-                      <Dog className={scale} />
+                      <Dog className={`${scale} [&_svg]:!stroke-[2.5] [&_svg]:[shape-rendering:geometricPrecision]`} />
                     </div>
                   );
                 })}
@@ -616,15 +616,15 @@ const TechnoDoggies = () => {
                 <div 
                   id="current-dog-display"
                   onClick={() => !isDogSelected && selectDog(currentDogIndex)}
-                  className={`flex-shrink-0 flex flex-col items-center transition-all duration-300 cursor-pointer ${
-                    isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+                  className={`flex-shrink-0 flex flex-col items-center transition-all duration-500 ease-out cursor-pointer ${
+                    isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
                   } ${isDogSelected ? 'scale-105' : 'hover:scale-105'}`}
                 >
                   {/* Subtle halo effect - reduced opacity for better visibility */}
                   <div className="relative">
                     <div className={`absolute inset-0 rounded-full blur-2xl transition-all ${isDogSelected ? 'bg-logo-green/15 scale-110' : 'bg-logo-green/8'}`} />
                     <DogComponent 
-                      className="w-32 h-32 sm:w-44 sm:h-44 relative z-10" 
+                      className="w-32 h-32 sm:w-44 sm:h-44 relative z-10 [&_svg]:!stroke-[3] [&_svg]:[shape-rendering:geometricPrecision]" 
                       animated 
                     />
                   </div>
@@ -657,9 +657,9 @@ const TechnoDoggies = () => {
                     <div
                       key={`next-${offset}`}
                       onClick={() => selectDog(index)}
-                      className={`flex-shrink-0 cursor-pointer transition-all duration-300 hover:opacity-80 hover:scale-110 ${offset === 2 ? 'hidden sm:block' : ''}`}
+                      className={`flex-shrink-0 cursor-pointer transition-all duration-500 ease-out hover:opacity-80 hover:scale-110 ${offset === 2 ? 'hidden sm:block' : ''}`}
                     >
-                      <Dog className={scale} />
+                      <Dog className={`${scale} [&_svg]:!stroke-[2.5] [&_svg]:[shape-rendering:geometricPrecision]`} />
                     </div>
                   );
                 })}

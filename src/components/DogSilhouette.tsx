@@ -12,11 +12,12 @@ const DogSilhouette = ({ className, animated = false }: DogSilhouetteProps) => {
       className={cn("w-10 h-10", className)}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      style={{ shapeRendering: 'geometricPrecision' }}
     >
-      {/* Happy dog face - minimal lines */}
+      {/* Happy dog face - sharp crisp lines */}
       <g 
         stroke="hsl(var(--logo-green))" 
-        strokeWidth="2" 
+        strokeWidth="2.5" 
         strokeLinecap="round" 
         strokeLinejoin="round"
         fill="none"
