@@ -138,7 +138,7 @@ const TechnoDoggies = () => {
       `Create your own pack & download your favorite doggies:\n` +
       `https://techno.dog/doggies\n\n` +
       `Each doggy is available for individual download as a high-quality PNG.\n\n` +
-      `Spread the borks!`
+      `Spread the barks!`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     toast.success("Opening email...");
@@ -336,14 +336,14 @@ const TechnoDoggies = () => {
     <>
       <Helmet>
         <title>Techno Doggies - Create & Share Your Pack | techno.dog</title>
-        <meta name="description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bork bork!" />
+        <meta name="description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Bark bark!" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://techno.dog/doggies" />
         <meta property="og:title" content="Techno Doggies - Create & Share Your Pack" />
-        <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the borks!" />
+        <meta property="og:description" content="Create and share your own pack of Techno Doggies! Fun, shareable dog characters for the techno community. Spread the barks!" />
         <meta property="og:image" content="https://techno.dog/og-doggies.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -393,7 +393,7 @@ const TechnoDoggies = () => {
                 Join the Pack!
               </h1>
               <p className="text-xs text-muted-foreground font-mono mb-4 max-w-xs mx-auto">
-                Every techno lover deserves a doggy. Find yours. Share the borks. Keep tails wagging worldwide!
+                Every techno lover deserves a doggy. Find yours. Share the barks. Keep tails wagging worldwide!
               </p>
               
               {/* Fun Stats */}
@@ -410,7 +410,7 @@ const TechnoDoggies = () => {
                     <Heart className="w-3 h-3 text-logo-green" />
                     <span className="font-mono text-sm font-bold text-foreground">∞</span>
                   </div>
-                  <span className="font-mono text-[9px] text-muted-foreground">Borks</span>
+                  <span className="font-mono text-[9px] text-muted-foreground">Barks</span>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1">
@@ -429,7 +429,7 @@ const TechnoDoggies = () => {
                 className="font-mono text-xs h-10 px-6 bg-logo-green text-background hover:bg-logo-green/90 shadow-[0_0_20px_hsl(100_100%_60%/0.3)]"
               >
                 <Share2 className="w-3 h-3 mr-2" />
-                Share & Spread the Borks
+                Share & Spread the Barks
               </Button>
               
               <p className="mt-3 font-mono text-[9px] text-muted-foreground italic">

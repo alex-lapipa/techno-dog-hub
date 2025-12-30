@@ -659,7 +659,7 @@ export const DiscoDog = ({ className, animated = true }: DogVariantProps) => (
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
-  { name: 'Excited', Component: ExcitedDog, personality: 'SQUIRREL! I mean... DATA!', status: 'maximum bork' },
+  { name: 'Excited', Component: ExcitedDog, personality: 'SQUIRREL! I mean... DATA!', status: 'maximum bark' },
   { name: 'Grumpy', Component: GrumpyDog, personality: 'Has opinions about your code', status: 'judging' },
   { name: 'Curious', Component: CuriousDog, personality: 'Sniffing out bugs since 2024', status: 'investigating' },
   { name: 'Party', Component: PartyDog, personality: 'Every deploy is a celebration', status: 'vibing' },
