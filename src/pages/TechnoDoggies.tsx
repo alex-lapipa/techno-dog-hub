@@ -83,10 +83,22 @@ const TechnoDoggies = () => {
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
   // Get the active variants from DB, fallback to static if loading
-  const activeVariants = dbVariants?.map(dbDog => {
-    const match = dogVariants.find(d => d.name.toLowerCase() === dbDog.name.toLowerCase());
-    return match ? { ...match, dbData: dbDog } : null;
-  }).filter(Boolean) || dogVariants;
+  // Deduplicate by name to avoid showing same dog twice
+  const activeVariants = (() => {
+    const variants = dbVariants?.map(dbDog => {
+      const match = dogVariants.find(d => d.name.toLowerCase() === dbDog.name.toLowerCase());
+      return match ? { ...match, dbData: dbDog } : null;
+    }).filter(Boolean) || dogVariants;
+    
+    // Remove duplicates by name
+    const seen = new Set<string>();
+    return variants.filter(v => {
+      const name = v?.name?.toLowerCase();
+      if (seen.has(name)) return false;
+      seen.add(name);
+      return true;
+    });
+  })();
 
   // Set initial dog based on visit history (runs once when variants load)
   useEffect(() => {
@@ -862,8 +874,8 @@ const TechnoDoggies = () => {
               <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-logo-green/20 to-transparent rounded-br-full" />
               <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-logo-green/20 to-transparent rounded-tl-full" />
               
-              {/* Grid - fewer columns for bigger icons */}
-              <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 sm:gap-3 relative z-10">
+              {/* Grid - mobile-first with larger icons (4 cols mobile, 6 tablet, 8 desktop) */}
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 sm:gap-4 relative z-10">
                 {activeVariants.map((dog: any, index: number) => {
                   const Dog = dog.Component;
                   const isActive = currentDogIndex === index;
