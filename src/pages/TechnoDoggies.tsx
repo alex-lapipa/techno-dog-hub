@@ -144,6 +144,7 @@ const TechnoDoggies = () => {
     toast.success("Opening email...");
   };
 
+  // Download as ultra-light SVG (~1-3KB)
   const downloadDog = async () => {
     const svg = document.querySelector('#current-dog-display svg');
     if (!svg) {
@@ -154,28 +155,30 @@ const TechnoDoggies = () => {
     logAction.mutate({
       variantId: currentDbData?.id,
       variantName: currentDog?.name || "Unknown",
-      actionType: "download",
+      actionType: "download_svg",
     });
-    trackDoggyEvent('main_page', 'download', undefined, currentDog?.name);
+    trackDoggyEvent('main_page', 'download_svg', undefined, currentDog?.name);
 
-    toast.loading("Generating your doggy...");
+    // Clone and clean the SVG (remove text, optimize)
+    const svgClone = svg.cloneNode(true) as SVGElement;
+    svgClone.querySelectorAll('text').forEach(t => t.remove());
+    svgClone.setAttribute('width', '512');
+    svgClone.setAttribute('height', '512');
+    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     
-    const imageData = await generateDoggyImage();
-    if (!imageData) {
-      toast.dismiss();
-      toast.error("Failed to generate image. Try again!");
-      return;
-    }
+    const svgData = new XMLSerializer().serializeToString(svgClone);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
     
     const link = document.createElement('a');
-    link.download = `techno-${currentDog?.name.toLowerCase().replace(/\s+/g, '-')}-dog.png`;
-    link.href = imageData;
+    link.download = `techno-${currentDog?.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
+    link.href = URL.createObjectURL(svgBlob);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    toast.dismiss();
-    toast.success(`Downloaded ${currentDog?.name} Dog!`);
+    toast.success(`Downloaded ${currentDog?.name} Dog!`, {
+      description: "~2KB SVG • Transparent • Perfect quality",
+    });
   };
 
   // Download sticker-ready version for WhatsApp (512x512 WebP, no text, transparent)
@@ -460,42 +463,60 @@ const TechnoDoggies = () => {
                 const Dog = dog.Component;
                 const isFeatured = dog.dbData?.is_featured;
                 
+                // Download as ultra-light SVG (~1-3KB) - best for sharing
                 const downloadSingleDog = async () => {
-                  toast.loading(`Creating ${dog.name} sticker...`);
-                  
-                  // Create a temporary container to render the dog without text
-                  const tempDiv = document.createElement('div');
-                  tempDiv.style.position = 'absolute';
-                  tempDiv.style.left = '-9999px';
-                  tempDiv.innerHTML = `
-                    <svg viewBox="0 0 64 64" width="512" height="512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      ${document.querySelector(`#dog-${index} svg`)?.innerHTML || ''}
-                    </svg>
-                  `;
-                  document.body.appendChild(tempDiv);
-                  
-                  const svg = tempDiv.querySelector('svg');
-                  if (!svg) {
-                    document.body.removeChild(tempDiv);
-                    toast.dismiss();
-                    toast.error("Couldn't generate sticker");
+                  const svgElement = document.querySelector(`#dog-${index} svg`);
+                  if (!svgElement) {
+                    toast.error("Couldn't find doggy");
                     return;
                   }
                   
-                  // Copy the stroke styles
-                  svg.querySelectorAll('g, path, ellipse, circle, rect, line, text').forEach(el => {
-                    if (!el.getAttribute('stroke')) {
-                      el.setAttribute('stroke', 'hsl(100, 100%, 65%)');
-                    }
-                    el.setAttribute('stroke-width', el.getAttribute('stroke-width') || '2');
-                    el.setAttribute('stroke-linecap', 'round');
-                    el.setAttribute('stroke-linejoin', 'round');
+                  // Clone and clean the SVG
+                  const svgClone = svgElement.cloneNode(true) as SVGElement;
+                  svgClone.querySelectorAll('text').forEach(t => t.remove()); // Remove text
+                  svgClone.setAttribute('width', '512');
+                  svgClone.setAttribute('height', '512');
+                  svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                  
+                  // Serialize to minimal SVG string
+                  const svgData = new XMLSerializer().serializeToString(svgClone);
+                  const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+                  
+                  const link = document.createElement('a');
+                  link.download = `techno-${dog.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
+                  link.href = URL.createObjectURL(svgBlob);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  
+                  logAction.mutate({
+                    variantId: dog.dbData?.id,
+                    variantName: dog.name,
+                    actionType: "download_svg",
                   });
                   
-                  // Remove any text elements (clean sticker)
-                  svg.querySelectorAll('text').forEach(t => t.remove());
+                  toast.success(`${dog.name} downloaded!`, {
+                    description: "~2KB SVG • Perfect for sharing",
+                    duration: 3000,
+                  });
+                };
+                
+                // WhatsApp needs WebP - offer as secondary option
+                const downloadForWhatsAppSingle = async () => {
+                  const svgElement = document.querySelector(`#dog-${index} svg`);
+                  if (!svgElement) {
+                    toast.error("Couldn't find doggy");
+                    return;
+                  }
                   
-                  const svgData = new XMLSerializer().serializeToString(svg);
+                  toast.loading("Creating sticker...");
+                  
+                  const svgClone = svgElement.cloneNode(true) as SVGElement;
+                  svgClone.querySelectorAll('text').forEach(t => t.remove());
+                  svgClone.setAttribute('width', '512');
+                  svgClone.setAttribute('height', '512');
+                  
+                  const svgData = new XMLSerializer().serializeToString(svgClone);
                   const canvas = document.createElement('canvas');
                   const ctx = canvas.getContext('2d');
                   const img = new Image();
@@ -507,8 +528,8 @@ const TechnoDoggies = () => {
                     ctx!.clearRect(0, 0, 512, 512);
                     ctx!.drawImage(img, 0, 0, 512, 512);
                     
+                    // Lower quality for smaller file (0.7 = ~15-25KB)
                     canvas.toBlob((blob) => {
-                      document.body.removeChild(tempDiv);
                       if (blob) {
                         const link = document.createElement('a');
                         link.download = `techno-${dog.name.toLowerCase().replace(/\s+/g, '-')}-sticker.webp`;
@@ -525,20 +546,19 @@ const TechnoDoggies = () => {
                         
                         toast.dismiss();
                         toast.success(`${dog.name} sticker ready!`, {
-                          description: "Add to WhatsApp via Stickers > Create",
-                          duration: 4000,
+                          description: "Add via WhatsApp > Stickers > Create",
+                          duration: 3000,
                         });
                       } else {
                         toast.dismiss();
-                        toast.error("Failed to create sticker");
+                        toast.error("Failed");
                       }
-                    }, 'image/webp', 0.95);
+                    }, 'image/webp', 0.7); // Lower quality = smaller file
                   };
                   
                   img.onerror = () => {
-                    document.body.removeChild(tempDiv);
                     toast.dismiss();
-                    toast.error("Failed to generate sticker");
+                    toast.error("Failed");
                   };
                   
                   const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
@@ -572,16 +592,27 @@ const TechnoDoggies = () => {
                       </p>
                     </div>
                     
-                    {/* Download Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={downloadSingleDog}
-                      className="flex-shrink-0 h-8 px-3 font-mono text-[10px] border-logo-green/30 hover:bg-logo-green/20"
-                    >
-                      <Smartphone className="w-3 h-3 mr-1" />
-                      Get
-                    </Button>
+                    {/* Download Buttons */}
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadSingleDog}
+                        className="h-8 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
+                        title="SVG ~2KB"
+                      >
+                        <Download className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadForWhatsAppSingle}
+                        className="h-8 px-2 font-mono text-[9px] border-logo-green/30 hover:bg-logo-green/20"
+                        title="WhatsApp sticker"
+                      >
+                        <Smartphone className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
