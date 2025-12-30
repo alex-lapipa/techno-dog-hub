@@ -20,12 +20,12 @@ const getInitialDogIndex = (variants: typeof dogVariants): number => {
   const lastVisitedDog = localStorage.getItem('doggy_last_shown');
   
   // TODO: When analytics mature, fetch most popular dogs from doggy_analytics
-  // For now: Happy dog for first visit, random different dog for returning visitors
-  const happyIndex = variants.findIndex(d => d.name.toLowerCase() === 'happy');
+  // Default: Techno dog for first visit, random different dog for returning visitors
+  const technoIndex = variants.findIndex(d => d.name.toLowerCase() === 'techno');
   
   if (visitCount === 0) {
-    // First visit: show Happy dog
-    return happyIndex >= 0 ? happyIndex : 0;
+    // First visit: show Techno dog (our official mascot)
+    return technoIndex >= 0 ? technoIndex : 0;
   } else {
     // Returning visitor: show a different dog than last time
     let newIndex = Math.floor(Math.random() * variants.length);
@@ -482,17 +482,27 @@ const TechnoDoggies = () => {
                 isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
               }`}
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-logo-green/20 rounded-full blur-2xl animate-pulse" />
-                <DogComponent className="w-32 h-32 sm:w-40 sm:h-40 relative z-10" animated />
+              {/* Enhanced glow effects like floating button */}
+              <div className="relative group">
+                {/* Outer pulsing glow ring */}
+                <div className="absolute inset-0 rounded-full bg-logo-green/30 animate-ping" style={{ animationDuration: '2.5s' }} />
+                {/* Inner soft glow */}
+                <div className="absolute inset-0 bg-logo-green/25 rounded-full blur-3xl animate-pulse" />
+                {/* Secondary glow layer */}
+                <div className="absolute -inset-4 bg-logo-green/10 rounded-full blur-2xl" />
+                {/* The dog with drop shadow */}
+                <DogComponent 
+                  className="w-36 h-36 sm:w-44 sm:h-44 relative z-10 drop-shadow-[0_0_20px_hsl(100_100%_60%/0.6)] transition-transform duration-300 hover:scale-105 hover:rotate-3" 
+                  animated 
+                />
               </div>
-              <h2 className="mt-4 text-2xl sm:text-3xl font-bold text-foreground font-mono">
+              <h2 className="mt-5 text-2xl sm:text-3xl font-bold text-foreground font-mono drop-shadow-[0_0_10px_hsl(100_100%_60%/0.3)]">
                 {currentDog?.name} Dog
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground text-center mt-1 font-mono px-4">
                 "{currentDbData?.personality || currentDog?.personality}"
               </p>
-              <span className="mt-2 px-3 py-1 text-[10px] uppercase tracking-wider rounded-full border border-logo-green/30 text-logo-green font-mono">
+              <span className="mt-3 px-4 py-1.5 text-[10px] uppercase tracking-wider rounded-full border border-logo-green/50 text-logo-green font-mono bg-logo-green/10 shadow-[0_0_15px_hsl(100_100%_60%/0.2)]">
                 {currentDbData?.status || currentDog?.status}
               </span>
               {currentDbData?.is_featured && (
