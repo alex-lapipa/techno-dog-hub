@@ -857,13 +857,13 @@ const TechnoDoggies = () => {
             </div>
             
             {/* Impressive grid with staggered animation */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-logo-green/10 via-background to-logo-green/5 border border-logo-green/20 p-4 overflow-hidden">
+            <div className="relative rounded-2xl bg-gradient-to-br from-logo-green/10 via-background to-logo-green/5 border border-logo-green/20 p-5 sm:p-6 overflow-hidden">
               {/* Decorative corner elements */}
-              <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-logo-green/20 to-transparent rounded-br-full" />
-              <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-logo-green/20 to-transparent rounded-tl-full" />
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-logo-green/20 to-transparent rounded-br-full" />
+              <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-logo-green/20 to-transparent rounded-tl-full" />
               
-              {/* Grid */}
-              <div className="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-12 gap-1.5 sm:gap-2 relative z-10">
+              {/* Grid - fewer columns for bigger icons */}
+              <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 sm:gap-3 relative z-10">
                 {activeVariants.map((dog: any, index: number) => {
                   const Dog = dog.Component;
                   const isActive = currentDogIndex === index;
@@ -874,11 +874,11 @@ const TechnoDoggies = () => {
                       key={`grid-${dog.name}`}
                       onClick={() => selectDog(index)}
                       style={{ 
-                        animationDelay: `${index * 20}ms`,
+                        animationDelay: `${index * 15}ms`,
                         opacity: 0,
                         animation: 'fade-in 0.3s ease-out forwards'
                       }}
-                      className={`aspect-square rounded-lg p-1 cursor-pointer transition-all duration-200 group relative ${
+                      className={`aspect-square rounded-xl p-1.5 cursor-pointer transition-all duration-200 group relative ${
                         isActive 
                           ? 'bg-logo-green/40 ring-2 ring-logo-green scale-110 z-20 shadow-[0_0_15px_hsl(var(--logo-green)/0.5)]' 
                           : isFeatured
@@ -889,18 +889,18 @@ const TechnoDoggies = () => {
                       <Dog className="w-full h-full transition-transform group-hover:scale-105" />
                       
                       {/* Tooltip on hover */}
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-background/95 border border-logo-green/30 rounded text-[8px] font-mono text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-background/95 border border-logo-green/30 rounded text-[9px] font-mono text-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-30">
                         {dog.name}
                       </div>
                       
                       {/* Active indicator */}
                       {isActive && (
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-logo-green animate-pulse" />
+                        <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-logo-green animate-pulse" />
                       )}
                       
                       {/* Featured star */}
                       {isFeatured && !isActive && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-logo-green flex items-center justify-center">
+                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-logo-green flex items-center justify-center">
                           <Star className="w-2 h-2 text-background" />
                         </div>
                       )}
