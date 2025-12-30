@@ -255,3 +255,6 @@ verify_jwt = false
 
 [functions.generate-doggy]
 verify_jwt = false
+
+[functions.doggy-analytics-insights]
+verify_jwt = false
