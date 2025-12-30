@@ -1,14 +1,13 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Loader2, Heart, Volume2, Square, Phone, PhoneOff, Wifi, WifiOff } from "lucide-react";
+import { Send, Loader2, Heart, Volume2, Square, Mic, MicOff } from "lucide-react";
 import DogSilhouette from "@/components/DogSilhouette";
-import { supabase } from "@/integrations/supabase/client";
-import { useVoiceConversation } from "@/hooks/useVoiceConversation";
+import { useVoiceChat } from "@/hooks/useVoiceChat";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -26,31 +25,30 @@ const DogChat = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [speakingMessageIndex, setSpeakingMessageIndex] = useState<number | null>(null);
+  const [manualSpeakingIndex, setManualSpeakingIndex] = useState<number | null>(null);
   const [audioVisualization, setAudioVisualization] = useState<number[]>([0.3, 0.5, 0.7, 0.5, 0.3]);
   
   const scrollRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const manualAudioRef = useRef<HTMLAudioElement | null>(null);
   const visualizationInterval = useRef<NodeJS.Timeout | null>(null);
   
   const { toast } = useToast();
 
-  // Voice conversation hook for live ElevenLabs conversation
-  const voiceConversation = useVoiceConversation({
+  // Voice chat hook - uses Web Speech API + ElevenLabs TTS
+  const voiceChat = useVoiceChat({
     onMessage: (message) => {
       setMessages(prev => [...prev, message]);
     },
     onStatusChange: (status) => {
-      if (status === 'connected') {
+      if (status === 'listening') {
         toast({
           title: "*perks up ears*",
-          description: "Voice call connected! Speak naturally — I'll respond when you pause.",
+          description: "Listening! Speak naturally — I'll respond when you pause.",
         });
-      } else if (status === 'disconnected') {
-        // Only show if was previously connected
-        console.log("Voice conversation disconnected");
       }
+    },
+    onTranscript: (transcript, isFinal) => {
+      console.log("Transcript:", transcript, isFinal ? "(final)" : "(interim)");
     },
     onError: (error) => {
       toast({
@@ -61,12 +59,8 @@ const DogChat = () => {
     }
   });
 
-  // Sync speaking state from conversation hook
-  useEffect(() => {
-    if (voiceConversation.isConnected) {
-      setIsSpeaking(voiceConversation.isSpeaking);
-    }
-  }, [voiceConversation.isSpeaking, voiceConversation.isConnected]);
+  const isSpeaking = voiceChat.isSpeaking || manualSpeakingIndex !== null;
+  const isVoiceActive = voiceChat.isListening;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -77,12 +71,12 @@ const DogChat = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (voiceConversation.isConnected) {
-        voiceConversation.endConversation();
+      if (voiceChat.isListening) {
+        voiceChat.stopListening();
       }
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
+      if (manualAudioRef.current) {
+        manualAudioRef.current.pause();
+        manualAudioRef.current = null;
       }
       if (visualizationInterval.current) {
         clearInterval(visualizationInterval.current);
@@ -116,15 +110,15 @@ const DogChat = () => {
     };
   }, [isSpeaking]);
 
+  // Manual speak for individual messages (non-voice mode)
   const speakMessage = async (text: string, messageIndex: number) => {
-    if (isSpeaking && speakingMessageIndex === messageIndex) {
-      stopSpeaking();
+    if (manualSpeakingIndex === messageIndex) {
+      stopManualSpeaking();
       return;
     }
 
-    stopSpeaking();
-    setIsSpeaking(true);
-    setSpeakingMessageIndex(messageIndex);
+    stopManualSpeaking();
+    setManualSpeakingIndex(messageIndex);
 
     try {
       const response = await fetch(
@@ -136,7 +130,7 @@ const DogChat = () => {
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ text, voice: 'it' }),
+          body: JSON.stringify({ text }),
         }
       );
 
@@ -148,15 +142,13 @@ const DogChat = () => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.onended = () => {
-        setIsSpeaking(false);
-        setSpeakingMessageIndex(null);
+      manualAudioRef.current = new Audio(audioUrl);
+      manualAudioRef.current.onended = () => {
+        setManualSpeakingIndex(null);
         URL.revokeObjectURL(audioUrl);
       };
-      audioRef.current.onerror = () => {
-        setIsSpeaking(false);
-        setSpeakingMessageIndex(null);
+      manualAudioRef.current.onerror = () => {
+        setManualSpeakingIndex(null);
         URL.revokeObjectURL(audioUrl);
         toast({
           title: "*confused head tilt*",
@@ -165,11 +157,10 @@ const DogChat = () => {
         });
       };
       
-      await audioRef.current.play();
+      await manualAudioRef.current.play();
     } catch (error) {
       console.error('Voice error:', error);
-      setIsSpeaking(false);
-      setSpeakingMessageIndex(null);
+      setManualSpeakingIndex(null);
       toast({
         title: "*sad whimper*",
         description: error instanceof Error ? error.message : "Couldn't speak that one. Try again!",
@@ -178,14 +169,13 @@ const DogChat = () => {
     }
   };
 
-  const stopSpeaking = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
+  const stopManualSpeaking = () => {
+    if (manualAudioRef.current) {
+      manualAudioRef.current.pause();
+      manualAudioRef.current.currentTime = 0;
+      manualAudioRef.current = null;
     }
-    setIsSpeaking(false);
-    setSpeakingMessageIndex(null);
+    setManualSpeakingIndex(null);
   };
 
   const sendMessage = async () => {
@@ -282,7 +272,13 @@ const DogChat = () => {
     "How can I contribute?"
   ];
 
-  const isVoiceActive = voiceConversation.isConnected || voiceConversation.isConnecting;
+  const handleVoiceToggle = () => {
+    if (isVoiceActive) {
+      voiceChat.stopListening();
+    } else {
+      voiceChat.startListening();
+    }
+  };
 
   return (
     <Card className="border-logo-green/30 bg-gradient-to-br from-background via-background to-logo-green/5 h-full flex flex-col overflow-hidden">
@@ -291,7 +287,7 @@ const DogChat = () => {
           {/* Dog Avatar with Audio Visualization */}
           <div className="relative">
             <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center border-2 border-logo-green shadow-[0_0_20px_hsl(var(--logo-green)/0.3)] transition-all duration-300 ${isSpeaking ? 'animate-pulse' : ''} ${isVoiceActive ? 'ring-2 ring-crimson ring-offset-2 ring-offset-background' : ''}`}>
-              <DogSilhouette className="w-8 h-8" animated={isSpeaking || voiceConversation.isConnected} />
+              <DogSilhouette className="w-8 h-8" animated={isSpeaking || isVoiceActive} />
             </div>
             {/* Speaking indicator */}
             {isSpeaking && (
@@ -305,13 +301,14 @@ const DogChat = () => {
                 ))}
               </div>
             )}
-            {/* Connection indicator */}
-            {voiceConversation.isConnected && !isSpeaking && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-logo-green rounded-full animate-pulse flex items-center justify-center">
-                <Wifi className="w-2.5 h-2.5 text-background" />
+            {/* Listening indicator */}
+            {isVoiceActive && !isSpeaking && (
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-crimson rounded-full animate-pulse flex items-center justify-center">
+                <Mic className="w-2.5 h-2.5 text-white" />
               </div>
             )}
-            {voiceConversation.isConnecting && (
+            {/* Processing indicator */}
+            {voiceChat.isProcessing && (
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full animate-pulse flex items-center justify-center">
                 <Loader2 className="w-2.5 h-2.5 text-background animate-spin" />
               </div>
@@ -320,19 +317,13 @@ const DogChat = () => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="tracking-tight">Techno Dog</span>
-              {voiceConversation.isConnected && (
-                <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green uppercase tracking-wider shrink-0">
-                  <Wifi className="w-3 h-3 mr-1" />
-                  Live
+              {isVoiceActive && (
+                <Badge variant="outline" className="text-[10px] font-mono border-crimson/50 text-crimson uppercase tracking-wider shrink-0">
+                  <Mic className="w-3 h-3 mr-1" />
+                  {voiceChat.status === 'listening' ? 'Listening' : voiceChat.status === 'processing' ? 'Thinking' : voiceChat.status === 'speaking' ? 'Speaking' : 'Voice'}
                 </Badge>
               )}
-              {voiceConversation.isConnecting && (
-                <Badge variant="outline" className="text-[10px] font-mono border-yellow-500/50 text-yellow-500 uppercase tracking-wider shrink-0">
-                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                  Connecting
-                </Badge>
-              )}
-              {isSpeaking && (
+              {isSpeaking && !isVoiceActive && (
                 <Badge variant="outline" className="text-[10px] font-mono border-logo-green/50 text-logo-green uppercase tracking-wider animate-pulse shrink-0">
                   <Volume2 className="w-3 h-3 mr-1" />
                   Speaking
@@ -340,11 +331,9 @@ const DogChat = () => {
               )}
             </div>
             <p className="text-xs text-muted-foreground font-normal mt-0.5">
-              {voiceConversation.isConnected 
-                ? "Voice call active — speak naturally, I'll respond" 
-                : voiceConversation.isConnecting
-                  ? "Connecting to voice..."
-                  : "One scene, one pack 🖤"}
+              {isVoiceActive 
+                ? voiceChat.currentTranscript || (voiceChat.status === 'listening' ? "Listening — speak when ready" : voiceChat.status === 'processing' ? "Thinking..." : "Speaking...")
+                : "One scene, one pack 🖤"}
             </p>
           </div>
           
@@ -352,24 +341,24 @@ const DogChat = () => {
           <Button
             variant={isVoiceActive ? "default" : "outline"}
             size="sm"
-            onClick={isVoiceActive ? voiceConversation.endConversation : voiceConversation.startConversation}
-            disabled={voiceConversation.isConnecting}
+            onClick={handleVoiceToggle}
+            disabled={voiceChat.isProcessing}
             className={`shrink-0 ${isVoiceActive ? 'bg-crimson hover:bg-crimson/90' : 'border-logo-green/50 hover:bg-logo-green/10'}`}
           >
-            {voiceConversation.isConnecting ? (
+            {voiceChat.isProcessing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-                Connecting...
+                Thinking...
               </>
             ) : isVoiceActive ? (
               <>
-                <PhoneOff className="w-4 h-4 mr-1.5" />
-                End Call
+                <MicOff className="w-4 h-4 mr-1.5" />
+                Stop
               </>
             ) : (
               <>
-                <Phone className="w-4 h-4 mr-1.5" />
-                Voice Call
+                <Mic className="w-4 h-4 mr-1.5" />
+                Voice
               </>
             )}
           </Button>
@@ -397,19 +386,19 @@ const DogChat = () => {
                         <DogSilhouette className="w-4 h-4" />
                         <span className="text-xs font-mono text-logo-green/80 uppercase tracking-wider font-normal">Techno Dog</span>
                       </div>
-                      {!voiceConversation.isConnected && (
+                      {!isVoiceActive && (
                         <Button
                           variant="ghost"
                           size="sm"
                           className={`h-7 w-7 p-0 transition-all ${
-                            isSpeaking && speakingMessageIndex === index 
+                            manualSpeakingIndex === index 
                               ? 'bg-crimson/20 hover:bg-crimson/30' 
                               : 'hover:bg-logo-green/20'
                           }`}
                           onClick={() => speakMessage(message.content, index)}
-                          title={isSpeaking && speakingMessageIndex === index ? "Stop speaking" : "Listen to this message"}
+                          title={manualSpeakingIndex === index ? "Stop speaking" : "Listen to this message"}
                         >
-                          {isSpeaking && speakingMessageIndex === index ? (
+                          {manualSpeakingIndex === index ? (
                             <Square className="w-3.5 h-3.5 text-crimson" />
                           ) : (
                             <Volume2 className="w-3.5 h-3.5 text-logo-green" />
@@ -465,34 +454,38 @@ const DogChat = () => {
         )}
         
         {/* Voice Mode Status Banner */}
-        {voiceConversation.isConnected && (
-          <div className="px-4 py-3 bg-logo-green/10 border-t border-logo-green/20 shrink-0">
+        {isVoiceActive && (
+          <div className="px-4 py-3 bg-crimson/10 border-t border-crimson/20 shrink-0">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-1">
                 <div className={`w-3 h-3 rounded-full shrink-0 ${
-                  isSpeaking ? 'bg-logo-green animate-pulse' : 'bg-logo-green/50'
+                  voiceChat.status === 'speaking' ? 'bg-logo-green animate-pulse' : 
+                  voiceChat.status === 'listening' ? 'bg-crimson animate-pulse' : 
+                  'bg-yellow-500 animate-pulse'
                 }`} />
                 <p className="text-xs font-mono">
-                  {isSpeaking 
-                    ? "Speaking... (interrupt anytime)" 
-                    : "Listening — speak when ready"}
+                  {voiceChat.status === 'speaking' 
+                    ? "Speaking... (tap stop to interrupt)" 
+                    : voiceChat.status === 'processing'
+                      ? "Thinking..."
+                      : voiceChat.currentTranscript || "Listening — speak when ready"}
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={voiceConversation.endConversation}
+                onClick={voiceChat.stopListening}
                 className="text-crimson hover:text-crimson hover:bg-crimson/20 text-xs font-mono"
               >
-                <PhoneOff className="w-3 h-3 mr-1" />
-                End Call
+                <MicOff className="w-3 h-3 mr-1" />
+                Stop
               </Button>
             </div>
           </div>
         )}
         
         {/* Input Area - Hidden in voice mode */}
-        {!voiceConversation.isConnected && (
+        {!isVoiceActive && (
           <div className="p-4 border-t border-border/50 bg-background/50 shrink-0">
             <div className="flex gap-2">
               <Input
