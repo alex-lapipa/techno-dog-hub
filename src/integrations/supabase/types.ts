@@ -2242,6 +2242,113 @@ export type Database = {
         }
         Relationships: []
       }
+      journalist_contacts: {
+        Row: {
+          authority_score: number | null
+          bio_summary: string | null
+          coverage_focus_tags: string[] | null
+          created_at: string | null
+          created_by: string | null
+          credibility_notes: string | null
+          data_source_url: string | null
+          email: string | null
+          enrichment_confidence: number | null
+          full_name: string
+          gdpr_consent_note: string | null
+          id: string
+          is_active: boolean | null
+          key_interviews: Json | null
+          key_recent_articles: Json | null
+          languages: string[] | null
+          last_verified_at: string | null
+          location_city: string | null
+          location_country: string | null
+          outlet_id: string | null
+          phone: string | null
+          preferred_contact_method: string | null
+          press_submission_url: string | null
+          relationship_status: string | null
+          role_title: string | null
+          social_links: Json | null
+          underground_credibility_score: number | null
+          updated_at: string | null
+          website: string | null
+          what_makes_them_tick: string | null
+        }
+        Insert: {
+          authority_score?: number | null
+          bio_summary?: string | null
+          coverage_focus_tags?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          credibility_notes?: string | null
+          data_source_url?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          full_name: string
+          gdpr_consent_note?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_interviews?: Json | null
+          key_recent_articles?: Json | null
+          languages?: string[] | null
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          outlet_id?: string | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          press_submission_url?: string | null
+          relationship_status?: string | null
+          role_title?: string | null
+          social_links?: Json | null
+          underground_credibility_score?: number | null
+          updated_at?: string | null
+          website?: string | null
+          what_makes_them_tick?: string | null
+        }
+        Update: {
+          authority_score?: number | null
+          bio_summary?: string | null
+          coverage_focus_tags?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          credibility_notes?: string | null
+          data_source_url?: string | null
+          email?: string | null
+          enrichment_confidence?: number | null
+          full_name?: string
+          gdpr_consent_note?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_interviews?: Json | null
+          key_recent_articles?: Json | null
+          languages?: string[] | null
+          last_verified_at?: string | null
+          location_city?: string | null
+          location_country?: string | null
+          outlet_id?: string | null
+          phone?: string | null
+          preferred_contact_method?: string | null
+          press_submission_url?: string | null
+          relationship_status?: string | null
+          role_title?: string | null
+          social_links?: Json | null
+          underground_credibility_score?: number | null
+          updated_at?: string | null
+          website?: string | null
+          what_makes_them_tick?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journalist_contacts_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "media_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       launch_notifications: {
         Row: {
           created_at: string
@@ -2335,6 +2442,75 @@ export type Database = {
           storage_url?: string | null
           tags?: Json | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      media_outlets: {
+        Row: {
+          activity_status: string | null
+          audience_size_estimate: string | null
+          authority_score: number | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          created_by: string | null
+          data_source_url: string | null
+          enrichment_confidence: number | null
+          genres_focus: string[] | null
+          id: string
+          last_verified_at: string | null
+          notes: string | null
+          outlet_name: string
+          outlet_type: string
+          primary_language: string | null
+          region: string | null
+          underground_credibility_score: number | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          activity_status?: string | null
+          audience_size_estimate?: string | null
+          authority_score?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_source_url?: string | null
+          enrichment_confidence?: number | null
+          genres_focus?: string[] | null
+          id?: string
+          last_verified_at?: string | null
+          notes?: string | null
+          outlet_name: string
+          outlet_type: string
+          primary_language?: string | null
+          region?: string | null
+          underground_credibility_score?: number | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          activity_status?: string | null
+          audience_size_estimate?: string | null
+          authority_score?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          data_source_url?: string | null
+          enrichment_confidence?: number | null
+          genres_focus?: string[] | null
+          id?: string
+          last_verified_at?: string | null
+          notes?: string | null
+          outlet_name?: string
+          outlet_type?: string
+          primary_language?: string | null
+          region?: string | null
+          underground_credibility_score?: number | null
+          updated_at?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -2504,6 +2680,78 @@ export type Database = {
           },
         ]
       }
+      outreach_history: {
+        Row: {
+          campaign_name: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          journalist_id: string | null
+          message_content: string | null
+          message_summary: string | null
+          next_action_date: string | null
+          next_action_note: string | null
+          outlet_id: string | null
+          outreach_date: string | null
+          outreach_type: string
+          response_notes: string | null
+          status: string | null
+          subject_line: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          journalist_id?: string | null
+          message_content?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          next_action_note?: string | null
+          outlet_id?: string | null
+          outreach_date?: string | null
+          outreach_type: string
+          response_notes?: string | null
+          status?: string | null
+          subject_line?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_name?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          journalist_id?: string | null
+          message_content?: string | null
+          message_summary?: string | null
+          next_action_date?: string | null
+          next_action_note?: string | null
+          outlet_id?: string | null
+          outreach_date?: string | null
+          outreach_type?: string
+          response_notes?: string | null
+          status?: string | null
+          subject_line?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outreach_history_journalist_id_fkey"
+            columns: ["journalist_id"]
+            isOneToOne: false
+            referencedRelation: "journalist_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outreach_history_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "media_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_webhook_events: {
         Row: {
           created_at: string
@@ -2581,6 +2829,132 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pr_agent_runs: {
+        Row: {
+          completed_at: string | null
+          contacts_processed: number | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          models_used: string[] | null
+          outlets_processed: number | null
+          parameters: Json | null
+          results: Json | null
+          run_type: string
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          contacts_processed?: number | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          outlets_processed?: number | null
+          parameters?: Json | null
+          results?: Json | null
+          run_type: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          contacts_processed?: number | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          outlets_processed?: number | null
+          parameters?: Json | null
+          results?: Json | null
+          run_type?: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      pr_lists_segments: {
+        Row: {
+          contact_ids: string[] | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          filters_json: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          outlet_ids: string[] | null
+          segment_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          contact_ids?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          outlet_ids?: string[] | null
+          segment_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          contact_ids?: string[] | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters_json?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          outlet_ids?: string[] | null
+          segment_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pr_scrape_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          models_used: string[] | null
+          parameters: Json | null
+          records_affected: number | null
+          source_url: string | null
+          status: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          records_affected?: number | null
+          source_url?: string | null
+          status?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          models_used?: string[] | null
+          parameters?: Json | null
+          records_affected?: number | null
+          source_url?: string | null
+          status?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
