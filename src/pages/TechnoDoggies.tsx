@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
-import CustomDoggyCreator from "@/components/CustomDoggyCreator";
 import { DoggyPageFooter, trackDoggyEvent } from "@/components/doggy";
 
 const TechnoDoggies = () => {
@@ -619,18 +618,6 @@ const TechnoDoggies = () => {
             </div>
           </div>
 
-          {/* 4. CREATE YOUR OWN - Interactive AI Generator */}
-          <div className="mb-8">
-            <div className="text-center mb-4">
-              <h2 className="font-mono text-base font-bold text-foreground mb-1">
-                Create Your Own Techno Doggy
-              </h2>
-              <p className="font-mono text-[10px] text-muted-foreground">
-                Powered by AI • Describe your dream doggy
-              </p>
-            </div>
-            <CustomDoggyCreator />
-          </div>
 
           {/* 5. SHARE & JOIN - Community CTA */}
           <Card id="share-section" className="mb-8 border-logo-green/30 bg-gradient-to-br from-logo-green/10 via-transparent to-logo-green/5">
