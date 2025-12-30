@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import DogSilhouette from '@/components/DogSilhouette';
 import DogChat from '@/components/admin/DogChat';
@@ -6,6 +7,10 @@ import DogChat from '@/components/admin/DogChat';
 const FloatingDogButton = () => {
   const [dogChatOpen, setDogChatOpen] = useState(false);
   const [isPulsing, setIsPulsing] = useState(true);
+  const location = useLocation();
+
+  // Hide on widget page - keep widget clean and self-contained
+  const isWidgetPage = location.pathname === '/doggy-widget';
 
   // Stop pulsing after first interaction
   useEffect(() => {
@@ -13,6 +18,11 @@ const FloatingDogButton = () => {
       setIsPulsing(false);
     }
   }, [dogChatOpen]);
+
+  // Don't render on widget page
+  if (isWidgetPage) {
+    return null;
+  }
 
   return (
     <>
