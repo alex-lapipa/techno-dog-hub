@@ -397,7 +397,7 @@ const TechnoDoggies = () => {
               </p>
               
               {/* Fun Stats */}
-              <div className="flex justify-center gap-4 mb-4">
+              <div className="flex justify-center gap-3 mb-4">
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1">
                     <Users className="w-3 h-3 text-logo-green" />
@@ -411,6 +411,13 @@ const TechnoDoggies = () => {
                     <span className="font-mono text-sm font-bold text-foreground">∞</span>
                   </div>
                   <span className="font-mono text-[9px] text-muted-foreground">Barks</span>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Sparkles className="w-3 h-3 text-logo-green" />
+                    <span className="font-mono text-sm font-bold text-foreground">∞</span>
+                  </div>
+                  <span className="font-mono text-[9px] text-muted-foreground">Tail Wags</span>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1">
