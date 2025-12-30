@@ -499,8 +499,8 @@ const TechnoDoggies = () => {
   };
 
   const shareUrl = "https://techno.dog/doggies";
-  // Doggies leave nameless - the techno.dog pack philosophy
-  const shareText = "Join the techno.dog pack! Create your own doggies at techno.dog";
+  // Share message for social platforms
+  const shareText = "Join the techno.dog community! Create your own pack of doggies at";
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
