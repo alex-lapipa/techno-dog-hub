@@ -1,4 +1,5 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Dog } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -62,6 +63,17 @@ const HeroSection = () => {
             <Button variant="terminal" size="lg">
               Aquasella 2025
             </Button>
+          </div>
+
+          {/* Secondary links */}
+          <div className="flex flex-wrap gap-6 font-mono text-xs text-muted-foreground">
+            <Link to="/submit" className="hover:text-foreground transition-colors underline underline-offset-4">
+              Contribute
+            </Link>
+            <Link to="/doggies" className="hover:text-foreground transition-colors underline underline-offset-4 flex items-center gap-1">
+              <Dog className="w-3 h-3" />
+              Doggies
+            </Link>
           </div>
 
           {/* Stats */}
