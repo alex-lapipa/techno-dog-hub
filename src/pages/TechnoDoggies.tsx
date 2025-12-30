@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Helmet } from "react-helmet-async";
 import PageSEO from "@/components/PageSEO";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,9 +101,24 @@ const TechnoDoggies = () => {
   })();
 
   // Set initial dog based on visit history (runs once when variants load)
+  // Read URL parameter for shared dog links
+  const [searchParams] = useSearchParams();
+  const sharedDogSlug = searchParams.get('dog');
+
   useEffect(() => {
     if (!initialDogSet && activeVariants.length > 0) {
-      const initialIndex = getInitialDogIndex(activeVariants);
+      let initialIndex: number;
+      
+      // Check for shared dog in URL first
+      if (sharedDogSlug) {
+        const sharedIndex = activeVariants.findIndex(
+          d => d.name.toLowerCase().replace(/\s+/g, '-') === sharedDogSlug.toLowerCase()
+        );
+        initialIndex = sharedIndex >= 0 ? sharedIndex : getInitialDogIndex(activeVariants);
+      } else {
+        initialIndex = getInitialDogIndex(activeVariants);
+      }
+      
       setCurrentDogIndex(initialIndex);
       setInitialDogSet(true);
       
@@ -112,7 +127,7 @@ const TechnoDoggies = () => {
       localStorage.setItem('doggy_visit_count', String(visitCount + 1));
       localStorage.setItem('doggy_last_shown', activeVariants[initialIndex]?.name || 'Happy');
     }
-  }, [activeVariants, initialDogSet]);
+  }, [activeVariants, initialDogSet, sharedDogSlug]);
 
   const currentDog = activeVariants[currentDogIndex] || activeVariants[0];
   const DogComponent = currentDog?.Component || dogVariants[0].Component;
@@ -288,13 +303,15 @@ const TechnoDoggies = () => {
     trackDoggyEvent('main_page', 'share', 'email', currentDog?.name);
     await recordShare();
     
-    // Doggies leave nameless - just the pack, no individual names
-    const subject = encodeURIComponent("Join the techno.dog pack!");
+    // Share the specific dog the user selected
+    const dogSlugForEmail = currentDog?.name?.toLowerCase().replace(/\s+/g, '-') || 'techno';
+    const emailShareUrl = `https://techno.dog/doggies?dog=${dogSlugForEmail}`;
+    const subject = encodeURIComponent(`I'm ${currentDog?.name || 'a Techno Dog'}! 🖤`);
     const body = encodeURIComponent(
-      `Woof woof! Check out the techno.dog pack!\n\n` +
-      `${activeVariants.length}+ unique doggies waiting to be adopted.\n\n` +
-      `Create your own pack & download your favorites:\n` +
-      `https://techno.dog/doggies\n\n` +
+      `🖤 I'm ${currentDog?.name || 'a Techno Dog'}!\n\n` +
+      `Join the techno.dog pack — ${activeVariants.length}+ unique doggies for the underground.\n\n` +
+      `Find yours:\n` +
+      `${emailShareUrl}\n\n` +
       `Spread the barks!`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
@@ -498,7 +515,9 @@ const TechnoDoggies = () => {
     await recordShare();
   };
 
-  const shareUrl = "https://techno.dog/doggies";
+  // Dynamic share URL with selected dog
+  const dogSlug = currentDog?.name?.toLowerCase().replace(/\s+/g, '-') || 'techno';
+  const shareUrl = `https://techno.dog/doggies?dog=${dogSlug}`;
   // Dynamic share message based on selected dog
   const dogName = currentDog?.name || 'Techno Dog';
   const shareText = `I'm ${dogName} 🖤 Join the techno.dog pack! Find your spirit doggy at`;
