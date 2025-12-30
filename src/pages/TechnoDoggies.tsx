@@ -84,6 +84,18 @@ const TechnoDoggies = () => {
   const [isDogSelected, setIsDogSelected] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  
+  // Mobile-safe platform detection
+  const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        setPlatform('ios');
+      } else if (/Android/.test(navigator.userAgent)) {
+        setPlatform('android');
+      }
+    }
+  }, []);
 
   // Get the active variants from DB, fallback to static if loading
   // Deduplicate by name to avoid showing same dog twice
@@ -362,9 +374,9 @@ const TechnoDoggies = () => {
     });
   };
 
-  // Detect platform for platform-specific instructions
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = /Android/.test(navigator.userAgent);
+  // Use state-based platform detection for mobile reliability
+  const isIOS = platform === 'ios';
+  const isAndroid = platform === 'android';
 
   // Download sticker-ready version for WhatsApp (512x512 WebP, no text, transparent)
   const downloadForWhatsApp = async () => {
