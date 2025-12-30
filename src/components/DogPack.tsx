@@ -905,6 +905,52 @@ export const BouncerDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Security Dog - watchful guardian with earpiece
+export const SecurityDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M14 30 Q10 20 16 14 Q22 18 22 26" />
+      <path d="M50 30 Q54 20 48 14 Q42 18 42 26" />
+      <ellipse cx="32" cy="40" rx="18" ry="16" />
+      {/* Serious focused eyes */}
+      <line x1="24" y1="35" x2="30" y2="35" />
+      <line x1="34" y1="35" x2="40" y2="35" />
+      <circle cx="27" cy="38" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="37" cy="38" r="2.5" fill="hsl(var(--logo-green))" />
+      <ellipse cx="32" cy="46" rx="3" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Earpiece */}
+      <circle cx="48" cy="36" r="3" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <path d="M48 39 L48 44" strokeWidth="2" />
+      {/* Neutral mouth */}
+      <line x1="29" y1="51" x2="35" y2="51" />
+    </g>
+  </svg>
+);
+
+// Bartender Dog - shaking cocktails
+export const BartenderDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Friendly eyes */}
+      <circle cx="26" cy="34" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="34" r="2" fill="hsl(var(--logo-green))" />
+      <ellipse cx="32" cy="40" rx="3" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Happy smile */}
+      <path d="M26 44 Q32 50 38 44" />
+      {/* Cocktail shaker */}
+      <g className={animated ? "animate-bounce" : ""}>
+        <rect x="46" y="26" width="8" height="16" rx="2" fill="hsl(var(--logo-green))" opacity="0.4" />
+        <rect x="47" y="22" width="6" height="4" rx="1" fill="hsl(var(--logo-green))" opacity="0.6" />
+      </g>
+      {/* Bowtie */}
+      <path d="M28 50 L32 52 L36 50 L32 54 Z" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 // Producer Dog - laptop warrior
 export const ProducerDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1501,4 +1547,6 @@ export const dogVariants = [
   { name: 'D-Edge', Component: DEdgeDog, personality: 'São Paulo marathon', status: 'south america' },
   { name: 'MUTEK', Component: MutekDog, personality: 'Audiovisual experiment', status: 'glitching' },
   { name: 'Sub Club', Component: SubClubDog, personality: 'Melbourne underground', status: 'australian' },
+  { name: 'Security', Component: SecurityDog, personality: 'Eyes on the floor always', status: 'watching' },
+  { name: 'Bartender', Component: BartenderDog, personality: 'Shaken not stirred', status: 'mixing' },
 ];
