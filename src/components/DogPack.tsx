@@ -1144,6 +1144,287 @@ export const NerdyDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// VENUE DOGS - Each venue has its own character
+
+// Tresor Dog - vault vibes, Detroit connection
+export const TresorDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Vault door */}
+      <circle cx="32" cy="10" r="8" opacity="0.3" />
+      <circle cx="32" cy="10" r="4" opacity="0.5" />
+      <path d="M28 10 L36 10" />
+      <path d="M32 6 L32 14" />
+    </g>
+  </svg>
+);
+
+// About Blank Dog - garden vibes, queer-friendly
+export const AboutBlankDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 54 36 50" />
+      {/* Flowers/garden */}
+      <path d="M8 20 Q10 14 12 20" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <path d="M52 18 Q54 12 56 18" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <text x="4" y="30" fontSize="8" fill="hsl(var(--logo-green))" opacity="0.5">://</text>
+    </g>
+  </svg>
+);
+
+// Bassiani Dog - swimming pool, resistance vibes
+export const BassianiDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      <path d="M24 34 Q26 30 28 34" />
+      <path d="M36 34 Q38 30 40 34" />
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 48 Q32 52 36 48" />
+      {/* Wave patterns - swimming pool */}
+      <path d="M4 54 Q8 50 12 54 Q16 58 20 54" opacity="0.4" />
+      <path d="M44 54 Q48 50 52 54 Q56 58 60 54" opacity="0.4" />
+      <text x="28" y="12" fontSize="8" fill="hsl(var(--logo-green))" opacity="0.6">✊</text>
+    </g>
+  </svg>
+);
+
+// Khidi Dog - raw industrial
+export const KhidiDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <line x1="24" y1="36" x2="28" y2="36" />
+      <line x1="36" y1="36" x2="40" y2="36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 50 36 50" />
+      {/* Dark/raw aesthetic */}
+      <rect x="4" y="6" width="8" height="12" opacity="0.2" />
+      <rect x="52" y="6" width="8" height="12" opacity="0.2" />
+    </g>
+  </svg>
+);
+
+// Concrete Dog - barge on Seine, daylight
+export const ConcreteDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      <path d="M24 32 Q26 28 28 32" />
+      <path d="M36 32 Q38 28 40 32" />
+      <ellipse cx="32" cy="40" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 46 Q32 50 38 46" />
+      {/* Boat/barge shape */}
+      <path d="M8 54 Q16 58 32 58 Q48 58 56 54 L52 50 L12 50 Z" opacity="0.3" />
+      <text x="50" y="16" fontSize="8" fill="hsl(var(--logo-green))" opacity="0.5">☀</text>
+    </g>
+  </svg>
+);
+
+// De School Dog - former school vibes
+export const DeSchoolDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 32 Q12 22 18 16 Q22 18 24 26" />
+      <path d="M48 32 Q52 22 46 16 Q42 18 40 26" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* School/book */}
+      <rect x="24" y="6" width="16" height="12" rx="1" opacity="0.3" />
+      <path d="M32 6 L32 18" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// Fold Dog - warehouse darkness
+export const FoldDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <circle cx="26" cy="36" r="3" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <circle cx="38" cy="36" r="3" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* 24+ hours indicator */}
+      <text x="4" y="14" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.5">24+</text>
+      <text x="48" y="12" fontSize="8" fill="hsl(var(--logo-green))" opacity="0.4">h</text>
+    </g>
+  </svg>
+);
+
+// Fuse Dog - low ceiling, vinyl
+export const FuseDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M18 34 Q14 28 18 22 Q22 24 24 30" />
+      <path d="M46 34 Q50 28 46 22 Q42 24 40 30" />
+      <ellipse cx="32" cy="42" rx="16" ry="12" />
+      <path d="M24 38 Q26 34 28 38" />
+      <path d="M36 38 Q38 34 40 38" />
+      <ellipse cx="32" cy="44" rx="3" ry="2" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Low ceiling line */}
+      <path d="M8 18 L56 18" opacity="0.4" />
+      {/* Vinyl record */}
+      <circle cx="32" cy="8" r="6" opacity="0.3" />
+      <circle cx="32" cy="8" r="2" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// Instytut Dog - Polish industrial
+export const InstytutDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Industrial chimneys - Silesia */}
+      <rect x="6" y="4" width="4" height="14" opacity="0.3" />
+      <rect x="54" y="6" width="4" height="12" opacity="0.3" />
+      <path d="M8 4 Q8 0 8 2" opacity="0.2" />
+    </g>
+  </svg>
+);
+
+// Marble Bar Dog - Detroit birthplace
+export const MarbleBarDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 Q32 54 38 50" />
+      {/* Detroit star/origin */}
+      <path d="M32 4 L34 10 L40 10 L35 14 L37 20 L32 16 L27 20 L29 14 L24 10 L30 10 Z" fill="hsl(var(--logo-green))" opacity="0.4" />
+    </g>
+  </svg>
+);
+
+// Vent Dog - Tokyo intimacy
+export const VentDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 34 28 36" />
+      <path d="M36 36 Q38 34 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Japanese character hint */}
+      <text x="6" y="16" fontSize="10" fill="hsl(var(--logo-green))" opacity="0.5">音</text>
+    </g>
+  </svg>
+);
+
+// Video Club Dog - Bogotá underground
+export const VideoClubDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Video/play button */}
+      <rect x="22" y="4" width="20" height="14" rx="2" opacity="0.3" />
+      <path d="M30 8 L36 11 L30 14 Z" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
+// D-Edge Dog - São Paulo marathon
+export const DEdgeDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M26 50 Q32 54 38 50" />
+      {/* LED/lights */}
+      <circle cx="12" cy="12" r="2" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <circle cx="52" cy="10" r="2" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <circle cx="32" cy="6" r="2" fill="hsl(var(--logo-green))" opacity="0.6" />
+    </g>
+  </svg>
+);
+
+// MUTEK Dog - audiovisual experimental
+export const MutekDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <rect x="22" y="32" width="8" height="8" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <rect x="34" y="32" width="8" height="8" fill="hsl(var(--logo-green))" opacity="0.3" />
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 52 Q32 54 36 52" />
+      {/* Glitch lines */}
+      <line x1="4" y1="20" x2="12" y2="20" opacity="0.4" />
+      <line x1="52" y1="24" x2="60" y2="24" opacity="0.4" />
+      <line x1="6" y1="16" x2="10" y2="16" opacity="0.3" />
+    </g>
+  </svg>
+);
+
+// Sub Club Melbourne Dog - Australian underground
+export const SubClubDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      <path d="M16 30 Q12 20 18 14 Q22 16 24 24" />
+      <path d="M48 30 Q52 20 46 14 Q42 16 40 24" />
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      <path d="M24 36 Q26 32 28 36" />
+      <path d="M36 36 Q38 32 40 36" />
+      <ellipse cx="32" cy="44" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      <path d="M28 50 Q32 52 36 50" />
+      {/* Southern cross stars hint */}
+      <circle cx="10" cy="10" r="1.5" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="16" cy="8" r="1" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="12" cy="16" r="1" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="8" cy="14" r="1" fill="hsl(var(--logo-green))" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1204,4 +1485,20 @@ export const dogVariants = [
   { name: 'Tourist', Component: TouristDog, personality: 'First time at the club', status: 'amazed' },
   { name: 'Legend', Component: LegendDog, personality: 'Been there since day one', status: 'iconic' },
   { name: 'Nerdy', Component: NerdyDog, personality: 'Knows every BPM by heart', status: 'calculating' },
+  // VENUE DOGS
+  { name: 'Tresor', Component: TresorDog, personality: 'Detroit-Berlin axis forever', status: 'in the vault' },
+  { name: 'About Blank', Component: AboutBlankDog, personality: 'Garden party til sunrise', status: 'collective' },
+  { name: 'Bassiani', Component: BassianiDog, personality: 'Dancing for freedom', status: 'resisting' },
+  { name: 'Khidi', Component: KhidiDog, personality: 'Raw and uncompromising', status: 'tbilisi dark' },
+  { name: 'Concrete', Component: ConcreteDog, personality: 'Sunrise on the Seine', status: 'legendary' },
+  { name: 'De School', Component: DeSchoolDog, personality: 'Class is in session', status: 'amsterdam' },
+  { name: 'Fold', Component: FoldDog, personality: '24+ hours of darkness', status: 'east london' },
+  { name: 'Fuse', Component: FuseDog, personality: 'Low ceiling, high energy', status: 'brussels' },
+  { name: 'Instytut', Component: InstytutDog, personality: 'Silesian steel', status: 'katowice' },
+  { name: 'Marble Bar', Component: MarbleBarDog, personality: 'Birthplace of techno', status: 'detroit' },
+  { name: 'Vent', Component: VentDog, personality: 'Tokyo intimacy', status: 'quality sound' },
+  { name: 'Video Club', Component: VideoClubDog, personality: 'Bogotá underground', status: 'colombian' },
+  { name: 'D-Edge', Component: DEdgeDog, personality: 'São Paulo marathon', status: 'south america' },
+  { name: 'MUTEK', Component: MutekDog, personality: 'Audiovisual experiment', status: 'glitching' },
+  { name: 'Sub Club', Component: SubClubDog, personality: 'Melbourne underground', status: 'australian' },
 ];
