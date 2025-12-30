@@ -33,24 +33,17 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    {
-      label: 'News',
-      path: '/news',
-      sub: [
-        { label: 'Latest', path: '/news' },
-        { label: 'Your Stories', path: '/news/your-stories' },
-      ]
-    },
+    { label: 'Technopedia', path: '/technopedia' },
+    { label: 'Artists', path: '/artists' },
+    { label: 'Gear', path: '/gear' },
     { 
       label: 'Scenes', 
       path: '/scenes',
       isScenes: true,
       sub: SCENES_ITEMS
     },
-    { label: 'Artists', path: '/artists' },
     { label: 'Labels', path: '/labels' },
-    { label: 'Gear', path: '/gear' },
-    { label: 'Technopedia', path: '/technopedia' },
+    { label: 'News', path: '/news' },
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
