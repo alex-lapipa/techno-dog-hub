@@ -135,17 +135,17 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     options.onMessage?.(userMessage);
     
     try {
-      // Get AI response from rag-chat
+      // Get AI response from rag-chat (expects 'query' parameter)
       const { data: chatData, error: chatError } = await supabase.functions.invoke("rag-chat", {
         body: { 
-          message: text,
-          conversationHistory: messagesRef.current.slice(-10) // Last 10 messages for context
+          query: text,
+          stream: false // Use non-streaming for voice
         }
       });
       
       if (chatError) throw chatError;
       
-      const assistantText = chatData?.response || chatData?.message || "Woof! I'm having trouble thinking right now.";
+      const assistantText = chatData?.answer || chatData?.response || chatData?.message || "Woof! I'm having trouble thinking right now.";
       
       // Add assistant message
       const assistantMessage: Message = {
