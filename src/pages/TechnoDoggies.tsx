@@ -131,7 +131,7 @@ const TechnoDoggies = () => {
     }
   }, []);
 
-  // Auto-cycle through dogs every 3 seconds (for focus carousel)
+  // Auto-cycle through dogs every 5 seconds (stops when selected)
   useEffect(() => {
     if (isCarouselPaused || isDogSelected) return;
     
@@ -141,7 +141,7 @@ const TechnoDoggies = () => {
         setCurrentDogIndex((prev) => (prev + 1) % activeVariants.length);
         setIsAnimating(false);
       }, 150);
-    }, 3000);
+    }, 5000);
     
     return () => clearInterval(interval);
   }, [isCarouselPaused, isDogSelected, activeVariants.length]);
