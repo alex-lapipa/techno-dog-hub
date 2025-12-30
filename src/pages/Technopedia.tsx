@@ -4,11 +4,35 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import FlexibleSubmissionForm from "@/components/FlexibleSubmissionForm";
-import { Database, Users, Heart, Globe, BookOpen, Github, Handshake, Gift, Sparkles } from "lucide-react";
+import { Database, Users, Heart, Globe, BookOpen, Github, Handshake, Gift, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+// Fetch real counts from database
+const fetchArchiveStats = async () => {
+  const [artistsResult, gearResult, labelsResult] = await Promise.all([
+    supabase.from('canonical_artists').select('artist_id', { count: 'exact', head: true }),
+    supabase.from('gear_catalog').select('id', { count: 'exact', head: true }),
+    supabase.from('labels').select('id', { count: 'exact', head: true }),
+  ]);
+
+  return {
+    artists: artistsResult.count || 0,
+    gear: gearResult.count || 0,
+    labels: labelsResult.count || 0,
+  };
+};
 
 const TechnopediaPage = () => {
   useScrollDepth({ pageName: 'technopedia' });
+  
+  // Fetch real stats from database
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['technopedia-stats'],
+    queryFn: fetchArchiveStats,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   const content = {
     title: "Technopedia",
@@ -31,13 +55,8 @@ const TechnopediaPage = () => {
       {
         icon: Database,
         title: "The Archive",
-        description: "An ever-growing collection of artists, labels, festivals, venues, and gear that shaped techno culture. From the Detroit originators to the latest Berlin residents, from forgotten warehouse parties to legendary clubs.",
-        stats: [
-          { label: "Artists", value: "130+" },
-          { label: "Festivals", value: "150+" },
-          { label: "Venues", value: "80+" },
-          { label: "Labels", value: "200+" }
-        ]
+        description: "A growing collection of artists and gear that shaped techno culture. From the Detroit originators to the latest Berlin residents. Community contributions welcome.",
+        hasDynamicStats: true // Flag to render dynamic stats
       },
       {
         icon: Globe,
@@ -169,14 +188,29 @@ const TechnopediaPage = () => {
                       {section.description}
                     </p>
                     
-                    {section.stats && (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
-                        {section.stats.map((stat, i) => (
-                          <div key={i}>
-                            <div className="font-mono text-2xl sm:text-3xl text-foreground">{stat.value}</div>
-                            <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</div>
+                    {'hasDynamicStats' in section && section.hasDynamicStats && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-border">
+                        {statsLoading ? (
+                          <div className="col-span-3 flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin text-logo-green" />
+                            <span className="font-mono text-xs text-muted-foreground">Loading stats...</span>
                           </div>
-                        ))}
+                        ) : (
+                          <>
+                            <div>
+                              <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.artists || 0}</div>
+                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Artists</div>
+                            </div>
+                            <div>
+                              <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.gear || 0}</div>
+                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Gear Items</div>
+                            </div>
+                            <div>
+                              <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.labels || 0}</div>
+                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Labels</div>
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                     
