@@ -505,6 +505,7 @@ const TechnoDoggies = () => {
   const twitterShareText = `I'm ${dogName} 🖤 No NPCs allowed. Find your spirit doggy #Techno #TechnoDog`;
   const telegramShareText = `🖤 I'm ${dogName}!\n\nJoin the techno.dog pack and find your spirit doggy. 70+ unique doggies waiting for you.`;
   const discordShareText = `🖤 **I'm ${dogName}!**\n\nJoin the techno.dog pack — 70+ unique doggies for the underground. Find yours:`;
+  const blueskyShareText = `🖤 I'm ${dogName}!\n\nJoin the techno.dog pack — 70+ unique doggies for the underground.\n\nFind yours ↓`;
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
@@ -790,7 +791,7 @@ const TechnoDoggies = () => {
                   
                   <button 
                     onClick={() => {
-                      window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank');
+                      window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(`${blueskyShareText}\n\n${shareUrl}`)}`, '_blank');
                       handleSocialShare("bluesky");
                     }}
                     className="flex flex-col items-center p-2 rounded-lg hover:bg-logo-green/20 transition-colors group"
