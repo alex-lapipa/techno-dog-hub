@@ -1503,6 +1503,36 @@ export const SubClubDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Aquasella Dog - Asturian festival, river Sella, mountains, nature
+export const AquasellaDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ shapeRendering: 'geometricPrecision' }}>
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Ears */}
+      <path d="M16 28 Q12 18 18 12 Q22 14 24 22" />
+      <path d="M48 28 Q52 18 46 12 Q42 14 40 22" />
+      {/* Face */}
+      <ellipse cx="32" cy="38" rx="16" ry="14" />
+      {/* Happy eyes */}
+      <path d="M24 34 Q26 30 28 34" />
+      <path d="M36 34 Q38 30 40 34" />
+      {/* Nose */}
+      <ellipse cx="32" cy="42" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Big smile - festival vibes */}
+      <path d="M26 48 Q32 54 38 48" />
+      {/* Mountain peaks - Asturian landscape */}
+      <path d="M4 20 L10 8 L16 18" opacity="0.5" />
+      <path d="M48 20 L54 10 L60 18" opacity="0.5" />
+      {/* River waves - Sella river */}
+      <path d="M8 56 Q14 52 20 56 Q26 60 32 56 Q38 52 44 56 Q50 60 56 56" opacity="0.4" />
+      {/* Sun - outdoor festival */}
+      <circle cx="32" cy="6" r="3" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <path d="M32 1 L32 3" opacity="0.4" />
+      <path d="M27 6 L29 6" opacity="0.4" />
+      <path d="M35 6 L37 6" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -1582,4 +1612,6 @@ export const dogVariants = [
   { name: 'Security', Component: SecurityDog, personality: 'Eyes on the floor always', status: 'watching' },
   { name: 'Bartender', Component: BartenderDog, personality: 'Shaken not stirred', status: 'mixing' },
   { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'You shall not pass', status: 'judging' },
+  // FESTIVAL DOGS
+  { name: 'Aquasella', Component: AquasellaDog, personality: 'River raving in Asturias', status: 'outdoor vibes' },
 ];
