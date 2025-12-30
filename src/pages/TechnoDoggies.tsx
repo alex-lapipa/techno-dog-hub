@@ -6,7 +6,7 @@ import { dogVariants } from "@/components/DogPack";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Share2, Download, Mail, ArrowLeft, Star, Sparkles, Users, Heart, Package, Smartphone, Copy } from "lucide-react";
+import { RefreshCw, Share2, Download, Mail, ArrowLeft, Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
@@ -587,11 +587,15 @@ const TechnoDoggies = () => {
           {/* 1. HERO HEADER - Brand Identity */}
           <div className="text-center mb-6">
             <div className="flex justify-center gap-1 mb-2">
-              <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
+              <svg className="w-4 h-4 text-logo-green animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
+              </svg>
               <span className="font-mono text-[10px] uppercase tracking-widest text-logo-green">
                 Woof woof!
               </span>
-              <Sparkles className="w-4 h-4 text-logo-green animate-pulse" />
+              <svg className="w-4 h-4 text-logo-green animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
+              </svg>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground font-mono mb-1">
               techno.dog
@@ -876,7 +880,7 @@ const TechnoDoggies = () => {
             {!isDogSelected && (
               <div className="text-center py-3 border-t border-logo-green/20">
                 <p className="font-mono text-[10px] text-muted-foreground animate-pulse">
-                  👆 Tap any doggy above to share
+                  ↑ Tap any doggy above to share
                 </p>
               </div>
             )}
@@ -894,7 +898,11 @@ const TechnoDoggies = () => {
             {/* Header with count */}
             <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-logo-green/10 border border-logo-green/30 mb-3">
-                <Users className="w-4 h-4 text-logo-green" />
+                <svg className="w-4 h-4 text-logo-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="9" cy="7" r="3"/>
+                  <circle cx="15" cy="7" r="3"/>
+                  <path d="M5.5 21c0-3.5 2-6 3.5-7M18.5 21c0-3.5-2-6-3.5-7" strokeLinecap="round"/>
+                </svg>
                 <span className="font-mono text-sm font-bold text-logo-green">{activeVariants.length} Doggies</span>
               </div>
               <h3 className="font-mono text-xl font-bold text-foreground mb-1">The Full Pack</h3>
@@ -946,7 +954,9 @@ const TechnoDoggies = () => {
                       {/* Featured star */}
                       {isFeatured && !isActive && (
                         <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-logo-green flex items-center justify-center">
-                          <Star className="w-2 h-2 text-background" />
+                          <svg className="w-2 h-2 text-background" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7-6-4.6h7.6z"/>
+                          </svg>
                         </div>
                       )}
                     </div>
