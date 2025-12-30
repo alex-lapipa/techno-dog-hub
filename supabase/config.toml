@@ -279,3 +279,18 @@ verify_jwt = false
 
 [functions.artist-label-agent]
 verify_jwt = false
+
+[functions.collectives-agent]
+verify_jwt = false
+
+[functions.playbook-agent]
+verify_jwt = false
+
+[functions.outreach-engine]
+verify_jwt = false
+
+[functions.dog-scribe-token]
+verify_jwt = false
+
+[functions.dog-transcribe]
+verify_jwt = false
