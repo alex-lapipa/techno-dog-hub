@@ -656,6 +656,32 @@ export const DiscoDog = ({ className, animated = true }: DogVariantProps) => (
   </svg>
 );
 
+// Thug Dog - cool sunglasses, confident pose
+export const ThugDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Ears - slightly tilted back, confident */}
+      <path d="M14 28 Q8 16 16 10 Q22 14 22 24" />
+      <path d="M50 28 Q56 16 48 10 Q42 14 42 24" />
+      {/* Head */}
+      <ellipse cx="32" cy="40" rx="16" ry="14" />
+      {/* Cool sunglasses - thick frames */}
+      <rect x="18" y="34" width="12" height="6" rx="1" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <rect x="34" y="34" width="12" height="6" rx="1" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <path d="M30 37 L34 37" strokeWidth="2" />
+      <path d="M18 37 L14 35" strokeWidth="1.5" />
+      <path d="M46 37 L50 35" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="46" rx="3" ry="2.5" fill="hsl(var(--logo-green))" />
+      {/* Smirk - confident half smile */}
+      <path d="M26 52 Q32 54 38 50" />
+      {/* Gold chain hint */}
+      <path d="M22 54 Q32 58 42 54" opacity="0.6" strokeWidth="1.5" />
+      <circle cx="32" cy="58" r="2" fill="hsl(var(--logo-green))" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Always wagging, never lagging', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Dreaming of infinite loops', status: 'zzz mode' },
@@ -690,4 +716,5 @@ export const dogVariants = [
   { name: 'Easter', Component: EasterDog, personality: 'Hopping through the beats', status: 'egg hunting' },
   { name: 'Birthday', Component: BirthdayDog, personality: 'Every day is a party', status: 'making wishes' },
   { name: 'Disco', Component: DiscoDog, personality: 'Stayin alive on the floor', status: 'funky' },
+  { name: 'Thug', Component: ThugDog, personality: 'Too cool for the mainstream', status: 'gangsta' },
 ];
