@@ -815,13 +815,13 @@ const TechnoDoggies = () => {
                     Email
                   </Button>
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     size="sm" 
                     onClick={deselectDog}
-                    className="font-mono text-[10px] h-9 px-3"
+                    className="font-mono text-[10px] h-9 px-3 border-crimson/60 text-crimson bg-crimson/10 hover:bg-crimson/20 hover:text-crimson hover:border-crimson/80 hover:shadow-[0_0_12px_hsl(var(--crimson)/0.3)]"
                   >
                     <RefreshCw className="w-3 h-3 mr-1" />
-                    Pick Another
+                    PICK ANOTHER
                   </Button>
                 </div>
               </div>
