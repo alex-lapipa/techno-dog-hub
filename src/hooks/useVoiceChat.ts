@@ -1,5 +1,4 @@
 import { useCallback, useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -135,17 +134,36 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     options.onMessage?.(userMessage);
     
     try {
-      // Get AI response from rag-chat (expects 'query' parameter)
-      const { data: chatData, error: chatError } = await supabase.functions.invoke("rag-chat", {
-        body: { 
-          query: text,
-          stream: false // Use non-streaming for voice
+      // Get AI response from dog-agent (same endpoint as text chat)
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-agent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            message: text,
+            conversationHistory: messagesRef.current.slice(-10).map(m => ({
+              role: m.role,
+              content: m.content
+            }))
+          }),
         }
-      });
+      );
       
-      if (chatError) throw chatError;
+      if (!response.ok) {
+        if (response.status === 429) throw new Error("Rate limit exceeded");
+        if (response.status === 402) throw new Error("Credits exhausted");
+        throw new Error(`Request failed: ${response.status}`);
+      }
       
-      const assistantText = chatData?.answer || chatData?.response || chatData?.message || "Woof! I'm having trouble thinking right now.";
+      const chatData = await response.json();
+      if (chatData.error) throw new Error(chatData.error);
+      
+      const assistantText = chatData?.response || chatData?.bark || "Woof! I'm having trouble thinking right now.";
       
       // Add assistant message
       const assistantMessage: Message = {
