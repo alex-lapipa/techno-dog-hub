@@ -28,11 +28,11 @@ const ModelRoles = {
   GROK: ['freshness_scan', 'trend_detection', 'roster_changes', 'discovery']
 };
 
-async function callLovableAI(messages: { role: string; content: string }[], model: string = 'openai/gpt-4o-mini') {
+async function callLovableAI(messages: { role: string; content: string }[], model: string = 'google/gemini-2.5-flash') {
   const apiKey = Deno.env.get('LOVABLE_API_KEY');
   if (!apiKey) throw new Error('LOVABLE_API_KEY not configured');
 
-  const response = await fetch('https://ai.lovable.dev/v1/chat/completions', {
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
