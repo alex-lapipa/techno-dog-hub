@@ -499,8 +499,10 @@ const TechnoDoggies = () => {
   };
 
   const shareUrl = "https://techno.dog/doggies";
-  // Share message for social platforms
-  const shareText = "Join the techno.dog community! Create your own pack of doggies at";
+  // Dynamic share message based on selected dog
+  const dogName = currentDog?.name || 'Techno Dog';
+  const shareText = `I'm ${dogName} 🐕 Join the techno.dog pack! Find your spirit doggy at`;
+  const twitterShareText = `I'm ${dogName} 🖤 No NPCs allowed. Find your spirit doggy #Techno #TechnoDog`;
 
   // Get featured dogs
   const featuredDogs = activeVariants.filter((dog: any) => dog.dbData?.is_featured);
@@ -734,7 +736,7 @@ const TechnoDoggies = () => {
                   
                   <button 
                     onClick={() => {
-                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterShareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
                       handleSocialShare("twitter");
                     }}
                     className="flex flex-col items-center p-2 rounded-lg hover:bg-logo-green/20 transition-colors group"
