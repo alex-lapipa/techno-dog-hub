@@ -758,8 +758,9 @@ const TechnoDoggies = () => {
               {/* PRIMARY ROW - All share buttons */}
               <div className="flex justify-center flex-wrap gap-2 mb-3">
                 <Button 
+                  variant="outline"
                   onClick={downloadForWhatsApp}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="WhatsApp"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -767,12 +768,13 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={() => {
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     toast.success("Copied! Now paste in Instagram");
                     handleSocialShare("social");
                   }}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="Instagram"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -780,12 +782,13 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={() => {
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     toast.success("Copied! Now paste in Discord");
                     handleSocialShare("social");
                   }}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="Discord"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -793,8 +796,9 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={() => window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, '_blank')}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="Bluesky"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -802,8 +806,9 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank')}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="X (Twitter)"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -811,8 +816,9 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank')}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="Telegram"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -820,12 +826,13 @@ const TechnoDoggies = () => {
                   </svg>
                 </Button>
                 <Button 
+                  variant="outline"
                   onClick={async () => {
                     await navigator.clipboard.writeText(shareUrl);
                     toast.success("Link copied!");
                     handleSocialShare("social");
                   }}
-                  className="h-10 w-10 p-0 bg-logo-green hover:bg-logo-green/90 text-background shadow-[0_0_15px_hsl(var(--logo-green)/0.4)]"
+                  className="h-10 w-10 p-0 border-border/50 text-foreground hover:bg-logo-green hover:text-background hover:border-logo-green transition-colors"
                   title="Copy Link"
                 >
                   <Copy className="h-5 w-5" />
