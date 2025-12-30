@@ -78,6 +78,7 @@ const TechnoDoggies = () => {
   const [initialDogSet, setInitialDogSet] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedDogs, setSelectedDogs] = useState<number[]>([]);
+  const [isDogSelected, setIsDogSelected] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [isCarouselPaused, setIsCarouselPaused] = useState(false);
 
@@ -139,9 +140,9 @@ const TechnoDoggies = () => {
     return () => clearInterval(interval);
   }, [isCarouselPaused, activeVariants.length]);
 
-  // Auto-rotate main doggy every 10 seconds in random order
+  // Auto-rotate main doggy every 10 seconds in random order (stops when dog is selected)
   useEffect(() => {
-    if (activeVariants.length <= 1) return;
+    if (activeVariants.length <= 1 || isDogSelected) return;
     
     const interval = setInterval(() => {
       setIsAnimating(true);
@@ -166,7 +167,37 @@ const TechnoDoggies = () => {
     }, 10000);
     
     return () => clearInterval(interval);
-  }, [activeVariants, currentDogIndex, logAction]);
+  }, [activeVariants, currentDogIndex, logAction, isDogSelected]);
+
+  // Select a dog and stop auto-rotation
+  const selectDog = (index: number) => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrentDogIndex(index);
+      setIsDogSelected(true);
+      setIsAnimating(false);
+      
+      const selectedDog = activeVariants[index];
+      if (selectedDog) {
+        logAction.mutate({
+          variantId: (selectedDog as any)?.dbData?.id,
+          variantName: selectedDog.name,
+          actionType: "select",
+        });
+        trackDoggyEvent('main_page', 'select', undefined, selectedDog.name);
+      }
+      
+      // Scroll to share section
+      setTimeout(() => {
+        document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
+    }, 150);
+  };
+
+  // Deselect and resume auto-rotation
+  const deselectDog = () => {
+    setIsDogSelected(false);
+  };
 
   const nextDog = () => {
     setIsAnimating(true);
@@ -537,13 +568,21 @@ const TechnoDoggies = () => {
           <div className="mb-8">
             <div 
               id="current-dog-display"
-              className={`flex flex-col items-center transition-all duration-150 ${
+              onClick={() => !isDogSelected && selectDog(currentDogIndex)}
+              className={`flex flex-col items-center transition-all duration-150 cursor-pointer ${
                 isAnimating ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
-              }`}
+              } ${isDogSelected ? 'ring-2 ring-logo-green ring-offset-2 ring-offset-background rounded-2xl p-4' : ''}`}
             >
+              {/* Selected indicator */}
+              {isDogSelected && (
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-logo-green text-background text-[10px] font-mono rounded-full z-20">
+                  Selected! Now share below
+                </div>
+              )}
+              
               {/* Subtle halo effect */}
               <div className="relative">
-                <div className="absolute inset-0 bg-logo-green/15 rounded-full blur-2xl" />
+                <div className={`absolute inset-0 rounded-full blur-2xl transition-all ${isDogSelected ? 'bg-logo-green/30' : 'bg-logo-green/15'}`} />
                 <DogComponent 
                   className="w-36 h-36 sm:w-44 sm:h-44 relative z-10" 
                   animated 
@@ -563,42 +602,41 @@ const TechnoDoggies = () => {
                   <Star className="w-3 h-3 mr-1" /> Featured
                 </Badge>
               )}
+              
+              {/* Tap to select hint */}
+              {!isDogSelected && (
+                <p className="mt-3 text-[10px] text-muted-foreground font-mono animate-pulse">
+                  Tap to select & share
+                </p>
+              )}
             </div>
 
             {/* Quick Controls */}
             <div className="flex gap-2 justify-center mt-4">
-              <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs h-9 px-4">
-                Next Doggy
-              </Button>
-              <Button 
-                size="sm" 
-                onClick={async () => {
-                  if (navigator.share) {
-                    try {
-                      // Doggies leave nameless when shared externally
-                      await navigator.share({
-                        title: "techno.dog pack",
-                        text: shareText,
-                        url: shareUrl,
-                      });
-                      await handleSocialShare('native');
-                    } catch (err) {
-                      // User cancelled or share failed, scroll to share section
-                      document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  } else {
-                    document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="font-mono text-xs h-9 px-4 bg-logo-green hover:bg-logo-green/90 text-background"
-              >
-                <Share2 className="w-3 h-3 mr-1" />
-                Share Me
-              </Button>
-              <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs h-9 px-4">
-                <RefreshCw className="w-3 h-3 mr-1" />
-                Surprise Me!
-              </Button>
+              {isDogSelected ? (
+                <Button variant="outline" size="sm" onClick={deselectDog} className="font-mono text-xs h-9 px-4">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Pick Another
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs h-9 px-4">
+                    Next Doggy
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={() => selectDog(currentDogIndex)}
+                    className="font-mono text-xs h-9 px-4 bg-logo-green hover:bg-logo-green/90 text-background"
+                  >
+                    <Share2 className="w-3 h-3 mr-1" />
+                    Select & Share
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs h-9 px-4">
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Surprise Me!
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -722,10 +760,13 @@ const TechnoDoggies = () => {
                 return (
                   <div
                     key={dog.name}
-                    className={`flex-shrink-0 w-36 snap-center rounded-xl border p-3 transition-all ${
-                      isFeatured 
-                        ? 'border-logo-green/50 bg-logo-green/10' 
-                        : 'border-border/30 bg-card/50'
+                    onClick={() => selectDog(index)}
+                    className={`flex-shrink-0 w-36 snap-center rounded-xl border p-3 transition-all cursor-pointer hover:scale-105 ${
+                      currentDogIndex === index && isDogSelected
+                        ? 'border-logo-green bg-logo-green/20 ring-2 ring-logo-green'
+                        : isFeatured 
+                          ? 'border-logo-green/50 bg-logo-green/10 hover:border-logo-green' 
+                          : 'border-border/30 bg-card/50 hover:border-logo-green/50'
                     }`}
                   >
                     {/* Large Dog Image */}
@@ -741,10 +782,13 @@ const TechnoDoggies = () => {
                         </h3>
                         {isFeatured && <Star className="w-3 h-3 text-logo-green" />}
                       </div>
+                      <p className="text-[9px] text-muted-foreground font-mono mt-1">
+                        Tap to select
+                      </p>
                     </div>
                     
                     {/* Buttons Under Image */}
-                    <div className="flex gap-1 justify-center">
+                    <div className="flex gap-1 justify-center" onClick={(e) => e.stopPropagation()}>
                       <Button
                         variant="outline"
                         size="sm"
