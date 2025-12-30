@@ -1773,6 +1773,6 @@ export const dogVariants = [
   // GEAR/STYLE DOGS
   { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, just hardware', status: 'patching' },
   // SPANISH LEGENDS
-  { name: 'Eulogio', Component: EulogioDog, personality: 'Asturian crate-digger since 1995', status: 'la real forever' },
+  { name: 'Eulogio', Component: EulogioDog, personality: 'Asturian crate-digger, Wayfarers on, sideburns fresh', status: 'la real forever' },
   { name: 'M.E.N', Component: MENDog, personality: 'Moog Barcelona basement dweller', status: 'deep hypnotic' },
 ];
