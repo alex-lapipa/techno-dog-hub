@@ -8,15 +8,38 @@ import { Download, Share2, Copy, MessageCircle, Twitter, Send, Image, Package, S
 import { dogVariants } from './DogPack';
 import DogSilhouette from './DogSilhouette';
 
+// Resolve CSS variables in SVG for proper export with transparent backgrounds
+const resolveCssVariables = (svgElement: SVGSVGElement): SVGSVGElement => {
+  const clone = svgElement.cloneNode(true) as SVGSVGElement;
+  const computedStyle = getComputedStyle(document.documentElement);
+  
+  // Get the actual color value for --logo-green
+  const logoGreen = computedStyle.getPropertyValue('--logo-green').trim();
+  const resolvedColor = logoGreen ? `hsl(${logoGreen})` : '#22c55e';
+  
+  // Replace all instances of hsl(var(--logo-green)) with the actual color
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const resolved = serialized
+    .replace(/hsl\(var\(--logo-green\)\)/g, resolvedColor)
+    .replace(/hsl\(var\(--foreground\)\)/g, computedStyle.getPropertyValue('--foreground').trim() ? `hsl(${computedStyle.getPropertyValue('--foreground').trim()})` : '#ffffff')
+    .replace(/hsl\(var\(--background\)\)/g, computedStyle.getPropertyValue('--background').trim() ? `hsl(${computedStyle.getPropertyValue('--background').trim()})` : '#000000');
+  
+  // Parse back to SVG element
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(resolved, 'image/svg+xml');
+  return doc.documentElement as unknown as SVGSVGElement;
+};
+
 // Convert SVG element to data URL
 const svgToDataUrl = (svgElement: SVGSVGElement): string => {
+  const resolvedSvg = resolveCssVariables(svgElement);
   const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(svgElement);
+  const svgString = serializer.serializeToString(resolvedSvg);
   const encoded = encodeURIComponent(svgString);
   return `data:image/svg+xml,${encoded}`;
 };
 
-// Convert SVG to PNG blob
+// Convert SVG to PNG blob with transparent background
 const svgToPngBlob = async (svgElement: SVGSVGElement, size: number = 512): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
@@ -30,6 +53,8 @@ const svgToPngBlob = async (svgElement: SVGSVGElement, size: number = 512): Prom
 
     const img = new window.Image();
     img.onload = () => {
+      // Clear canvas for transparent background
+      ctx.clearRect(0, 0, size, size);
       ctx.drawImage(img, 0, 0, size, size);
       canvas.toBlob((blob) => {
         if (blob) resolve(blob);
@@ -53,10 +78,11 @@ const downloadBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
-// Create sticker pack (multiple PNGs in a zip-like structure)
+// Download SVG with resolved CSS variables and transparent background
 const downloadSVG = (svgElement: SVGSVGElement, filename: string) => {
+  const resolvedSvg = resolveCssVariables(svgElement);
   const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(svgElement);
+  const svgString = serializer.serializeToString(resolvedSvg);
   const blob = new Blob([svgString], { type: 'image/svg+xml' });
   downloadBlob(blob, filename);
 };
