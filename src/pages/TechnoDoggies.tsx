@@ -511,6 +511,30 @@ const TechnoDoggies = () => {
               <Button variant="outline" size="sm" onClick={nextDog} className="font-mono text-xs h-9 px-4">
                 Next Doggy
               </Button>
+              <Button 
+                size="sm" 
+                onClick={async () => {
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: `${currentDog?.name === 'Techno' ? 'Techno Dog' : `${currentDog?.name} Doggy`}`,
+                        text: shareText,
+                        url: shareUrl,
+                      });
+                      await handleSocialShare('native');
+                    } catch (err) {
+                      // User cancelled or share failed, scroll to share section
+                      document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  } else {
+                    document.getElementById('share-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="font-mono text-xs h-9 px-4 bg-logo-green hover:bg-logo-green/90 text-background"
+              >
+                <Share2 className="w-3 h-3 mr-1" />
+                Share Me
+              </Button>
               <Button variant="outline" size="sm" onClick={randomDog} className="font-mono text-xs h-9 px-4">
                 <RefreshCw className="w-3 h-3 mr-1" />
                 Surprise Me!
