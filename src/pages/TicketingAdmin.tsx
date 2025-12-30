@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Download, 
-  ArrowLeft, 
   Ticket, 
   Shield, 
   Mail, 
@@ -25,7 +23,6 @@ import {
   Edit,
   Calendar,
   Building,
-  RefreshCw,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -38,11 +35,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { useTicketingData, TktOrganization, TktEvent, TktTicketType } from '@/hooks/useTicketingData';
 import { format } from 'date-fns';
+import { AdminPageLayout } from '@/components/admin/AdminPageLayout';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export default function TicketingAdmin() {
-  const navigate = useNavigate();
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [embedOrgSlug, setEmbedOrgSlug] = useState('your-org');
   const [embedEventSlug, setEmbedEventSlug] = useState('your-event');
@@ -173,46 +170,21 @@ export default function TicketingAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate('/admin')}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-mono font-bold text-foreground flex items-center gap-2">
-                <Ticket className="w-6 h-6 text-crimson" />
-                TICKETING MODULE
-              </h1>
-              <p className="text-sm text-muted-foreground font-mono">
-                Manage events, tickets, and orders
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={refresh}
-              disabled={loading}
-              className="font-mono"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <Badge variant="outline" className="font-mono text-xs border-logo-green/50 text-logo-green">
-              <Package className="w-3 h-3 mr-1" />
-              SELF-CONTAINED
-            </Badge>
-          </div>
-        </div>
-
+    <AdminPageLayout
+      title="Ticketing Module"
+      description="Manage events, tickets, and orders"
+      icon={Ticket}
+      iconColor="text-crimson"
+      onRefresh={refresh}
+      isLoading={loading}
+      actions={
+        <Badge variant="outline" className="font-mono text-xs border-logo-green/50 text-logo-green">
+          <Package className="w-3 h-3 mr-1" />
+          SELF-CONTAINED
+        </Badge>
+      }
+    >
+      <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="bg-zinc-900 border-crimson/20">
@@ -924,6 +896,6 @@ export default function TicketingAdmin() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AdminPageLayout>
   );
 }
