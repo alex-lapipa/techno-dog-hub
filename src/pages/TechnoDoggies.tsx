@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import HexagonLogo from "@/components/HexagonLogo";
 import { SocialShareButtons } from "@/components/social/SocialShareButtons";
 import { useActiveDoggyVariants, useLogDoggyAction } from "@/hooks/useDoggyData";
-import { DoggyPageFooter, trackDoggyEvent } from "@/components/doggy";
+import { DoggyPageFooter, trackDoggyEvent, DoggyShareLeaderboard, recordShare } from "@/components/doggy";
 import ParticleBackground from "@/components/ParticleBackground";
 
 // Get initial dog index based on visit history and popularity
@@ -191,6 +191,7 @@ const TechnoDoggies = () => {
       actionType: "share_email",
     });
     trackDoggyEvent('main_page', 'share', 'email', currentDog?.name);
+    await recordShare();
     
     const dogNames = activeVariants.slice(0, 5).map((d: any) => d.name).join(', ');
     const subject = encodeURIComponent(`Join the Techno Dog Pack! - ${currentDog?.name} Dog`);
@@ -380,13 +381,16 @@ const TechnoDoggies = () => {
     toast.success(`Downloaded ${downloadCount} doggies to your device!`);
   };
 
-  const handleSocialShare = (platform: string) => {
+  const handleSocialShare = async (platform: string) => {
     logAction.mutate({
       variantId: currentDbData?.id,
       variantName: currentDog?.name || "Unknown",
       actionType: `share_${platform}`,
     });
     trackDoggyEvent('main_page', 'share', platform, currentDog?.name);
+    
+    // Record share for leaderboard
+    await recordShare();
   };
 
   const shareUrl = "https://techno.dog/doggies";
@@ -768,7 +772,38 @@ const TechnoDoggies = () => {
             </CardContent>
           </Card>
 
+          {/* 6. SHARE LEADERBOARD */}
+          <div className="mb-8">
+            <DoggyShareLeaderboard />
+          </div>
+
         </main>
+        
+        {/* Sticky Mobile Share Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-background/95 backdrop-blur-md border-t border-border/30 sm:hidden">
+          <div className="flex gap-2 max-w-lg mx-auto">
+            <Button 
+              onClick={downloadForWhatsApp}
+              className="flex-1 font-mono text-xs h-11 bg-[#25D366] hover:bg-[#25D366]/90 text-white"
+            >
+              <Smartphone className="w-4 h-4 mr-2" />
+              WhatsApp Sticker
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => {
+                const shareSection = document.getElementById('share-section');
+                shareSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="font-mono text-xs h-11 px-4 border-logo-green/50 text-logo-green"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+        
+        {/* Spacer for sticky bar on mobile */}
+        <div className="h-20 sm:hidden" />
         
         {/* Doggy Footer with copyright and site links */}
         <DoggyPageFooter pageSource="main_page" currentDoggyName={currentDog?.name} />

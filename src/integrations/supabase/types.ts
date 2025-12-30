@@ -1847,6 +1847,39 @@ export type Database = {
         }
         Relationships: []
       }
+      doggy_share_leaderboard: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          last_share_at: string
+          session_id: string | null
+          share_count: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          last_share_at?: string
+          session_id?: string | null
+          share_count?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          last_share_at?: string
+          session_id?: string | null
+          share_count?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       doggy_variants: {
         Row: {
           created_at: string | null
