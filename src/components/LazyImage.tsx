@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getSafeImageUrl } from "@/lib/imageProxy";
 
 interface LazyImageProps {
   src: string;
@@ -7,14 +8,15 @@ interface LazyImageProps {
   placeholderColor?: string;
 }
 
-const LazyImage = ({ 
-  src, 
-  alt, 
+const LazyImage = ({
+  src,
+  alt,
   className = "",
-  placeholderColor = "hsl(var(--muted))"
+  placeholderColor = "hsl(var(--muted))",
 }: LazyImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [useProxy, setUseProxy] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,39 +30,39 @@ const LazyImage = ({
       { rootMargin: "100px", threshold: 0.1 }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
-    }
-
+    if (imgRef.current) observer.observe(imgRef.current);
     return () => observer.disconnect();
   }, []);
 
+  const effectiveSrc = useProxy ? getSafeImageUrl(src) ?? src : src;
+
   return (
-    <div 
-      ref={imgRef} 
+    <div
+      ref={imgRef}
       className={`relative overflow-hidden ${className}`}
       style={{ backgroundColor: placeholderColor }}
     >
       {/* Blur placeholder */}
-      <div 
+      <div
         className={`absolute inset-0 transition-opacity duration-500 ${
           isLoaded ? "opacity-0" : "opacity-100"
         }`}
-        style={{ 
+        style={{
           background: `linear-gradient(135deg, ${placeholderColor}, hsl(var(--card)))`,
           filter: "blur(20px)",
-          transform: "scale(1.1)"
+          transform: "scale(1.1)",
         }}
       />
-      
+
       {/* Shimmer effect while loading */}
       {!isLoaded && (
         <div className="absolute inset-0 animate-pulse">
-          <div 
+          <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 50%, transparent 100%)",
-              animation: "shimmer 1.5s infinite"
+              background:
+                "linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 50%, transparent 100%)",
+              animation: "shimmer 1.5s infinite",
             }}
           />
         </div>
@@ -69,10 +71,21 @@ const LazyImage = ({
       {/* Actual image - only load when in view */}
       {isInView && (
         <img
-          src={src}
+          src={effectiveSrc}
           alt={alt}
           loading="lazy"
+          referrerPolicy="no-referrer"
           onLoad={() => setIsLoaded(true)}
+          onError={() => {
+            // If direct URL fails (hotlink/CORS), retry via proxy once
+            if (!useProxy) {
+              setUseProxy(true);
+              setIsLoaded(false);
+              return;
+            }
+            // If proxy also fails, stop loading state and leave placeholder
+            setIsLoaded(true);
+          }}
           className={`w-full h-full object-cover transition-opacity duration-500 ${
             isLoaded ? "opacity-100" : "opacity-0"
           }`}
