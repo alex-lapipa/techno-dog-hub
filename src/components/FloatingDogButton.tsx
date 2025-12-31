@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import DogSilhouette from '@/components/DogSilhouette';
@@ -43,6 +43,7 @@ const FloatingDogButton = () => {
   const [isPulsing, setIsPulsing] = useState(true);
   const [bubbleMessage, setBubbleMessage] = useState<string | null>(null);
   const [bubbleVisible, setBubbleVisible] = useState(false);
+  const shownMessagesRef = useRef<Set<number>>(new Set());
   const location = useLocation();
 
   // Hide on widget page - keep widget clean and self-contained
@@ -55,9 +56,25 @@ const FloatingDogButton = () => {
     }
   }, [dogChatOpen]);
 
-  // Pick a random message
+  // Pick a random message that hasn't been shown yet
   const pickRandomMessage = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * ambientMessages.length);
+    // Reset if all messages have been shown
+    if (shownMessagesRef.current.size >= ambientMessages.length) {
+      shownMessagesRef.current.clear();
+    }
+    
+    // Find available indices
+    const availableIndices: number[] = [];
+    for (let i = 0; i < ambientMessages.length; i++) {
+      if (!shownMessagesRef.current.has(i)) {
+        availableIndices.push(i);
+      }
+    }
+    
+    // Pick random from available
+    const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    shownMessagesRef.current.add(randomIndex);
+    
     return ambientMessages[randomIndex];
   }, []);
 
