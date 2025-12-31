@@ -130,19 +130,19 @@ const Index = () => {
       title: 'Audio Lab',
       description: 'Synth experiments & sound design',
       path: '/sound-machine',
-      color: 'bg-purple-500/20 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white'
+      accent: 'destructive' as const
     },
     {
       title: 'Developer API',
       description: 'Build with our techno database',
       path: '/developer',
-      color: 'bg-blue-500/20 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white'
+      accent: 'green' as const
     },
     {
       title: 'Support',
       description: 'Help & community resources',
       path: '/support',
-      color: 'bg-orange-500/20 border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white'
+      accent: 'white' as const
     }
   ];
 
@@ -275,31 +275,78 @@ const Index = () => {
         {/* Daily Spotlight */}
         <DailySpotlight />
 
-        {/* Tools & Services - matches colored nav tabs */}
+        {/* Tools & Services - VHS aesthetic with parallax */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-8">
               // Tools & Services
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {toolsSections.map((section) => (
-                <Link
-                  key={section.path}
-                  to={section.path}
-                  className={`group block border p-6 transition-all ${section.color}`}
-                >
-                  <h3 className="font-mono text-xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
-                    {section.title}
-                  </h3>
-                  <p className="font-mono text-xs opacity-80 group-hover:opacity-100 mb-4">
-                    {section.description}
-                  </p>
-                  <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider">
-                    <span>Open</span>
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {toolsSections.map((section) => {
+                const accentColors = {
+                  destructive: {
+                    border: 'border-destructive/50 hover:border-destructive',
+                    glow: 'group-hover:shadow-[0_0_30px_hsl(0_100%_50%/0.3)]',
+                    text: 'text-destructive',
+                    line: 'bg-destructive',
+                    overlay: 'rgba(220,38,38,0.08)'
+                  },
+                  green: {
+                    border: 'border-logo-green/50 hover:border-logo-green',
+                    glow: 'group-hover:shadow-[0_0_30px_hsl(100_100%_60%/0.3)]',
+                    text: 'text-logo-green',
+                    line: 'bg-logo-green',
+                    overlay: 'rgba(0,255,136,0.08)'
+                  },
+                  white: {
+                    border: 'border-foreground/30 hover:border-foreground',
+                    glow: 'group-hover:shadow-[0_0_30px_hsl(0_0%_100%/0.2)]',
+                    text: 'text-foreground',
+                    line: 'bg-foreground',
+                    overlay: 'rgba(255,255,255,0.05)'
+                  }
+                };
+                const colors = accentColors[section.accent];
+                
+                return (
+                  <Link
+                    key={section.path}
+                    to={section.path}
+                    className={`group relative block border ${colors.border} bg-card/50 overflow-hidden transition-all duration-500 ${colors.glow}`}
+                  >
+                    {/* VHS scan lines overlay */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none opacity-60 group-hover:opacity-30 transition-opacity duration-500"
+                      style={{
+                        background: `
+                          repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px),
+                          linear-gradient(to bottom, ${colors.overlay}, transparent)
+                        `,
+                      }}
+                    />
+                    
+                    {/* Top accent line */}
+                    <div className={`absolute top-0 left-0 right-0 h-[2px] ${colors.line} opacity-70 group-hover:opacity-100 transition-opacity`} />
+                    
+                    {/* Content with parallax effect */}
+                    <div className="relative z-10 p-6 transition-transform duration-500 group-hover:translate-y-[-4px]">
+                      <h3 className={`font-mono text-xl uppercase tracking-tight mb-2 ${colors.text} group-hover:animate-glitch`}>
+                        {section.title}
+                      </h3>
+                      <p className="font-mono text-xs text-muted-foreground group-hover:text-foreground/80 mb-6 transition-colors">
+                        {section.description}
+                      </p>
+                      <div className={`flex items-center gap-2 font-mono text-xs uppercase tracking-wider ${colors.text}`}>
+                        <span>Open</span>
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-2 transition-transform duration-300" />
+                      </div>
+                    </div>
+                    
+                    {/* Bottom glow on hover */}
+                    <div className={`absolute bottom-0 left-0 right-0 h-12 ${colors.line} opacity-0 group-hover:opacity-10 blur-xl transition-opacity duration-500`} />
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
