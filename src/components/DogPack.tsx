@@ -2452,6 +2452,60 @@ export const JeremiasDog = ({ className, animated = false }: DogVariantProps) =>
   </svg>
 );
 
+// Hoshine Dog - bookworm with ponytail, always reading
+export const HoshineDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* PONYTAIL - hair tied back */}
+      <path d="M44 12 Q52 10 56 16 Q58 22 54 28" strokeWidth="2" />
+      <path d="M44 12 Q46 8 50 8 Q54 10 54 14" strokeWidth="1.5" opacity="0.8" />
+      {/* Hair tie */}
+      <ellipse cx="44" cy="12" rx="2" ry="3" fill="hsl(var(--logo-green))" opacity="0.6" />
+      {/* Hair flowing to ponytail */}
+      <path d="M32 16 Q38 14 44 12" strokeWidth="1.5" opacity="0.7" />
+      <path d="M28 18 Q36 16 44 12" strokeWidth="1.5" opacity="0.6" />
+      <path d="M36 18 Q40 16 44 12" strokeWidth="1.5" opacity="0.7" />
+      {/* Ears */}
+      <path d="M12 28 Q6 20 10 12 Q16 16 18 26" />
+      <path d="M48 30 Q52 24 50 18 Q46 20 46 28" />
+      {/* Round head */}
+      <ellipse cx="32" cy="34" rx="18" ry="16" />
+      {/* Reading glasses - round intellectual style */}
+      <circle cx="24" cy="32" r="6" strokeWidth="1.5" />
+      <circle cx="40" cy="32" r="6" strokeWidth="1.5" />
+      <line x1="30" y1="32" x2="34" y2="32" strokeWidth="1.5" />
+      <line x1="18" y1="32" x2="12" y2="30" strokeWidth="1.5" />
+      <line x1="46" y1="32" x2="52" y2="30" strokeWidth="1.5" />
+      {/* Eyes looking down at book */}
+      <circle cx="24" cy="33" r="2" />
+      <circle cx="40" cy="33" r="2" />
+      <circle cx="24" cy="34" r="0.8" fill="hsl(var(--logo-green))" />
+      <circle cx="40" cy="34" r="0.8" fill="hsl(var(--logo-green))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Thoughtful slight smile */}
+      <path d="M28 46 Q32 48 36 46" strokeWidth="1.5" />
+      {/* BOOK being read - held up in front */}
+      <rect x="6" y="44" width="14" height="18" rx="1" strokeWidth="2" />
+      {/* Book spine */}
+      <line x1="13" y1="44" x2="13" y2="62" strokeWidth="1.5" />
+      {/* Book pages */}
+      <line x1="8" y1="48" x2="11" y2="48" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="51" x2="11" y2="51" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="54" x2="11" y2="54" strokeWidth="0.8" opacity="0.6" />
+      <line x1="8" y1="57" x2="11" y2="57" strokeWidth="0.8" opacity="0.6" />
+      <line x1="15" y1="48" x2="18" y2="48" strokeWidth="0.8" opacity="0.6" />
+      <line x1="15" y1="51" x2="18" y2="51" strokeWidth="0.8" opacity="0.6" />
+      <line x1="15" y1="54" x2="18" y2="54" strokeWidth="0.8" opacity="0.6" />
+      <line x1="15" y1="57" x2="18" y2="57" strokeWidth="0.8" opacity="0.6" />
+      {/* Floating knowledge symbols */}
+      <text x="54" y="10" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">✦</text>
+      <text x="58" y="20" fontSize="4" fill="hsl(var(--logo-green))" opacity="0.4">∞</text>
+      <text x="56" y="58" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">📖</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2555,4 +2609,5 @@ export const dogVariants = [
   { name: 'Yayo', Component: YayoDog, personality: 'Neverland commander, moustache game strong, pointy hair pointing to the stars', status: 'mixing dreams' },
   { name: 'Helios', Component: HeliosDog, personality: 'Funky soul, flowing locks, legendary mustache, voice of the underground', status: 'singing & grooving' },
   { name: 'Jeremias', Component: JeremiasDog, personality: 'Frankfurt banker by day, Gijón party legend by night, slit eyes see all the beats', status: 'banking & raving' },
+  { name: 'Hoshine', Component: HoshineDog, personality: 'Eternal bookworm, ponytail wisdom, reads between the beats', status: 'reading & raving' },
 ];
