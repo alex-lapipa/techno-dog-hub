@@ -80,6 +80,7 @@ const AIOrchestratorAdmin = lazy(() => import("./pages/AIOrchestratorAdmin"));
 const TranslationAgentAdmin = lazy(() => import("./pages/TranslationAgentAdmin"));
 const GoogleOrganicStrategyAdmin = lazy(() => import("./pages/GoogleOrganicStrategyAdmin"));
 const ChangelogAdmin = lazy(() => import("./pages/ChangelogAdmin"));
+const Architecture = lazy(() => import("./pages/Architecture"));
 
 // Agent Admin Pages
 const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
@@ -279,6 +280,9 @@ const App = () => (
                     <Route path="/sitemap" element={<Sitemap />} />
                     <Route path="/admin/privacy-agent" element={<PrivacyAgentAdmin />} />
                     <Route path="/admin/og-preview" element={<OGPreview />} />
+                    
+                    {/* Architecture Blueprint */}
+                    <Route path="/architecture" element={<Architecture />} />
                     
                     {/* Support */}
                     <Route path="/support" element={<Support />} />
