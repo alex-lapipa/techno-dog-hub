@@ -465,8 +465,8 @@ export const venues: Venue[] = [
 
   // SPAIN
   {
-    id: "lana-gijon",
-    name: "Lana",
+    id: "lanna-gijon",
+    name: "Lanna",
     city: "Gijón",
     country: "Spain",
     type: "club",
