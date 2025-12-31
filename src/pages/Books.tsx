@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface Category {
   id: string;
@@ -27,6 +28,8 @@ interface Book {
 
 const Books = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -58,17 +61,41 @@ const Books = () => {
     },
   });
 
-  // Initialize expanded categories when data loads
-  useState(() => {
-    if (categories.length > 0 && expandedCategories.size === 0) {
-      setExpandedCategories(new Set(categories.map(c => c.name)));
-    }
-  });
-
   // Expand all categories by default
   if (categories.length > 0 && expandedCategories.size === 0) {
     setExpandedCategories(new Set(categories.map(c => c.name)));
   }
+
+  // Filter books based on search and active category
+  const filteredBooks = useMemo(() => {
+    let result = books;
+    
+    // Filter by category
+    if (activeCategory) {
+      result = result.filter(b => b.category?.name === activeCategory);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(b => 
+        b.title.toLowerCase().includes(query) ||
+        b.author.toLowerCase().includes(query) ||
+        b.description?.toLowerCase().includes(query) ||
+        b.why_read?.toLowerCase().includes(query)
+      );
+    }
+    
+    return result;
+  }, [books, activeCategory, searchQuery]);
+
+  // Get categories with book counts
+  const categoriesWithCounts = useMemo(() => {
+    return categories.map(cat => ({
+      ...cat,
+      count: books.filter(b => b.category?.name === cat.name).length
+    }));
+  }, [categories, books]);
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories(prev => {
@@ -90,6 +117,11 @@ const Books = () => {
     "url": "https://techno.dog/books"
   };
 
+  // Group filtered books by category for display
+  const displayCategories = activeCategory 
+    ? categories.filter(c => c.name === activeCategory)
+    : categories;
+
   return (
     <PageLayout
       title="Books – Essential Reading"
@@ -99,7 +131,7 @@ const Books = () => {
     >
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         {/* VHS Header */}
-        <div className="mb-12">
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-8 bg-crimson animate-pulse" />
             <h1 className="text-3xl md:text-4xl font-mono uppercase tracking-wider text-foreground">
@@ -116,6 +148,81 @@ const Books = () => {
           </div>
         </div>
 
+        {/* Search Box */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search books by title, author, or topic..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 bg-card/50 border-border font-mono text-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="mb-8 overflow-x-auto">
+          <div className="flex gap-2 pb-2 min-w-max">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={cn(
+                "px-4 py-2 font-mono text-xs uppercase tracking-wider border transition-all",
+                !activeCategory
+                  ? "bg-logo-green text-background border-logo-green"
+                  : "bg-transparent text-muted-foreground border-border hover:border-logo-green/50 hover:text-foreground"
+              )}
+            >
+              All ({books.length})
+            </button>
+            {categoriesWithCounts.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(activeCategory === category.name ? null : category.name)}
+                className={cn(
+                  "px-4 py-2 font-mono text-xs uppercase tracking-wider border transition-all whitespace-nowrap",
+                  activeCategory === category.name
+                    ? "bg-logo-green text-background border-logo-green"
+                    : "bg-transparent text-muted-foreground border-border hover:border-logo-green/50 hover:text-foreground"
+                )}
+              >
+                {category.name} ({category.count})
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Search Results Info */}
+        {(searchQuery || activeCategory) && (
+          <div className="mb-6 flex items-center gap-4">
+            <p className="font-mono text-xs text-muted-foreground">
+              Showing {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+              {searchQuery && <span> matching "{searchQuery}"</span>}
+              {activeCategory && <span> in {activeCategory}</span>}
+            </p>
+            {(searchQuery || activeCategory) && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveCategory(null);
+                }}
+                className="font-mono text-xs text-crimson hover:text-crimson/80 underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-16">
@@ -126,8 +233,8 @@ const Books = () => {
         {/* Categories */}
         {!isLoading && (
           <div className="space-y-8">
-            {categories.map((category) => {
-              const categoryBooks = books.filter(b => b.category?.name === category.name);
+            {displayCategories.map((category) => {
+              const categoryBooks = filteredBooks.filter(b => b.category?.name === category.name);
               const isExpanded = expandedCategories.has(category.name);
 
               if (categoryBooks.length === 0) return null;
@@ -166,6 +273,16 @@ const Books = () => {
                 </section>
               );
             })}
+          </div>
+        )}
+
+        {/* No Results */}
+        {!isLoading && filteredBooks.length === 0 && (
+          <div className="py-16 text-center">
+            <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+            <p className="font-mono text-sm text-muted-foreground">
+              No books found matching your search.
+            </p>
           </div>
         )}
 
