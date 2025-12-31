@@ -295,6 +295,172 @@ export const venues: Venue[] = [
     tags: ["Australian", "underground", "intimate", "quality"],
     atmosphere: "Melbourne's underground techno space. Intimate and focused.",
     coords: { lat: -37.8136, lng: 144.9631 }
+  },
+
+  // SPAIN
+  {
+    id: "la-real",
+    name: "La Real",
+    city: "Oviedo",
+    country: "Spain",
+    type: "club",
+    active: "1994–early 2000s",
+    capacity: 2000,
+    tags: ["Spanish", "techno cathedral", "marathon sets", "legendary"],
+    atmosphere: "Highly influential Spanish club in the 1990s, known for marathon resident sets and regular international guests.",
+    historicLineups: ["Pepo", "Higinio", "Eulogio Victorero", "Oscar Mulero"]
+  },
+  {
+    id: "florida-135",
+    name: "Florida 135",
+    city: "Fraga",
+    country: "Spain",
+    type: "club",
+    active: "1988–present",
+    capacity: 5000,
+    tags: ["Spanish", "destination club", "techno cathedral", "legendary"],
+    atmosphere: "Legendary Spanish club often described as a techno cathedral; large capacity and top-tier bookings made it an international reference point for decades."
+  },
+  {
+    id: "quimica",
+    name: "Química",
+    city: "Gijón",
+    country: "Spain",
+    type: "club",
+    active: "early 1990s–2000s",
+    tags: ["Spanish", "underground", "foundational", "Asturias"],
+    atmosphere: "One of Spain's foundational underground electronic spaces where figures like Eulogio Victorero shaped early northern Spanish techno.",
+    historicLineups: ["Eulogio Victorero"]
+  },
+
+  // UK
+  {
+    id: "club-414",
+    name: "Club 414",
+    city: "London",
+    country: "UK",
+    type: "club",
+    active: "1988–present",
+    capacity: 350,
+    tags: ["acid techno", "Brixton", "DIY", "squat party spirit"],
+    atmosphere: "A Brixton landmark and epicenter of London acid techno. DIY ethos rooted in squat-party spirit within a club setting.",
+    historicLineups: ["Chris Liberator", "D.A.V.E. The Drummer", "The Geezer"]
+  },
+
+  // USA
+  {
+    id: "music-institute",
+    name: "The Music Institute",
+    city: "Detroit",
+    country: "USA",
+    type: "club",
+    active: "1988–1989",
+    tags: ["birthplace", "historic", "Belleville Three", "foundational"],
+    atmosphere: "Seminal Detroit venue where the first wave of techno took shape; closely linked with the Belleville Three and early Detroit innovators.",
+    historicLineups: ["Derrick May", "Kevin Saunderson", "Juan Atkins"]
+  },
+  {
+    id: "movement-festival",
+    name: "Movement Festival",
+    city: "Detroit",
+    country: "USA",
+    type: "outdoor",
+    active: "2000–present",
+    capacity: 100000,
+    tags: ["festival", "Hart Plaza", "DEMF", "techno homecoming"],
+    atmosphere: "Annual festival at Hart Plaza (formerly DEMF) celebrating Detroit's techno legacy; a global pilgrimage for techno fans.",
+    coords: { lat: 42.3286, lng: -83.0441 }
+  },
+
+  // NETHERLANDS
+  {
+    id: "shelter-amsterdam",
+    name: "Shelter",
+    city: "Amsterdam",
+    country: "Netherlands",
+    type: "club",
+    active: "2016–present",
+    capacity: 700,
+    tags: ["bunker", "underground", "Funktion-One", "ADAM Tower"],
+    soundSystem: "Funktion-One",
+    atmosphere: "Club under the A'DAM Tower with a bunker-like dancefloor and Funktion-One sound; widely respected in Amsterdam's underground.",
+    coords: { lat: 52.3843, lng: 4.9016 }
+  },
+  {
+    id: "radion",
+    name: "RADION",
+    city: "Amsterdam",
+    country: "Netherlands",
+    type: "multi-space",
+    active: "2014–present",
+    capacity: 1000,
+    tags: ["arts space", "multifaceted", "long-hour", "community"],
+    atmosphere: "Cultural venue combining visual arts and underground electronic music; known for long-hour programming.",
+    coords: { lat: 52.3579, lng: 4.8430 }
+  },
+
+  // ARGENTINA
+  {
+    id: "under-club",
+    name: "Under Club",
+    city: "Buenos Aires",
+    country: "Argentina",
+    type: "club",
+    active: "2012–present",
+    capacity: 600,
+    tags: ["Latin America", "techno temple", "intense", "community"],
+    atmosphere: "Key Buenos Aires techno venue with an intense atmosphere, international bookings, and strong community drive.",
+    coords: { lat: -34.5947, lng: -58.3973 }
+  },
+  {
+    id: "crobar-bsas",
+    name: "Crobar Buenos Aires",
+    city: "Buenos Aires",
+    country: "Argentina",
+    type: "club",
+    active: "2001–present",
+    capacity: 2500,
+    tags: ["South America", "peak-time", "multi-room", "large-scale"],
+    atmosphere: "Major South American electronic club with large-scale production and multi-room experiences.",
+    coords: { lat: -34.5829, lng: -58.4257 }
+  },
+
+  // COLOMBIA
+  {
+    id: "baum-park",
+    name: "Baum Park",
+    city: "Medellín",
+    country: "Colombia",
+    type: "outdoor",
+    active: "2018–present",
+    tags: ["festival", "outdoor", "Parque Norte", "Latin America"],
+    atmosphere: "Outdoor techno event in Parque Norte that helped cement Medellín's position in the Latin American techno circuit.",
+    coords: { lat: 6.2748, lng: -75.5669 }
+  },
+
+  // MEXICO
+  {
+    id: "funk-club",
+    name: "Fünk Club",
+    city: "Mexico City",
+    country: "Mexico",
+    type: "club",
+    active: "2018–present",
+    capacity: 200,
+    tags: ["hidden", "intimate", "underground", "historic building"],
+    atmosphere: "Hidden, intimate venue under a historic building, championing underground electronic programming.",
+    coords: { lat: 19.4320, lng: -99.1520 }
+  },
+  {
+    id: "brutal-mx",
+    name: "Brutal (MX)",
+    city: "Mexico City",
+    country: "Mexico",
+    type: "warehouse",
+    active: "2019–present",
+    tags: ["warehouse", "Pervert collective", "raw", "immersive"],
+    atmosphere: "Warehouse-style event series associated with the Pervert collective, focused on raw, immersive techno experiences.",
+    coords: { lat: 19.4284, lng: -99.1276 }
   }
 ];
 
