@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
 import DogChat from '@/components/admin/DogChat';
 import DogSilhouette from '@/components/DogSilhouette';
+import ArticleParticleBackground from '@/components/ArticleParticleBackground';
 import alexLaunchHero from '@/assets/alex-launch-hero.png';
 
 // Split content into two columns for magazine layout
@@ -307,7 +308,8 @@ const NewsArticleDetail = () => {
   const [leftColumn, rightColumn] = splitIntoColumns(renderedContent);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <ArticleParticleBackground />
       <PageSEO
         title={article.title}
         description={article.subtitle || `Techno news: ${article.title}`}
@@ -334,15 +336,21 @@ const NewsArticleDetail = () => {
 
         {/* Full-width hero with background image */}
         <div className="relative w-full mb-10 overflow-hidden">
-          {/* Background image */}
+          {/* Background image with blended edges */}
           <div className="absolute inset-0 flex items-center justify-end pr-8">
-            <img 
-              src={alexLaunchHero} 
-              alt="" 
-              className="h-[120%] w-auto max-w-none object-contain opacity-80"
-            />
+            <div className="relative h-[130%] w-auto">
+              <img 
+                src={alexLaunchHero} 
+                alt="" 
+                className="h-full w-auto max-w-none object-contain opacity-75"
+                style={{
+                  maskImage: 'radial-gradient(ellipse 80% 80% at 60% 50%, black 30%, transparent 70%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 60% 50%, black 30%, transparent 70%)',
+                }}
+              />
+            </div>
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
           
           {/* Content overlay */}
           <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
