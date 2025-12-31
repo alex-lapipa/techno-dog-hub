@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -212,10 +212,11 @@ const CommunityLeaderboard = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Community Leaderboard | techno.dog</title>
-        <meta name="description" content="Top contributors to the techno.dog knowledge base" />
-      </Helmet>
+      <PageSEO
+        title="Community Leaderboard | Top Contributors"
+        description="Top contributors to the techno.dog knowledge base. See who's earning the most points and badges in the community."
+        path="/community/leaderboard"
+      />
 
       <div className="min-h-screen bg-background">
         <Header />

@@ -114,7 +114,11 @@ const Documentaries = () => {
   };
 
   return (
-    <PageLayout title="Documentaries" path="/documentaries">
+    <PageLayout 
+      title="Techno Documentaries" 
+      description="Essential viewing for the underground. Documentaries covering Detroit origins, Berlin's golden era, warehouse raves, and the machines that shaped the sound."
+      path="/documentaries"
+    >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
