@@ -2402,6 +2402,56 @@ export const HeliosDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Jeremias Dog - Frankfurt banker from Gijón with glasses, sparse fair hair, slit eyes, gap teeth, party animal
+export const JeremiasDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* SPARSE FAIR HAIRS - just a few on top */}
+      <path d="M28 14 Q28 8 26 4" strokeWidth="1.5" opacity="0.6" />
+      <path d="M32 13 Q32 7 30 3" strokeWidth="1.5" opacity="0.7" />
+      <path d="M36 14 Q36 8 38 4" strokeWidth="1.5" opacity="0.6" />
+      <path d="M40 16 Q42 10 44 6" strokeWidth="1.5" opacity="0.5" />
+      {/* Ears */}
+      <path d="M12 28 Q6 20 10 12 Q16 16 18 26" />
+      <path d="M52 28 Q58 20 54 12 Q48 16 46 26" />
+      {/* Round head - balding top */}
+      <ellipse cx="32" cy="34" rx="18" ry="16" />
+      {/* GLASSES - banker style rectangular frames */}
+      <rect x="18" y="28" width="11" height="8" rx="1" strokeWidth="2" />
+      <rect x="35" y="28" width="11" height="8" rx="1" strokeWidth="2" />
+      <line x1="29" y1="32" x2="35" y2="32" strokeWidth="1.5" />
+      <line x1="18" y1="32" x2="12" y2="30" strokeWidth="1.5" />
+      <line x1="46" y1="32" x2="52" y2="30" strokeWidth="1.5" />
+      {/* VERY SLIT EYES - narrow horizontal lines behind glasses */}
+      <line x1="21" y1="32" x2="26" y2="32" strokeWidth="2.5" />
+      <line x1="38" y1="32" x2="43" y2="32" strokeWidth="2.5" />
+      {/* Tiny pupils */}
+      <circle cx="23.5" cy="32" r="0.8" fill="hsl(var(--logo-green))" />
+      <circle cx="40.5" cy="32" r="0.8" fill="hsl(var(--logo-green))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* GAP-TOOTHED SMILE - wide smile with separated teeth */}
+      <path d="M22 46 Q32 54 42 46" strokeWidth="2" />
+      {/* Upper lip line */}
+      <path d="M24 46 Q32 44 40 46" strokeWidth="1" opacity="0.6" />
+      {/* Visible teeth with gaps */}
+      <line x1="26" y1="47" x2="26" y2="50" strokeWidth="2" fill="hsl(var(--logo-green))" />
+      <line x1="30" y1="47" x2="30" y2="51" strokeWidth="2" fill="hsl(var(--logo-green))" />
+      {/* GAP */}
+      <line x1="34" y1="47" x2="34" y2="51" strokeWidth="2" fill="hsl(var(--logo-green))" />
+      <line x1="38" y1="47" x2="38" y2="50" strokeWidth="2" fill="hsl(var(--logo-green))" />
+      {/* Serious banker tie hint */}
+      <path d="M32 52 L30 58 L32 60 L34 58 L32 52" strokeWidth="1.5" opacity="0.7" />
+      {/* Euro symbol - Frankfurt banker */}
+      <text x="6" y="16" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.5">€</text>
+      {/* Party star - secret party animal */}
+      <text x="52" y="14" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.6">★</text>
+      {/* Music note - party side */}
+      <text x="56" y="56" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">♪</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2504,4 +2554,5 @@ export const dogVariants = [
   { name: 'Fran', Component: FranDog, personality: 'Showjumping legend, 90s clubbing madman, Gijón heart beating in Bali', status: 'jumping & dancing' },
   { name: 'Yayo', Component: YayoDog, personality: 'Neverland commander, moustache game strong, pointy hair pointing to the stars', status: 'mixing dreams' },
   { name: 'Helios', Component: HeliosDog, personality: 'Funky soul, flowing locks, legendary mustache, voice of the underground', status: 'singing & grooving' },
+  { name: 'Jeremias', Component: JeremiasDog, personality: 'Frankfurt banker by day, Gijón party legend by night, slit eyes see all the beats', status: 'banking & raving' },
 ];
