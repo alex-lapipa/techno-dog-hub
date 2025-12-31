@@ -404,21 +404,18 @@ const NewsArticleDetail = () => {
               </div>
             </div>
 
-            {/* Embedded Dog Chat Box - Full width below columns */}
-            <div className="mt-16 mb-8 border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background rounded-lg overflow-hidden shadow-[0_0_30px_hsl(100_100%_60%/0.1)]">
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-logo-green/30 bg-logo-green/10">
-                <DogSilhouette className="w-8 h-8 text-logo-green drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
-                <div>
-                  <h3 className="font-mono text-sm uppercase tracking-wider text-foreground font-semibold">
-                    Want to know more?
-                  </h3>
-                  <p className="font-mono text-xs text-muted-foreground">
-                    Ask our Techno Dog anything about techno.dog
-                  </p>
+            {/* Embedded Dog Chat Box - Square format, right-aligned */}
+            <div className="mt-12 mb-8 flex justify-end">
+              <div className="w-full max-w-[320px] aspect-square border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background overflow-hidden shadow-[0_0_20px_hsl(100_100%_60%/0.1)]">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-logo-green/30 bg-logo-green/10">
+                  <DogSilhouette className="w-5 h-5 text-logo-green drop-shadow-[0_0_6px_hsl(100_100%_60%/0.6)]" />
+                  <span className="font-mono text-xs uppercase tracking-wider text-foreground font-semibold">
+                    Ask Techno Dog
+                  </span>
                 </div>
-              </div>
-              <div className="h-[400px]">
-                <DogChat />
+                <div className="h-[calc(100%-36px)]">
+                  <DogChat />
+                </div>
               </div>
             </div>
 
