@@ -52,12 +52,14 @@ export function buildAmazonSearchUrl(
 }
 
 /**
- * Save purchase_url ONLY if it's missing in DB (never overwrites an existing one)
+ * Save purchase_url ONLY if it's missing in DB (never overwrites an existing one).
+ * Optionally uses AI to generate better Amazon links.
  */
 export async function ensurePurchaseUrlSaved(
   bookId: string,
   title: string,
-  author?: string | null
+  author?: string | null,
+  useAI: boolean = true
 ): Promise<boolean> {
   if (!bookId || !title) return false;
 
@@ -71,8 +73,23 @@ export async function ensurePurchaseUrlSaved(
     if (readErr || !existing) return false;
     if (existing.purchase_url && existing.purchase_url.trim() !== "") return false;
 
-    // Generate Amazon search URL as fallback
-    const amazonUrl = buildAmazonSearchUrl(title, author, "es");
+    // Default fallback URL
+    let amazonUrl = buildAmazonSearchUrl(title, author, "es");
+
+    // Try AI-powered link generation
+    if (useAI) {
+      try {
+        const response = await supabase.functions.invoke("amazon-link", {
+          body: { title, author },
+        });
+
+        if (response.data?.amazon_url) {
+          amazonUrl = response.data.amazon_url;
+        }
+      } catch (aiError) {
+        console.warn("AI Amazon link generation failed, using fallback:", aiError);
+      }
+    }
 
     const { error: updateErr } = await supabase
       .from("books")
