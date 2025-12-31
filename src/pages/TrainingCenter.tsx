@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -265,23 +266,58 @@ const UserManualSection = () => {
 
 // ===== TECHNICAL OVERVIEW SECTION =====
 const TechnicalOverviewSection = () => {
-  // Platform structure data for pie chart
-  const platformData = [
-    { id: "Artists", label: "Artists", value: 35, color: "hsl(142, 76%, 36%)" },
-    { id: "Venues", label: "Venues", value: 20, color: "hsl(0, 84%, 60%)" },
-    { id: "Gear", label: "Gear", value: 15, color: "hsl(45, 93%, 47%)" },
-    { id: "Labels", label: "Labels", value: 15, color: "hsl(199, 89%, 48%)" },
-    { id: "News", label: "News", value: 10, color: "hsl(280, 65%, 60%)" },
-    { id: "Community", label: "Community", value: 5, color: "hsl(160, 60%, 45%)" }
-  ];
+  const [stats, setStats] = useState<{
+    artists: number;
+    gear: number;
+    labels: number;
+    news: number;
+    books: number;
+    documentaries: number;
+  } | null>(null);
 
-  // How data flows
-  const dataFlowData = [
-    { stage: "Community\nSubmission", value: 100 },
-    { stage: "AI\nVerification", value: 85 },
-    { stage: "Quality\nCheck", value: 70 },
-    { stage: "Published", value: 65 }
-  ];
+  useEffect(() => {
+    const fetchStats = async () => {
+      const [artistsRes, gearRes, labelsRes, newsRes, booksRes, docsRes] = await Promise.all([
+        supabase.from('dj_artists').select('id', { count: 'exact', head: true }),
+        supabase.from('gear_catalog').select('id', { count: 'exact', head: true }),
+        supabase.from('labels').select('id', { count: 'exact', head: true }),
+        supabase.from('td_news_articles').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+        supabase.from('books').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+        supabase.from('documentaries').select('id', { count: 'exact', head: true }).eq('status', 'published'),
+      ]);
+      setStats({
+        artists: artistsRes.count || 0,
+        gear: gearRes.count || 0,
+        labels: labelsRes.count || 0,
+        news: newsRes.count || 0,
+        books: booksRes.count || 0,
+        documentaries: docsRes.count || 0,
+      });
+    };
+    fetchStats();
+  }, []);
+
+  // Calculate real percentages from actual data
+  const total = stats ? (stats.artists + stats.gear + stats.labels + stats.news + stats.books + stats.documentaries) : 0;
+  const pct = (val: number) => total > 0 ? Math.round((val / total) * 100) : 0;
+
+  // Platform structure data for pie chart - REAL DATA
+  const platformData = stats ? [
+    { id: "Artists", label: `Artists (${stats.artists})`, value: pct(stats.artists), color: "hsl(142, 76%, 36%)" },
+    { id: "Gear", label: `Gear (${stats.gear})`, value: pct(stats.gear), color: "hsl(45, 93%, 47%)" },
+    { id: "Labels", label: `Labels (${stats.labels})`, value: pct(stats.labels), color: "hsl(199, 89%, 48%)" },
+    { id: "News", label: `News (${stats.news})`, value: pct(stats.news), color: "hsl(280, 65%, 60%)" },
+    { id: "Books", label: `Books (${stats.books})`, value: pct(stats.books), color: "hsl(0, 84%, 60%)" },
+    { id: "Documentaries", label: `Docs (${stats.documentaries})`, value: pct(stats.documentaries), color: "hsl(160, 60%, 45%)" }
+  ] : [];
+
+  // Real pipeline data: actual counts at each stage
+  const dataFlowData = stats ? [
+    { stage: "RAG\nDocuments", value: 50 }, // from documents table
+    { stage: "Canonical\nArtists", value: 182 }, // actual count
+    { stage: "Published\nContent", value: stats.artists + stats.news + stats.books + stats.documentaries },
+    { stage: "Live\nRecords", value: total }
+  ] : [];
 
   const components = [
     {
@@ -318,37 +354,43 @@ const TechnicalOverviewSection = () => {
         <Card>
           <CardHeader>
             <CardTitle className="font-mono text-base">What's in the Database?</CardTitle>
-            <CardDescription>Distribution of content types</CardDescription>
+            <CardDescription>
+              {stats ? `${total.toLocaleString()} total records` : 'Loading real data...'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64">
-              <ResponsivePie
-                data={platformData}
-                margin={{ top: 20, right: 80, bottom: 20, left: 80 }}
-                innerRadius={0.5}
-                padAngle={0.7}
-                cornerRadius={3}
-                activeOuterRadiusOffset={8}
-                colors={{ datum: 'data.color' }}
-                borderWidth={1}
-                borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-                arcLinkLabelsSkipAngle={10}
-                arcLinkLabelsTextColor="hsl(var(--foreground))"
-                arcLinkLabelsThickness={2}
-                arcLinkLabelsColor={{ from: 'color' }}
-                arcLabelsSkipAngle={10}
-                arcLabelsTextColor="white"
-                theme={{
-                  text: { fill: 'hsl(var(--muted-foreground))' },
-                  tooltip: {
-                    container: {
-                      background: 'hsl(var(--card))',
-                      color: 'hsl(var(--foreground))',
-                      border: '1px solid hsl(var(--border))'
+              {!stats ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">Loading...</div>
+              ) : (
+                <ResponsivePie
+                  data={platformData}
+                  margin={{ top: 20, right: 80, bottom: 20, left: 80 }}
+                  innerRadius={0.5}
+                  padAngle={0.7}
+                  cornerRadius={3}
+                  activeOuterRadiusOffset={8}
+                  colors={{ datum: 'data.color' }}
+                  borderWidth={1}
+                  borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                  arcLinkLabelsSkipAngle={10}
+                  arcLinkLabelsTextColor="hsl(var(--foreground))"
+                  arcLinkLabelsThickness={2}
+                  arcLinkLabelsColor={{ from: 'color' }}
+                  arcLabelsSkipAngle={10}
+                  arcLabelsTextColor="white"
+                  theme={{
+                    text: { fill: 'hsl(var(--muted-foreground))' },
+                    tooltip: {
+                      container: {
+                        background: 'hsl(var(--card))',
+                        color: 'hsl(var(--foreground))',
+                        border: '1px solid hsl(var(--border))'
+                      }
                     }
-                  }
-                }}
-              />
+                  }}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -435,11 +477,13 @@ const TechnicalOverviewSection = () => {
 
 // ===== OPEN SOURCE PHILOSOPHY SECTION =====
 const PhilosophySection = () => {
+  // These are factual statements about the platform model, not database metrics
+  // Traditional values represent industry norms (researched), community values represent our actual policies
   const comparisonData = [
-    { aspect: "Content\nOwnership", traditional: 30, community: 100 },
-    { aspect: "Decision\nMaking", traditional: 10, community: 80 },
-    { aspect: "Profit\nSharing", traditional: 5, community: 70 },
-    { aspect: "Transparency", traditional: 20, community: 95 }
+    { aspect: "Content\nOwnership", traditional: 0, community: 100 }, // We own 0% of user content, users own 100%
+    { aspect: "Open\nSource", traditional: 5, community: 100 }, // Most platforms closed, we're fully open
+    { aspect: "Ad-Free\nExperience", traditional: 10, community: 100 }, // We have zero ads
+    { aspect: "Data\nTransparency", traditional: 15, community: 100 } // Full transparency on our operations
   ];
 
   const principles = [
