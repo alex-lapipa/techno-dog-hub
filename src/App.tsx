@@ -79,6 +79,7 @@ const DoggyOrchestratorAdmin = lazy(() => import("./pages/DoggyOrchestratorAdmin
 const AIOrchestratorAdmin = lazy(() => import("./pages/AIOrchestratorAdmin"));
 const TranslationAgentAdmin = lazy(() => import("./pages/TranslationAgentAdmin"));
 const GoogleOrganicStrategyAdmin = lazy(() => import("./pages/GoogleOrganicStrategyAdmin"));
+const ChangelogAdmin = lazy(() => import("./pages/ChangelogAdmin"));
 
 // Agent Admin Pages
 const ApiGuardianAdmin = lazy(() => import("./pages/ApiGuardianAdmin"));
@@ -257,6 +258,7 @@ const App = () => (
                     <Route path="/admin/google-organic-strategy" element={<GoogleOrganicStrategyAdmin />} />
                     <Route path="/admin/librarian" element={<LibrarianAgentAdmin />} />
                     <Route path="/admin/book-knowledge" element={<AdminBookKnowledge />} />
+                    <Route path="/admin/changelog" element={<ChangelogAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
