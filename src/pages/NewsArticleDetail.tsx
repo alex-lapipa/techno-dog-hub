@@ -332,56 +332,58 @@ const NewsArticleDetail = () => {
           </Link>
         </div>
 
-        {/* Full-width hero section with overlay text */}
+        {/* Full-width hero section with watermark background */}
         <div className="w-full mb-12">
-          {/* Hero Photo with Title Overlay */}
-          <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] border-y border-destructive/30 overflow-hidden">
+          {/* Hero with Image as Watermark Background */}
+          <div className="relative w-full min-h-[500px] md:min-h-[600px] lg:min-h-[700px] border-y border-destructive/30 overflow-hidden flex items-center">
             {/* Red accent line at top */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent z-20" />
             
-            {/* Hero Image */}
-            <img 
-              src={alexLaunchHero} 
-              alt="Techno Dog artwork - Las Querodias" 
-              className="w-full h-full object-cover"
-            />
+            {/* Watermark Background Image - zoomed out, faded */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src={alexLaunchHero} 
+                alt="Techno Dog artwork - Las Querodias" 
+                className="w-[80%] md:w-[60%] lg:w-[50%] h-auto object-contain opacity-[0.15] blur-[1px]"
+              />
+            </div>
             
-            {/* Dark overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
+            {/* Dark overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
             
-            {/* Title Content Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-end z-10">
-              <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 pb-8 md:pb-12">
-                <header className="max-w-5xl">
+            {/* Title Content - Centered and Prominent */}
+            <div className="relative z-10 w-full">
+              <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
+                <header className="max-w-5xl mx-auto text-center">
                   {/* Tags */}
-                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
                     {article.city_tags?.map(tag => (
-                      <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive bg-background/50 backdrop-blur-sm">
+                      <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive">
                         {tag}
                       </Badge>
                     ))}
                     {article.genre_tags?.map(tag => (
-                      <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest bg-background/50 backdrop-blur-sm">
+                      <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest">
                         {tag}
                       </Badge>
                     ))}
                   </div>
 
                   {/* Title */}
-                  <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold uppercase tracking-tight mb-4 leading-[0.95] text-foreground drop-shadow-lg">
+                  <h1 className="font-mono text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-tight mb-6 leading-[0.95] text-foreground">
                     {article.title}
                   </h1>
 
                   {/* Subtitle */}
                   {article.subtitle && (
-                    <p className="font-mono text-base md:text-lg lg:text-xl font-light text-foreground/80 mb-6 leading-relaxed max-w-3xl drop-shadow-md">
+                    <p className="font-mono text-lg md:text-xl lg:text-2xl font-light text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
                       {article.subtitle}
                     </p>
                   )}
 
                   {/* Byline */}
-                  <div className="flex items-center gap-4 font-mono text-sm border-t border-destructive/40 pt-4">
-                    <span className="font-semibold text-destructive drop-shadow-sm">By {article.author_pseudonym}</span>
+                  <div className="flex items-center justify-center gap-4 font-mono text-sm border-t border-destructive/40 pt-6 max-w-md mx-auto">
+                    <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
                     <span className="text-destructive/60">|</span>
                     <span className="font-light text-foreground/70">{formatDate(article.published_at || article.created_at)}</span>
                   </div>
