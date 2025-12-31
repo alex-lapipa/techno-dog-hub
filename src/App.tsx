@@ -99,6 +99,7 @@ const Lookbook = lazy(() => import("./pages/Lookbook"));
 const SoundMachine = lazy(() => import("./pages/SoundMachine"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
+const Books = lazy(() => import("./pages/Books"));
 const Community = lazy(() => import("./pages/Community"));
 const CommunityDocs = lazy(() => import("./pages/CommunityDocs"));
 const CommunityLeaderboard = lazy(() => import("./pages/CommunityLeaderboard"));
@@ -245,6 +246,7 @@ const App = () => (
                     <Route path="/my-submissions" element={<MySubmissions />} />
                     <Route path="/submit" element={<Navigate to="/technopedia#contribute" replace />} />
                     <Route path="/technopedia" element={<Technopedia />} />
+                    <Route path="/books" element={<Books />} />
                     
                     {/* Support */}
                     <Route path="/support" element={<Support />} />
