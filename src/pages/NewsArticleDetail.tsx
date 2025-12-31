@@ -5,9 +5,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageSEO from '@/components/PageSEO';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Camera } from 'lucide-react';
 import DogChat from '@/components/admin/DogChat';
 import DogSilhouette from '@/components/DogSilhouette';
+
+// Split content into two columns for magazine layout
+const splitIntoColumns = (elements: JSX.Element[]): [JSX.Element[], JSX.Element[]] => {
+  const midpoint = Math.ceil(elements.length / 2);
+  return [elements.slice(0, midpoint), elements.slice(midpoint)];
+};
 
 interface NewsArticle {
   id: string;
@@ -296,6 +302,9 @@ const NewsArticleDetail = () => {
     "keywords": [...article.genre_tags, ...article.city_tags, ...article.entity_tags].join(", ")
   };
 
+  const renderedContent = renderMarkdown(article.body_markdown);
+  const [leftColumn, rightColumn] = splitIntoColumns(renderedContent);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
@@ -311,18 +320,40 @@ const NewsArticleDetail = () => {
       />
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
+        {/* Back link */}
+        <div className="container mx-auto px-4 md:px-8 mb-6">
           <Link 
             to="/news" 
-            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+            className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to News
           </Link>
+        </div>
 
-          <article className="max-w-2xl lg:max-w-3xl">
-            <header className="mb-10">
-              <div className="flex flex-wrap items-center gap-3 mb-5">
+        {/* Full-width hero section */}
+        <div className="w-full mb-12">
+          {/* Hero Photo Placeholder */}
+          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-muted/50 via-muted/30 to-background border-y border-border overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <Camera className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground/50">
+                  Featured photograph
+                </span>
+              </div>
+            </div>
+            {/* Decorative grid overlay */}
+            <div className="absolute inset-0 opacity-5" style={{
+              backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+              backgroundSize: '40px 40px'
+            }} />
+          </div>
+
+          {/* Article Header - Full width */}
+          <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 mt-10">
+            <header className="max-w-6xl mx-auto">
+              <div className="flex flex-wrap items-center gap-3 mb-6">
                 {article.city_tags?.map(tag => (
                   <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest">
                     {tag}
@@ -335,29 +366,43 @@ const NewsArticleDetail = () => {
                 ))}
               </div>
 
-              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-tight mb-4 leading-tight">
+              <h1 className="font-mono text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-tight mb-6 leading-[0.95]">
                 {article.title}
               </h1>
 
               {article.subtitle && (
-                <p className="font-mono text-base md:text-lg font-light text-muted-foreground mb-6 leading-relaxed">
+                <p className="font-mono text-lg md:text-xl lg:text-2xl font-light text-muted-foreground mb-8 leading-relaxed max-w-4xl">
                   {article.subtitle}
                 </p>
               )}
 
-              <div className="flex items-center gap-4 font-mono text-xs text-muted-foreground border-t border-border pt-4">
-                <span className="font-medium text-foreground/80">By {article.author_pseudonym}</span>
-                <span className="text-border">•</span>
+              <div className="flex items-center gap-6 font-mono text-sm text-muted-foreground border-t border-border pt-6">
+                <span className="font-semibold text-foreground">By {article.author_pseudonym}</span>
+                <span className="text-border">|</span>
                 <span className="font-light">{formatDate(article.published_at || article.created_at)}</span>
               </div>
             </header>
+          </div>
+        </div>
 
-            <div className="space-y-1">
-              {renderMarkdown(article.body_markdown)}
+        {/* Two-column magazine layout */}
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24">
+          <article className="max-w-6xl mx-auto">
+            {/* Two-column content grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 xl:gap-x-16 gap-y-8">
+              {/* Left Column */}
+              <div className="space-y-1">
+                {leftColumn}
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-1">
+                {rightColumn}
+              </div>
             </div>
 
-            {/* Embedded Dog Chat Box */}
-            <div className="mt-12 mb-8 border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background rounded-lg overflow-hidden shadow-[0_0_30px_hsl(100_100%_60%/0.1)]">
+            {/* Embedded Dog Chat Box - Full width below columns */}
+            <div className="mt-16 mb-8 border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background rounded-lg overflow-hidden shadow-[0_0_30px_hsl(100_100%_60%/0.1)]">
               <div className="flex items-center gap-3 px-5 py-4 border-b border-logo-green/30 bg-logo-green/10">
                 <DogSilhouette className="w-8 h-8 text-logo-green drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
                 <div>
@@ -374,42 +419,45 @@ const NewsArticleDetail = () => {
               </div>
             </div>
 
-            {article.entity_tags && article.entity_tags.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-border">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  Mentioned
+            {/* Footer metadata - Two column layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 pt-8 border-t border-border">
+              {article.entity_tags && article.entity_tags.length > 0 && (
+                <div>
+                  <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
+                    Mentioned
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {article.entity_tags.map(tag => (
+                      <Badge key={tag} variant="outline" className="font-mono text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {article.entity_tags.map(tag => (
-                    <Badge key={tag} variant="outline" className="font-mono text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
 
-            {article.source_urls && article.source_urls.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-border">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-                  Sources
+              {article.source_urls && article.source_urls.length > 0 && (
+                <div>
+                  <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
+                    Sources
+                  </div>
+                  <ul className="space-y-2">
+                    {article.source_urls.map((url, i) => (
+                      <li key={i}>
+                        <a 
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="font-mono text-sm text-primary hover:underline break-all"
+                        >
+                          {url}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-1">
-                  {article.source_urls.map((url, i) => (
-                    <li key={i}>
-                      <a 
-                        href={url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="font-mono text-sm text-primary hover:underline break-all"
-                      >
-                        {url}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              )}
+            </div>
           </article>
         </div>
       </main>
