@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Quote } from "lucide-react";
 import { getCrewById, crews } from "@/data/crews";
 import { PageLayout } from "@/components/layout";
+import CuratedChannelVideos from "@/components/CuratedChannelVideos";
 
 const CrewDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -88,6 +89,13 @@ const CrewDetail = () => {
           {crew.soundSystem && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">Sound System</h2><div className="border border-border p-4 sm:p-6 bg-card/30"><p className="font-mono text-xs sm:text-sm text-muted-foreground">{crew.soundSystem}</p></div></section>)}
 
           {crew.members && crew.members.length > 0 && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3"><Users className="w-4 h-4 sm:w-5 sm:h-5" />Members</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">{crew.members.map((member, i) => (<div key={i} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors"><span className="font-mono text-xs sm:text-sm">{member}</span></div>))}</div></section>)}
+
+          {/* Curated Archive Videos */}
+          <CuratedChannelVideos 
+            pageType="crew" 
+            entitySlug={crew.id} 
+            title="From Our Archive"
+          />
 
         {relatedCrews.length > 0 && (<section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8"><h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">Related Crews</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">{relatedCrews.map((c) => (<Link key={c.id} to={`/crews/${c.id}`} className="border border-border p-3 sm:p-4 hover:bg-card transition-colors group"><span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">{typeLabels[c.type] || c.type}</span><h3 className="font-mono text-xs sm:text-sm uppercase group-hover:animate-glitch">{c.name}</h3><p className="font-mono text-[10px] sm:text-xs text-muted-foreground mt-1">{c.city}, {c.country}</p></Link>))}</div></section>)}
       </div>
