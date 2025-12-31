@@ -13,6 +13,16 @@ export { default as AdminStatsCard } from './AdminStatsCard';
 export { default as AdminDataTable } from './AdminDataTable';
 export { default as AdminAIAssistant } from './AdminAIAssistant';
 
+// Shared Agent Admin Components (Phase 2.1)
+export { 
+  AgentRunButton,
+  PipelineProgress,
+  AgentStatusBadge,
+  QuickStatsRow,
+  AgentEmptyState,
+  AgentLastRun
+} from './AgentAdminComponents';
+
 // Gear Agent components
 export { default as GearStatsGrid } from './GearStatsGrid';
 export { default as GearPipelineControl, type PipelineStep, type GapSummary } from './GearPipelineControl';
