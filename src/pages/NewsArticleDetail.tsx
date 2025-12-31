@@ -335,14 +335,14 @@ const NewsArticleDetail = () => {
         {/* Full-width hero with background image */}
         <div className="relative w-full mb-10 overflow-hidden">
           {/* Background image */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-end pr-8">
             <img 
               src={alexLaunchHero} 
               alt="" 
-              className="w-auto h-full max-w-none object-contain opacity-60"
+              className="h-[120%] w-auto max-w-none object-contain opacity-80"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
           </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
           
           {/* Content overlay */}
           <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
