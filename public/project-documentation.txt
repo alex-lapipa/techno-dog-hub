@@ -750,15 +750,17 @@ for each specific task rather than defaulting to any single provider.
 
 AVAILABLE API SECRETS:
 ----------------------
-1. LOVABLE_API_KEY   - Lovable AI Gateway (chat/text generation)
-2. OPENAI_API_KEY    - OpenAI Direct (embeddings, images, audio)
+1. LOVABLE_API_KEY   - Lovable AI Gateway (chat/text generation via Gemini/GPT)
+2. OPENAI_API_KEY    - OpenAI Direct (embeddings, images, audio, TTS)
 3. ANTHROPIC_API_KEY - Claude (long documents, complex reasoning)
-4. GEMINI_API_KEY    - Google Gemini Direct
-5. GROQ_API_KEY      - Groq (ultra-fast inference)
-6. XAI_KEY           - xAI / Grok
-7. FIRECRAWL_API_KEY - Web scraping
-8. YOUTUBE_API_KEY   - YouTube Data API
-9. RESEND_API_KEY    - Email delivery
+4. GEMINI_API_KEY    - Google Gemini Direct API
+5. GOOGLE_API_KEY    - Unified Google Cloud Services (Books, Custom Search, etc.)
+6. GROQ_API_KEY      - Groq (ultra-fast inference)
+7. XAI_KEY           - xAI / Grok
+8. FIRECRAWL_API_KEY - Web scraping & crawling
+9. YOUTUBE_API_KEY   - YouTube Data API v3 (video search, verification)
+10. RESEND_API_KEY   - Transactional email delivery
+11. ELEVENLABS_API_KEY - Voice synthesis & TTS (via connector)
 
 API SELECTION DECISION TREE:
 ----------------------------
