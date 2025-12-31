@@ -2296,6 +2296,58 @@ export const FranDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Yayo Dog - DJ/producer with glasses, pointy hair, moustache, runs Neverland club nights
+export const YayoDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Ears - alert DJ ears */}
+      <path d="M12 28 Q6 18 12 8 Q20 14 18 26" />
+      <path d="M52 28 Q58 18 52 8 Q44 14 46 26" />
+      {/* POINTY SPIKY HAIR - signature look */}
+      <path d="M16 12 L20 2 L24 14" strokeWidth="2" />
+      <path d="M22 10 L26 -2 L30 12" strokeWidth="2" />
+      <path d="M28 8 L32 -4 L36 8" strokeWidth="2" />
+      <path d="M34 10 L38 -2 L42 12" strokeWidth="2" />
+      <path d="M40 12 L44 2 L48 14" strokeWidth="2" />
+      {/* Extra spiky details */}
+      <path d="M18 14 L22 6" strokeWidth="1.5" opacity="0.7" />
+      <path d="M46 14 L42 6" strokeWidth="1.5" opacity="0.7" />
+      {/* Round head */}
+      <ellipse cx="32" cy="36" rx="17" ry="15" />
+      {/* GLASSES - thick rectangular frames */}
+      <rect x="18" y="28" width="10" height="8" rx="1" strokeWidth="2" />
+      <rect x="36" y="28" width="10" height="8" rx="1" strokeWidth="2" />
+      {/* Glasses bridge */}
+      <path d="M28 32 L36 32" strokeWidth="2" />
+      {/* Glasses arms */}
+      <path d="M18 30 L12 28" strokeWidth="1.5" />
+      <path d="M46 30 L52 28" strokeWidth="1.5" />
+      {/* Eyes behind glasses */}
+      <circle cx="23" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="41" cy="32" r="2" fill="hsl(var(--logo-green))" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="2" ry="1.5" fill="hsl(var(--logo-green))" />
+      {/* THE MOUSTACHE - proper thick handlebar style */}
+      <path d="M22 44 Q26 42 32 44 Q38 42 42 44" strokeWidth="2.5" />
+      <path d="M20 44 Q18 46 16 44" strokeWidth="2" />
+      <path d="M44 44 Q46 46 48 44" strokeWidth="2" />
+      {/* Moustache detail - thickness */}
+      <path d="M24 45 Q28 43 32 45 Q36 43 40 45" strokeWidth="1.5" />
+      {/* Small smile under moustache */}
+      <path d="M28 50 Q32 52 36 50" strokeWidth="1.5" />
+      {/* Headphones hint - DJ gear */}
+      <path d="M8 32 Q4 32 4 38 Q4 44 8 44" strokeWidth="2" opacity="0.6" />
+      <path d="M56 32 Q60 32 60 38 Q60 44 56 44" strokeWidth="2" opacity="0.6" />
+      <path d="M4 38 L8 38" strokeWidth="3" opacity="0.5" />
+      <path d="M56 38 L60 38" strokeWidth="3" opacity="0.5" />
+      {/* Neverland star symbol */}
+      <text x="54" y="56" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6">★</text>
+      {/* Music notes - producer vibes */}
+      <text x="4" y="56" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">♪</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2396,4 +2448,5 @@ export const dogVariants = [
   { name: 'Alberto', Component: AlbertoDog, personality: 'Argentinian chef-raver, best steaks by day, glow sticks til sunrise', status: 'grilling & dancing' },
   { name: 'Richard', Component: RichardDog, personality: 'Steel factory legend by day, Paranoox underground king by night', status: 'forging & raving' },
   { name: 'Fran', Component: FranDog, personality: 'Showjumping legend, 90s clubbing madman, Gijón heart beating in Bali', status: 'jumping & dancing' },
+  { name: 'Yayo', Component: YayoDog, personality: 'Neverland commander, moustache game strong, pointy hair pointing to the stars', status: 'mixing dreams' },
 ];
