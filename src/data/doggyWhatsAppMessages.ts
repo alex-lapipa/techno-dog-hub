@@ -491,6 +491,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Alberto Dog — Argentinian soul in London, grilling steaks by day, waving glow sticks by night",
     quote: "The asado is perfect, the friends are beautiful, the bass is heavy. From Buenos Aires to Brixton, this is the life.",
     packInvite: "Dance with us til the sun comes up"
+  },
+  'richard': {
+    intro: "I'm the Richard Dog — steel factory legend by day, Paranoox underground king by night",
+    quote: "8 hours forging metal in Gijón, 8 hours forging memories at Paranoox. The beard grows longer with every kick drum.",
+    packInvite: "Join the Paranoox family"
   }
 };
 
