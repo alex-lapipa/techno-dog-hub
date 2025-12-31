@@ -139,7 +139,7 @@ const NewsArticleDetail = () => {
         elements.push(
           <ListTag key={elements.length} className={`${listType === 'ol' ? 'list-decimal' : 'list-none'} ml-4 my-4 space-y-2`}>
             {listItems.map((item, i) => (
-              <li key={i} className="font-mono text-[15px] leading-relaxed text-foreground/90 pl-2 border-l border-muted-foreground/30">
+              <li key={i} className="font-mono text-[15px] leading-relaxed text-foreground/90 pl-3 border-l-2 border-destructive/40 hover:border-logo-green hover:text-foreground transition-all duration-300">
                 {parseInlineMarkdown(item)}
               </li>
             ))}
@@ -154,7 +154,7 @@ const NewsArticleDetail = () => {
       flushList();
       if (currentParagraph.length > 0) {
         elements.push(
-          <p key={elements.length} className="font-mono text-[15px] leading-[1.8] text-foreground/85 mb-5">
+          <p key={elements.length} className="font-mono text-[15px] leading-[1.8] text-foreground/85 mb-5 hover:text-foreground transition-colors duration-300">
             {parseInlineMarkdown(currentParagraph.join(' '))}
           </p>
         );
@@ -174,7 +174,8 @@ const NewsArticleDetail = () => {
       if (trimmedLine.startsWith('# ')) {
         flushParagraph();
         elements.push(
-          <h2 key={elements.length} className="font-mono text-xl md:text-2xl font-semibold uppercase tracking-wide text-foreground mt-10 mb-4 border-b border-border pb-2">
+          <h2 key={elements.length} className="font-mono text-xl md:text-2xl font-semibold uppercase tracking-wide text-foreground mt-10 mb-4 border-b border-destructive/50 pb-2 hover:border-logo-green transition-colors duration-300">
+            <span className="text-destructive mr-2">//</span>
             {trimmedLine.substring(2)}
           </h2>
         );
@@ -183,7 +184,8 @@ const NewsArticleDetail = () => {
       else if (trimmedLine.startsWith('## ')) {
         flushParagraph();
         elements.push(
-          <h3 key={elements.length} className="font-mono text-lg font-medium uppercase tracking-wider text-logo-green mt-8 mb-3">
+          <h3 key={elements.length} className="font-mono text-lg font-medium uppercase tracking-wider text-logo-green mt-8 mb-3 hover:text-foreground transition-colors duration-300">
+            <span className="text-destructive mr-1">›</span>
             {trimmedLine.substring(3)}
           </h3>
         );
@@ -192,7 +194,7 @@ const NewsArticleDetail = () => {
       else if (trimmedLine.startsWith('### ')) {
         flushParagraph();
         elements.push(
-          <h4 key={elements.length} className="font-mono text-base font-medium text-foreground/90 mt-6 mb-2">
+          <h4 key={elements.length} className="font-mono text-base font-medium text-foreground/90 mt-6 mb-2 hover:text-logo-green transition-colors duration-300">
             {trimmedLine.substring(4)}
           </h4>
         );
@@ -201,11 +203,11 @@ const NewsArticleDetail = () => {
       else if (trimmedLine.startsWith('> ')) {
         flushParagraph();
         elements.push(
-          <blockquote key={elements.length} className="border-l-2 border-logo-green/60 pl-5 py-2 my-6 italic text-muted-foreground text-[15px] leading-relaxed bg-muted/20">
+          <blockquote key={elements.length} className="border-l-2 border-logo-green pl-5 py-3 my-6 italic text-muted-foreground text-[15px] leading-relaxed bg-gradient-to-r from-logo-green/5 to-transparent hover:from-logo-green/10 hover:border-destructive transition-all duration-300">
             {parseInlineMarkdown(trimmedLine.substring(2))}
           </blockquote>
         );
-      } 
+      }
       // Numbered lists
       else if (/^\d+\.\s/.test(trimmedLine)) {
         flushParagraph();
@@ -230,8 +232,8 @@ const NewsArticleDetail = () => {
       else if (trimmedLine.startsWith('—') || trimmedLine.startsWith('--')) {
         flushParagraph();
         elements.push(
-          <p key={elements.length} className="font-mono text-sm text-muted-foreground mt-8 pt-4 border-t border-border/50">
-            {trimmedLine}
+          <p key={elements.length} className="font-mono text-sm text-logo-green mt-8 pt-4 border-t border-gradient-to-r from-destructive to-logo-green/50 hover:text-foreground transition-colors duration-300">
+            <span className="text-destructive">{'>'}</span> {trimmedLine}
           </p>
         );
       }
@@ -335,22 +337,36 @@ const NewsArticleDetail = () => {
         </div>
 
         {/* Full-width hero with background image */}
-        <div className="relative w-full mb-10 overflow-hidden">
-          {/* Background image with blended edges */}
-          <div className="absolute inset-0 flex items-center justify-end pr-8">
+        <div className="relative w-full mb-10 overflow-hidden group/hero">
+          {/* Background image with blended edges and VHS effect */}
+          <div className="absolute inset-0 flex items-center justify-end pr-8 transition-transform duration-700 group-hover/hero:scale-105">
             <div className="relative h-[130%] w-auto">
               <img 
                 src={alexLaunchHero} 
                 alt="" 
-                className="h-full w-auto max-w-none object-contain opacity-75"
+                className="h-full w-auto max-w-none object-contain opacity-70 transition-all duration-500 group-hover/hero:opacity-85"
                 style={{
                   maskImage: 'radial-gradient(ellipse 80% 80% at 60% 50%, black 30%, transparent 70%)',
                   WebkitMaskImage: 'radial-gradient(ellipse 80% 80% at 60% 50%, black 30%, transparent 70%)',
                 }}
               />
+              {/* VHS overlay on image */}
+              <div 
+                className="absolute inset-0 pointer-events-none opacity-80 group-hover/hero:opacity-50 transition-opacity duration-500"
+                style={{
+                  background: `
+                    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.15) 1px, rgba(0,0,0,0.15) 2px),
+                    radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%),
+                    linear-gradient(to top, rgba(220,38,38,0.08), rgba(0,255,136,0.03))
+                  `,
+                }}
+              />
             </div>
           </div>
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent" />
+          
+          {/* Accent lines */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-destructive via-logo-green/50 to-transparent" />
           
           {/* Content overlay */}
           <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
@@ -358,40 +374,40 @@ const NewsArticleDetail = () => {
               {/* Tags */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {article.city_tags?.map(tag => (
-                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive bg-background/80">
+                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive text-destructive bg-background/80 hover:bg-destructive hover:text-white transition-colors duration-300">
                     {tag}
                   </Badge>
                 ))}
                 {article.genre_tags?.map(tag => (
-                  <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest bg-background/80">
+                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-logo-green/70 text-logo-green bg-background/80 hover:bg-logo-green hover:text-background transition-colors duration-300">
                     {tag}
                   </Badge>
                 ))}
               </div>
 
-              {/* Title */}
-              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-[1.1] text-foreground mb-4">
+              {/* Title with hover effect */}
+              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-[1.1] text-foreground mb-4 transition-all duration-300 hover:text-logo-green cursor-default">
                 {article.title}
               </h1>
 
               {/* Subtitle */}
               {article.subtitle && (
-                <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
+                <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed mb-6 hover:text-foreground transition-colors duration-300">
                   {article.subtitle}
                 </p>
               )}
 
-              {/* Byline */}
-              <div className="flex items-center gap-3 font-mono text-xs pt-4 border-t border-destructive/40">
-                <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
-                <span className="text-muted-foreground/50">|</span>
-                <span className="text-muted-foreground">{formatDate(article.published_at || article.created_at)}</span>
+              {/* Byline with colored accents */}
+              <div className="flex items-center gap-3 font-mono text-xs pt-4 border-t border-gradient-to-r from-destructive to-logo-green/50">
+                <span className="font-semibold text-destructive hover:text-white transition-colors duration-300">By {article.author_pseudonym}</span>
+                <span className="text-logo-green">|</span>
+                <span className="text-muted-foreground hover:text-logo-green transition-colors duration-300">{formatDate(article.published_at || article.created_at)}</span>
               </div>
             </div>
           </div>
           
-          {/* Bottom border accent */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive via-destructive/50 to-transparent" />
+          {/* Bottom border accent - tricolor */}
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive via-logo-green to-transparent" />
         </div>
 
         {/* Two-column magazine layout */}
