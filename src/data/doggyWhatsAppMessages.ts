@@ -481,6 +481,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Julieta Dog — Madrid party queen, ex-London raver, absolutely unhinged on the dancefloor",
     quote: "Madrid nights, London memories, zero regrets. If the bass isn't making my earrings shake, we need a bigger speaker.",
     packInvite: "Party with us til sunrise"
+  },
+  'pire': {
+    intro: "I'm the Pire Dog — globe-trotting acid head, serious business by day, serious party by night",
+    quote: "San Francisco sunrise, London warehouse, Madrid afterhours. The 303 doesn't care about time zones and neither do I.",
+    packInvite: "Squelch across continents with us"
   }
 };
 
