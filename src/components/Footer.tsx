@@ -26,7 +26,6 @@ const Footer = () => {
     { label: 'Cookie Policy', path: '/cookies' },
     { label: 'Terms of Service', path: '/terms' },
     { label: 'Sitemap', path: '/sitemap' },
-    { label: 'XML Sitemap', path: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sitemap-xml`, external: true },
   ];
   
   return (
@@ -117,23 +116,12 @@ const Footer = () => {
             <ul className="space-y-2" role="list">
               {legalLinks.map((link) => (
                 <li key={link.path}>
-                  {link.external ? (
-                    <a
-                      href={link.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      to={link.path}
-                      className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  )}
+                  <Link
+                    to={link.path}
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

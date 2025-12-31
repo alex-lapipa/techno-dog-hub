@@ -19,5 +19,5 @@ Allow: /
 Disallow: /auth
 Disallow: /analytics
 
-# Sitemap location
-Sitemap: https://techno.dog/sitemap.xml
+# Sitemap location (dynamic XML via edge function)
+Sitemap: https://bshyeweljerupobpmmes.supabase.co/functions/v1/sitemap-xml
