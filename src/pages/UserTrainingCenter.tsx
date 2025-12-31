@@ -10,6 +10,7 @@ import DogChat from "@/components/admin/DogChat";
 import DogSilhouette from "@/components/DogSilhouette";
 import { PageLayout } from "@/components/layout";
 import { supabase } from "@/integrations/supabase/client";
+import { useGlobalStatsWithMetrics } from "@/hooks/useGlobalStats";
 import { useToast } from "@/hooks/use-toast";
 import { 
   BookOpen, 
@@ -401,40 +402,7 @@ const DogSilhouetteIcon = ({ className }: { className?: string }) => (
 );
 
 const TechnicalOverviewSection = () => {
-  const [stats, setStats] = useState<{
-    artists: number;
-    gear: number;
-    labels: number;
-    news: number;
-    books: number;
-    documentaries: number;
-  } | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const [artistsRes, gearRes, labelsRes, newsRes, booksRes, docsRes] = await Promise.all([
-        supabase.from('dj_artists').select('id', { count: 'exact', head: true }),
-        supabase.from('gear_catalog').select('id', { count: 'exact', head: true }),
-        supabase.from('labels').select('id', { count: 'exact', head: true }),
-        supabase.from('td_news_articles').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-        supabase.from('books').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-        supabase.from('documentaries').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-      ]);
-      setStats({
-        artists: artistsRes.count || 0,
-        gear: gearRes.count || 0,
-        labels: labelsRes.count || 0,
-        news: newsRes.count || 0,
-        books: booksRes.count || 0,
-        documentaries: docsRes.count || 0,
-      });
-    };
-    fetchStats();
-  }, []);
-
-  // Calculate real percentages from actual data
-  const total = stats ? (stats.artists + stats.gear + stats.labels + stats.news + stats.books + stats.documentaries) : 0;
-  const pct = (val: number) => total > 0 ? Math.round((val / total) * 100) : 0;
+  const { data: stats, isLoading, total, pct } = useGlobalStatsWithMetrics();
 
   const platformData = stats ? [
     { id: "Artists", label: `Artists (${stats.artists})`, value: pct(stats.artists), color: "hsl(142, 76%, 36%)" },
