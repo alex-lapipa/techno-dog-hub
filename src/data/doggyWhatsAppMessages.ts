@@ -511,6 +511,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Helios Dog — funky soul with flowing locks, the mustache of legends, and a voice that moves crowds",
     quote: "Long hair catches the strobe light, the mustache catches the bass, and my voice catches your soul. Grab the mic, let's go.",
     packInvite: "Sing along with the pack"
+  },
+  'jeremias': {
+    intro: "I'm the Jeremias Dog — Frankfurt banker from Gijón, glasses on, gap-toothed grin ready, party mode activated",
+    quote: "By day I crunch euros in Frankfurt. By night these slit eyes scan the dancefloor. Gijón roots never die, the gap in my teeth lets the bass through.",
+    packInvite: "Bank on the beat with us"
   }
 };
 
