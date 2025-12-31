@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Download, Share2, Copy, MessageCircle, Twitter, Send, Image, Package, Sparkles } from 'lucide-react';
 import { dogVariants } from './DogPack';
 import DogSilhouette from './DogSilhouette';
+import { getWhatsAppShareText, getDoggyHashtag } from '@/data/doggyWhatsAppMessages';
 
 // Resolve CSS variables in SVG for proper export with transparent backgrounds
 const resolveCssVariables = (svgElement: SVGSVGElement): SVGSVGElement => {
@@ -203,20 +204,20 @@ const DoggyExport = ({ selectedDog, generatedDogs = [] }: DoggyExportProps) => {
   };
 
   const handleShare = (platform: string, dogName: string) => {
-    const dogText = dogTexts.find(e => e.name === dogName);
-    const shareText = `Check out this ${dogName} Dog from techno.dog! ${dogText?.text || ''}\n\nJoin the pack at techno.dog`;
-    const shareUrl = 'https://techno.dog';
+    const hashtag = getDoggyHashtag(dogName);
+    const shareUrl = 'https://techno.dog/doggies';
 
     let shareLink = '';
     switch (platform) {
       case 'twitter':
-        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`🖤 Check out my Techno Doggy! ${hashtag}`)}&url=${encodeURIComponent(shareUrl)}`;
         break;
       case 'whatsapp':
-        shareLink = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
+        // Use the full personalized WhatsApp share text with hashtag
+        shareLink = `https://wa.me/?text=${encodeURIComponent(getWhatsAppShareText(dogName))}`;
         break;
       case 'telegram':
-        shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+        shareLink = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`🖤 Check out my Techno Doggy! ${hashtag}`)}`;
         break;
     }
 

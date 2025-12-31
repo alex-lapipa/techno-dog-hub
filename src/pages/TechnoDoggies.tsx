@@ -1491,7 +1491,7 @@ const TechnoDoggies = () => {
                         await navigator.share({
                           files: [file],
                           title: `I'm ${currentDog?.name || 'a Techno Dog'}!`,
-                          text: `Join the techno.dog pack! ${shareUrl}`,
+                          text: whatsAppShareText,
                         });
                         toast.dismiss();
                         toast.success("Shared!");
@@ -1499,14 +1499,14 @@ const TechnoDoggies = () => {
                         await recordShare();
                       } else {
                         toast.dismiss();
-                        window.open(`https://wa.me/?text=${encodeURIComponent(`I'm ${currentDog?.name || 'a Techno Dog'}! Join the pack: ${shareUrl}`)}`, '_blank');
+                        window.open(`https://wa.me/?text=${encodeURIComponent(whatsAppShareText)}`, '_blank');
                         handleSocialShare("whatsapp_text_mobile");
                         await recordShare();
                       }
                     } catch (error) {
                       toast.dismiss();
                       if ((error as Error).name !== 'AbortError') {
-                        window.open(`https://wa.me/?text=${encodeURIComponent(`I'm ${currentDog?.name || 'a Techno Dog'}! Join the pack: ${shareUrl}`)}`, '_blank');
+                        window.open(`https://wa.me/?text=${encodeURIComponent(whatsAppShareText)}`, '_blank');
                         handleSocialShare("whatsapp_fallback");
                         await recordShare();
                       }

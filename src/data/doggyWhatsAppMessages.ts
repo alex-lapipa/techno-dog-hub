@@ -524,21 +524,72 @@ export const doggyMessages: Record<string, DoggyMessage> = {
   }
 };
 
-// Generate full WhatsApp share text for a doggy
-export const getWhatsAppShareText = (dogName: string): string => {
-  const slug = dogName.toLowerCase().replace(/\s+/g, '-');
+// Generate hashtag for a doggy (e.g., #aciddoggy, #technodoggy)
+export const getDoggyHashtag = (dogName: string): string => {
+  const slug = dogName.toLowerCase().replace(/\s+/g, '');
+  return `#${slug}doggy`;
+};
+
+// Get quirky text for a doggy (the intro quote)
+export const getDoggyQuirkyText = (dogName: string): string => {
   const message = doggyMessages[dogName.toLowerCase()] || doggyMessages['techno'];
+  return message.quote;
+};
+
+// Get the full message object for a doggy
+export const getDoggyMessage = (dogName: string): DoggyMessage => {
+  return doggyMessages[dogName.toLowerCase()] || doggyMessages['techno'];
+};
+
+// Generate full WhatsApp share text for a doggy (default format)
+export const getWhatsAppShareText = (dogName: string): string => {
+  const message = doggyMessages[dogName.toLowerCase()] || doggyMessages['techno'];
+  const hashtag = getDoggyHashtag(dogName);
   
   return `🖤 ${message.intro}
 
 "${message.quote}"
 
-${message.packInvite}:
-techno.dog/doggies?dog=${slug}`;
+${message.packInvite}!
+
+${hashtag}
+techno.dog/doggies`;
+};
+
+// Generate WhatsApp share text with custom user message
+export const getWhatsAppShareTextWithCustom = (
+  dogName: string, 
+  options: { 
+    includeQuirky?: boolean; 
+    customMessage?: string;
+  } = {}
+): string => {
+  const { includeQuirky = true, customMessage = '' } = options;
+  const message = doggyMessages[dogName.toLowerCase()] || doggyMessages['techno'];
+  const hashtag = getDoggyHashtag(dogName);
+  
+  const parts: string[] = [];
+  
+  // Add quirky text if enabled
+  if (includeQuirky) {
+    parts.push(`🖤 "${message.quote}"`);
+  }
+  
+  // Add custom message if provided
+  if (customMessage.trim()) {
+    parts.push(customMessage.trim());
+  }
+  
+  // Always add hashtag and link
+  parts.push(`\n${hashtag}`);
+  parts.push(`techno.dog/doggies`);
+  
+  return parts.join('\n');
 };
 
 // Generate shorter SMS/general text share
 export const getShortShareText = (dogName: string): string => {
   const message = doggyMessages[dogName.toLowerCase()] || doggyMessages['techno'];
-  return `🖤 ${message.intro} — "${message.quote}"`;
+  const hashtag = getDoggyHashtag(dogName);
+  return `🖤 ${message.intro} — "${message.quote}" ${hashtag}`;
 };
