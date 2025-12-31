@@ -336,3 +336,6 @@ verify_jwt = false
 
 [functions.extract-book-knowledge]
 verify_jwt = true
+
+[functions.documentary-curator]
+verify_jwt = false

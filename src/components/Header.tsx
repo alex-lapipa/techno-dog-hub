@@ -44,6 +44,7 @@ const Header = () => {
       sub: SCENES_ITEMS
     },
     { label: 'Books', path: '/books' },
+    { label: 'Documentaries', path: '/documentaries' },
     { label: 'News', path: '/news' },
   ];
 
