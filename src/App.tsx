@@ -29,6 +29,7 @@ const ArtistDetail = lazy(() => import("./pages/ArtistDetail"));
 const Venues = lazy(() => import("./pages/Venues"));
 const VenueDetail = lazy(() => import("./pages/VenueDetail"));
 const Labels = lazy(() => import("./pages/Labels"));
+const LabelDetail = lazy(() => import("./pages/LabelDetail"));
 const Releases = lazy(() => import("./pages/Releases"));
 const Crews = lazy(() => import("./pages/Crews"));
 const CrewDetail = lazy(() => import("./pages/CrewDetail"));
@@ -66,6 +67,7 @@ const GearAgentAdmin = lazy(() => import("./pages/GearAgentAdmin"));
 const PRMediaAgentAdmin = lazy(() => import("./pages/PRMediaAgentAdmin"));
 const GearManufacturerAdmin = lazy(() => import("./pages/GearManufacturerAdmin"));
 const ArtistLabelAgentAdmin = lazy(() => import("./pages/ArtistLabelAgentAdmin"));
+const LabelsAgentAdmin = lazy(() => import("./pages/LabelsAgentAdmin"));
 const CollectivesAgentAdmin = lazy(() => import("./pages/CollectivesAgentAdmin"));
 const OutreachEngineAdmin = lazy(() => import("./pages/OutreachEngineAdmin"));
 const PlaybookAgentAdmin = lazy(() => import("./pages/PlaybookAgentAdmin"));
@@ -174,6 +176,7 @@ const App = () => (
                     <Route path="/admin/ticketing" element={<TicketingAdmin />} />
                     <Route path="/admin/dog-agent" element={<DogAgentAdmin />} />
                     <Route path="/admin/artist-enrichment" element={<ArtistEnrichmentAdmin />} />
+                    <Route path="/admin/labels-agent" element={<LabelsAgentAdmin />} />
                     <Route path="/admin/training" element={<TrainingCenter />} />
                     <Route path="/admin/doggies" element={<DoggiesAdmin />} />
                     <Route path="/doggy-widget" element={<DoggyWidget />} />
@@ -194,7 +197,7 @@ const App = () => (
                     
                     {/* Labels */}
                     <Route path="/labels" element={<Labels />} />
-                    <Route path="/labels/:id" element={<Labels />} />
+                    <Route path="/labels/:id" element={<LabelDetail />} />
                     
                     {/* Releases */}
                     <Route path="/releases" element={<Releases />} />
