@@ -2348,6 +2348,60 @@ export const YayoDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Helios Dog - Funky musician with long flowing hair, big smile, mustache, microphone
+export const HeliosDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* LONG FLOWING HAIR - down to shoulders */}
+      <path d="M8 20 Q4 30 6 45 Q8 52 12 56" strokeWidth="2" />
+      <path d="M12 18 Q8 28 10 45 Q12 52 16 56" strokeWidth="2" />
+      <path d="M14 16 Q10 26 12 42 Q14 50 18 54" strokeWidth="1.5" opacity="0.7" />
+      <path d="M56 20 Q60 30 58 45 Q56 52 52 56" strokeWidth="2" />
+      <path d="M52 18 Q56 28 54 45 Q52 52 48 56" strokeWidth="2" />
+      <path d="M50 16 Q54 26 52 42 Q50 50 46 54" strokeWidth="1.5" opacity="0.7" />
+      {/* Extra wavy hair details */}
+      <path d="M10 35 Q6 38 8 42" strokeWidth="1.5" opacity="0.6" />
+      <path d="M54 35 Q58 38 56 42" strokeWidth="1.5" opacity="0.6" />
+      {/* Ears - peeking through hair */}
+      <path d="M14 26 Q10 18 16 12 Q22 16 20 24" opacity="0.8" />
+      <path d="M50 26 Q54 18 48 12 Q42 16 44 24" opacity="0.8" />
+      {/* Round head */}
+      <ellipse cx="32" cy="34" rx="16" ry="14" />
+      {/* Cool eyes - confident look */}
+      <circle cx="25" cy="30" r="3" />
+      <circle cx="39" cy="30" r="3" />
+      <circle cx="25" cy="30" r="1.5" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="30" r="1.5" fill="hsl(var(--logo-green))" />
+      {/* Funky eyebrows */}
+      <path d="M21 26 Q25 24 28 26" strokeWidth="1.5" />
+      <path d="M36 26 Q39 24 43 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="36" rx="2" ry="1.5" fill="hsl(var(--logo-green))" />
+      {/* THE BIG MUSTACHE - thick and impressive */}
+      <path d="M20 42 Q26 40 32 42 Q38 40 44 42" strokeWidth="3" />
+      <path d="M18 42 Q14 44 12 42" strokeWidth="2.5" />
+      <path d="M46 42 Q50 44 52 42" strokeWidth="2.5" />
+      {/* Mustache detail curls */}
+      <path d="M14 43 Q12 45 10 43" strokeWidth="1.5" />
+      <path d="M50 43 Q52 45 54 43" strokeWidth="1.5" />
+      {/* BIG SMILE - under the mustache */}
+      <path d="M24 48 Q32 54 40 48" strokeWidth="2" />
+      <path d="M26 49 Q32 52 38 49" strokeWidth="1" opacity="0.5" />
+      {/* MICROPHONE - singer essential */}
+      <line x1="56" y1="38" x2="56" y2="52" strokeWidth="2.5" />
+      <ellipse cx="56" cy="35" rx="4" ry="5" strokeWidth="2" />
+      <line x1="52" y1="35" x2="53" y2="35" strokeWidth="1" />
+      <line x1="52" y1="37" x2="53" y2="37" strokeWidth="1" />
+      <line x1="52" y1="33" x2="53" y2="33" strokeWidth="1" />
+      {/* Music notes - singer vibes */}
+      <text x="4" y="14" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6">♪</text>
+      <text x="58" y="60" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">♫</text>
+      {/* Funky star */}
+      <text x="48" y="12" fontSize="4" fill="hsl(var(--logo-green))" opacity="0.5">✦</text>
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2449,4 +2503,5 @@ export const dogVariants = [
   { name: 'Richard', Component: RichardDog, personality: 'Steel factory legend by day, Paranoox underground king by night', status: 'forging & raving' },
   { name: 'Fran', Component: FranDog, personality: 'Showjumping legend, 90s clubbing madman, Gijón heart beating in Bali', status: 'jumping & dancing' },
   { name: 'Yayo', Component: YayoDog, personality: 'Neverland commander, moustache game strong, pointy hair pointing to the stars', status: 'mixing dreams' },
+  { name: 'Helios', Component: HeliosDog, personality: 'Funky soul, flowing locks, legendary mustache, voice of the underground', status: 'singing & grooving' },
 ];

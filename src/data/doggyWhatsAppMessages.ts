@@ -506,6 +506,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Yayo Dog — DJ, producer, Neverland commander with the moustache of legends",
     quote: "Behind these glasses I see frequencies. Under this moustache lives bass. The pointy hair? That's just style.",
     packInvite: "Enter Neverland with us"
+  },
+  'helios': {
+    intro: "I'm the Helios Dog — funky soul with flowing locks, the mustache of legends, and a voice that moves crowds",
+    quote: "Long hair catches the strobe light, the mustache catches the bass, and my voice catches your soul. Grab the mic, let's go.",
+    packInvite: "Sing along with the pack"
   }
 };
 
