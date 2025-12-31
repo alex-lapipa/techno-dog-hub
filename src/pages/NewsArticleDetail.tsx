@@ -332,60 +332,58 @@ const NewsArticleDetail = () => {
           </Link>
         </div>
 
-        {/* Magazine-style hero section */}
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 mb-10">
-          <div className="max-w-6xl mx-auto">
-            {/* Two-column hero: text left, image right */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 lg:gap-10 items-start border-b border-destructive/40 pb-8">
-              {/* Left: Header content */}
-              <header className="space-y-4">
-                {/* Tags */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {article.city_tags?.map(tag => (
-                    <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive">
-                      {tag}
-                    </Badge>
-                  ))}
-                  {article.genre_tags?.map(tag => (
-                    <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
+        {/* Full-width hero with background image */}
+        <div className="relative w-full mb-10 overflow-hidden">
+          {/* Background image */}
+          <div className="absolute inset-0">
+            <img 
+              src={alexLaunchHero} 
+              alt="" 
+              className="w-full h-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/70" />
+          </div>
+          
+          {/* Content overlay */}
+          <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
+            <div className="max-w-3xl">
+              {/* Tags */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {article.city_tags?.map(tag => (
+                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive bg-background/80">
+                    {tag}
+                  </Badge>
+                ))}
+                {article.genre_tags?.map(tag => (
+                  <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest bg-background/80">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
 
-                {/* Title */}
-                <h1 className="font-mono text-2xl md:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-[1.1] text-foreground">
-                  {article.title}
-                </h1>
+              {/* Title */}
+              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl font-bold uppercase tracking-tight leading-[1.1] text-foreground mb-4">
+                {article.title}
+              </h1>
 
-                {/* Subtitle */}
-                {article.subtitle && (
-                  <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {article.subtitle}
-                  </p>
-                )}
+              {/* Subtitle */}
+              {article.subtitle && (
+                <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed mb-6">
+                  {article.subtitle}
+                </p>
+              )}
 
-                {/* Byline */}
-                <div className="flex items-center gap-3 font-mono text-xs pt-2 border-t border-border/50">
-                  <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
-                  <span className="text-muted-foreground/50">|</span>
-                  <span className="text-muted-foreground">{formatDate(article.published_at || article.created_at)}</span>
-                </div>
-              </header>
-
-              {/* Right: Hero image */}
-              <div className="relative aspect-square lg:aspect-[4/5] border border-destructive/30 overflow-hidden bg-muted/20">
-                <img 
-                  src={alexLaunchHero} 
-                  alt="Techno Dog artwork - Las Querodias" 
-                  className="w-full h-full object-cover"
-                />
-                {/* Red corner accent */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-destructive" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-destructive" />
+              {/* Byline */}
+              <div className="flex items-center gap-3 font-mono text-xs pt-4 border-t border-destructive/40">
+                <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
+                <span className="text-muted-foreground/50">|</span>
+                <span className="text-muted-foreground">{formatDate(article.published_at || article.created_at)}</span>
               </div>
             </div>
           </div>
+          
+          {/* Bottom border accent */}
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive via-destructive/50 to-transparent" />
         </div>
 
         {/* Two-column magazine layout */}
