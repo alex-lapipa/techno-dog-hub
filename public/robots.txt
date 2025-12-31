@@ -1,10 +1,13 @@
 # robots.txt for techno.dog
+# Last updated: 2025-01-01
 
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -15,9 +18,13 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Disallow private routes
+# Disallow private/admin routes
 Disallow: /auth
 Disallow: /analytics
+Disallow: /admin
+Disallow: /headquarters
+Disallow: /doggy-hq
 
-# Sitemap location (dynamic XML via edge function)
+# Sitemap locations - Google Search Console compatible
+# Primary sitemap (edge function generates dynamic XML)
 Sitemap: https://bshyeweljerupobpmmes.supabase.co/functions/v1/sitemap-xml

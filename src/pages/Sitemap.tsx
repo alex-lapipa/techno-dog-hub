@@ -151,16 +151,27 @@ const Sitemap = () => {
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
+        <div className="mt-12 pt-8 border-t border-border space-y-4">
+          <div className="bg-card/50 border border-border p-6 text-center">
+            <h3 className="font-mono text-sm uppercase tracking-wider mb-2 text-logo-green">
+              Google Search Console
+            </h3>
+            <p className="font-mono text-xs text-muted-foreground mb-3">
+              Submit this URL to Google Search Console for indexing:
+            </p>
+            <code className="block bg-background px-4 py-2 font-mono text-sm text-foreground border border-border select-all">
+              https://techno.dog/sitemap.xml
+            </code>
+          </div>
           <p className="font-mono text-xs text-muted-foreground text-center">
-            For machine-readable sitemap, see{' '}
+            Direct XML sitemap:{' '}
             <a 
-              href="/sitemap.xml" 
+              href="https://bshyeweljerupobpmmes.supabase.co/functions/v1/sitemap-xml" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-logo-green hover:underline"
             >
-              sitemap.xml
+              View XML
             </a>
           </p>
         </div>
