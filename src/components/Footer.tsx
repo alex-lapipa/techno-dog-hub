@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavAnalytics } from "@/hooks/useAdvancedAnalytics";
 import HexagonLogo from "./HexagonLogo";
 
 const Footer = () => {
   const { t } = useLanguage();
+  const location = useLocation();
+  const { trackFooterNav } = useNavAnalytics();
   
   const exploreLinks = [
     { label: 'Festivals', path: '/festivals' },
@@ -39,7 +42,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
-            <Link to="/" className="flex items-center gap-2 group" aria-label="techno.dog home">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 group" 
+              aria-label="techno.dog home"
+              onClick={() => trackFooterNav('logo', '/', 'brand')}
+            >
               <HexagonLogo className="w-8 h-8 drop-shadow-[0_0_6px_hsl(100_100%_60%/0.5)]" />
               <span className="font-mono text-sm tracking-[0.2em] text-foreground group-hover:animate-glitch">
                 techno.dog
@@ -58,6 +66,7 @@ const Footer = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-foreground hover:underline"
+                onClick={() => trackFooterNav('Alex Lawton', 'https://alexlawton.io', 'brand')}
               >
                 Alex Lawton
               </a>
@@ -69,6 +78,7 @@ const Footer = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-foreground hover:underline"
+                onClick={() => trackFooterNav('La PiPa', 'https://lapipa.io', 'brand')}
               >
                 La PiPa
               </a>
@@ -85,6 +95,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
+                    onClick={() => trackFooterNav(link.label, link.path, 'explore')}
                     className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
@@ -104,6 +115,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
+                    onClick={() => trackFooterNav(link.label, link.path, 'resources')}
                     className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
@@ -123,6 +135,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
+                    onClick={() => trackFooterNav(link.label, link.path, 'legal')}
                     className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}
