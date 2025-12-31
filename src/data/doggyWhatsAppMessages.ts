@@ -225,6 +225,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     quote: "Roland didn't know they were making the most important instrument ever. But I know.",
     packInvite: "Feel the boom"
   },
+  'gabber': {
+    intro: "I'm the Gabber Dog — 200 BPM minimum, hakken til death",
+    quote: "If your tempo starts with a 1, I'm already asleep. Wake me when it's hardcore.",
+    packInvite: "Hakken with us"
+  },
   
   // CLUB LIFE
   'berghain': {
@@ -417,7 +422,7 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     packInvite: "Rave forever"
   },
   
-  // GEAR
+  // GEAR & STYLE
   'dawless': {
     intro: "I'm the Dawless Dog — no laptop, no safety net, pure chaos",
     quote: "If it can't fit in a case and cause technical problems live, I'm not interested.",
