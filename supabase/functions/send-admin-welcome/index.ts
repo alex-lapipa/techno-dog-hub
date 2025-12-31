@@ -29,9 +29,9 @@ const handler = async (req: Request): Promise<Response> => {
       
       try {
         const emailResponse = await resend.emails.send({
-          from: "Techno.Dog <ringleader@techno.dog>",
+          from: "Techno.Dog <doggy@techno.dog>",
           to: [admin.email],
-          reply_to: "alex@rmtv.io",
+          reply_to: "doggy@techno.dog",
           subject: "🐕 Welcome to Techno.Dog Admin Team",
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #ffffff; padding: 40px;">

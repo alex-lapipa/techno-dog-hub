@@ -293,9 +293,9 @@ async function sendEmailNotification(
   
   try {
     await resend.emails.send({
-      from: "ringleader@techno.dog <alex@rmtv.io>",
-      reply_to: "alex@rmtv.io",
-      to: ["alex@rmtv.io"],
+      from: "Techno.Dog <doggy@techno.dog>",
+      reply_to: "doggy@techno.dog",
+      to: ["doggy@techno.dog"],
       subject: `${severity} System Health Alert - techno.dog`,
       html: `
         <div style="font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff;">
