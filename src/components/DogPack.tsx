@@ -2452,8 +2452,8 @@ export const JeremiasDog = ({ className, animated = false }: DogVariantProps) =>
   </svg>
 );
 
-// Hoshine Dog - bookworm with ponytail, always reading
-export const HoshineDog = ({ className, animated = false }: DogVariantProps) => (
+// Josin Dog - bookworm with ponytail, always reading
+export const JosinDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
       {/* PONYTAIL - hair tied back */}
@@ -2609,5 +2609,5 @@ export const dogVariants = [
   { name: 'Yayo', Component: YayoDog, personality: 'Neverland commander, moustache game strong, pointy hair pointing to the stars', status: 'mixing dreams' },
   { name: 'Helios', Component: HeliosDog, personality: 'Funky soul, flowing locks, legendary mustache, voice of the underground', status: 'singing & grooving' },
   { name: 'Jeremias', Component: JeremiasDog, personality: 'Frankfurt banker by day, Gijón party legend by night, slit eyes see all the beats', status: 'banking & raving' },
-  { name: 'Hoshine', Component: HoshineDog, personality: 'Eternal bookworm, ponytail wisdom, reads between the beats', status: 'reading & raving' },
+  { name: 'Josin', Component: JosinDog, personality: 'Eternal bookworm, ponytail wisdom, reads between the beats', status: 'reading & raving' },
 ];
