@@ -127,10 +127,108 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     };
   }, []);
 
+  // Speak response using ElevenLabs TTS - defined BEFORE processUserInput
+  const speakResponse = useCallback(async (text: string) => {
+    console.log("[VoiceChat] Starting TTS for:", text.substring(0, 50) + "...");
+    setStatus('speaking');
+    optionsRef.current.onStatusChange?.('speaking');
+    setIsSpeaking(true);
+    isSpeakingRef.current = true;
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Missing Supabase configuration");
+      }
+
+      console.log("[VoiceChat] Fetching audio from dog-voice...");
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/dog-voice`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error("[VoiceChat] TTS request failed:", response.status, errorText);
+        throw new Error(`TTS request failed: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      console.log("[VoiceChat] Response content-type:", contentType);
+      
+      if (!contentType?.includes('audio')) {
+        const responseText = await response.text();
+        console.error("[VoiceChat] Unexpected response type:", responseText.substring(0, 200));
+        throw new Error("Invalid audio response from server");
+      }
+
+      const audioBlob = await response.blob();
+      console.log("[VoiceChat] Audio blob size:", audioBlob.size, "bytes");
+      
+      if (audioBlob.size < 100) {
+        throw new Error("Audio response too small - may be corrupted");
+      }
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // Play audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        URL.revokeObjectURL(audioRef.current.src);
+      }
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      return new Promise<void>((resolve, reject) => {
+        audio.onended = () => {
+          console.log("[VoiceChat] Audio playback ended");
+          setIsSpeaking(false);
+          isSpeakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+        };
+        audio.onerror = (e) => {
+          console.error("[VoiceChat] Audio playback error:", e);
+          setIsSpeaking(false);
+          isSpeakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+          reject(new Error("Audio playback failed"));
+        };
+        audio.oncanplaythrough = () => {
+          console.log("[VoiceChat] Audio ready to play");
+        };
+        audio.play()
+          .then(() => console.log("[VoiceChat] Audio playback started"))
+          .catch((err) => {
+            console.error("[VoiceChat] Audio play() failed:", err);
+            reject(err);
+          });
+      });
+
+    } catch (error) {
+      console.error("[VoiceChat] TTS error:", error);
+      setIsSpeaking(false);
+      isSpeakingRef.current = false;
+      throw error;
+    }
+  }, []);
+
   // Process user input and get AI response
   const processUserInput = useCallback(async (text: string) => {
     if (isProcessingRef.current || !text.trim()) return;
 
+    console.log("[VoiceChat] Processing user input:", text);
     isProcessingRef.current = true;
     setStatus('processing');
     optionsRef.current.onStatusChange?.('processing');
@@ -153,15 +251,23 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     optionsRef.current.onMessage?.(userMessage);
 
     try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Missing Supabase configuration");
+      }
+
+      console.log("[VoiceChat] Sending to dog-agent...");
       // Get AI response from dog-agent (same endpoint as text chat)
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-agent`,
+        `${supabaseUrl}/functions/v1/dog-agent`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({
             message: text,
@@ -176,10 +282,14 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
       if (!response.ok) {
         if (response.status === 429) throw new Error("Rate limit exceeded");
         if (response.status === 402) throw new Error("Credits exhausted");
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error("[VoiceChat] Dog-agent error:", response.status, errorText);
         throw new Error(`Request failed: ${response.status}`);
       }
 
       const chatData = await response.json();
+      console.log("[VoiceChat] Dog-agent response received");
+      
       if (chatData.error) throw new Error(chatData.error);
 
       const assistantText = chatData?.response || chatData?.bark || "Woof! I'm having trouble thinking right now.";
@@ -194,10 +304,11 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
       optionsRef.current.onMessage?.(assistantMessage);
 
       // Speak the response
+      console.log("[VoiceChat] Speaking response...");
       await speakResponse(assistantText);
 
     } catch (error) {
-      console.error("Error processing input:", error);
+      console.error("[VoiceChat] Error processing input:", error);
       optionsRef.current.onError?.(error instanceof Error ? error.message : "Error processing request");
     } finally {
       isProcessingRef.current = false;
@@ -216,74 +327,13 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
         optionsRef.current.onStatusChange?.('idle');
       }
     }
-  }, []);
+  }, [speakResponse]);
 
   useEffect(() => {
     processUserInputRef.current = (text: string) => {
       void processUserInput(text);
     };
   }, [processUserInput]);
-
-  // Speak response using ElevenLabs TTS
-  const speakResponse = useCallback(async (text: string) => {
-    setStatus('speaking');
-    optionsRef.current.onStatusChange?.('speaking');
-    setIsSpeaking(true);
-    isSpeakingRef.current = true;
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-voice`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`TTS request failed: ${response.status}`);
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-
-      // Play audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        URL.revokeObjectURL(audioRef.current.src);
-      }
-
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-
-      return new Promise<void>((resolve, reject) => {
-        audio.onended = () => {
-          setIsSpeaking(false);
-          isSpeakingRef.current = false;
-          URL.revokeObjectURL(audioUrl);
-          resolve();
-        };
-        audio.onerror = (e) => {
-          setIsSpeaking(false);
-          isSpeakingRef.current = false;
-          URL.revokeObjectURL(audioUrl);
-          reject(e);
-        };
-        audio.play().catch(reject);
-      });
-
-    } catch (error) {
-      console.error("TTS error:", error);
-      setIsSpeaking(false);
-      isSpeakingRef.current = false;
-      throw error;
-    }
-  }, []);
 
   // Start voice conversation
   const startListening = useCallback(async () => {

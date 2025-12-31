@@ -121,33 +121,59 @@ const DogChat = () => {
     setManualSpeakingIndex(messageIndex);
 
     try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Missing Supabase configuration");
+      }
+
+      console.log("[DogChat] Requesting TTS for message:", messageIndex);
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dog-voice`,
+        `${supabaseUrl}/functions/v1/dog-voice`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
           },
           body: JSON.stringify({ text }),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Voice request failed: ${response.status}`);
+        const errorData = await response.text().catch(() => 'Unknown error');
+        console.error("[DogChat] Voice request failed:", response.status, errorData);
+        throw new Error(`Voice request failed: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      console.log("[DogChat] Response content-type:", contentType);
+
+      if (!contentType?.includes('audio')) {
+        const errorText = await response.text();
+        console.error("[DogChat] Unexpected response:", errorText.substring(0, 200));
+        throw new Error("Invalid audio response");
       }
 
       const audioBlob = await response.blob();
+      console.log("[DogChat] Audio blob size:", audioBlob.size, "bytes");
+      
+      if (audioBlob.size < 100) {
+        throw new Error("Audio response too small");
+      }
+
       const audioUrl = URL.createObjectURL(audioBlob);
       
       manualAudioRef.current = new Audio(audioUrl);
       manualAudioRef.current.onended = () => {
+        console.log("[DogChat] Audio playback ended");
         setManualSpeakingIndex(null);
         URL.revokeObjectURL(audioUrl);
       };
-      manualAudioRef.current.onerror = () => {
+      manualAudioRef.current.onerror = (e) => {
+        console.error("[DogChat] Audio playback error:", e);
         setManualSpeakingIndex(null);
         URL.revokeObjectURL(audioUrl);
         toast({
@@ -158,8 +184,9 @@ const DogChat = () => {
       };
       
       await manualAudioRef.current.play();
+      console.log("[DogChat] Audio playback started");
     } catch (error) {
-      console.error('Voice error:', error);
+      console.error('[DogChat] Voice error:', error);
       setManualSpeakingIndex(null);
       toast({
         title: "*sad whimper*",
