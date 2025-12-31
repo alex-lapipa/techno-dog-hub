@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageSEO from '@/components/PageSEO';
 import { ContentSyncPanel } from '@/components/ContentSyncPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -528,6 +529,11 @@ export default function Developer() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
+        <PageSEO
+          title="Developer Portal - API Access & Documentation"
+          description="Access the techno.dog API for artists, venues, festivals, labels, and gear data. Build integrations with the Global Techno Knowledge Hub."
+          path="/developer"
+        />
         <Header />
         <main className="container mx-auto px-4 md:px-8 py-12 max-w-5xl">
           {/* Breadcrumb */}
@@ -589,6 +595,11 @@ export default function Developer() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageSEO
+        title="Developer Portal - API Access & Documentation"
+        description="Access the techno.dog API for artists, venues, festivals, labels, and gear data. Build integrations with the Global Techno Knowledge Hub."
+        path="/developer"
+      />
       <Header />
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Breadcrumb */}

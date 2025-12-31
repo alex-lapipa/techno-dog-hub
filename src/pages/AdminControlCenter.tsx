@@ -217,6 +217,7 @@ const AdminControlCenter = () => {
         title="Admin Control Center"
         description="AI-powered orchestration and monitoring"
         path="/admin/control-center"
+        noindex={true}
       />
       <Header />
 

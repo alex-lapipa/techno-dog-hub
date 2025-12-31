@@ -394,6 +394,7 @@ const SystemHealth = () => {
         title="System Health"
         description="Real-time system status and health monitoring"
         path="/admin/health"
+        noindex={true}
       />
       <Header />
 
