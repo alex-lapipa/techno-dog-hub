@@ -21,7 +21,8 @@ const corsHeaders = {
 
 // Route to OG config mapping (simplified version of frontend config)
 const OG_ROUTE_CONFIG: Record<string, { doggy: string; skin: string; tagline: string; icon: string }> = {
-  '/': { doggy: 'happy', skin: 'minimal', tagline: 'Global Techno Culture Archive', icon: 'home' },
+  '/': { doggy: 'logo', skin: 'minimal', tagline: 'Global Techno Culture Archive', icon: 'home' },
+  '/news/article/a0000001-0001-0001-0001-000000000001': { doggy: 'logo', skin: 'minimal', tagline: 'The story behind techno.dog', icon: 'news' },
   '/artists': { doggy: 'dj', skin: 'rave', tagline: 'The selectors shaping the sound', icon: 'music' },
   '/gear': { doggy: 'modular', skin: 'neon', tagline: 'The machines behind the music', icon: 'gear' },
   '/venues': { doggy: 'berghain', skin: 'archive', tagline: 'Sacred spaces of the underground', icon: 'venue' },
@@ -83,8 +84,33 @@ serve(async (req) => {
     // Generate title from route if not provided
     const title = customTitle || formatRouteAsTitle(route);
     
-    // Create image generation prompt
-    const prompt = `Create a social media share image (1200x630 pixels, 1.91:1 aspect ratio) for a techno music website called "techno.dog".
+    // Create image generation prompt - special handling for logo pages
+    const useLogo = config.doggy === 'logo';
+    
+    const prompt = useLogo 
+      ? `Create a social media share image (1200x630 pixels, 1.91:1 aspect ratio) for a techno music website called "techno.dog".
+
+DESIGN REQUIREMENTS:
+- Style: ${skinStyle}
+- Background: Solid black (#000000) with subtle texture/pattern
+- Primary accent color: Bright green (#7CFC00)
+- Typography: Bold, modern sans-serif
+
+CENTRAL LOGO ELEMENT:
+- Feature a prominent HEXAGON shape in the center
+- The hexagon should be rendered with bright green (#7CFC00) stroke/outline
+- Inside or near the hexagon: stylized dog silhouette in green
+- This is the official techno.dog brand mark
+
+LAYOUT (poster-style):
+- Center: The hexagon logo mark, large and prominent
+- Below logo: "techno.dog" text in white, bold
+- Bottom: Tagline "${config.tagline}" in green
+- Geometric grid lines radiating from hexagon
+- Safe zones: Keep elements 50px from edges
+
+The image should look like an official brand announcement - clean, iconic, and authoritative. Ultra high resolution.`
+      : `Create a social media share image (1200x630 pixels, 1.91:1 aspect ratio) for a techno music website called "techno.dog".
 
 DESIGN REQUIREMENTS:
 - Style: ${skinStyle}
