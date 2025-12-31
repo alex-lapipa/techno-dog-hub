@@ -193,6 +193,28 @@ const FestivalDetail = () => {
                     className="relative mx-2 aspect-[4/3] overflow-hidden border border-crimson/20 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900"
                     style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.6)' }}
                   >
+                    {/* Festival Image or Placeholder */}
+                    {festival.image ? (
+                      <img 
+                        src={festival.image} 
+                        alt={`${festival.name} festival`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                        <Music className="w-16 h-16 md:w-20 md:h-20 text-crimson/40 mb-4" />
+                        <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight text-foreground/80 mb-2">
+                          {festival.name}
+                        </h2>
+                        <p className="font-mono text-sm text-muted-foreground">
+                          {festival.city}, {festival.country}
+                        </p>
+                        <p className="font-mono text-xs text-crimson/60 mt-2">
+                          EST. {festival.founded}
+                        </p>
+                      </div>
+                    )}
+                    
                     {/* VHS overlay */}
                     <div 
                       className="absolute inset-0 z-10 pointer-events-none"
@@ -204,20 +226,6 @@ const FestivalDetail = () => {
                         `,
                       }}
                     />
-                    
-                    {/* Festival icon and info */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                      <Music className="w-16 h-16 md:w-20 md:h-20 text-crimson/40 mb-4" />
-                      <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight text-foreground/80 mb-2">
-                        {festival.name}
-                      </h2>
-                      <p className="font-mono text-sm text-muted-foreground">
-                        {festival.city}, {festival.country}
-                      </p>
-                      <p className="font-mono text-xs text-crimson/60 mt-2">
-                        EST. {festival.founded}
-                      </p>
-                    </div>
                     
                     {/* Crimson glow overlay */}
                     <div className="absolute inset-0 z-[11] pointer-events-none bg-gradient-to-t from-crimson/20 via-transparent to-transparent" />
