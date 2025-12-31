@@ -135,9 +135,10 @@ export const festivals: Festival[] = [
     active: true,
     type: "outdoor",
     months: ["August"],
-    tags: ["outdoor", "river", "Asturias", "intimate"],
-    description: "Intimate outdoor festival by the Sella river. Asturian mountains as backdrop.",
+    tags: ["outdoor", "river", "Asturias", "Picos de Europa", "intimate", "legendary", "community"],
+    description: "Intimate outdoor festival by the Sella river in the Picos de Europa region. Founded in 1997, Aquasella grew from 1,000 attendees in its first year to over 5,000 by its third edition. Philosophy: community, nature, and music without commercial compromise. 2026 marks the 29th edition (August 13-16).",
     capacity: 15000,
+    historicLineups: ["Óscar Mulero", "Pepo", "Cristian Varela", "Frogmen", "Rudy", "Higinio", "Monika", "Eulogio Victorero Escotet"],
     coords: { lat: 43.3883, lng: -5.1878 }
   },
   {
