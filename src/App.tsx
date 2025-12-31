@@ -184,6 +184,7 @@ const App = () => (
                     <Route path="/admin/artist-enrichment" element={<ArtistEnrichmentAdmin />} />
                     <Route path="/admin/labels-agent" element={<LabelsAgentAdmin />} />
                     <Route path="/admin/training" element={<TrainingCenter />} />
+                    <Route path="/training" element={<UserTrainingCenter />} />
                     <Route path="/admin/doggies" element={<DoggiesAdmin />} />
                     <Route path="/doggy-widget" element={<DoggyWidget />} />
                     <Route path="/doggies" element={<TechnoDoggies />} />
