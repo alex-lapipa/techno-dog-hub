@@ -318,3 +318,6 @@ verify_jwt = false
 
 [functions.artist-image-scraper]
 verify_jwt = false
+
+[functions.gear-youtube-curator]
+verify_jwt = false
