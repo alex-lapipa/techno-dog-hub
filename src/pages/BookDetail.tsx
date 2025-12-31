@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { ArrowLeft, BookOpen, ExternalLink, Calendar, User, Tag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BookCover } from "@/components/books/BookCover";
 
 interface Book {
   id: string;
@@ -138,29 +139,12 @@ const BookDetail = () => {
           {/* Cover & Meta */}
           <div className="space-y-6">
             {/* Cover Image */}
-            <div className="relative aspect-[2/3] overflow-hidden border border-border bg-card">
-              {/* VHS Scanlines */}
-              <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
-              <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen opacity-5 bg-gradient-to-r from-crimson via-transparent to-cyan-500" />
-              
-              {book.cover_url ? (
-                <img
-                  src={book.cover_url}
-                  alt={`${book.title} cover`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <BookOpen className="w-16 h-16 text-muted-foreground/20" />
-                </div>
-              )}
-              
-              {book.year_published && (
-                <div className="absolute bottom-0 right-0 bg-crimson text-white text-xs font-mono px-2 py-1">
-                  {book.year_published}
-                </div>
-              )}
-            </div>
+            <BookCover
+              coverUrl={book.cover_url}
+              title={book.title}
+              yearPublished={book.year_published}
+              showYearBadge
+            />
 
             {/* Quick Info */}
             <div className="space-y-3 font-mono text-xs">
