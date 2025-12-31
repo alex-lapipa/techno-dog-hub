@@ -603,8 +603,83 @@ serve(async (req) => {
       );
     }
 
+    if (action === "refresh-thumbnails") {
+      // Refresh all thumbnail URLs using YouTube API
+      if (!YOUTUBE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: "YouTube API key not configured" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Get all documentaries
+      const { data: docs, error: fetchError } = await supabase
+        .from("documentaries")
+        .select("id, youtube_video_id, thumbnail_url")
+        .eq("status", "published");
+
+      if (fetchError) throw fetchError;
+
+      const results: any[] = [];
+      const batchSize = 50;
+
+      for (let i = 0; i < docs.length; i += batchSize) {
+        const batch = docs.slice(i, i + batchSize);
+        const videoIds = batch.map(d => d.youtube_video_id).join(",");
+
+        const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoIds}&key=${YOUTUBE_API_KEY}`;
+        const response = await fetch(detailsUrl);
+        
+        if (!response.ok) {
+          console.error(`YouTube API error: ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+
+        for (const item of data.items || []) {
+          // Get best thumbnail - prioritize maxres
+          const thumbnailUrl = 
+            item.snippet.thumbnails?.maxres?.url ||
+            item.snippet.thumbnails?.standard?.url ||
+            item.snippet.thumbnails?.high?.url ||
+            item.snippet.thumbnails?.medium?.url ||
+            `https://img.youtube.com/vi/${item.id}/maxresdefault.jpg`;
+
+          // Update the documentary
+          const { error: updateError } = await supabase
+            .from("documentaries")
+            .update({ 
+              thumbnail_url: thumbnailUrl,
+              view_count: parseInt(item.statistics?.viewCount || "0", 10),
+              duration: item.contentDetails?.duration
+            })
+            .eq("youtube_video_id", item.id);
+
+          if (!updateError) {
+            results.push({ 
+              videoId: item.id, 
+              title: item.snippet.title,
+              thumbnailUrl 
+            });
+          }
+        }
+
+        await new Promise(r => setTimeout(r, 300)); // Rate limiting
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: `Refreshed thumbnails for ${results.length} documentaries`,
+          results 
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: "Unknown action. Use: curate-lapipa, discover, or list" }),
+      JSON.stringify({ error: "Unknown action. Use: curate-lapipa, discover, list, or refresh-thumbnails" }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
