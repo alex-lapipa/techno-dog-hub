@@ -516,6 +516,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Jeremias Dog — Frankfurt banker from Gijón, glasses on, gap-toothed grin ready, party mode activated",
     quote: "By day I crunch euros in Frankfurt. By night these slit eyes scan the dancefloor. Gijón roots never die, the gap in my teeth lets the bass through.",
     packInvite: "Bank on the beat with us"
+  },
+  'hoshine': {
+    intro: "I'm the Hoshine Dog — eternal bookworm with ponytail wisdom, reading between the beats",
+    quote: "Knowledge is the ultimate bass. Every book I read adds another layer to the mix. The ponytail keeps the thoughts flowing, the glasses focus the frequencies.",
+    packInvite: "Read and rave with us"
   }
 };
 
