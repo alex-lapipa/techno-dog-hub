@@ -30,7 +30,16 @@ serve(async (req) => {
   }
 
   try {
-    const { action, entities, entityType } = await req.json();
+    // Safe JSON parsing - handle empty body
+    let body: { action?: string; entities?: any[]; entityType?: string };
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+    const { action = 'analyze', entities, entityType } = body;
+    
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     
     if (!ANTHROPIC_API_KEY) {

@@ -165,7 +165,15 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { action, entityType, entityId, entityName, jobId } = await req.json();
+    // Safe JSON parsing - handle empty body
+    let body: { action?: string; entityType?: string; entityId?: string; entityName?: string; jobId?: string };
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+    const { action = 'queue-stats', entityType, entityId, entityName, jobId } = body;
 
     console.log(`Media curator action: ${action} for ${entityType}/${entityId}`);
 

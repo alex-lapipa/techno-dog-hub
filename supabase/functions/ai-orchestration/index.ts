@@ -62,7 +62,16 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const { action, target, context, previousPlan, previousChanges, dryRun = false }: OrchestrationRequest = await req.json();
+    
+    // Safe JSON parsing - handle empty body
+    let body: OrchestrationRequest;
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : { action: 'status' };
+    } catch {
+      body = { action: 'status' };
+    }
+    const { action, target, context, previousPlan, previousChanges, dryRun = false } = body;
 
     console.log(`AI Orchestration: action=${action}, target=${target}`);
 

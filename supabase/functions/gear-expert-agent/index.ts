@@ -107,7 +107,16 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { action, gearId, query, limit } = await req.json();
+    
+    // Safe JSON parsing - handle empty body
+    let body: { action?: string; gearId?: string; query?: string; limit?: number };
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+    const { action = 'status', gearId, query, limit } = body;
 
     // Get gear catalog stats
     const { count: totalGear } = await supabase

@@ -88,7 +88,15 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { action, data, timeRange = '24h' } = await req.json();
+    // Safe JSON parsing - handle empty body
+    let body: { action?: string; data?: any; timeRange?: string };
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+    const { action = 'get-status', data, timeRange = '24h' } = body;
     console.log(`[doggy-orchestrator] Action: ${action}, TimeRange: ${timeRange}`);
 
     switch (action) {
