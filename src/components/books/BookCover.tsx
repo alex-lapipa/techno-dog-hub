@@ -1,27 +1,15 @@
 import React, { useState } from "react";
 import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getSafeCoverUrl, normalizeCoverUrl } from "@/lib/bookCoverUtils";
 
 /**
  * Safe book cover renderer that handles:
  * - Missing/null URLs with placeholder
  * - Broken images with graceful fallback
  * - Various URL formats (protocol-relative, etc.)
- * - Hotlink protection bypass
+ * - Hotlink protection bypass via proxy
  */
-
-function normalizeCoverUrl(url?: string | null): string | null {
-  if (!url) return null;
-  const trimmed = url.trim();
-  if (!trimmed) return null;
-
-  // Handle protocol-relative URLs
-  if (trimmed.startsWith("//")) return `https:${trimmed}`;
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
-
-  // Return as-is for relative paths
-  return trimmed;
-}
 
 interface BookCoverProps {
   coverUrl?: string | null;
@@ -32,6 +20,7 @@ interface BookCoverProps {
   yearPublished?: number | null;
   showYearBadge?: boolean;
   vhsEffect?: boolean;
+  useProxy?: boolean;
 }
 
 export function BookCover({
@@ -43,9 +32,12 @@ export function BookCover({
   yearPublished,
   showYearBadge = false,
   vhsEffect = true,
+  useProxy = true,
 }: BookCoverProps) {
   const [hasError, setHasError] = useState(false);
-  const src = normalizeCoverUrl(coverUrl);
+  
+  // Use proxy for external images to bypass hotlinking restrictions
+  const src = useProxy ? getSafeCoverUrl(coverUrl) : normalizeCoverUrl(coverUrl);
 
   const aspectClasses = {
     "2/3": "aspect-[2/3]",
@@ -96,6 +88,7 @@ export function BookCover({
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
+        crossOrigin="anonymous"
         onError={() => setHasError(true)}
       />
       
@@ -109,4 +102,4 @@ export function BookCover({
   );
 }
 
-export { normalizeCoverUrl };
+export { normalizeCoverUrl } from "@/lib/bookCoverUtils";
