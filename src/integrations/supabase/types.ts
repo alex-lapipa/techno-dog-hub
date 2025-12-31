@@ -1429,6 +1429,290 @@ export type Database = {
         }
         Relationships: []
       }
+      book_analytics: {
+        Row: {
+          book_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          referrer: string | null
+          session_id: string | null
+        }
+        Insert: {
+          book_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          book_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_analytics_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      book_discovery_queue: {
+        Row: {
+          author: string | null
+          confidence_score: number | null
+          created_at: string
+          discovery_reason: string | null
+          discovery_source: string | null
+          id: string
+          merged_book_id: string | null
+          raw_data: Json | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          suggested_category: string | null
+          title: string
+        }
+        Insert: {
+          author?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          discovery_reason?: string | null
+          discovery_source?: string | null
+          id?: string
+          merged_book_id?: string | null
+          raw_data?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_category?: string | null
+          title: string
+        }
+        Update: {
+          author?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          discovery_reason?: string | null
+          discovery_source?: string | null
+          id?: string
+          merged_book_id?: string | null
+          raw_data?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_category?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_discovery_queue_merged_book_id_fkey"
+            columns: ["merged_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_relations: {
+        Row: {
+          book_id: string
+          created_at: string
+          id: string
+          related_book_id: string
+          relation_type: string | null
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          id?: string
+          related_book_id: string
+          relation_type?: string | null
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          id?: string
+          related_book_id?: string
+          relation_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_relations_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "book_relations_related_book_id_fkey"
+            columns: ["related_book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      book_tags: {
+        Row: {
+          book_id: string
+          created_at: string
+          id: string
+          tag: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          id?: string
+          tag: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_tags_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      books: {
+        Row: {
+          author: string
+          category_id: string | null
+          click_count: number | null
+          cover_url: string | null
+          created_at: string
+          curator_notes: string | null
+          description: string | null
+          discovery_source: string | null
+          featured_order: number | null
+          id: string
+          is_featured: boolean | null
+          isbn: string | null
+          language: string | null
+          pages: number | null
+          published_at: string | null
+          publisher: string | null
+          purchase_url: string | null
+          search_vector: unknown
+          status: string
+          title: string
+          updated_at: string
+          view_count: number | null
+          why_read: string | null
+          year_published: number | null
+        }
+        Insert: {
+          author: string
+          category_id?: string | null
+          click_count?: number | null
+          cover_url?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          description?: string | null
+          discovery_source?: string | null
+          featured_order?: number | null
+          id?: string
+          is_featured?: boolean | null
+          isbn?: string | null
+          language?: string | null
+          pages?: number | null
+          published_at?: string | null
+          publisher?: string | null
+          purchase_url?: string | null
+          search_vector?: unknown
+          status?: string
+          title: string
+          updated_at?: string
+          view_count?: number | null
+          why_read?: string | null
+          year_published?: number | null
+        }
+        Update: {
+          author?: string
+          category_id?: string | null
+          click_count?: number | null
+          cover_url?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          description?: string | null
+          discovery_source?: string | null
+          featured_order?: number | null
+          id?: string
+          is_featured?: boolean | null
+          isbn?: string | null
+          language?: string | null
+          pages?: number | null
+          published_at?: string | null
+          publisher?: string | null
+          purchase_url?: string | null
+          search_vector?: unknown
+          status?: string
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+          why_read?: string | null
+          year_published?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "books_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "book_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_contacts: {
         Row: {
           brand_id: string | null
@@ -4482,6 +4766,48 @@ export type Database = {
           email?: string
           id?: string
           notified_at?: string | null
+        }
+        Relationships: []
+      }
+      librarian_agent_runs: {
+        Row: {
+          books_discovered: number | null
+          books_processed: number | null
+          books_updated: number | null
+          created_at: string
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          run_type: string
+          started_at: string
+          stats: Json | null
+          status: string
+        }
+        Insert: {
+          books_discovered?: number | null
+          books_processed?: number | null
+          books_updated?: number | null
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type: string
+          started_at?: string
+          stats?: Json | null
+          status?: string
+        }
+        Update: {
+          books_discovered?: number | null
+          books_processed?: number | null
+          books_updated?: number | null
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          run_type?: string
+          started_at?: string
+          stats?: Json | null
+          status?: string
         }
         Relationships: []
       }
