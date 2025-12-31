@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Zap } from "lucide-react";
+import { Share2 } from "lucide-react";
+import DogSilhouette from "@/components/DogSilhouette";
 
 interface LeaderboardEntry {
   id: string;
@@ -22,8 +23,19 @@ const getRankDisplay = (rank: number) => {
   }
 };
 
-// Dog-themed name prefixes for fun display
-const dogEmojis = ["🐕", "🐾", "🦴", "🐶", "🎧", "🔊", "💿", "🖤"];
+// Rank-based icon variations using design system colors
+const getRankIconStyle = (rank: number) => {
+  switch (rank) {
+    case 1:
+      return "w-5 h-5 [&_g]:stroke-yellow-400 [&_ellipse[fill]]:fill-yellow-400";
+    case 2:
+      return "w-5 h-5 [&_g]:stroke-gray-300 [&_ellipse[fill]]:fill-gray-300";
+    case 3:
+      return "w-5 h-5 [&_g]:stroke-amber-500 [&_ellipse[fill]]:fill-amber-500";
+    default:
+      return "w-4 h-4 opacity-70";
+  }
+};
 
 export const DoggyShareLeaderboard = () => {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
@@ -139,14 +151,14 @@ export const DoggyShareLeaderboard = () => {
           </span>
         </div>
 
-        {/* Title - Arcade Style */}
+        {/* Title - Arcade Style with DogSilhouette */}
         <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <span className="text-2xl">🐕</span>
+          <div className="flex items-center justify-center gap-3 mb-1">
+            <DogSilhouette className="w-7 h-7" animated />
             <h3 className="font-mono text-lg font-black uppercase tracking-wider text-logo-green drop-shadow-[0_0_10px_rgba(0,255,0,0.5)]">
               Hall of Fame
             </h3>
-            <span className="text-2xl">🐕</span>
+            <DogSilhouette className="w-7 h-7" animated />
           </div>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-logo-green/60">
             Top Techno Dogs
@@ -167,7 +179,7 @@ export const DoggyShareLeaderboard = () => {
 
             {leaders.map((leader, index) => {
               const rank = getRankDisplay(index + 1);
-              const emoji = dogEmojis[index % dogEmojis.length];
+              const iconStyle = getRankIconStyle(index + 1);
               
               return (
                 <div
@@ -183,9 +195,9 @@ export const DoggyShareLeaderboard = () => {
                     </span>
                   </div>
                   
-                  {/* Player Name */}
+                  {/* Player Name with DogSilhouette */}
                   <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <span className="text-base">{emoji}</span>
+                    <DogSilhouette className={iconStyle} />
                     <span className={`font-mono text-sm truncate ${
                       index === 0 ? 'text-yellow-400 font-bold' : 'text-foreground'
                     }`}>
@@ -227,7 +239,7 @@ export const DoggyShareLeaderboard = () => {
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="text-4xl mb-3 animate-bounce">🐾</div>
+            <DogSilhouette className="w-12 h-12 mx-auto mb-3" animated />
             <p className="font-mono text-sm text-logo-green uppercase tracking-wider mb-1">
               No Players Yet
             </p>
@@ -248,7 +260,7 @@ export const DoggyShareLeaderboard = () => {
               </span>
             </div>
             <div className="flex-1 flex items-center gap-2">
-              <Zap className="w-4 h-4 text-logo-green" />
+              <DogSilhouette className="w-4 h-4" />
               <span className="font-mono text-sm text-foreground font-bold">YOU</span>
             </div>
             <div className="w-16 text-right">
@@ -264,7 +276,7 @@ export const DoggyShareLeaderboard = () => {
       <div className="border-t-2 border-logo-green/30 p-3 bg-logo-green/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg animate-bounce">🎮</span>
+            <Share2 className="w-4 h-4 text-logo-green animate-bounce" />
             <span className="font-mono text-[10px] uppercase tracking-wider text-logo-green/70">
               Share to climb!
             </span>
