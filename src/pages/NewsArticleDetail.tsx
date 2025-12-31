@@ -332,67 +332,59 @@ const NewsArticleDetail = () => {
           </Link>
         </div>
 
-        {/* Full-width hero section with watermark background */}
-        <div className="w-full mb-12">
-          {/* Hero with Image as Watermark Background */}
-          <div className="relative w-full min-h-[500px] md:min-h-[600px] lg:min-h-[700px] border-y border-destructive/30 overflow-hidden flex items-center">
-            {/* Red accent line at top */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent z-20" />
-            
-            {/* Watermark Background Image - zoomed out, faded */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <img 
-                src={alexLaunchHero} 
-                alt="Techno Dog artwork - Las Querodias" 
-                className="w-[80%] md:w-[60%] lg:w-[50%] h-auto object-contain opacity-[0.15] blur-[1px]"
-              />
-            </div>
-            
-            {/* Dark overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
-            
-            {/* Title Content - Centered and Prominent */}
-            <div className="relative z-10 w-full">
-              <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
-                <header className="max-w-5xl mx-auto text-center">
-                  {/* Tags */}
-                  <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-                    {article.city_tags?.map(tag => (
-                      <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {article.genre_tags?.map(tag => (
-                      <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+        {/* Magazine-style hero section */}
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 mb-10">
+          <div className="max-w-6xl mx-auto">
+            {/* Two-column hero: text left, image right */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 lg:gap-10 items-start border-b border-destructive/40 pb-8">
+              {/* Left: Header content */}
+              <header className="space-y-4">
+                {/* Tags */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {article.city_tags?.map(tag => (
+                    <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/70 text-destructive">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {article.genre_tags?.map(tag => (
+                    <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
 
-                  {/* Title */}
-                  <h1 className="font-mono text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-tight mb-6 leading-[0.95] text-foreground">
-                    {article.title}
-                  </h1>
+                {/* Title */}
+                <h1 className="font-mono text-2xl md:text-3xl lg:text-4xl font-bold uppercase tracking-tight leading-[1.1] text-foreground">
+                  {article.title}
+                </h1>
 
-                  {/* Subtitle */}
-                  {article.subtitle && (
-                    <p className="font-mono text-lg md:text-xl lg:text-2xl font-light text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-                      {article.subtitle}
-                    </p>
-                  )}
+                {/* Subtitle */}
+                {article.subtitle && (
+                  <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed">
+                    {article.subtitle}
+                  </p>
+                )}
 
-                  {/* Byline */}
-                  <div className="flex items-center justify-center gap-4 font-mono text-sm border-t border-destructive/40 pt-6 max-w-md mx-auto">
-                    <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
-                    <span className="text-destructive/60">|</span>
-                    <span className="font-light text-foreground/70">{formatDate(article.published_at || article.created_at)}</span>
-                  </div>
-                </header>
+                {/* Byline */}
+                <div className="flex items-center gap-3 font-mono text-xs pt-2 border-t border-border/50">
+                  <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
+                  <span className="text-muted-foreground/50">|</span>
+                  <span className="text-muted-foreground">{formatDate(article.published_at || article.created_at)}</span>
+                </div>
+              </header>
+
+              {/* Right: Hero image */}
+              <div className="relative aspect-square lg:aspect-[4/5] border border-destructive/30 overflow-hidden bg-muted/20">
+                <img 
+                  src={alexLaunchHero} 
+                  alt="Techno Dog artwork - Las Querodias" 
+                  className="w-full h-full object-cover"
+                />
+                {/* Red corner accent */}
+                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-destructive" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-destructive" />
               </div>
             </div>
-            
-            {/* Red accent line at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent z-20" />
           </div>
         </div>
 
