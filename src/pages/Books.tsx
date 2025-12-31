@@ -7,6 +7,7 @@ import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2, Search, X, Lay
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { BookSuggestionForm } from "@/components/books/BookSuggestionForm";
+import { BookCover } from "@/components/books/BookCover";
 
 interface Category {
   id: string;
@@ -268,26 +269,18 @@ const Books = () => {
               <Link
                 key={book.id}
                 to={`/books/${book.id}`}
-                className="group relative aspect-[2/3] overflow-hidden border border-border bg-card hover:border-logo-green/50 transition-all hover:scale-[1.02]"
+                className="group relative hover:scale-[1.02] transition-transform"
               >
-                {/* VHS Scanlines */}
-                <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
-                
-                {book.cover_url ? (
-                  <img
-                    src={book.cover_url}
-                    alt={book.title}
-                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-muted-foreground/20" />
-                  </div>
-                )}
+                <BookCover
+                  coverUrl={book.cover_url}
+                  title={book.title}
+                  yearPublished={book.year_published}
+                  showYearBadge
+                  className="group-hover:border-logo-green/50 [&_img]:grayscale-[30%] [&_img]:group-hover:grayscale-0 [&_img]:transition-all [&_img]:duration-500"
+                />
                 
                 {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2 z-20">
                   <p className="font-mono text-[9px] text-foreground line-clamp-2 leading-tight">
                     {book.title}
                   </p>
@@ -295,13 +288,6 @@ const Books = () => {
                     {book.author}
                   </p>
                 </div>
-                
-                {/* Year Badge */}
-                {book.year_published && (
-                  <div className="absolute top-0 right-0 bg-crimson text-white text-[8px] font-mono px-1 py-0.5">
-                    {book.year_published}
-                  </div>
-                )}
               </Link>
             ))}
           </div>
@@ -387,34 +373,15 @@ interface BookCardProps {
 const BookCard = ({ book }: BookCardProps) => {
   return (
     <article className="group flex flex-col md:flex-row gap-6 p-4 border border-border/50 bg-background/50 hover:border-logo-green/30 transition-colors">
-      {/* Cover Image - VHS Style */}
+      {/* Cover Image */}
       <Link to={`/books/${book.id}`} className="relative shrink-0 w-full md:w-32 lg:w-40">
-        <div className="relative aspect-[2/3] overflow-hidden border border-border group-hover:border-logo-green/50 transition-colors">
-          {/* VHS Scanlines Overlay */}
-          <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
-          {/* VHS Color Aberration Effect */}
-          <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen opacity-5 bg-gradient-to-r from-crimson via-transparent to-cyan-500" />
-          
-          {book.cover_url ? (
-            <img
-              src={book.cover_url}
-              alt={`${book.title} cover`}
-              className="w-full h-full object-cover grayscale-[30%] contrast-110 group-hover:grayscale-0 transition-all duration-500"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full bg-card flex items-center justify-center">
-              <BookOpen className="w-8 h-8 text-muted-foreground/30" />
-            </div>
-          )}
-          
-          {/* VHS Corner Badge */}
-          {book.year_published && (
-            <div className="absolute bottom-0 right-0 bg-crimson text-white text-[9px] font-mono px-1.5 py-0.5">
-              {book.year_published}
-            </div>
-          )}
-        </div>
+        <BookCover
+          coverUrl={book.cover_url}
+          title={book.title}
+          yearPublished={book.year_published}
+          showYearBadge
+          className="group-hover:border-logo-green/50 [&_img]:grayscale-[30%] [&_img]:contrast-110 [&_img]:group-hover:grayscale-0 [&_img]:transition-all [&_img]:duration-500"
+        />
       </Link>
 
       {/* Content */}
