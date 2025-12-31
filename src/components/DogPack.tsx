@@ -2174,6 +2174,75 @@ export const AlbertoDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Richard Dog - Long bearded steel factory manager by day, Paranoox club owner by night in Gijón
+export const RichardDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Floppy ears - wise and experienced */}
+      <path d="M10 30 Q4 22 8 12 Q16 16 18 28" />
+      <path d="M54 30 Q60 22 56 12 Q48 16 46 28" />
+      {/* Scraggy wild hair - unkempt genius */}
+      <path d="M14 14 Q8 6 16 2 Q20 4 18 12" strokeWidth="1.5" />
+      <path d="M18 10 Q14 2 22 0 Q26 2 24 10" strokeWidth="1.5" />
+      <path d="M24 8 Q20 -2 30 -2 Q34 0 32 8" strokeWidth="1.5" />
+      <path d="M32 6 Q28 -2 38 0 Q42 2 38 10" strokeWidth="1.5" />
+      <path d="M40 8 Q36 0 46 2 Q50 6 46 14" strokeWidth="1.5" />
+      <path d="M46 12 Q44 4 52 6 Q56 10 50 16" strokeWidth="1.5" />
+      {/* Extra wild strands sticking out */}
+      <path d="M10 18 Q6 14 8 10" strokeWidth="1" opacity="0.6" />
+      <path d="M54 18 Q58 14 56 10" strokeWidth="1" opacity="0.6" />
+      <path d="M28 4 Q26 -4 30 -4" strokeWidth="1" opacity="0.5" />
+      <path d="M36 4 Q38 -4 34 -4" strokeWidth="1" opacity="0.5" />
+      {/* Round wise head */}
+      <ellipse cx="32" cy="34" rx="16" ry="14" />
+      {/* Thin eyes - wise, knowing look */}
+      <path d="M22 30 L30 30" strokeWidth="2" />
+      <path d="M34 30 L42 30" strokeWidth="2" />
+      {/* Small eye details - squinting wisdom */}
+      <circle cx="26" cy="30" r="1" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="30" r="1" fill="hsl(var(--logo-green))" />
+      {/* Eyebrows - slightly raised, knowing */}
+      <path d="M21 26 Q26 24 31 26" strokeWidth="1.5" />
+      <path d="M33 26 Q38 24 43 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="38" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* THE MAGNIFICENT LONG BEARD - his signature */}
+      {/* Beard starts from cheeks */}
+      <path d="M18 38 Q16 42 14 48 Q12 54 16 60" strokeWidth="2" />
+      <path d="M46 38 Q48 42 50 48 Q52 54 48 60" strokeWidth="2" />
+      {/* Beard flows down long and majestic */}
+      <path d="M20 40 Q18 48 20 58 Q22 66 28 68" strokeWidth="1.8" />
+      <path d="M44 40 Q46 48 44 58 Q42 66 36 68" strokeWidth="1.8" />
+      {/* Center beard flow - longest part */}
+      <path d="M24 44 Q22 52 24 62 Q28 72 32 74" strokeWidth="2" />
+      <path d="M40 44 Q42 52 40 62 Q36 72 32 74" strokeWidth="2" />
+      <path d="M28 46 Q26 56 28 66 Q30 74 32 76" strokeWidth="1.5" />
+      <path d="M36 46 Q38 56 36 66 Q34 74 32 76" strokeWidth="1.5" />
+      {/* Beard texture lines */}
+      <path d="M30 48 Q28 58 30 68 Q32 76 32 78" strokeWidth="1" opacity="0.7" />
+      <path d="M34 48 Q36 58 34 68 Q32 76 32 78" strokeWidth="1" opacity="0.7" />
+      {/* Beard waves - scraggy texture */}
+      <path d="M22 52 Q20 54 22 56" strokeWidth="1" opacity="0.5" />
+      <path d="M42 52 Q44 54 42 56" strokeWidth="1" opacity="0.5" />
+      <path d="M26 58 Q24 60 26 62" strokeWidth="1" opacity="0.5" />
+      <path d="M38 58 Q40 60 38 62" strokeWidth="1" opacity="0.5" />
+      {/* Mustache connecting to beard */}
+      <path d="M26 42 Q32 46 38 42" strokeWidth="1.5" />
+      {/* Small smile hidden in beard */}
+      <path d="M28 44 Q32 48 36 44" strokeWidth="1" opacity="0.6" />
+      {/* Steel factory symbol - hard hat silhouette hint */}
+      <path d="M2 12 L8 12 L8 16 L2 16 Z" strokeWidth="1" opacity="0.4" />
+      <path d="M3 12 L7 8 L11 12" strokeWidth="1" opacity="0.4" />
+      {/* Paranoox club vibes - small music notes */}
+      <text x="52" y="48" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6">♪</text>
+      <text x="56" y="42" fontSize="5" fill="hsl(var(--logo-green))" opacity="0.5">♫</text>
+      {/* Gijón/Asturias cider hint */}
+      <path d="M58 56 L60 56 L60 62 L58 62 Z" strokeWidth="1" opacity="0.4" />
+      <path d="M58 58 L60 58" strokeWidth="0.5" opacity="0.3" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2272,4 +2341,5 @@ export const dogVariants = [
   { name: 'Julieta', Component: JulietaDog, personality: 'Madrid party queen, ex-London raver, absolutely unhinged', status: 'partying' },
   { name: 'Pire', Component: PireDog, personality: 'Globe-trotting acid head, business by day, party legend by night', status: 'squelching' },
   { name: 'Alberto', Component: AlbertoDog, personality: 'Argentinian chef-raver, best steaks by day, glow sticks til sunrise', status: 'grilling & dancing' },
+  { name: 'Richard', Component: RichardDog, personality: 'Steel factory legend by day, Paranoox underground king by night', status: 'forging & raving' },
 ];
