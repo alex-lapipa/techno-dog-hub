@@ -2451,6 +2451,116 @@ export type Database = {
         }
         Relationships: []
       }
+      curated_channel_videos: {
+        Row: {
+          ai_analyzed_at: string | null
+          ai_relevance_score: number | null
+          ai_summary: string | null
+          ai_tags: string[] | null
+          channel_title: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          playlist_id: string | null
+          playlist_title: string | null
+          published_at: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_id: string
+          view_count: number | null
+        }
+        Insert: {
+          ai_analyzed_at?: string | null
+          ai_relevance_score?: number | null
+          ai_summary?: string | null
+          ai_tags?: string[] | null
+          channel_title?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          playlist_id?: string | null
+          playlist_title?: string | null
+          published_at?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_id: string
+          view_count?: number | null
+        }
+        Update: {
+          ai_analyzed_at?: string | null
+          ai_relevance_score?: number | null
+          ai_summary?: string | null
+          ai_tags?: string[] | null
+          channel_title?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          playlist_id?: string | null
+          playlist_title?: string | null
+          published_at?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_id?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
+      curated_video_assignments: {
+        Row: {
+          assigned_by: string | null
+          assignment_reason: string | null
+          created_at: string
+          display_order: number | null
+          entity_slug: string | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          page_type: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          assignment_reason?: string | null
+          created_at?: string
+          display_order?: number | null
+          entity_slug?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          page_type: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          assignment_reason?: string | null
+          created_at?: string
+          display_order?: number | null
+          entity_slug?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          page_type?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curated_video_assignments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "curated_channel_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_imports: {
         Row: {
           completed_at: string | null
@@ -6345,6 +6455,45 @@ export type Database = {
           expires_at?: string
           id?: string
           videos?: Json
+        }
+        Relationships: []
+      }
+      youtube_channel_sync: {
+        Row: {
+          channel_handle: string | null
+          channel_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          last_sync_at: string | null
+          playlists_synced: number | null
+          sync_status: string | null
+          updated_at: string
+          videos_synced: number | null
+        }
+        Insert: {
+          channel_handle?: string | null
+          channel_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          playlists_synced?: number | null
+          sync_status?: string | null
+          updated_at?: string
+          videos_synced?: number | null
+        }
+        Update: {
+          channel_handle?: string | null
+          channel_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          playlists_synced?: number | null
+          sync_status?: string | null
+          updated_at?: string
+          videos_synced?: number | null
         }
         Relationships: []
       }

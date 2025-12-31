@@ -327,3 +327,6 @@ verify_jwt = false
 
 [functions.labels-agent]
 verify_jwt = false
+
+[functions.youtube-channel-curator]
+verify_jwt = false
