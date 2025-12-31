@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { dogVariants } from "@/components/DogPack";
-import { getWhatsAppShareText, getDoggyHashtag } from "@/data/doggyWhatsAppMessages";
+import { useWhatsAppMessage } from "@/hooks/useWhatsAppMessage";
 
 // Simple Mobile-First Widget
 // - Scrolling images that auto-change
@@ -19,6 +19,9 @@ const DoggyWidget = () => {
 
   const currentDog = dogVariants[currentDogIndex];
   const DogComponent = currentDog.Component;
+
+  // Use memoized WhatsApp message hook
+  const { getFullShareText } = useWhatsAppMessage(currentDog.name);
 
   // Auto-rotate through doggies
   useEffect(() => {
@@ -50,12 +53,12 @@ const DoggyWidget = () => {
     }, 200);
   }, [currentDogIndex]);
 
-  // WhatsApp share with full personalized message + hashtag
+  // WhatsApp share with memoized personalized message + hashtag
   const shareWhatsApp = useCallback(() => {
-    const text = getWhatsAppShareText(currentDog.name);
+    const text = getFullShareText();
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
-  }, [currentDog.name]);
+  }, [getFullShareText]);
 
   return (
     <div 

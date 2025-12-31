@@ -16,6 +16,8 @@ import ParticleBackground from "@/components/ParticleBackground";
 import { trackShareEvent, trackClickThrough } from "@/hooks/useShareTracking";
 import DoggyEmbedCode from "@/components/DoggyEmbedCode";
 import { getWhatsAppShareText } from "@/data/doggyWhatsAppMessages";
+import { useDoggyShare } from "@/hooks/useDoggyShare";
+import { useStickerGenerator } from "@/hooks/useStickerGenerator";
 import {
   Dialog,
   DialogContent,

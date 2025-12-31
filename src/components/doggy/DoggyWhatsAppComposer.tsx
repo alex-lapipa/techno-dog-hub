@@ -1,15 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MessageCircle, Sparkles, Send } from "lucide-react";
-import { 
-  getWhatsAppShareText, 
-  getDoggyQuirkyText, 
-  getDoggyHashtag,
-  doggyMessages 
-} from "@/data/doggyWhatsAppMessages";
+import { useWhatsAppMessage } from "@/hooks/useWhatsAppMessage";
 
 interface DoggyWhatsAppComposerProps {
   dogName: string;
@@ -26,6 +21,8 @@ interface DoggyWhatsAppComposerProps {
  * - Optional custom message input
  * - Mandatory hashtag (#aciddoggy, etc.) + landing page link
  * - Combine both or use one
+ * 
+ * Performance: Uses memoized useWhatsAppMessage hook
  */
 export const DoggyWhatsAppComposer = ({
   dogName,
@@ -37,41 +34,34 @@ export const DoggyWhatsAppComposer = ({
   const [customMessage, setCustomMessage] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const quirkyText = getDoggyQuirkyText(dogName);
-  const hashtag = getDoggyHashtag(dogName);
-  const hasQuirkyText = quirkyText.length > 0;
+  // Use memoized hook for message data
+  const { 
+    hashtag, 
+    quirkyText, 
+    hasQuirkyText, 
+    getFullShareText,
+    buildShareText: buildFromHook 
+  } = useWhatsAppMessage(dogName);
 
-  // Build the final share text
+  // Build the final share text (memoized)
   const buildShareText = useCallback(() => {
-    const parts: string[] = [];
-    
-    // Add quirky text if enabled and available
-    if (useQuirkyText && hasQuirkyText) {
-      parts.push(`🖤 ${quirkyText}`);
-    }
-    
-    // Add custom message if provided
-    if (customMessage.trim()) {
-      parts.push(customMessage.trim());
-    }
-    
-    // Always add hashtag and link (mandatory)
-    parts.push(`\n${hashtag}`);
-    parts.push(`techno.dog/doggies`);
-    
-    return parts.join('\n');
-  }, [useQuirkyText, hasQuirkyText, quirkyText, customMessage, hashtag]);
+    return buildFromHook({
+      includeQuirky: useQuirkyText,
+      customMessage: customMessage,
+    });
+  }, [buildFromHook, useQuirkyText, customMessage]);
 
-  const handleShare = () => {
-    const text = buildShareText();
-    onShare(text);
-  };
+  // Memoized preview text
+  const previewText = useMemo(() => buildShareText(), [buildShareText]);
 
-  // Quick share without expansion
-  const handleQuickShare = () => {
-    const text = getWhatsAppShareText(dogName);
-    onShare(text);
-  };
+  const handleShare = useCallback(() => {
+    onShare(previewText);
+  }, [onShare, previewText]);
+
+  // Quick share without expansion (uses full default format)
+  const handleQuickShare = useCallback(() => {
+    onShare(getFullShareText());
+  }, [onShare, getFullShareText]);
 
   // Compact mode: just a button that opens composer
   if (compact && !isExpanded) {
