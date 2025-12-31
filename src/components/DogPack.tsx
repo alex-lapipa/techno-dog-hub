@@ -2243,6 +2243,59 @@ export const RichardDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Fran Dog - Big-eyed, big-smiled showjumping legend from Gijón, 90s clubbing madman, now living in Bali
+export const FranDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Perky happy ears - always up, always excited */}
+      <path d="M12 26 Q6 12 14 4 Q22 8 20 24" />
+      <path d="M52 26 Q58 12 50 4 Q42 8 44 24" />
+      {/* Round head - signature round shape */}
+      <ellipse cx="32" cy="36" rx="18" ry="16" />
+      {/* BIG eyes - huge, expressive, full of joy */}
+      <ellipse cx="24" cy="32" rx="6" ry="7" strokeWidth="2" />
+      <ellipse cx="40" cy="32" rx="6" ry="7" strokeWidth="2" />
+      {/* Eye pupils - bright and alive */}
+      <circle cx="25" cy="31" r="3" fill="hsl(var(--logo-green))" />
+      <circle cx="41" cy="31" r="3" fill="hsl(var(--logo-green))" />
+      {/* Eye sparkle - joyful glint */}
+      <circle cx="26" cy="29" r="1" fill="white" />
+      <circle cx="42" cy="29" r="1" fill="white" />
+      {/* Happy eyebrows - raised in perpetual joy */}
+      <path d="M17 24 Q24 20 31 24" strokeWidth="1.5" />
+      <path d="M33 24 Q40 20 47 24" strokeWidth="1.5" />
+      {/* Nose - small and cute */}
+      <ellipse cx="32" cy="40" rx="2" ry="1.5" fill="hsl(var(--logo-green))" />
+      {/* BIG SMILE - always smiling, huge happy grin */}
+      <path d="M20 44 Q32 56 44 44" strokeWidth="2.5" />
+      {/* Teeth showing in big smile */}
+      <path d="M24 46 L24 49" strokeWidth="1" />
+      <path d="M28 47 L28 50" strokeWidth="1" />
+      <path d="M32 47 L32 51" strokeWidth="1" />
+      <path d="M36 47 L36 50" strokeWidth="1" />
+      <path d="M40 46 L40 49" strokeWidth="1" />
+      {/* Laugh lines - from constant smiling */}
+      <path d="M14 42 Q16 46 18 44" strokeWidth="1" opacity="0.6" />
+      <path d="M50 42 Q48 46 46 44" strokeWidth="1" opacity="0.6" />
+      {/* Showjumping helmet hint */}
+      <path d="M18 10 Q32 4 46 10" strokeWidth="1.5" opacity="0.5" />
+      <ellipse cx="32" cy="8" rx="8" ry="4" strokeWidth="1" opacity="0.4" />
+      {/* Horse/equestrian symbol - small horseshoe */}
+      <path d="M4 36 Q2 30 6 28 M6 28 Q10 30 8 36" strokeWidth="1.5" opacity="0.5" />
+      {/* 90s club vibes - glow stick hint */}
+      <path d="M56 28 L58 36" strokeWidth="2" opacity="0.6" />
+      <path d="M58 28 L60 36" strokeWidth="2" opacity="0.5" />
+      {/* Bali palm tree hint */}
+      <path d="M54 52 L56 58" strokeWidth="1" opacity="0.4" />
+      <path d="M52 52 Q56 50 58 52" strokeWidth="1" opacity="0.4" />
+      <path d="M54 52 Q56 48 60 50" strokeWidth="1" opacity="0.4" />
+      {/* Dancing motion lines */}
+      <path d="M6 56 Q10 54 8 58" strokeWidth="1" opacity="0.4" />
+      <path d="M58 56 Q54 54 56 58" strokeWidth="1" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2342,4 +2395,5 @@ export const dogVariants = [
   { name: 'Pire', Component: PireDog, personality: 'Globe-trotting acid head, business by day, party legend by night', status: 'squelching' },
   { name: 'Alberto', Component: AlbertoDog, personality: 'Argentinian chef-raver, best steaks by day, glow sticks til sunrise', status: 'grilling & dancing' },
   { name: 'Richard', Component: RichardDog, personality: 'Steel factory legend by day, Paranoox underground king by night', status: 'forging & raving' },
+  { name: 'Fran', Component: FranDog, personality: 'Showjumping legend, 90s clubbing madman, Gijón heart beating in Bali', status: 'jumping & dancing' },
 ];
