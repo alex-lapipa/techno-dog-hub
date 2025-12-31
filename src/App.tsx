@@ -62,6 +62,7 @@ const AIImageGallery = lazy(() => import("./pages/AIImageGallery"));
 const ActivityLog = lazy(() => import("./pages/ActivityLog"));
 const NotificationChannels = lazy(() => import("./pages/NotificationChannels"));
 const KnowledgeAdmin = lazy(() => import("./pages/KnowledgeAdmin"));
+const KnowledgeLayerAdmin = lazy(() => import("./pages/admin/KnowledgeLayerAdmin"));
 const ArtistMigrationAdmin = lazy(() => import("./pages/ArtistMigrationAdmin"));
 const ArtistEnrichmentAdmin = lazy(() => import("./pages/ArtistEnrichmentAdmin"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
@@ -180,6 +181,7 @@ const App = () => (
                     <Route path="/admin/activity-log" element={<ActivityLog />} />
                     <Route path="/admin/notifications" element={<NotificationChannels />} />
                     <Route path="/admin/knowledge" element={<KnowledgeAdmin />} />
+                    <Route path="/admin/knowledge-layer" element={<KnowledgeLayerAdmin />} />
                     <Route path="/admin/badges" element={<BadgeAdmin />} />
                     <Route path="/admin/xp-events" element={<XPEventsAdmin />} />
                     
