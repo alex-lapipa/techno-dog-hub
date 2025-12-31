@@ -501,6 +501,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Fran Dog — showjumping legend from Gijón, now raving in Bali til sunrise",
     quote: "90s clubs taught me how to fly without a horse. Big smile, bigger beats, the dancefloor is my arena.",
     packInvite: "Jump into the pack"
+  },
+  'yayo': {
+    intro: "I'm the Yayo Dog — DJ, producer, Neverland commander with the moustache of legends",
+    quote: "Behind these glasses I see frequencies. Under this moustache lives bass. The pointy hair? That's just style.",
+    packInvite: "Enter Neverland with us"
   }
 };
 
