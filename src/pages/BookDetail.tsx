@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { ArrowLeft, BookOpen, ExternalLink, Calendar, User, Tag, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ExternalLink, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookCover } from "@/components/books/BookCover";
 
@@ -53,6 +53,25 @@ const BookDetail = () => {
     },
     enabled: !!id,
   });
+
+  // Fetch all published books for prev/next navigation
+  const { data: allBooks = [] } = useQuery({
+    queryKey: ["all-books-nav"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("books")
+        .select("id, title")
+        .eq("status", "published")
+        .order("title");
+      if (error) throw error;
+      return data as { id: string; title: string }[];
+    },
+  });
+
+  // Find prev/next books
+  const currentIndex = allBooks.findIndex(b => b.id === id);
+  const prevBook = currentIndex > 0 ? allBooks[currentIndex - 1] : null;
+  const nextBook = currentIndex < allBooks.length - 1 ? allBooks[currentIndex + 1] : null;
 
   // Fetch related books from same category
   const { data: relatedBooks = [] } = useQuery({
@@ -340,6 +359,47 @@ const BookDetail = () => {
             )}
           </div>
         </div>
+
+        {/* Prev/Next Navigation */}
+        {(prevBook || nextBook) && (
+          <div className="mt-12 pt-6 border-t border-border/30">
+            <div className="flex items-center justify-between gap-4">
+              {prevBook ? (
+                <Link
+                  to={`/books/${prevBook.id}`}
+                  className="group flex items-center gap-3 p-3 border border-border/50 bg-card/30 hover:border-logo-green/50 hover:bg-card/50 transition-all max-w-[45%]"
+                >
+                  <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-logo-green shrink-0 transition-colors" />
+                  <div className="min-w-0">
+                    <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-0.5">Previous</span>
+                    <span className="block font-mono text-xs text-foreground group-hover:text-logo-green transition-colors truncate">
+                      {prevBook.title}
+                    </span>
+                  </div>
+                </Link>
+              ) : (
+                <div />
+              )}
+              
+              {nextBook ? (
+                <Link
+                  to={`/books/${nextBook.id}`}
+                  className="group flex items-center gap-3 p-3 border border-border/50 bg-card/30 hover:border-logo-green/50 hover:bg-card/50 transition-all max-w-[45%] text-right"
+                >
+                  <div className="min-w-0">
+                    <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-0.5">Next</span>
+                    <span className="block font-mono text-xs text-foreground group-hover:text-logo-green transition-colors truncate">
+                      {nextBook.title}
+                    </span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-logo-green shrink-0 transition-colors" />
+                </Link>
+              ) : (
+                <div />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </PageLayout>
   );
