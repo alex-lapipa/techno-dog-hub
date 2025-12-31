@@ -11,8 +11,23 @@ import DogSilhouette from '@/components/DogSilhouette';
 import ArticleParticleBackground from '@/components/ArticleParticleBackground';
 import alexLaunchHero from '@/assets/alex-launch-hero.png';
 
-// Split content into two columns for magazine layout
-const splitIntoColumns = (elements: JSX.Element[]): [JSX.Element[], JSX.Element[]] => {
+// Split content: right column starts at "How You Can Help", rest goes to left
+const splitAtHowYouCanHelp = (elements: JSX.Element[]): [JSX.Element[], JSX.Element[]] => {
+  // Find the index of "How You Can Help" header
+  const splitIndex = elements.findIndex((el) => {
+    if (el.props?.children) {
+      const children = Array.isArray(el.props.children) ? el.props.children : [el.props.children];
+      return children.some((child: any) => 
+        typeof child === 'string' && child.includes('How You Can Help')
+      );
+    }
+    return false;
+  });
+  
+  if (splitIndex > 0) {
+    return [elements.slice(0, splitIndex), elements.slice(splitIndex)];
+  }
+  // Fallback to midpoint if not found
   const midpoint = Math.ceil(elements.length / 2);
   return [elements.slice(0, midpoint), elements.slice(midpoint)];
 };
@@ -307,7 +322,7 @@ const NewsArticleDetail = () => {
   };
 
   const renderedContent = renderMarkdown(article.body_markdown);
-  const [leftColumn, rightColumn] = splitIntoColumns(renderedContent);
+  const [leftColumn, rightColumn] = splitAtHowYouCanHelp(renderedContent);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
