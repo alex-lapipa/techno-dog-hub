@@ -10,6 +10,7 @@ export interface VenueSummary {
   active: string;
   tags: string[];
   atmosphere?: string;
+  imageUrl?: string;
 }
 
 // Dynamically load full venue data
@@ -21,7 +22,7 @@ export const loadVenueById = async (id: string) => {
 // Load all summaries (lightweight)
 export const loadVenuesSummary = async (): Promise<VenueSummary[]> => {
   const { venues } = await import('./venues-legacy');
-  return venues.map(({ id, name, city, country, type, active, tags, atmosphere }) => ({
-    id, name, city, country, type, active, tags, atmosphere
+  return venues.map(({ id, name, city, country, type, active, tags, atmosphere, image }) => ({
+    id, name, city, country, type, active, tags, atmosphere, imageUrl: image?.url
   }));
 };
