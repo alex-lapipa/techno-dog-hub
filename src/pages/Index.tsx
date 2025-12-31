@@ -18,7 +18,7 @@ const Index = () => {
     "name": "techno.dog",
     "url": "https://techno.dog",
     "logo": "https://techno.dog/og-image.png",
-    "description": "Global techno culture archive - artists, festivals, venues, labels, and history from Detroit to Tbilisi",
+    "description": "Open-source archive of underground techno culture — artists, labels, festivals, venues, gear, and the ideas that shaped the sound",
     "foundingDate": "2024",
     "knowsAbout": ["Techno Music", "Electronic Music", "DJ Culture", "Music Festivals", "Record Labels"]
   };
@@ -184,12 +184,8 @@ const Index = () => {
               </h1>
               
               {/* Mission Statement */}
-              <p className="font-mono text-sm md:text-base text-foreground/90 leading-relaxed max-w-2xl mb-6 border-l-2 border-primary pl-4">
-                A daily, open platform and database dedicated to underground techno culture — artists, clubs, festivals, machines and ideas. Strictly non-mainstream.
-              </p>
-              
-              <p className="font-mono text-sm text-muted-foreground leading-relaxed max-w-2xl mb-8">
-                The collaborative digital magazine and encyclopedia. From Detroit to Tbilisi, Tokyo to Bogotá.
+              <p className="font-mono text-sm md:text-base text-foreground/90 leading-relaxed max-w-2xl mb-8 border-l-2 border-primary pl-4">
+                An open-source archive and living encyclopedia of underground techno culture — artists, labels, festivals, venues, gear, and the ideas that shaped the sound. Community-built. Strictly non-commercial.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link 
@@ -376,7 +372,7 @@ const Index = () => {
           <div className="container mx-auto px-4 md:px-8 py-8">
             <div className="font-mono text-xs text-muted-foreground/30 leading-relaxed whitespace-pre overflow-x-auto">
 {`░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░  DETROIT → BERLIN → TBILISI → TOKYO → BOGOTÁ → SÃO PAULO → MEXICO CITY → MELBOURNE  ░░
+░░   ARTISTS → LABELS → FESTIVALS → VENUES → GEAR → HISTORY → COMMUNITY → OPEN SOURCE   ░░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`}
             </div>
           </div>

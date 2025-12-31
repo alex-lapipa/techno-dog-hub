@@ -87,7 +87,7 @@ function newsletterOptInEmail(confirmUrl: string, email: string): string {
       What you'll get:
     </p>
     <div style="padding: 0 20px; margin: 0 0 24px;">
-      <p style="${styles.listItem}">→ Weekly artist spotlights from Detroit to Tbilisi</p>
+      <p style="${styles.listItem}">→ Weekly artist spotlights from the underground</p>
       <p style="${styles.listItem}">→ New releases from labels that matter</p>
       <p style="${styles.listItem}">→ Festival & venue updates worldwide</p>
       <p style="${styles.listItem}">→ Community contributions & corrections</p>

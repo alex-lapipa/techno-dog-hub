@@ -70,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
               </p>
               
               <p style="color: #666666; font-size: 12px; text-align: center; margin-top: 20px;">
-                🖤 From Detroit to Tbilisi, pure warehouse truth.
+                🖤 Pure warehouse truth, strictly underground.
               </p>
             </div>
           `,

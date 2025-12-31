@@ -318,7 +318,7 @@ Deno.serve(async (req) => {
 
     const combinedContext = [artistContext, documentContext].filter(Boolean).join('\n\n');
 
-    const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene from Detroit to Berlin to Tokyo. 
+    const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene. 
 
 IMPORTANT: You MUST always respond in English, regardless of the language of the user's question. All responses must be in English only.
 
