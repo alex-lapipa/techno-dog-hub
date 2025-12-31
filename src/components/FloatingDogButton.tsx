@@ -78,10 +78,10 @@ const FloatingDogButton = () => {
       setBubbleMessage(pickRandomMessage());
       setBubbleVisible(true);
       
-      // Hide after 4-6 seconds
+      // Hide after exactly 4 seconds
       hideTimeout = setTimeout(() => {
         setBubbleVisible(false);
-      }, 4000 + Math.random() * 2000);
+      }, 4000);
     };
 
     // Start the cycle
@@ -109,11 +109,12 @@ const FloatingDogButton = () => {
     <>
       {/* Ambient Speech Bubble */}
       <div
-        className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-500 ${
+        className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none ${
           bubbleVisible && !dogChatOpen
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-4'
+            ? 'animate-fade-in'
+            : 'animate-fade-out'
         }`}
+        style={{ animationDuration: '400ms', animationFillMode: 'forwards' }}
       >
         <div className="relative bg-background/95 backdrop-blur-md border border-logo-green/50 rounded-xl px-4 py-2.5 shadow-[0_0_20px_hsl(100_100%_60%/0.2)] max-w-[280px]">
           {/* Speech bubble tail */}
