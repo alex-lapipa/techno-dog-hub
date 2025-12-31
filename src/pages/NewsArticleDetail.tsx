@@ -396,23 +396,21 @@ const NewsArticleDetail = () => {
                 {leftColumn}
               </div>
 
-              {/* Right Column */}
+              {/* Right Column - content + chat box */}
               <div className="space-y-1">
                 {rightColumn}
-              </div>
-            </div>
-
-            {/* Embedded Dog Chat Box - Square format, right-aligned */}
-            <div className="mt-12 mb-8 flex justify-end">
-              <div className="w-full max-w-[320px] aspect-square border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background overflow-hidden shadow-[0_0_20px_hsl(100_100%_60%/0.1)]">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-logo-green/30 bg-logo-green/10">
-                  <DogSilhouette className="w-5 h-5 text-logo-green drop-shadow-[0_0_6px_hsl(100_100%_60%/0.6)]" />
-                  <span className="font-mono text-xs uppercase tracking-wider text-foreground font-semibold">
-                    Ask Techno Dog
-                  </span>
-                </div>
-                <div className="h-[calc(100%-36px)]">
-                  <DogChat />
+                
+                {/* Embedded Dog Chat Box - fills right column width */}
+                <div className="mt-8 border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background overflow-hidden shadow-[0_0_20px_hsl(100_100%_60%/0.1)]">
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-logo-green/30 bg-logo-green/10">
+                    <DogSilhouette className="w-6 h-6 text-logo-green drop-shadow-[0_0_6px_hsl(100_100%_60%/0.6)]" />
+                    <span className="font-mono text-sm uppercase tracking-wider text-foreground font-semibold">
+                      Ask Techno Dog
+                    </span>
+                  </div>
+                  <div className="h-[400px]">
+                    <DogChat />
+                  </div>
                 </div>
               </div>
             </div>
