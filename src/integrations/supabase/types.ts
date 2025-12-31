@@ -2540,6 +2540,51 @@ export type Database = {
         }
         Relationships: []
       }
+      consent_records: {
+        Row: {
+          consent_type: string
+          consent_version: string | null
+          created_at: string | null
+          granted_at: string | null
+          id: string
+          ip_hash: string | null
+          is_granted: boolean
+          revoked_at: string | null
+          session_id: string
+          updated_at: string | null
+          user_agent_hash: string | null
+          user_id: string | null
+        }
+        Insert: {
+          consent_type: string
+          consent_version?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          is_granted?: boolean
+          revoked_at?: string | null
+          session_id: string
+          updated_at?: string | null
+          user_agent_hash?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          consent_type?: string
+          consent_version?: string | null
+          created_at?: string | null
+          granted_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          is_granted?: boolean
+          revoked_at?: string | null
+          session_id?: string
+          updated_at?: string | null
+          user_agent_hash?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       content_sync: {
         Row: {
           corrections: Json | null
@@ -2887,6 +2932,45 @@ export type Database = {
           records_imported?: number | null
           source_file?: string | null
           started_at?: string | null
+        }
+        Relationships: []
+      }
+      data_retention_rules: {
+        Row: {
+          created_at: string | null
+          deletion_strategy: string | null
+          id: string
+          is_active: boolean | null
+          last_cleanup_at: string | null
+          notes: string | null
+          records_deleted: number | null
+          retention_days: number
+          table_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deletion_strategy?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_cleanup_at?: string | null
+          notes?: string | null
+          records_deleted?: number | null
+          retention_days?: number
+          table_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deletion_strategy?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_cleanup_at?: string | null
+          notes?: string | null
+          records_deleted?: number | null
+          retention_days?: number
+          table_name?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -5774,6 +5858,129 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_agent_runs: {
+        Row: {
+          alerts_created: number | null
+          created_at: string | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          issues_found: number | null
+          scan_results: Json | null
+          scan_type: string
+          started_at: string | null
+          status: string | null
+          tables_scanned: number | null
+        }
+        Insert: {
+          alerts_created?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          issues_found?: number | null
+          scan_results?: Json | null
+          scan_type: string
+          started_at?: string | null
+          status?: string | null
+          tables_scanned?: number | null
+        }
+        Update: {
+          alerts_created?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          issues_found?: number | null
+          scan_results?: Json | null
+          scan_type?: string
+          started_at?: string | null
+          status?: string | null
+          tables_scanned?: number | null
+        }
+        Relationships: []
+      }
+      privacy_alerts: {
+        Row: {
+          affected_count: number | null
+          affected_entity: string | null
+          alert_type: string
+          created_at: string | null
+          description: string | null
+          detection_source: string | null
+          id: string
+          metadata: Json | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          affected_count?: number | null
+          affected_entity?: string | null
+          alert_type: string
+          created_at?: string | null
+          description?: string | null
+          detection_source?: string | null
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          affected_count?: number | null
+          affected_entity?: string | null
+          alert_type?: string
+          created_at?: string | null
+          description?: string | null
+          detection_source?: string | null
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      privacy_audit_log: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_hash: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_hash?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_hash?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       processes_workflows: {
         Row: {
           common_failure_modes: string | null
@@ -6365,6 +6572,51 @@ export type Database = {
           subject_template?: string
           template_name?: string
           tone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      third_party_integrations: {
+        Row: {
+          created_at: string | null
+          data_shared: string[] | null
+          dpa_signed: boolean | null
+          id: string
+          integration_type: string | null
+          is_active: boolean | null
+          last_reviewed_at: string | null
+          name: string
+          notes: string | null
+          privacy_policy_url: string | null
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_shared?: string[] | null
+          dpa_signed?: boolean | null
+          id?: string
+          integration_type?: string | null
+          is_active?: boolean | null
+          last_reviewed_at?: string | null
+          name: string
+          notes?: string | null
+          privacy_policy_url?: string | null
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_shared?: string[] | null
+          dpa_signed?: boolean | null
+          id?: string
+          integration_type?: string | null
+          is_active?: boolean | null
+          last_reviewed_at?: string | null
+          name?: string
+          notes?: string | null
+          privacy_policy_url?: string | null
+          provider?: string
           updated_at?: string | null
         }
         Relationships: []
