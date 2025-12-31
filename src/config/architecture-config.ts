@@ -455,95 +455,220 @@ export const analyticsEvents: AnalyticsEvent[] = [
 // MERMAID DIAGRAMS
 // ============================================
 export const mermaidDiagrams = {
+  // Complete site overview
+  siteOverview: `graph TB
+    subgraph Entry["🏠 Entry Points"]
+      HOME[Homepage]
+      SEARCH[Search]
+      DIRECT[Direct Links]
+    end
+
+    subgraph Content["📚 Content Layer"]
+      direction TB
+      subgraph Knowledge["Knowledge Base"]
+        ARTISTS[Artists 182]
+        LABELS[Labels 12]
+        VENUES[Venues]
+        FESTIVALS[Festivals]
+        CREWS[Collectives 12]
+        GEAR[Gear 99]
+      end
+      subgraph Media["Media Library"]
+        BOOKS[Books 49]
+        DOCS[Documentaries 31]
+        NEWS[News Articles]
+        TECHNOPEDIA[Technopedia]
+      end
+    end
+
+    subgraph Community["👥 Community Layer"]
+      PROFILES[User Profiles]
+      SUBMISSIONS[Submissions]
+      LEADERBOARD[Leaderboard]
+      DOGGIES[Doggies 91]
+    end
+
+    subgraph Admin["🔧 Admin Layer"]
+      DASHBOARD[Control Center]
+      AGENTS[AI Agents 18]
+      MONITORING[Health Monitor]
+    end
+
+    subgraph Backend["☁️ Backend"]
+      DB[(PostgreSQL 150 Tables)]
+      EDGE[Edge Functions 110]
+      AUTH[Authentication]
+      AI[AI Gateway]
+    end
+
+    Entry --> Content
+    Entry --> Community
+    Content --> Backend
+    Community --> Backend
+    Admin --> Backend
+    Admin -.->|Protected| AUTH`,
+
   sitemap: `graph TD
-    subgraph Public["🌐 Public"]
-      HOME[Home] --> NEWS[News]
-      HOME --> ARTISTS[Artists]
-      HOME --> LABELS[Labels]
-      HOME --> VENUES[Venues]
-      HOME --> FESTIVALS[Festivals]
-      HOME --> CREWS[Collectives]
-      HOME --> GEAR[Gear]
-      HOME --> TECHNOPEDIA[Technopedia]
-      HOME --> BOOKS[Books]
-      HOME --> DOCS[Documentaries]
-      HOME --> DOGGIES[Doggies]
-      HOME --> STORE[Store]
-      HOME --> SUPPORT[Support]
-      HOME --> DEVELOPER[Developer]
+    subgraph Public["🌐 Public Pages"]
+      HOME["/"] --> NEWS["/news"]
+      HOME --> ARTISTS["/artists"]
+      HOME --> LABELS["/labels"]
+      HOME --> VENUES["/venues"]
+      HOME --> FESTIVALS["/festivals"]
+      HOME --> CREWS["/crews"]
+      HOME --> GEAR["/gear"]
+      HOME --> TECHNOPEDIA["/technopedia"]
+      HOME --> BOOKS["/books"]
+      HOME --> DOCS["/documentaries"]
+      HOME --> DOGGIES["/doggies"]
+      HOME --> STORE["/store"]
+      HOME --> SUPPORT["/support"]
+      HOME --> DEVELOPER["/developer"]
+    end
+    
+    subgraph Dynamic["📄 Dynamic Routes"]
+      ARTISTS --> ARTIST_DETAIL["/artists/:id"]
+      LABELS --> LABEL_DETAIL["/labels/:id"]
+      VENUES --> VENUE_DETAIL["/venues/:id"]
+      FESTIVALS --> FESTIVAL_DETAIL["/festivals/:id"]
+      CREWS --> CREW_DETAIL["/crews/:id"]
+      GEAR --> GEAR_DETAIL["/gear/:id"]
+      NEWS --> NEWS_ARTICLE["/news/article/:id"]
     end
     
     subgraph Community["👥 Community"]
-      COMMUNITY[Hub] --> LEADERBOARD[Leaderboard]
-      COMMUNITY --> PROFILE[Profile]
-      COMMUNITY --> TRAINING[Training]
-      COMMUNITY --> SUBMISSIONS[My Submissions]
+      COMMUNITY["/community"] --> LEADERBOARD["/community/leaderboard"]
+      COMMUNITY --> PROFILE["/community/profile/:id"]
+      COMMUNITY --> TRAINING["/training"]
+      COMMUNITY --> MY_SUBS["/my-submissions"]
     end
     
-    subgraph Admin["🔧 Admin"]
-      ADMIN[Dashboard] --> CONTROL[Control Center]
-      ADMIN --> USERS[Users]
-      ADMIN --> AGENTS[AI Agents]
-      ADMIN --> MONITORING[Monitoring]
-      AGENTS --> NEWS_AGENT[News]
-      AGENTS --> ARTIST_AGENT[Artist Research]
-      AGENTS --> MEDIA_CURATOR[Media Curator]
-      AGENTS --> ORCHESTRATORS[Orchestrators]
+    subgraph Admin["🔧 Admin Routes"]
+      ADMIN["/admin"] --> CONTROL["/admin/control-center"]
+      ADMIN --> USERS["/admin/users"]
+      ADMIN --> SUBMISSIONS["/admin/submissions"]
+      ADMIN --> CHANGELOG["/admin/changelog"]
+      
+      subgraph Agents["AI Agents"]
+        NEWS_AGENT["/admin/news-agent"]
+        ARTIST_AGENT["/admin/artist-research"]
+        MEDIA_CURATOR["/admin/media-curator"]
+        DOGGY_ORCH["/admin/doggy-orchestrator"]
+        CONTENT_ORCH["/admin/content-orchestrator"]
+        AI_ORCH["/admin/ai-orchestrator"]
+      end
+      
+      subgraph Monitoring["Monitoring"]
+        HEALTH["/admin/health-monitor"]
+        SECURITY["/admin/security-auditor"]
+        API_GUARD["/admin/api-guardian"]
+        DATA_INT["/admin/data-integrity"]
+      end
     end
     
     HOME --> COMMUNITY
-    ADMIN -.->|Auth Required| COMMUNITY`,
+    ADMIN -.->|Auth Required| CONTROL`,
 
   systemArchitecture: `graph TB
-    subgraph Client["📱 Frontend"]
+    subgraph Client["📱 Frontend Layer"]
       REACT[React 18 + Vite]
-      UI[Shadcn/ui + Tailwind]
-      STATE[Zustand + React Query]
+      UI[Shadcn/ui Components]
+      TAILWIND[Tailwind CSS]
+      STATE[Zustand State]
+      QUERY[React Query Cache]
+    end
+    
+    subgraph Gateway["🚪 API Gateway"]
+      EDGE[Edge Functions]
+      RLS[Row Level Security]
+      RATE[Rate Limiting]
     end
     
     subgraph Backend["☁️ Lovable Cloud"]
-      EDGE[Edge Functions x110]
       DB[(PostgreSQL)]
-      AUTH[Auth]
-      STORAGE[Storage]
-      REALTIME[Realtime]
+      AUTH[Auth Service]
+      STORAGE[File Storage]
+      REALTIME[Realtime Pub/Sub]
     end
     
-    subgraph AI["🤖 AI Layer"]
-      ROUTER[Model Router]
-      GEMINI[Gemini 2.5/3]
-      GPT5[GPT-5]
-      GROQ[Groq LPU]
+    subgraph AI["🤖 AI Infrastructure"]
+      ROUTER[4-Tier Model Router]
+      subgraph Models["Model Pool"]
+        GROQ[Groq LPU - Ultra Fast]
+        GEMINI_FLASH[Gemini 2.5 Flash]
+        GEMINI_PRO[Gemini 3 Pro]
+        GPT5[GPT-5 - Complex]
+      end
+      EMBEDDINGS[Vector Embeddings]
+      RAG[RAG Pipeline]
     end
     
-    subgraph External["🔗 External"]
-      STRIPE[Stripe]
-      ELEVEN[ElevenLabs]
-      FIRECRAWL[Firecrawl]
-      YOUTUBE[YouTube API]
-      GA4[GA4 + GTM]
+    subgraph External["🔗 External Services"]
+      STRIPE[Stripe Payments]
+      ELEVEN[ElevenLabs TTS]
+      FIRECRAWL[Firecrawl Scraping]
+      YOUTUBE[YouTube Data API]
+      GA4[GA4 Analytics]
+      GTM[Google Tag Manager]
     end
     
-    REACT --> EDGE
-    REACT --> DB
-    REACT --> AUTH
-    EDGE --> DB
-    EDGE --> ROUTER
-    ROUTER --> GEMINI
-    ROUTER --> GPT5
-    ROUTER --> GROQ
-    EDGE --> STRIPE
-    EDGE --> ELEVEN
-    EDGE --> FIRECRAWL
-    EDGE --> YOUTUBE
-    REACT --> GA4`,
+    Client --> Gateway
+    Gateway --> Backend
+    Gateway --> AI
+    AI --> Models
+    AI --> EMBEDDINGS
+    EMBEDDINGS --> RAG
+    Gateway --> External
+    Client --> GA4`,
+
+  aiAgentEcosystem: `graph TB
+    subgraph Orchestrators["🎛️ Orchestration Layer"]
+      AI_ORCH[AI Orchestrator]
+      CONTENT_ORCH[Content Orchestrator]
+      DOGGY_ORCH[Doggy Orchestrator]
+    end
+    
+    subgraph ContentAgents["📝 Content Agents"]
+      NEWS[News Agent]
+      MEDIA[Media Curator]
+      TRANSLATION[Translation Agent]
+      YOUTUBE_CUR[YouTube Curator]
+    end
+    
+    subgraph ResearchAgents["🔍 Research Agents"]
+      ARTIST_RES[Artist Research]
+      GEAR_EXP[Gear Expert]
+      LABEL_AGENT[Labels Agent]
+      COLLECTIVE[Collectives Agent]
+    end
+    
+    subgraph InfraAgents["🔧 Infrastructure Agents"]
+      HEALTH[Health Monitor]
+      SECURITY[Security Auditor]
+      API_GUARD[API Guardian]
+      DATA_INT[Data Integrity]
+      ANALYTICS[Analytics Reporter]
+    end
+    
+    subgraph OutreachAgents["📣 Outreach Agents"]
+      PR_MEDIA[PR Media Agent]
+      OUTREACH[Outreach Engine]
+      PLAYBOOK[Playbook Agent]
+    end
+    
+    AI_ORCH --> ContentAgents
+    AI_ORCH --> ResearchAgents
+    AI_ORCH --> InfraAgents
+    CONTENT_ORCH --> NEWS
+    CONTENT_ORCH --> MEDIA
+    DOGGY_ORCH --> DOGGY_VARIANTS[Doggy Variants]`,
 
   authFlow: `sequenceDiagram
     participant U as User
     participant F as Frontend
-    participant A as Auth
+    participant A as Auth Service
     participant DB as Database
-    participant E as Email
+    participant E as Email Service
     
     U->>F: Click Login/Signup
     F->>A: signInWithOtp(email)
@@ -562,6 +687,7 @@ export const mermaidDiagrams = {
     participant E as Edge Function
     participant S as Stripe
     participant DB as Database
+    participant N as Notifications
     
     U->>F: Select support tier
     F->>E: stripe-support(tier)
@@ -572,21 +698,30 @@ export const mermaidDiagrams = {
     U->>S: Complete payment
     S->>E: Webhook: payment_success
     E->>DB: Update supporters table
-    E->>U: Confirmation email`,
+    E->>DB: Award supporter badge
+    E->>N: Send confirmation email
+    N->>U: Receipt & welcome email`,
 
   dataFlow: `graph LR
-    subgraph Sources["📥 Sources"]
+    subgraph Sources["📥 Data Sources"]
       RA[Resident Advisor]
       WIKI[Wikipedia]
       DISCOGS[Discogs]
       YT[YouTube]
       USER[User Submissions]
+      MANUAL[Manual Entry]
+    end
+    
+    subgraph Ingestion["⬇️ Ingestion"]
+      FIRECRAWL[Firecrawl Scrape]
+      PARSE[Content Parser]
+      VALIDATE[Validation]
     end
     
     subgraph Processing["⚙️ Processing"]
-      FIRECRAWL[Firecrawl Scrape]
-      EMBED[Embedding Gen]
-      VALIDATE[Validation]
+      EMBED[Embedding Generation]
+      ENRICH[AI Enrichment]
+      DEDUP[Deduplication]
       TRIAGE[AI Triage]
     end
     
@@ -594,18 +729,76 @@ export const mermaidDiagrams = {
       CANONICAL[canonical_artists]
       PROFILES[artist_profiles]
       DOCS[artist_documents]
-      VECTORS[Embeddings]
+      VECTORS[(Vector Store)]
     end
     
-    subgraph Output["📤 Output"]
+    subgraph Serving["📤 Serving"]
       RAG[RAG Search]
       API[Public API]
       PAGES[Detail Pages]
+      AGENT[Dog Agent]
     end
     
-    Sources --> Processing
+    Sources --> Ingestion
+    Ingestion --> Processing
     Processing --> Storage
-    Storage --> Output`,
+    Storage --> Serving`,
+
+  doggyEcosystem: `graph TB
+    subgraph Variants["🐕 Doggy Variants 91"]
+      NERDY[NerdyDog]
+      DJ[DJDog]
+      ACID[AcidDog]
+      BERLIN[BerlinDog]
+      VINYL[VinylDog]
+      MORE[... 86 more]
+    end
+    
+    subgraph Generation["🎨 Generation"]
+      SVG[SVG Templates]
+      COLORS[Color Schemes]
+      ACCESSORIES[Accessories]
+    end
+    
+    subgraph Distribution["📤 Distribution"]
+      GALLERY["/doggies Gallery"]
+      WIDGET[Embed Widget]
+      WHATSAPP[WhatsApp Stickers]
+      TWITTER[Twitter Share]
+      TELEGRAM[Telegram Share]
+    end
+    
+    subgraph Analytics["📊 Tracking"]
+      SHARE_COUNT[Share Counts]
+      LEADERBOARD[Share Leaderboard]
+      VIRAL[Viral Metrics]
+    end
+    
+    Variants --> Generation
+    Generation --> Distribution
+    Distribution --> Analytics`,
+
+  databaseSchema: `erDiagram
+    canonical_artists ||--o{ artist_profiles : has
+    canonical_artists ||--o{ artist_documents : has
+    canonical_artists ||--o{ artist_aliases : has
+    
+    community_profiles ||--o{ referrals : creates
+    community_profiles ||--o{ supporters : becomes
+    community_profiles ||--o{ community_submissions : submits
+    
+    doggy_variants ||--o{ doggy_analytics : tracks
+    doggy_share_leaderboard ||--o{ doggy_analytics : aggregates
+    
+    td_news_articles ||--o{ td_article_entities : links
+    td_knowledge_entities ||--o{ td_article_entities : links
+    
+    books ||--o{ book_tags : has
+    books }o--|| book_categories : belongs_to
+    
+    gear_catalog ||--o{ gear_brands : manufactured_by
+    
+    agent_status ||--o{ agent_reports : generates`,
 };
 
 // ============================================
