@@ -207,6 +207,9 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Daily Spotlight */}
+        <DailySpotlight />
+
         {/* Primary Archive Grid - matches top nav */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16">
@@ -272,8 +275,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Daily Spotlight */}
-        <DailySpotlight />
 
         {/* Tools & Services - VHS aesthetic with parallax */}
         <section className="border-b border-border">
