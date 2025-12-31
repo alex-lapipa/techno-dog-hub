@@ -374,3 +374,6 @@ verify_jwt = false
 
 [functions.fix-documentaries]
 verify_jwt = false
+
+[functions.restore-book-covers]
+verify_jwt = false
