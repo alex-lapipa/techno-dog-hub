@@ -2068,6 +2068,57 @@ export const JulietaDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
+// Pire Dog - Globe-trotting acid lover, round glasses, business by day, party legend by night
+export const PireDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Round floppy ears */}
+      <path d="M10 30 Q4 22 8 12 Q14 16 16 28" />
+      <path d="M54 30 Q60 22 56 12 Q50 16 48 28" />
+      {/* Sparse hair on top - distinguished gentleman */}
+      <path d="M28 12 Q30 6 32 12" strokeWidth="1.5" />
+      <path d="M32 10 Q34 4 36 10" strokeWidth="1.5" />
+      <path d="M36 12 Q38 6 40 12" strokeWidth="1.5" />
+      {/* Single wisp */}
+      <path d="M32 8 L32 4" strokeWidth="1" opacity="0.7" />
+      {/* Round head - very round */}
+      <circle cx="32" cy="36" r="16" />
+      {/* Round glasses - distinctive */}
+      <circle cx="24" cy="34" r="6" strokeWidth="2" />
+      <circle cx="40" cy="34" r="6" strokeWidth="2" />
+      {/* Glasses bridge */}
+      <path d="M30 34 L34 34" strokeWidth="1.5" />
+      {/* Glasses arms */}
+      <path d="M18 34 L12 32" strokeWidth="1.5" opacity="0.8" />
+      <path d="M46 34 L52 32" strokeWidth="1.5" opacity="0.8" />
+      {/* Happy eyes behind glasses */}
+      <circle cx="24" cy="33" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="23" cy="32" r="0.8" fill="hsl(var(--background))" />
+      <circle cx="40" cy="33" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="32" r="0.8" fill="hsl(var(--background))" />
+      {/* Happy raised eyebrows */}
+      <path d="M19 26 Q24 24 29 26" strokeWidth="1.5" />
+      <path d="M35 26 Q40 24 45 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="42" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Big happy smile - always happy */}
+      <path d="M24 48 Q32 56 40 48" strokeWidth="2.5" />
+      {/* Smile lines - genuine happiness */}
+      <path d="M22 46 Q20 48 22 50" strokeWidth="1" opacity="0.5" />
+      <path d="M42 46 Q44 48 42 50" strokeWidth="1" opacity="0.5" />
+      {/* 303 acid symbol near ear - loves acid */}
+      <text x="2" y="44" fontSize="6" fill="hsl(var(--logo-green))" opacity="0.6" fontFamily="monospace">303</text>
+      {/* Globe/travel dots - world traveler */}
+      <circle cx="56" cy="44" r="1" fill="hsl(var(--logo-green))" opacity="0.5" />
+      <circle cx="58" cy="48" r="0.8" fill="hsl(var(--logo-green))" opacity="0.4" />
+      <circle cx="60" cy="46" r="0.6" fill="hsl(var(--logo-green))" opacity="0.5" />
+      {/* Briefcase hint - business by day */}
+      <path d="M4 54 L10 54 L10 58 L4 58 Z" strokeWidth="1" opacity="0.4" />
+      <path d="M6 54 L6 52 L8 52 L8 54" strokeWidth="1" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2164,4 +2215,5 @@ export const dogVariants = [
   { name: 'La Pipa', Component: LaPipaDog, personality: 'Beyond the obvious, into the stranger', status: 'something stranger' },
   { name: 'Ron', Component: RonDog, personality: 'Mad LA technologist, guitar hero, open source legend', status: 'shipping code' },
   { name: 'Julieta', Component: JulietaDog, personality: 'Madrid party queen, ex-London raver, absolutely unhinged', status: 'partying' },
+  { name: 'Pire', Component: PireDog, personality: 'Globe-trotting acid head, business by day, party legend by night', status: 'squelching' },
 ];
