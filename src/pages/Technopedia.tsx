@@ -130,35 +130,46 @@ const TechnopediaPage = () => {
           
           {/* Hero */}
           <div className="max-w-4xl mb-16 sm:mb-20">
-            <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
+            <div className="font-mono text-[10px] sm:text-xs text-destructive uppercase tracking-[0.3em] mb-4">
               // Open Knowledge
             </div>
-            <h1 className="font-mono text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tight mb-6">
+            <h1 className="font-mono text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tight mb-6 text-foreground">
               {content.title}
             </h1>
             <p className="font-mono text-lg sm:text-xl text-logo-green mb-6">
               {content.subtitle}
             </p>
-            <p className="font-mono text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">
+            <p className="font-mono text-sm sm:text-base text-foreground/80 max-w-2xl leading-relaxed border-l-2 border-destructive pl-4">
               {content.intro}
             </p>
           </div>
 
-          {/* Mission Statement */}
-          <div className="border border-logo-green/30 bg-logo-green/5 p-6 sm:p-10 mb-12 sm:mb-16">
-            <div className="flex items-start gap-4 mb-6">
-              <Sparkles className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
+          {/* Mission Statement - VHS aesthetic with red/green/white */}
+          <div className="relative border border-border bg-card p-6 sm:p-10 mb-12 sm:mb-16 overflow-hidden group hover:border-logo-green/50 transition-colors">
+            {/* Top accent line - red to green gradient */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-destructive via-logo-green/50 to-transparent" />
+            
+            {/* VHS scan line overlay */}
+            <div 
+              className="absolute inset-0 pointer-events-none opacity-30"
+              style={{
+                background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.03) 2px, rgba(0,255,136,0.03) 4px)',
+              }}
+            />
+            
+            <div className="relative flex items-start gap-4 mb-6">
+              <Sparkles className="w-8 h-8 text-destructive flex-shrink-0 mt-1" />
               <div>
-                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-4">
+                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-4 text-foreground">
                   {content.mission.title}
                 </h2>
-                <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-6">
+                <p className="font-mono text-sm text-foreground/70 leading-relaxed mb-6">
                   {content.mission.text}
                 </p>
                 <ul className="space-y-2">
                   {content.mission.points.map((point, i) => (
                     <li key={i} className="font-mono text-xs text-foreground flex items-start gap-2">
-                      <span className="text-logo-green mt-0.5">◆</span>
+                      <span className="text-destructive mt-0.5">◆</span>
                       {point}
                     </li>
                   ))}
@@ -172,19 +183,22 @@ const TechnopediaPage = () => {
             {content.sections.map((section, index) => (
               <div 
                 key={index}
-                className="border border-border p-6 sm:p-8 hover:border-logo-green/30 transition-colors group"
+                className="relative border border-border p-6 sm:p-8 hover:border-logo-green/50 transition-all group overflow-hidden"
               >
+                {/* Left accent line - alternating red/green */}
+                <div className={`absolute left-0 top-0 bottom-0 w-[2px] ${index % 2 === 0 ? 'bg-destructive' : 'bg-logo-green'}`} />
+                
                 <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 border border-border flex items-center justify-center group-hover:border-logo-green/50 transition-colors">
-                      <section.icon className="w-6 h-6 text-logo-green" />
+                    <div className={`w-12 h-12 border flex items-center justify-center transition-colors ${index % 2 === 0 ? 'border-destructive/50 group-hover:border-destructive' : 'border-logo-green/50 group-hover:border-logo-green'}`}>
+                      <section.icon className={`w-6 h-6 ${index % 2 === 0 ? 'text-destructive' : 'text-logo-green'}`} />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-wide mb-4 group-hover:text-logo-green transition-colors">
+                    <h2 className="font-mono text-xl sm:text-2xl uppercase tracking-wide mb-4 text-foreground group-hover:text-logo-green transition-colors">
                       {section.title}
                     </h2>
-                    <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-4">
+                    <p className="font-mono text-sm text-foreground/70 leading-relaxed mb-4">
                       {section.description}
                     </p>
                     
@@ -193,21 +207,21 @@ const TechnopediaPage = () => {
                         {statsLoading ? (
                           <div className="col-span-3 flex items-center gap-2">
                             <Loader2 className="w-4 h-4 animate-spin text-logo-green" />
-                            <span className="font-mono text-xs text-muted-foreground">Loading stats...</span>
+                            <span className="font-mono text-xs text-foreground/50">Loading stats...</span>
                           </div>
                         ) : (
                           <>
                             <div>
-                              <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.artists || 0}</div>
-                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Artists</div>
+                              <div className="font-mono text-2xl sm:text-3xl text-logo-green">{stats?.artists || 0}</div>
+                              <div className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Artists</div>
                             </div>
                             <div>
-                              <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.gear || 0}</div>
-                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Gear Items</div>
+                              <div className="font-mono text-2xl sm:text-3xl text-destructive">{stats?.gear || 0}</div>
+                              <div className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Gear Items</div>
                             </div>
                             <div>
                               <div className="font-mono text-2xl sm:text-3xl text-foreground">{stats?.labels || 0}</div>
-                              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">Labels</div>
+                              <div className="font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Labels</div>
                             </div>
                           </>
                         )}
@@ -216,7 +230,7 @@ const TechnopediaPage = () => {
                     
                     {section.cta && (
                       <Link to={section.cta.path}>
-                        <Button variant="outline" size="sm" className="mt-4 hover:bg-logo-green hover:text-background hover:border-logo-green">
+                        <Button variant="outline" size="sm" className="mt-4 border-logo-green/50 text-logo-green hover:bg-logo-green hover:text-background hover:border-logo-green">
                           {section.cta.label}
                         </Button>
                       </Link>
@@ -228,15 +242,18 @@ const TechnopediaPage = () => {
           </div>
 
           {/* Contribute Section with Form */}
-          <div id="contribute" className="border border-logo-green/30 bg-card mb-12 sm:mb-16">
+          <div id="contribute" className="relative border border-border bg-card mb-12 sm:mb-16 overflow-hidden">
+            {/* Top gradient line */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-logo-green via-destructive to-transparent" />
+            
             <div className="p-6 sm:p-10 border-b border-border">
               <div className="flex items-start gap-4 mb-6">
                 <Handshake className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
                 <div>
-                  <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2">
+                  <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2 text-foreground">
                     {content.contribute.title}
                   </h2>
-                  <p className="font-mono text-sm text-muted-foreground">
+                  <p className="font-mono text-sm text-foreground/70">
                     {content.contribute.description}
                   </p>
                 </div>
@@ -244,8 +261,8 @@ const TechnopediaPage = () => {
               
               <div className="grid sm:grid-cols-2 gap-3 pl-12">
                 {content.contribute.examples.map((item, i) => (
-                  <div key={i} className="font-mono text-xs text-muted-foreground flex items-start gap-2">
-                    <span className="text-logo-green">→</span>
+                  <div key={i} className="font-mono text-xs text-foreground/60 flex items-start gap-2">
+                    <span className="text-destructive">→</span>
                     {item}
                   </div>
                 ))}
@@ -258,17 +275,20 @@ const TechnopediaPage = () => {
           </div>
 
           {/* Sponsor Section */}
-          <div className="border border-border p-6 sm:p-10 mb-12">
+          <div className="relative border border-border p-6 sm:p-10 mb-12 overflow-hidden group hover:border-destructive/50 transition-colors">
+            {/* Left accent line - red */}
+            <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-destructive" />
+            
             <div className="flex items-start gap-4 mb-6">
-              <Gift className="w-8 h-8 text-logo-green flex-shrink-0 mt-1" />
+              <Gift className="w-8 h-8 text-destructive flex-shrink-0 mt-1" />
               <div>
-                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2">
+                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-2 text-foreground">
                   {content.sponsor.title}
                 </h2>
-                <p className="font-mono text-sm text-muted-foreground mb-4">
+                <p className="font-mono text-sm text-foreground/70 mb-4">
                   {content.sponsor.description}
                 </p>
-                <p className="font-mono text-xs text-logo-green/80 italic">
+                <p className="font-mono text-xs text-destructive/80 italic">
                   {content.sponsor.note}
                 </p>
               </div>
@@ -276,7 +296,7 @@ const TechnopediaPage = () => {
             
             <div className="pl-12 mt-6">
               <a href="mailto:hello@techno.dog">
-                <Button variant="outline" className="hover:bg-logo-green hover:text-background hover:border-logo-green">
+                <Button variant="outline" className="border-destructive/50 text-destructive hover:bg-destructive hover:text-white hover:border-destructive">
                   {content.sponsor.cta}
                 </Button>
               </a>
@@ -285,20 +305,27 @@ const TechnopediaPage = () => {
 
           {/* Quick Links */}
           <div className="pt-8 border-t border-border">
-            <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-6">
+            <div className="font-mono text-xs text-destructive uppercase tracking-widest mb-6">
               // Explore the Archive
             </div>
             <div className="flex flex-wrap gap-3">
               {[
-                { label: 'Artists', path: '/artists' },
-                { label: 'Festivals', path: '/festivals' },
-                { label: 'Venues', path: '/venues' },
-                { label: 'Labels', path: '/labels' },
-                { label: 'Gear', path: '/gear' },
-                { label: 'Developer API', path: '/developer' },
+                { label: 'Artists', path: '/artists', color: 'green' },
+                { label: 'Festivals', path: '/festivals', color: 'red' },
+                { label: 'Venues', path: '/venues', color: 'green' },
+                { label: 'Labels', path: '/labels', color: 'red' },
+                { label: 'Gear', path: '/gear', color: 'green' },
+                { label: 'Developer API', path: '/developer', color: 'red' },
               ].map((link) => (
                 <Link key={link.path} to={link.path}>
-                  <Button variant="outline" size="sm" className="hover:text-logo-green hover:border-logo-green">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={link.color === 'green' 
+                      ? "border-logo-green/50 text-logo-green hover:bg-logo-green hover:text-background hover:border-logo-green" 
+                      : "border-destructive/50 text-destructive hover:bg-destructive hover:text-white hover:border-destructive"
+                    }
+                  >
                     {link.label}
                   </Button>
                 </Link>
