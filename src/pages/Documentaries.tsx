@@ -5,6 +5,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Film, Play, Search, X, Loader2, LayoutGrid, List, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { VHSDocumentaryCard } from "@/components/documentaries/VHSDocumentaryCard";
 
 interface Category {
   id: string;
@@ -227,84 +228,26 @@ const Documentaries = () => {
           </div>
         )}
 
-        {/* Grid View */}
+        {/* Grid View - VHS Style */}
         {!isLoading && viewMode === "grid" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDocs.map((doc) => (
-              <article 
+            {filteredDocs.map((doc, index) => (
+              <VHSDocumentaryCard
                 key={doc.id}
-                className="group border border-border/50 bg-card/30 hover:border-logo-green/30 transition-colors"
-              >
-                {/* Thumbnail / Video */}
-                <div className="relative aspect-video overflow-hidden bg-black">
-                  {playingVideo === doc.youtube_video_id ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${doc.youtube_video_id}?autoplay=1`}
-                      title={doc.title}
-                      className="absolute inset-0 w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <>
-                      <img
-                        src={doc.thumbnail_url || `https://img.youtube.com/vi/${doc.youtube_video_id}/hqdefault.jpg`}
-                        alt={doc.title}
-                        className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
-                        loading="lazy"
-                      />
-                      {/* VHS Overlay */}
-                      <div className="absolute inset-0 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
-                      
-                      {/* Play Button */}
-                      <button
-                        onClick={() => setPlayingVideo(doc.youtube_video_id)}
-                        className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <div className="w-16 h-16 rounded-full bg-crimson/90 flex items-center justify-center">
-                          <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                        </div>
-                      </button>
-                      
-                      {/* Duration Badge */}
-                      {doc.duration && (
-                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-mono px-1.5 py-0.5">
-                          {formatDuration(doc.duration)}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-mono text-sm text-foreground leading-tight mb-2 line-clamp-2 group-hover:text-logo-green transition-colors">
-                    {doc.title}
-                  </h3>
-                  
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground mb-3">
-                    {doc.channel_name && <span>{doc.channel_name}</span>}
-                    {doc.view_count && (
-                      <>
-                        <span>•</span>
-                        <span>{formatViews(doc.view_count)}</span>
-                      </>
-                    )}
-                  </div>
-
-                  {doc.why_watch && (
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-3">
-                      {doc.why_watch}
-                    </p>
-                  )}
-
-                  {doc.category && (
-                    <span className="inline-block text-[9px] font-mono uppercase tracking-widest text-logo-green border border-logo-green/30 px-2 py-0.5">
-                      {doc.category.name}
-                    </span>
-                  )}
-                </div>
-              </article>
+                videoId={doc.youtube_video_id}
+                title={doc.title}
+                thumbnailUrl={doc.thumbnail_url}
+                channelName={doc.channel_name}
+                duration={doc.duration}
+                viewCount={doc.view_count}
+                whyWatch={doc.why_watch}
+                category={doc.category || null}
+                isPlaying={playingVideo === doc.youtube_video_id}
+                frameNumber={String(index + 1).padStart(2, "0")}
+                onPlay={() => setPlayingVideo(doc.youtube_video_id)}
+                formatDuration={formatDuration}
+                formatViews={formatViews}
+              />
             ))}
           </div>
         )}
