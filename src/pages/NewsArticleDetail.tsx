@@ -334,28 +334,35 @@ const NewsArticleDetail = () => {
         {/* Full-width hero section */}
         <div className="w-full mb-12">
           {/* Hero Photo Placeholder */}
-          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-muted/50 via-muted/30 to-background border-y border-border overflow-hidden">
+          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-muted/50 via-muted/30 to-background border-y border-destructive/30 overflow-hidden">
+            {/* Red accent line at top */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <Camera className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground/50">
+                <Camera className="w-16 h-16 text-destructive/30 mx-auto mb-4" />
+                <span className="font-mono text-xs uppercase tracking-[0.3em] text-destructive/50">
                   Featured photograph
                 </span>
               </div>
             </div>
-            {/* Decorative grid overlay */}
-            <div className="absolute inset-0 opacity-5" style={{
-              backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+            {/* Decorative grid overlay with subtle red tint */}
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: 'linear-gradient(to right, hsl(0 84% 60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(0 84% 60%) 1px, transparent 1px)',
               backgroundSize: '40px 40px'
             }} />
+            {/* Red accent line at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent" />
           </div>
 
           {/* Article Header - Full width */}
           <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 mt-10">
             <header className="max-w-6xl mx-auto">
+              {/* Red decorative line */}
+              <div className="w-16 h-[2px] bg-destructive mb-6" />
+              
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 {article.city_tags?.map(tag => (
-                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest">
+                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest border-destructive/50 text-destructive">
                     {tag}
                   </Badge>
                 ))}
@@ -376,9 +383,9 @@ const NewsArticleDetail = () => {
                 </p>
               )}
 
-              <div className="flex items-center gap-6 font-mono text-sm text-muted-foreground border-t border-border pt-6">
-                <span className="font-semibold text-foreground">By {article.author_pseudonym}</span>
-                <span className="text-border">|</span>
+              <div className="flex items-center gap-6 font-mono text-sm text-muted-foreground border-t border-destructive/30 pt-6">
+                <span className="font-semibold text-destructive">By {article.author_pseudonym}</span>
+                <span className="text-destructive/50">|</span>
                 <span className="font-light">{formatDate(article.published_at || article.created_at)}</span>
               </div>
             </header>
