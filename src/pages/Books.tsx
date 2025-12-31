@@ -5,6 +5,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { BookSuggestionForm } from "@/components/books/BookSuggestionForm";
 
 interface Category {
   id: string;
@@ -286,8 +287,13 @@ const Books = () => {
           </div>
         )}
 
+        {/* Suggestion Form */}
+        <div className="mt-16 border-t border-border pt-12">
+          <BookSuggestionForm />
+        </div>
+
         {/* Footer Note */}
-        <div className="mt-16 border-t border-border pt-8">
+        <div className="mt-12 border-t border-border pt-8">
           <p className="font-mono text-xs text-muted-foreground text-center max-w-xl mx-auto">
             This list is curated to align with techno.dog's mission: culture, movements, gear, and art. 
             No affiliate links. Support your local bookshop when possible.
