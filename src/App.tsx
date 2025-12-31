@@ -142,7 +142,7 @@ const App = () => (
                     <Route path="/news/article/:id" element={<NewsArticleDetail />} />
                     <Route path="/news/:id" element={<NewsArticleDetail />} />
                     <Route path="/news/archive" element={<NewsArchive />} />
-                    <Route path="/news/features" element={<News />} />
+                    <Route path="/news/features" element={<Navigate to="/news" replace />} />
                     
                     {/* Admin */}
                     <Route path="/admin/news-agent" element={<NewsAgentAdmin />} />
@@ -206,7 +206,7 @@ const App = () => (
                     
                     {/* User Stories (under News) */}
                     <Route path="/news/your-stories" element={<UserStories />} />
-                    <Route path="/mad/stories" element={<UserStories />} /> {/* Legacy redirect */}
+                    <Route path="/mad/stories" element={<Navigate to="/news/your-stories" replace />} />
                     
                     {/* Gear */}
                     <Route path="/gear" element={<Gear />} />
@@ -214,7 +214,7 @@ const App = () => (
                     
                     {/* Developers (merged docs + API) */}
                     <Route path="/developer" element={<Developer />} />
-                    <Route path="/docs" element={<Developer />} />
+                    <Route path="/docs" element={<Navigate to="/developer" replace />} />
                     <Route path="/api-docs" element={<ApiDocs />} />
                     
                     {/* Analytics (Admin only) */}
