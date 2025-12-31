@@ -376,7 +376,7 @@ const DogChat = () => {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-br-md'
+                      ? 'bg-transparent'
                       : 'bg-muted/50 border border-border/50 rounded-bl-md'
                   }`}
                 >
@@ -407,10 +407,18 @@ const DogChat = () => {
                       )}
                     </div>
                   )}
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed font-normal text-foreground/80">
+                  <p className={`text-sm whitespace-pre-wrap leading-relaxed font-normal ${
+                    message.role === 'user' 
+                      ? 'text-crimson' 
+                      : 'text-foreground'
+                  }`}>
                     {message.content}
                   </p>
-                  <p className="text-[10px] opacity-50 mt-1.5 font-mono">
+                  <p className={`text-[10px] mt-1.5 font-mono ${
+                    message.role === 'user' 
+                      ? 'text-crimson/50' 
+                      : 'opacity-50'
+                  }`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
