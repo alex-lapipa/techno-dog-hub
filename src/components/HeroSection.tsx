@@ -1,7 +1,8 @@
-import { ArrowRight, Dog } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import DogSilhouette from "@/components/DogSilhouette";
 
 const HeroSection = () => {
   const { t } = useLanguage();
@@ -26,100 +27,120 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content - Two column layout */}
       <div className="relative z-10 container mx-auto px-4 md:px-8 pt-20 pb-24">
-        <div className="max-w-4xl space-y-12">
-          {/* Terminal header */}
-          <div className="font-mono text-xs text-muted-foreground tracking-wider" aria-hidden="true">
-            <span className="text-foreground">user@techno.dog</span>
-            <span className="text-muted-foreground">:</span>
-            <span className="text-foreground">~</span>
-            <span className="text-muted-foreground">$ </span>
-            <span className="animate-flicker">{t('hero.terminal')}</span>
-            <span className="animate-blink">_</span>
-          </div>
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16">
+          {/* Left column - Text content */}
+          <div className="max-w-2xl space-y-12 flex-1">
+            {/* Terminal header */}
+            <div className="font-mono text-xs text-muted-foreground tracking-wider" aria-hidden="true">
+              <span className="text-foreground">user@techno.dog</span>
+              <span className="text-muted-foreground">:</span>
+              <span className="text-foreground">~</span>
+              <span className="text-muted-foreground">$ </span>
+              <span className="animate-flicker">{t('hero.terminal')}</span>
+              <span className="animate-blink">_</span>
+            </div>
 
-          {/* Main title */}
-          <header className="space-y-4">
-            <h1 
-              id="hero-title"
-              className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]"
-              itemProp="headline"
+            {/* Main title */}
+            <header className="space-y-4">
+              <h1 
+                id="hero-title"
+                className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]"
+                itemProp="headline"
+              >
+                <span className="block text-foreground">
+                  techno<span className="text-logo-green">.</span>dog
+                </span>
+                <span className="block text-foreground animate-glitch-hover text-2xl md:text-4xl lg:text-5xl mt-2">{t('hero.subtitle')}</span>
+              </h1>
+            </header>
+
+            {/* Mission tagline */}
+            <p 
+              className="font-mono text-sm md:text-lg text-foreground/90 max-w-2xl leading-relaxed border-l-2 border-primary pl-4"
+              itemProp="description"
             >
-              <span className="block text-foreground">
-                techno<span className="text-logo-green">.</span>dog
-              </span>
-              <span className="block text-foreground animate-glitch-hover text-2xl md:text-4xl lg:text-5xl mt-2">{t('hero.subtitle')}</span>
-            </h1>
-          </header>
+              {t('hero.tagline')}
+            </p>
 
-          {/* Mission tagline */}
-          <p 
-            className="font-mono text-sm md:text-lg text-foreground/90 max-w-2xl leading-relaxed border-l-2 border-primary pl-4"
-            itemProp="description"
-          >
-            {t('hero.tagline')}
-          </p>
+            {/* Description */}
+            <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-xl leading-relaxed tracking-wide">
+              {t('hero.description')}
+            </p>
 
-          {/* Description */}
-          <p className="font-mono text-xs md:text-sm text-muted-foreground max-w-xl leading-relaxed tracking-wide">
-            {t('hero.description')}
-          </p>
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button variant="brutalist" size="lg">
+                {t('hero.explore')}
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+              <Button variant="terminal" size="lg">
+                Aquasella 2025
+              </Button>
+            </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <Button variant="brutalist" size="lg">
-              {t('hero.explore')}
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Button variant="terminal" size="lg">
-              Aquasella 2025
-            </Button>
+            {/* Secondary links */}
+            <div className="flex flex-wrap gap-6 font-mono text-xs text-muted-foreground">
+              <Link to="/submit" className="hover:text-foreground transition-colors underline underline-offset-4">
+                Contribute
+              </Link>
+              <Link to="/doggies" className="hover:text-foreground transition-colors underline underline-offset-4 flex items-center gap-1">
+                <DogSilhouette className="w-3 h-3" />
+                Doggies
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <aside 
+              className="grid grid-cols-3 gap-8 pt-12 border-t border-border"
+              aria-label="Platform statistics"
+              itemScope
+              itemType="https://schema.org/AggregateRating"
+            >
+              <div itemProp="ratingCount">
+                <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
+                  150+
+                </div>
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
+                  {t('hero.festivals')}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
+                  25
+                </div>
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
+                  {t('hero.countries')}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
+                  2M+
+                </div>
+                <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
+                  {t('hero.attendees')}
+                </div>
+              </div>
+            </aside>
           </div>
 
-          {/* Secondary links */}
-          <div className="flex flex-wrap gap-6 font-mono text-xs text-muted-foreground">
-            <Link to="/submit" className="hover:text-foreground transition-colors underline underline-offset-4">
-              Contribute
-            </Link>
-            <Link to="/doggies" className="hover:text-foreground transition-colors underline underline-offset-4 flex items-center gap-1">
-              <Dog className="w-3 h-3" />
-              Doggies
-            </Link>
+          {/* Right column - Techno Dog mascot */}
+          <div className="hidden lg:flex items-center justify-center flex-shrink-0" aria-hidden="true">
+            <div className="relative">
+              {/* Glow effect behind the dog */}
+              <div className="absolute inset-0 blur-3xl bg-logo-green/10 rounded-full scale-150" />
+              
+              {/* Main Dog Silhouette - Leader of the pack */}
+              <DogSilhouette 
+                className="w-64 h-64 xl:w-80 xl:h-80 relative z-10 drop-shadow-[0_0_40px_hsl(100_100%_60%/0.4)] transition-transform duration-700 hover:scale-105 hover:rotate-3" 
+                animated={false}
+              />
+              
+              {/* Decorative ring */}
+              <div className="absolute inset-0 border-2 border-logo-green/20 rounded-full scale-125 animate-pulse" style={{ animationDuration: '3s' }} />
+            </div>
           </div>
-
-          {/* Stats */}
-          <aside 
-            className="grid grid-cols-3 gap-8 pt-12 border-t border-border"
-            aria-label="Platform statistics"
-            itemScope
-            itemType="https://schema.org/AggregateRating"
-          >
-            <div itemProp="ratingCount">
-              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
-                150+
-              </div>
-              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                {t('hero.festivals')}
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
-                25
-              </div>
-              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                {t('hero.countries')}
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
-                2M+
-              </div>
-              <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                {t('hero.attendees')}
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
 
