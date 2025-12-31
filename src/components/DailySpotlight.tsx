@@ -204,7 +204,7 @@ const DailySpotlight = () => {
           {/* Latest News */}
           {news ? (
             <Link 
-              to={`/news/${news.id}`}
+              to={`/news/article/${news.id}`}
               className="group block border border-border p-6 hover:bg-card transition-colors"
             >
               <div className="flex items-center gap-3 mb-4">
