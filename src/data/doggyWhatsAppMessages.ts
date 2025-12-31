@@ -468,9 +468,9 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     packInvite: "Question everything"
   },
   'ron': {
-    intro: "I'm the Ron Dog",
-    quote: "Open source everything. Build in public. Studio sessions til sunrise.",
-    packInvite: "Fork the future"
+    intro: "I'm the Ron Dog — mad technologist from Los Angeles, now building the future from Asturias",
+    quote: "Open source everything. Guitar riffs at 4am. Robots in the studio. Cider in hand. The revolution is collaborative.",
+    packInvite: "Fork the future with us"
   }
 };
 
