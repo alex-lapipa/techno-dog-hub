@@ -13,6 +13,8 @@ export interface Festival {
   capacity?: number;
   historicLineups?: string[];
   coords?: { lat: number; lng: number };
+  image?: string;
+  images?: string[];
 }
 
 export const festivals: Festival[] = [
@@ -92,7 +94,9 @@ export const festivals: Festival[] = [
     description: "International festival of advanced music and new media art. Day and night programs.",
     stages: ["SonarHall", "SonarPub", "SonarClub", "SonarVillage"],
     capacity: 100000,
-    coords: { lat: 41.3879, lng: 2.1699 }
+    coords: { lat: 41.3879, lng: 2.1699 },
+    image: "/festivals/sonar-2015.jpg",
+    historicLineups: ["Richie Hawtin", "Jeff Mills", "Laurent Garnier", "Aphex Twin", "Autechre"]
   },
   {
     id: "mira",
