@@ -1,10 +1,18 @@
 // AI utility functions for edge functions
+// 
+// ARCHITECTURE NOTE (2025-01):
+// - Embeddings: Use this file (OpenAI text-embedding-3-small)
+// - Chat/Completions: Use lovable-ai.ts (Lovable AI Gateway)
+// - This file maintains backwards compatibility by routing chat through the gateway
 
 const OPENAI_EMBEDDING_MODEL = 'text-embedding-3-small';
 const OPENAI_EMBEDDING_DIMENSIONS = 1536;
 const MAX_EMBEDDING_TEXT_LENGTH = 8000;
 
-// Generate embeddings using OpenAI API
+// Lovable AI Gateway for chat completions (unified routing)
+const LOVABLE_AI_GATEWAY = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+
+// Generate embeddings using OpenAI API (primary use case for this file)
 export async function generateEmbedding(
   text: string,
   apiKey?: string
@@ -47,7 +55,11 @@ export async function generateEmbedding(
   }
 }
 
-// Generate chat completion using OpenAI API
+/**
+ * Generate chat completion - NOW ROUTES THROUGH LOVABLE AI GATEWAY
+ * @deprecated Prefer importing from lovable-ai.ts for new code
+ * This function is maintained for backwards compatibility
+ */
 export async function generateChatCompletion(
   messages: Array<{ role: string; content: string }>,
   options: {
@@ -61,13 +73,45 @@ export async function generateChatCompletion(
     model = 'google/gemini-2.5-flash',
     temperature = 0.7,
     maxTokens = 1000,
-    apiKey,
   } = options;
 
-  const openaiKey = apiKey || Deno.env.get('OPENAI_API_KEY');
+  // Route through Lovable AI Gateway for unified billing and routing
+  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+  
+  if (lovableKey) {
+    try {
+      const response = await fetch(LOVABLE_AI_GATEWAY, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature,
+          max_tokens: maxTokens,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Lovable AI Gateway error:', response.status, error);
+        // Fall through to OpenAI fallback
+      } else {
+        const data = await response.json();
+        return data.choices[0]?.message?.content || null;
+      }
+    } catch (error) {
+      console.error('Lovable AI Gateway error, falling back to OpenAI:', error);
+    }
+  }
+
+  // Fallback to direct OpenAI if gateway unavailable
+  const openaiKey = options.apiKey || Deno.env.get('OPENAI_API_KEY');
   
   if (!openaiKey) {
-    console.error('Missing OPENAI_API_KEY');
+    console.error('No API key available (LOVABLE_API_KEY or OPENAI_API_KEY)');
     return null;
   }
 
@@ -79,7 +123,7 @@ export async function generateChatCompletion(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: model.startsWith('google/') ? 'gpt-4o-mini' : model, // Map Gemini to GPT for fallback
         messages,
         temperature,
         max_tokens: maxTokens,
@@ -88,7 +132,7 @@ export async function generateChatCompletion(
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('OpenAI chat error:', error);
+      console.error('OpenAI fallback error:', error);
       return null;
     }
 
@@ -100,7 +144,11 @@ export async function generateChatCompletion(
   }
 }
 
-// Stream chat completion (returns ReadableStream)
+/**
+ * Stream chat completion - NOW ROUTES THROUGH LOVABLE AI GATEWAY
+ * @deprecated Prefer importing from lovable-ai.ts for new code
+ * This function is maintained for backwards compatibility
+ */
 export async function streamChatCompletion(
   messages: Array<{ role: string; content: string }>,
   options: {
@@ -114,13 +162,45 @@ export async function streamChatCompletion(
     model = 'google/gemini-2.5-flash',
     temperature = 0.7,
     maxTokens = 1000,
-    apiKey,
   } = options;
 
-  const openaiKey = apiKey || Deno.env.get('OPENAI_API_KEY');
+  // Route through Lovable AI Gateway for unified billing and routing
+  const lovableKey = Deno.env.get('LOVABLE_API_KEY');
+  
+  if (lovableKey) {
+    try {
+      const response = await fetch(LOVABLE_AI_GATEWAY, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature,
+          max_tokens: maxTokens,
+          stream: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Lovable AI Gateway stream error:', response.status, error);
+        // Fall through to OpenAI fallback
+      } else {
+        return response.body;
+      }
+    } catch (error) {
+      console.error('Lovable AI Gateway error, falling back to OpenAI:', error);
+    }
+  }
+
+  // Fallback to direct OpenAI if gateway unavailable
+  const openaiKey = options.apiKey || Deno.env.get('OPENAI_API_KEY');
   
   if (!openaiKey) {
-    console.error('Missing OPENAI_API_KEY');
+    console.error('No API key available (LOVABLE_API_KEY or OPENAI_API_KEY)');
     return null;
   }
 
@@ -132,7 +212,7 @@ export async function streamChatCompletion(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: model.startsWith('google/') ? 'gpt-4o-mini' : model,
         messages,
         temperature,
         max_tokens: maxTokens,
@@ -142,7 +222,7 @@ export async function streamChatCompletion(
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('OpenAI stream error:', error);
+      console.error('OpenAI stream fallback error:', error);
       return null;
     }
 

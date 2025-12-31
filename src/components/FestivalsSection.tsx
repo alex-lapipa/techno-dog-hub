@@ -1,16 +1,19 @@
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { festivals as allFestivals } from "@/data/festivals";
 
 interface FestivalCardProps {
+  id: string;
   name: string;
   location: string;
   date: string;
   index: number;
 }
 
-const FestivalCard = ({ name, location, date, index }: FestivalCardProps) => {
+const FestivalCard = ({ id, name, location, date, index }: FestivalCardProps) => {
   return (
-    <a
-      href={`#${name.toLowerCase().replace(/\s/g, "-")}`}
+    <Link
+      to={`/festivals/${id}`}
       className="group block border-b border-border py-6 hover:bg-muted/30 transition-colors px-4 -mx-4"
     >
       <div className="flex items-center justify-between gap-4">
@@ -41,22 +44,37 @@ const FestivalCard = ({ name, location, date, index }: FestivalCardProps) => {
           <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
         </div>
       </div>
-    </a>
+    </Link>
   );
 };
 
-const festivals = [
-  { name: "Aquasella", location: "Arriondas, Asturias", date: "Ago 2025" },
-  { name: "L.E.V. Festival", location: "Gijón, Asturias", date: "May 2025" },
-  { name: "Sónar", location: "Barcelona", date: "Jun 2025" },
-  { name: "Awakenings", location: "Ámsterdam", date: "Jul 2025" },
-  { name: "Dekmantel", location: "Ámsterdam", date: "Ago 2025" },
-  { name: "Time Warp", location: "Mannheim", date: "Abr 2025" },
-  { name: "Mira Festival", location: "Barcelona", date: "Nov 2025" },
-  { name: "Atonal", location: "Berlín", date: "Ago 2025" },
-];
+// Helper to format month for display
+const formatMonthsForDisplay = (months: string[]): string => {
+  const monthAbbrev: { [key: string]: string } = {
+    'January': 'Ene', 'February': 'Feb', 'March': 'Mar', 'April': 'Abr',
+    'May': 'May', 'June': 'Jun', 'July': 'Jul', 'August': 'Ago',
+    'September': 'Sep', 'October': 'Oct', 'November': 'Nov', 'December': 'Dic'
+  };
+  const first = months[0];
+  return `${monthAbbrev[first] || first} 2025`;
+};
+
+// Get featured festivals from the verified database - prioritize active festivals with upcoming dates
+const getFeaturedFestivals = () => {
+  return allFestivals
+    .filter(f => f.active)
+    .slice(0, 8)
+    .map(f => ({
+      id: f.id,
+      name: f.name,
+      location: `${f.city}, ${f.country}`,
+      date: formatMonthsForDisplay(f.months)
+    }));
+};
 
 const FestivalsSection = () => {
+  const featuredFestivals = getFeaturedFestivals();
+
   return (
     <section id="festivales" className="py-24 bg-background border-t border-border">
       <div className="container mx-auto px-4 md:px-8">
@@ -72,14 +90,22 @@ const FestivalsSection = () => {
 
         {/* List */}
         <div className="border-t border-border">
-          {festivals.map((festival, index) => (
-            <FestivalCard key={festival.name} {...festival} index={index + 1} />
+          {featuredFestivals.map((festival, index) => (
+            <FestivalCard key={festival.id} {...festival} index={index + 1} />
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 font-mono text-xs text-muted-foreground">
-          Mostrando {festivals.length} de 150+ festivales
+        {/* Footer - show actual count from database */}
+        <div className="mt-8 flex items-center justify-between">
+          <span className="font-mono text-xs text-muted-foreground">
+            Mostrando {featuredFestivals.length} de {allFestivals.length} festivales
+          </span>
+          <Link 
+            to="/festivals" 
+            className="font-mono text-xs text-crimson hover:text-crimson/80 transition-colors flex items-center gap-1"
+          >
+            Ver todos <ArrowUpRight className="w-3 h-3" />
+          </Link>
         </div>
       </div>
     </section>

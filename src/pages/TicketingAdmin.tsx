@@ -41,8 +41,8 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 export default function TicketingAdmin() {
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
-  const [embedOrgSlug, setEmbedOrgSlug] = useState('your-org');
-  const [embedEventSlug, setEmbedEventSlug] = useState('your-event');
+  const [embedOrgSlug, setEmbedOrgSlug] = useState('');
+  const [embedEventSlug, setEmbedEventSlug] = useState('');
   const [embedColor, setEmbedColor] = useState('#dc2626');
   const [showPreview, setShowPreview] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -698,7 +698,7 @@ export default function TicketingAdmin() {
                           onChange={(e) => setEmbedOrgSlug(e.target.value)}
                           className="w-full bg-zinc-800 border border-border rounded-md px-3 py-2 text-sm font-mono"
                         >
-                          <option value="your-org">your-org (example)</option>
+                          <option value="" disabled>Select organization...</option>
                           {organizations.map(org => (
                             <option key={org.id} value={org.slug}>{org.slug}</option>
                           ))}
@@ -711,7 +711,7 @@ export default function TicketingAdmin() {
                           onChange={(e) => setEmbedEventSlug(e.target.value)}
                           className="w-full bg-zinc-800 border border-border rounded-md px-3 py-2 text-sm font-mono"
                         >
-                          <option value="your-event">your-event (example)</option>
+                          <option value="" disabled>Select event...</option>
                           {events
                             .filter(e => e.status === 'published')
                             .map(event => (

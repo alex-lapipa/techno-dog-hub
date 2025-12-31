@@ -2,6 +2,7 @@
 // ZERO TOLERANCE HALLUCINATION POLICY
 // Uses Lovable AI, Anthropic, and OpenAI with strict cross-validation
 // Only facts confirmed by 2+ models are accepted
+// OPTIMIZATION: Includes response caching to avoid redundant API calls
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
@@ -10,6 +11,21 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Simple hash function for cache keys
+function hashPrompt(text: string): string {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'cache_' + Math.abs(hash).toString(36);
+}
+
+// In-memory cache for this request cycle (persists across invocations for ~5 min in Deno Deploy)
+const responseCache = new Map<string, { data: string; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minute cache
 
 interface ResearchRequest {
   action: 'research_artist' | 'research_batch' | 'full_pipeline' | 'verify_claims' | 'audit' | 'status' | 'research_gear' | 'gear_batch';
