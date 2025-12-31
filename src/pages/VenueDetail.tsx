@@ -1,11 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Users, Volume2, Building2, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import { getVenueById, venues } from "@/data/venues";
+import { getVenueById, venues, isVenueOpen } from "@/data/venues";
 import { PageLayout } from "@/components/layout";
 import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
 import YouTubeVideos from "@/components/YouTubeVideos";
+import { cn } from "@/lib/utils";
 
 const VenueDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -215,8 +216,19 @@ const VenueDetail = () => {
             {/* Venue Info */}
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-2">
-                  // {typeLabels[venue.type] || venue.type}
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+                    // {typeLabels[venue.type] || venue.type}
+                  </div>
+                  {/* Status Badge */}
+                  <span className={cn(
+                    "font-mono text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 border",
+                    isVenueOpen(venue) 
+                      ? "bg-logo-green/90 text-background border-logo-green" 
+                      : "bg-crimson/80 text-white border-crimson"
+                  )}>
+                    {isVenueOpen(venue) ? "STILL OPEN" : "CLOSED"}
+                  </span>
                 </div>
                 <h1 className="font-mono text-2xl sm:text-4xl lg:text-5xl xl:text-6xl uppercase tracking-tight mb-2 hover:animate-glitch break-words">
                   {venue.name}

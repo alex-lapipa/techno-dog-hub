@@ -6,5 +6,7 @@ export {
   getVenueById, 
   getVenuesByCity, 
   getVenuesByType, 
-  getActiveVenues 
+  getActiveVenues,
+  getClosedVenues,
+  isVenueOpen
 } from './venues-legacy';

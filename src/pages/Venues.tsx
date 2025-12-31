@@ -7,17 +7,25 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { cn } from "@/lib/utils";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
+type StatusFilter = "all" | "open" | "closed";
 
 const regionLabels: Record<RegionFilter, string> = {
-  "all": "All",
+  "all": "All Regions",
   "europe": "Europe",
   "north-america": "North America",
   "south-america": "South America",
   "asia": "Asia",
   "oceania": "Oceania",
   "africa": "Africa"
+};
+
+const statusLabels: Record<StatusFilter, string> = {
+  "all": "All Venues",
+  "open": "Still Open",
+  "closed": "Closed / Historic"
 };
 
 const countryToRegion: Record<string, RegionFilter> = {
@@ -39,29 +47,52 @@ const countryToRegion: Record<string, RegionFilter> = {
   "South Africa": "africa", "Egypt": "africa", "Morocco": "africa", "Nigeria": "africa",
 };
 
+// Helper to check if venue is currently open based on "active" field
+const isVenueOpen = (active: string | undefined): boolean => {
+  if (!active) return false;
+  return active.toLowerCase().includes('present');
+};
+
 const VenuesPage = () => {
   const prefetchVenue = usePrefetchVenue();
   const { data: venues = [], isLoading } = useVenues();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Sync region from URL
+  // Sync filters from URL
   const regionFromUrl = searchParams.get("region") as RegionFilter | null;
+  const statusFromUrl = searchParams.get("status") as StatusFilter | null;
+  
   const [selectedRegion, setSelectedRegion] = useState<RegionFilter>(
     regionFromUrl && Object.keys(regionLabels).includes(regionFromUrl)
       ? regionFromUrl
       : "all"
   );
+  
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>(
+    statusFromUrl && Object.keys(statusLabels).includes(statusFromUrl)
+      ? statusFromUrl
+      : "all"
+  );
 
-  // Update URL when region changes
+  // Update URL when filters change
   useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    
     if (selectedRegion === "all") {
-      searchParams.delete("region");
+      newParams.delete("region");
     } else {
-      searchParams.set("region", selectedRegion);
+      newParams.set("region", selectedRegion);
     }
-    setSearchParams(searchParams, { replace: true });
-  }, [selectedRegion, searchParams, setSearchParams]);
+    
+    if (selectedStatus === "all") {
+      newParams.delete("status");
+    } else {
+      newParams.set("status", selectedStatus);
+    }
+    
+    setSearchParams(newParams, { replace: true });
+  }, [selectedRegion, selectedStatus, searchParams, setSearchParams]);
 
   const filteredVenues = useMemo(() => {
     return venues.filter(venue => {
@@ -74,11 +105,21 @@ const VenuesPage = () => {
       const venueRegion = countryToRegion[venue.country || ""] || "europe";
       const matchesRegion = selectedRegion === "all" || venueRegion === selectedRegion;
       
-      return matchesSearch && matchesRegion;
+      const venueIsOpen = isVenueOpen(venue.active);
+      const matchesStatus = selectedStatus === "all" || 
+        (selectedStatus === "open" && venueIsOpen) ||
+        (selectedStatus === "closed" && !venueIsOpen);
+      
+      return matchesSearch && matchesRegion && matchesStatus;
     });
-  }, [venues, searchQuery, selectedRegion]);
+  }, [venues, searchQuery, selectedRegion, selectedStatus]);
+
+  // Counts for status tabs
+  const openCount = useMemo(() => venues.filter(v => isVenueOpen(v.active)).length, [venues]);
+  const closedCount = useMemo(() => venues.filter(v => !isVenueOpen(v.active)).length, [venues]);
 
   const regions: RegionFilter[] = ["all", "europe", "north-america", "south-america", "asia", "oceania", "africa"];
+  const statuses: StatusFilter[] = ["all", "open", "closed"];
 
   const itemListSchema = {
     "@context": "https://schema.org",
@@ -131,11 +172,50 @@ const VenuesPage = () => {
               Venues
             </h1>
             <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
-              The clubs, warehouses, and spaces where techno lives.
+              The clubs, warehouses, and spaces where techno lives. Active and historic.
             </p>
+            <div className="flex items-center gap-4 font-mono text-[10px] sm:text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-logo-green animate-pulse" />
+                {openCount} open
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-muted-foreground/50" />
+                {closedCount} historic
+              </span>
+            </div>
           </div>
 
-          {/* Search & Filter */}
+          {/* Status Tabs */}
+          <div className="mb-6 sm:mb-8 border-b border-border/50">
+            <div className="flex gap-0">
+              {statuses.map((status) => {
+                const count = status === "all" ? venues.length : 
+                              status === "open" ? openCount : closedCount;
+                return (
+                  <button
+                    key={status}
+                    onClick={() => setSelectedStatus(status)}
+                    className={cn(
+                      "font-mono text-xs sm:text-sm uppercase tracking-wider px-4 sm:px-6 py-3 border-b-2 transition-colors relative",
+                      selectedStatus === status
+                        ? "text-foreground border-logo-green"
+                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-border"
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      {status === "open" && <span className="w-1.5 h-1.5 rounded-full bg-logo-green" />}
+                      {status === "closed" && <span className="w-1.5 h-1.5 rounded-full bg-crimson/60" />}
+                      {statusLabels[status]}
+                      <span className="text-[10px] text-muted-foreground">({count})</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Search & Region Filter */}
           <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
             <div className="relative w-full sm:max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -153,11 +233,12 @@ const VenuesPage = () => {
                 <button
                   key={region}
                   onClick={() => setSelectedRegion(region)}
-                  className={`font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 border transition-colors ${
+                  className={cn(
+                    "font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 border transition-colors",
                     selectedRegion === region
-                      ? 'bg-foreground text-background border-foreground'
-                      : 'bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground'
-                  }`}
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+                  )}
                 >
                   {regionLabels[region]}
                 </button>
@@ -167,78 +248,102 @@ const VenuesPage = () => {
 
           {/* Venues Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {filteredVenues.map((venue, index) => (
-              <Link
-                key={venue.id}
-                to={`/venues/${venue.id}`}
-                onMouseEnter={() => prefetchVenue(venue.id)}
-                className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
-              >
-                {/* Venue Image */}
-                <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
-                  {venue.imageUrl ? (
-                    <GlitchImage 
-                      src={venue.imageUrl} 
-                      alt={venue.name}
-                      className="w-full h-full"
-                      frameNumber={String(index + 1).padStart(2, '0')}
-                      size="thumbnail"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <MapPin className="w-12 h-12 text-muted-foreground/20" />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="p-3 sm:p-4">
-                  <div className="flex justify-between items-start mb-2 sm:mb-3">
-                    <div className="flex-1 min-w-0">
-                      <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider border border-border px-1 py-0.5">
-                        {venue.type}
-                      </span>
-                      <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate mt-1">
-                        {venue.name}
-                      </h2>
-                    </div>
-                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 flex-shrink-0" />
-                  </div>
+            {filteredVenues.map((venue, index) => {
+              const venueIsOpen = isVenueOpen(venue.active);
+              
+              return (
+                <Link
+                  key={venue.id}
+                  to={`/venues/${venue.id}`}
+                  onMouseEnter={() => prefetchVenue(venue.id)}
+                  className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
+                >
+                  {/* Venue Image */}
+                  <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
+                    {venue.imageUrl ? (
+                      <GlitchImage 
+                        src={venue.imageUrl} 
+                        alt={venue.name}
+                        className="w-full h-full"
+                        frameNumber={String(index + 1).padStart(2, '0')}
+                        size="thumbnail"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <MapPin className="w-12 h-12 text-muted-foreground/20" />
+                      </div>
+                    )}
                     
-                  <div className="flex items-center gap-2 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
-                    <span>{venue.city}, {venue.country}</span>
-                    {venue.active && (
-                      <>
-                        <span className="text-border">|</span>
-                        <span className={venue.active === 'Active' ? 'text-logo-green' : 'text-muted-foreground'}>
-                          {venue.active}
+                    {/* Status Badge */}
+                    <div className={cn(
+                      "absolute top-2 right-2 z-20 font-mono text-[8px] sm:text-[9px] uppercase tracking-wider px-1.5 py-0.5 border",
+                      venueIsOpen 
+                        ? "bg-logo-green/90 text-background border-logo-green" 
+                        : "bg-crimson/80 text-white border-crimson"
+                    )}>
+                      {venueIsOpen ? "OPEN" : "CLOSED"}
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 sm:p-4">
+                    <div className="flex justify-between items-start mb-2 sm:mb-3">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider border border-border px-1 py-0.5">
+                          {venue.type}
                         </span>
-                      </>
+                        <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate mt-1">
+                          {venue.name}
+                        </h2>
+                      </div>
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 flex-shrink-0" />
+                    </div>
+                      
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
+                      <MapPin className="w-3 h-3" />
+                      <span>{venue.city}, {venue.country}</span>
+                      {venue.active && (
+                        <>
+                          <span className="text-border">|</span>
+                          <span className={venueIsOpen ? 'text-logo-green' : 'text-crimson/70'}>
+                            {venue.active}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {venue.atmosphere && (
+                      <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
+                        {venue.atmosphere}
+                      </p>
+                    )}
+
+                    {venue.tags && venue.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {venue.tags.slice(0, 3).map(tag => (
+                          <span 
+                            key={tag} 
+                            className="font-mono text-[9px] sm:text-[10px] text-muted-foreground border border-border/50 px-1 sm:px-1.5 py-0.5"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
-
-                  {venue.atmosphere && (
-                    <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
-                      {venue.atmosphere}
-                    </p>
-                  )}
-
-                  {venue.tags && venue.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {venue.tags.slice(0, 3).map(tag => (
-                        <span 
-                          key={tag} 
-                          className="font-mono text-[9px] sm:text-[10px] text-muted-foreground border border-border/50 px-1 sm:px-1.5 py-0.5"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
+
+          {/* No results */}
+          {filteredVenues.length === 0 && (
+            <div className="text-center py-16">
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+              <p className="font-mono text-sm text-muted-foreground">
+                No venues found matching your filters.
+              </p>
+            </div>
+          )}
 
           {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
