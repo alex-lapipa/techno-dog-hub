@@ -4013,71 +4013,346 @@ export type Database = {
       labels: {
         Row: {
           address: string | null
+          artist_roster: Json | null
+          bandcamp_url: string | null
+          bio_long: string | null
+          bio_short: string | null
           collaborations_policy_url: string | null
           contact_form_url: string | null
           created_at: string | null
+          description: string | null
+          discogs_url: string | null
+          enrichment_score: number | null
+          enrichment_sources: Json | null
+          enrichment_status: string | null
+          founded_year: number | null
+          founders: string[] | null
           general_email: string | null
           headquarters_city: string | null
           headquarters_country: string | null
           id: string
+          image_url: string | null
+          instagram_url: string | null
+          is_active: boolean | null
+          key_artists: string[] | null
+          key_releases: Json | null
+          known_for: string | null
           label_name: string
           label_type: string | null
           label_website_url: string | null
+          last_enriched_at: string | null
           last_verified_at: string | null
+          logo_url: string | null
           notes: string | null
           parent_company: string | null
+          philosophy: string | null
           phone: string | null
+          release_count: number | null
           roster_url: string | null
+          slug: string | null
+          soundcloud_url: string | null
           sources_json: Json | null
+          subgenres: string[] | null
           submissions_policy_url: string | null
+          tags: string[] | null
           updated_at: string | null
           verification_confidence: number | null
         }
         Insert: {
           address?: string | null
+          artist_roster?: Json | null
+          bandcamp_url?: string | null
+          bio_long?: string | null
+          bio_short?: string | null
           collaborations_policy_url?: string | null
           contact_form_url?: string | null
           created_at?: string | null
+          description?: string | null
+          discogs_url?: string | null
+          enrichment_score?: number | null
+          enrichment_sources?: Json | null
+          enrichment_status?: string | null
+          founded_year?: number | null
+          founders?: string[] | null
           general_email?: string | null
           headquarters_city?: string | null
           headquarters_country?: string | null
           id?: string
+          image_url?: string | null
+          instagram_url?: string | null
+          is_active?: boolean | null
+          key_artists?: string[] | null
+          key_releases?: Json | null
+          known_for?: string | null
           label_name: string
           label_type?: string | null
           label_website_url?: string | null
+          last_enriched_at?: string | null
           last_verified_at?: string | null
+          logo_url?: string | null
           notes?: string | null
           parent_company?: string | null
+          philosophy?: string | null
           phone?: string | null
+          release_count?: number | null
           roster_url?: string | null
+          slug?: string | null
+          soundcloud_url?: string | null
           sources_json?: Json | null
+          subgenres?: string[] | null
           submissions_policy_url?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           verification_confidence?: number | null
         }
         Update: {
           address?: string | null
+          artist_roster?: Json | null
+          bandcamp_url?: string | null
+          bio_long?: string | null
+          bio_short?: string | null
           collaborations_policy_url?: string | null
           contact_form_url?: string | null
           created_at?: string | null
+          description?: string | null
+          discogs_url?: string | null
+          enrichment_score?: number | null
+          enrichment_sources?: Json | null
+          enrichment_status?: string | null
+          founded_year?: number | null
+          founders?: string[] | null
           general_email?: string | null
           headquarters_city?: string | null
           headquarters_country?: string | null
           id?: string
+          image_url?: string | null
+          instagram_url?: string | null
+          is_active?: boolean | null
+          key_artists?: string[] | null
+          key_releases?: Json | null
+          known_for?: string | null
           label_name?: string
           label_type?: string | null
           label_website_url?: string | null
+          last_enriched_at?: string | null
           last_verified_at?: string | null
+          logo_url?: string | null
           notes?: string | null
           parent_company?: string | null
+          philosophy?: string | null
           phone?: string | null
+          release_count?: number | null
           roster_url?: string | null
+          slug?: string | null
+          soundcloud_url?: string | null
           sources_json?: Json | null
+          subgenres?: string[] | null
           submissions_policy_url?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           verification_confidence?: number | null
         }
         Relationships: []
+      }
+      labels_claims: {
+        Row: {
+          claim_text: string
+          claim_type: string
+          confidence_score: number | null
+          created_at: string | null
+          extraction_model: string | null
+          id: string
+          label_id: string | null
+          source_urls: string[] | null
+          updated_at: string | null
+          value_structured: Json | null
+          verification_status: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          claim_text: string
+          claim_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          extraction_model?: string | null
+          id?: string
+          label_id?: string | null
+          source_urls?: string[] | null
+          updated_at?: string | null
+          value_structured?: Json | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          claim_text?: string
+          claim_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          extraction_model?: string | null
+          id?: string
+          label_id?: string | null
+          source_urls?: string[] | null
+          updated_at?: string | null
+          value_structured?: Json | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_claims_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels_documents: {
+        Row: {
+          content: string
+          created_at: string | null
+          document_type: string
+          embedding: string | null
+          id: string
+          label_id: string | null
+          metadata: Json | null
+          source_name: string | null
+          source_url: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          document_type: string
+          embedding?: string | null
+          id?: string
+          label_id?: string | null
+          metadata?: Json | null
+          source_name?: string | null
+          source_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          document_type?: string
+          embedding?: string | null
+          id?: string
+          label_id?: string | null
+          metadata?: Json | null
+          source_name?: string | null
+          source_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_documents_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels_enrichment_queue: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          id: string
+          label_id: string | null
+          last_attempt_at: string | null
+          last_error: string | null
+          priority: number | null
+          reason: string | null
+          scheduled_for: string | null
+          status: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          label_id?: string | null
+          last_attempt_at?: string | null
+          last_error?: string | null
+          priority?: number | null
+          reason?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          label_id?: string | null
+          last_attempt_at?: string | null
+          last_error?: string | null
+          priority?: number | null
+          reason?: string | null
+          scheduled_for?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_enrichment_queue_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labels_enrichment_runs: {
+        Row: {
+          created_at: string | null
+          errors: Json | null
+          finished_at: string | null
+          firecrawl_urls: string[] | null
+          id: string
+          label_id: string | null
+          models_used: string[] | null
+          run_type: string
+          started_at: string | null
+          stats: Json | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          errors?: Json | null
+          finished_at?: string | null
+          firecrawl_urls?: string[] | null
+          id?: string
+          label_id?: string | null
+          models_used?: string[] | null
+          run_type: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          errors?: Json | null
+          finished_at?: string | null
+          firecrawl_urls?: string[] | null
+          id?: string
+          label_id?: string | null
+          models_used?: string[] | null
+          run_type?: string
+          started_at?: string | null
+          stats?: Json | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_enrichment_runs_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       launch_notifications: {
         Row: {
