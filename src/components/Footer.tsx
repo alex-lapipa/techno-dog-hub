@@ -40,7 +40,7 @@ const Footer = () => {
               © 2025 Techno.Dog
             </p>
             <p className="font-mono text-xs text-muted-foreground">
-              Techno.Dog ringleader{' '}
+              Techno.Dog founder and ringleader{' '}
               <a 
                 href="https://alexlawton.io" 
                 target="_blank" 
