@@ -143,12 +143,6 @@ const Index = () => {
       description: 'Help & community resources',
       path: '/support',
       color: 'bg-orange-500/20 border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white'
-    },
-    {
-      title: 'Store',
-      description: 'Merch & gear from the underground',
-      path: '/store',
-      color: 'bg-logo-green/20 border-logo-green text-logo-green hover:bg-logo-green hover:text-background'
     }
   ];
 
