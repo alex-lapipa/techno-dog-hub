@@ -2012,6 +2012,62 @@ export const RonDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Julieta Dog - Madrid party queen, ex-London raver, crazy gorgeous energy
+export const JulietaDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Flowing elegant ears - party ready */}
+      <path d="M10 28 Q4 18 8 8 Q14 12 16 24" />
+      <path d="M54 28 Q60 18 56 8 Q50 12 48 24" />
+      {/* Gorgeous wavy hair - Madrid glamour */}
+      <path d="M18 16 Q16 10 20 8 Q24 6 22 12" />
+      <path d="M22 12 Q20 6 26 4 Q30 2 28 10" />
+      <path d="M28 10 Q26 4 32 2 Q38 0 36 8" />
+      <path d="M36 8 Q34 2 40 4 Q44 6 42 12" />
+      <path d="M42 12 Q40 6 44 8 Q48 10 46 16" />
+      {/* Extra flowing locks */}
+      <path d="M14 20 Q12 14 16 12" strokeWidth="1.5" opacity="0.7" />
+      <path d="M50 20 Q52 14 48 12" strokeWidth="1.5" opacity="0.7" />
+      {/* Head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Sparkling party eyes - wide and excited */}
+      <circle cx="24" cy="32" r="5" strokeWidth="1.5" />
+      <circle cx="40" cy="32" r="5" strokeWidth="1.5" />
+      <circle cx="24" cy="31" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="22" cy="30" r="1" fill="hsl(var(--background))" />
+      <circle cx="40" cy="31" r="2.5" fill="hsl(var(--logo-green))" />
+      <circle cx="38" cy="30" r="1" fill="hsl(var(--background))" />
+      {/* Sparkle accents in eyes - crazy energy */}
+      <circle cx="26" cy="29" r="0.5" fill="hsl(var(--logo-green))" opacity="0.8" />
+      <circle cx="42" cy="29" r="0.5" fill="hsl(var(--logo-green))" opacity="0.8" />
+      {/* Long fluttery lashes - gorgeous */}
+      <path d="M19 28 L17 26" strokeWidth="1.5" />
+      <path d="M21 27 L20 24" strokeWidth="1.5" />
+      <path d="M43 27 L44 24" strokeWidth="1.5" />
+      <path d="M45 28 L47 26" strokeWidth="1.5" />
+      {/* Raised excited eyebrows */}
+      <path d="M19 24 Q24 21 28 24" strokeWidth="1.5" />
+      <path d="M36 24 Q40 21 45 24" strokeWidth="1.5" />
+      {/* Cute nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Big party smile - showing teeth */}
+      <path d="M24 46 Q32 54 40 46" strokeWidth="2" />
+      <path d="M27 47 L37 47" strokeWidth="1" opacity="0.5" />
+      {/* Beauty mark - Madrid glamour */}
+      <circle cx="42" cy="42" r="1" fill="hsl(var(--logo-green))" />
+      {/* Small hoop earring - party vibes */}
+      <circle cx="8" cy="28" r="2.5" strokeWidth="1.5" opacity="0.8" />
+      {/* Little crown/tiara - party queen */}
+      <path d="M26 6 L28 2 L30 5 L32 1 L34 5 L36 2 L38 6" strokeWidth="1.5" opacity="0.7" />
+      {/* Confetti/sparkles around - party atmosphere */}
+      <circle cx="6" cy="18" r="1" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <circle cx="58" cy="16" r="1" fill="hsl(var(--logo-green))" opacity="0.6" />
+      <path d="M4 36 L6 34" strokeWidth="1" opacity="0.5" />
+      <path d="M58 38 L60 36" strokeWidth="1" opacity="0.5" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2107,4 +2163,5 @@ export const dogVariants = [
   { name: 'Antain', Component: AntainDog, personality: 'Irish-Asturian curly-haired creative soul', status: 'creating' },
   { name: 'La Pipa', Component: LaPipaDog, personality: 'Beyond the obvious, into the stranger', status: 'something stranger' },
   { name: 'Ron', Component: RonDog, personality: 'Mad LA technologist, guitar hero, open source legend', status: 'shipping code' },
+  { name: 'Julieta', Component: JulietaDog, personality: 'Madrid party queen, ex-London raver, absolutely unhinged', status: 'partying' },
 ];

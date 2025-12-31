@@ -476,6 +476,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Ron Dog — mad technologist from Los Angeles, now building the future from Asturias",
     quote: "Open source everything. Guitar riffs at 4am. Robots in the studio. Cider in hand. The revolution is collaborative.",
     packInvite: "Fork the future with us"
+  },
+  'julieta': {
+    intro: "I'm the Julieta Dog — Madrid party queen, ex-London raver, absolutely unhinged on the dancefloor",
+    quote: "Madrid nights, London memories, zero regrets. If the bass isn't making my earrings shake, we need a bigger speaker.",
+    packInvite: "Party with us til sunrise"
   }
 };
 
