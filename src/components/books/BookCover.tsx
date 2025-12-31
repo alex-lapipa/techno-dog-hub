@@ -108,7 +108,6 @@ export function BookCover({
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
-        crossOrigin="anonymous"
         onError={() => setHasError(true)}
       />
       
