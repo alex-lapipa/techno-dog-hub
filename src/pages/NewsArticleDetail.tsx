@@ -5,9 +5,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageSEO from '@/components/PageSEO';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Camera } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import DogChat from '@/components/admin/DogChat';
 import DogSilhouette from '@/components/DogSilhouette';
+import alexLaunchHero from '@/assets/alex-launch-hero.png';
 
 // Split content into two columns for magazine layout
 const splitIntoColumns = (elements: JSX.Element[]): [JSX.Element[], JSX.Element[]] => {
@@ -333,25 +334,23 @@ const NewsArticleDetail = () => {
 
         {/* Full-width hero section */}
         <div className="w-full mb-12">
-          {/* Hero Photo Placeholder */}
-          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-muted/50 via-muted/30 to-background border-y border-destructive/30 overflow-hidden">
+          {/* Hero Photo */}
+          <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] border-y border-destructive/30 overflow-hidden">
             {/* Red accent line at top */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <Camera className="w-16 h-16 text-destructive/30 mx-auto mb-4" />
-                <span className="font-mono text-xs uppercase tracking-[0.3em] text-destructive/50">
-                  Featured photograph
-                </span>
-              </div>
-            </div>
-            {/* Decorative grid overlay with subtle red tint */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: 'linear-gradient(to right, hsl(0 84% 60%) 1px, transparent 1px), linear-gradient(to bottom, hsl(0 84% 60%) 1px, transparent 1px)',
-              backgroundSize: '40px 40px'
-            }} />
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent z-10" />
+            
+            {/* Hero Image */}
+            <img 
+              src={alexLaunchHero} 
+              alt="Techno Dog artwork - Las Querodias" 
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Subtle overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-background/30" />
+            
             {/* Red accent line at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-destructive to-transparent z-10" />
           </div>
 
           {/* Article Header - Full width */}
