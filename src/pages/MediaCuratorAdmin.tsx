@@ -60,33 +60,32 @@ const MediaCuratorAdmin = () => {
 
       const uniqueArtists = new Set(artistsWithMedia?.map(a => a.entity_id) || []);
 
-      // Fetch recent agent reports for media jobs
-      const { data: reports } = await supabase
-        .from('agent_reports')
+      // Fetch recent media pipeline jobs from proper table
+      const { data: pipelineJobs } = await supabase
+        .from('media_pipeline_jobs')
         .select('*')
-        .eq('agent_name', 'media-curator')
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(20);
+
+      const pendingCount = pipelineJobs?.filter(j => j.status === 'pending' || j.status === 'processing').length || 0;
+      const failedCount = pipelineJobs?.filter(j => j.status === 'failed').length || 0;
 
       setMediaStats({
         total: totalAssets || 0,
         withImages: uniqueArtists.size,
-        pending: reports?.filter(r => r.status === 'pending').length || 0,
-        failed: reports?.filter(r => r.severity === 'error').length || 0
+        pending: pendingCount,
+        failed: failedCount
       });
 
-      // Convert reports to job format
-      const jobs: MediaJob[] = (reports || []).map(r => {
-        const details = r.details as Record<string, any> | null;
-        return {
-          id: r.id,
-          entity_type: details?.entity_type || 'unknown',
-          entity_id: details?.entity_id || '',
-          status: r.status,
-          created_at: r.created_at,
-          completed_at: r.reviewed_at || undefined
-        };
-      });
+      // Map pipeline jobs to MediaJob format
+      const jobs: MediaJob[] = (pipelineJobs || []).map(j => ({
+        id: j.id,
+        entity_type: j.entity_type,
+        entity_id: j.entity_id,
+        status: j.status,
+        created_at: j.created_at,
+        completed_at: j.completed_at || undefined
+      }));
       setRecentJobs(jobs);
     } catch (err) {
       console.error('Failed to fetch data:', err);
