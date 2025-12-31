@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, Shield, Heart, Code, ShoppingBag, Radio } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, Shield, Heart, Code, ShoppingBag, Radio, BookOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DogChat from "@/components/admin/DogChat";
