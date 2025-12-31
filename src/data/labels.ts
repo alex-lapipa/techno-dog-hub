@@ -15,6 +15,30 @@ export interface Label {
 export const labels: Label[] = [
   // DETROIT
   {
+    id: "metroplex",
+    name: "Metroplex",
+    city: "Detroit",
+    country: "USA",
+    founded: 1985,
+    active: true,
+    tags: ["Detroit", "foundational", "essential", "origin"],
+    description: "Juan Atkins' label, often cited as one of techno's earliest foundations.",
+    founders: ["Juan Atkins"],
+    artists: ["Juan Atkins", "Model 500"]
+  },
+  {
+    id: "transmat",
+    name: "Transmat",
+    city: "Detroit",
+    country: "USA",
+    founded: 1986,
+    active: true,
+    tags: ["Detroit", "soulful", "emotional", "essential"],
+    description: "Derrick May's label known for soulful, emotional techno output.",
+    founders: ["Derrick May"],
+    artists: ["Derrick May", "Rhythim Is Rhythim"]
+  },
+  {
     id: "axis",
     name: "Axis Records",
     city: "Detroit",
@@ -22,9 +46,21 @@ export const labels: Label[] = [
     founded: 1992,
     active: true,
     tags: ["Detroit", "minimal", "sci-fi", "essential"],
-    description: "Jeff Mills' personal imprint. Techno as cosmic, futuristic art form.",
+    description: "Jeff Mills' conceptual, futurist techno home base.",
     founders: ["Jeff Mills"],
     artists: ["Jeff Mills", "Robert Hood"]
+  },
+  {
+    id: "m-plant",
+    name: "M-Plant",
+    city: "Detroit",
+    country: "USA",
+    founded: 1994,
+    active: true,
+    tags: ["Detroit", "minimal", "stripped-back", "essential"],
+    description: "Robert Hood's minimal techno platform defining stripped-back Detroit minimal.",
+    founders: ["Robert Hood"],
+    artists: ["Robert Hood", "Floorplan"]
   },
   {
     id: "underground-resistance",
@@ -48,7 +84,7 @@ export const labels: Label[] = [
     founded: 2005,
     active: true,
     tags: ["Berghain", "Berlin", "diverse", "quality"],
-    description: "The label arm of Berghain. Documenting the club's residents and sound.",
+    description: "Berghain's label, documenting Berlin's contemporary techno sound.",
     artists: ["Ben Klock", "Marcel Dettmann", "Steffi", "Fiedel", "Len Faki", "Phase Fatale"]
   },
   {
@@ -59,9 +95,33 @@ export const labels: Label[] = [
     founded: 1991,
     active: true,
     tags: ["Detroit-Berlin", "historic", "essential", "foundational"],
-    description: "The label that bridged Detroit and Berlin. Document of a transatlantic revolution.",
+    description: "Foundational label that forged the Detroit–Berlin axis in the 1990s.",
     founders: ["Dimitri Hegemann"],
     artists: ["Jeff Mills", "Juan Atkins", "Blake Baxter", "Surgeon"]
+  },
+  {
+    id: "klockworks",
+    name: "Klockworks",
+    city: "Berlin",
+    country: "Germany",
+    founded: 2006,
+    active: true,
+    tags: ["Berlin", "hypnotic", "deep", "essential"],
+    description: "Ben Klock's label specializing in deep, hypnotic techno releases.",
+    founders: ["Ben Klock"],
+    artists: ["Ben Klock", "Trevino", "DVS1", "Etapp Kyle"]
+  },
+  {
+    id: "m-nus",
+    name: "M_nus",
+    city: "Windsor / Berlin",
+    country: "Canada / Germany",
+    founded: 1998,
+    active: true,
+    tags: ["minimal", "advanced", "Richie Hawtin", "essential"],
+    description: "Richie Hawtin's label focused on minimal and advanced techno aesthetics.",
+    founders: ["Richie Hawtin"],
+    artists: ["Richie Hawtin", "Plastikman", "Magda", "Gaiser", "Ambivalent"]
   },
   {
     id: "dystopian",
@@ -148,6 +208,18 @@ export const labels: Label[] = [
     description: "UK label focused on hypnotic, deep techno.",
     founders: ["Sigha"],
     artists: ["Sigha", "Onyvaa"]
+  },
+  {
+    id: "monnom-black",
+    name: "Monnom Black",
+    city: "London",
+    country: "UK",
+    founded: 2014,
+    active: true,
+    tags: ["UK", "dark", "hard", "modern"],
+    description: "Dax J's label associated with dark, hard, modern techno.",
+    founders: ["Dax J"],
+    artists: ["Dax J", "VTSS", "Shlømo", "Introversion"]
   },
   {
     id: "r-label-group",
