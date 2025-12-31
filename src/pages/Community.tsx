@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -149,10 +149,11 @@ const Community = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Community | techno.dog</title>
-        <meta name="description" content="Join the techno.dog community. Upload photos, get API access, and connect with techno enthusiasts worldwide." />
-      </Helmet>
+      <PageSEO
+        title="Community | Join the techno.dog Pack"
+        description="Join the techno.dog community. Upload photos, get API access, and connect with techno enthusiasts worldwide."
+        path="/community"
+      />
       
       <div className="min-h-screen bg-background">
         <Header />

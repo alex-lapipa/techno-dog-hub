@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 import PublishedNewsArticles from "@/components/PublishedNewsArticles";
 import TrendingTopics from "@/components/TrendingTopics";
 
@@ -84,6 +85,11 @@ const NewsPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title="Techno News & Stories"
+        description="Curated stories from the global underground. News, interviews, scene reports, and in-depth features from Detroit to Tbilisi."
+        path="/news"
+      />
       <Header />
       <main className="pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">

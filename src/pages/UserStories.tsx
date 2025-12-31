@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageSEO from "@/components/PageSEO";
 
 const UserStories = () => {
   const stories = [
@@ -43,6 +44,11 @@ const UserStories = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title="User Stories | Community Stories from the Underground"
+        description="Personal stories from the global techno community. First-hand experiences from Tresor, Bassiani, Movement Detroit, and clubs around the world."
+        path="/news/your-stories"
+      />
       <Header />
       <main className="pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
