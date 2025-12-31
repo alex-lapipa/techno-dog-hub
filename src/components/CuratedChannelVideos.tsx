@@ -99,7 +99,7 @@ const CuratedChannelVideos = ({
           className="font-mono text-[10px] sm:text-xs text-muted-foreground hover:text-crimson transition-colors flex items-center gap-1"
         >
           <Youtube className="w-3 h-3" />
-          La Pipa Channel
+          LA PIPA Channel
         </a>
       </div>
 
@@ -107,7 +107,7 @@ const CuratedChannelVideos = ({
       <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-crimson/30">
         <div className="w-2 h-2 rounded-full bg-crimson animate-pulse" />
         <span className="font-mono text-[9px] sm:text-[10px] text-crimson uppercase tracking-widest">
-          Curated Archive • La Pipa is La Pipa
+          Curated Archive • LA PIPA is LA PIPA
         </span>
       </div>
 

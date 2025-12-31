@@ -74,7 +74,7 @@ const DailySpotlight = () => {
 
               {/* Byline with colored accents */}
               <div className="flex items-center gap-3 font-mono text-xs pt-4 border-t border-border group-hover:border-logo-green/30 transition-colors">
-                <span className="font-semibold text-destructive group-hover:text-white transition-colors duration-300">By Alex Techno Dog La Pippa</span>
+                <span className="font-semibold text-destructive group-hover:text-white transition-colors duration-300">By Alex Techno Dog LA PIPA</span>
                 <span className="text-logo-green">|</span>
                 <span className="text-muted-foreground group-hover:text-logo-green transition-colors duration-300">Read the launch note</span>
                 <ArrowRight className="w-4 h-4 text-logo-green group-hover:translate-x-1 transition-transform" />
