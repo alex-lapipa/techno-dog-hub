@@ -330,3 +330,6 @@ verify_jwt = false
 
 [functions.youtube-channel-curator]
 verify_jwt = false
+
+[functions.librarian-fetch-covers]
+verify_jwt = false
