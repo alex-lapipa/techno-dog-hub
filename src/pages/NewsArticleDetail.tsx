@@ -6,6 +6,8 @@ import Footer from '@/components/Footer';
 import PageSEO from '@/components/PageSEO';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
+import DogChat from '@/components/admin/DogChat';
+import DogSilhouette from '@/components/DogSilhouette';
 
 interface NewsArticle {
   id: string;
@@ -352,6 +354,24 @@ const NewsArticleDetail = () => {
 
             <div className="space-y-1">
               {renderMarkdown(article.body_markdown)}
+            </div>
+
+            {/* Embedded Dog Chat Box */}
+            <div className="mt-12 mb-8 border-2 border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background rounded-lg overflow-hidden shadow-[0_0_30px_hsl(100_100%_60%/0.1)]">
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-logo-green/30 bg-logo-green/10">
+                <DogSilhouette className="w-8 h-8 text-logo-green drop-shadow-[0_0_8px_hsl(100_100%_60%/0.6)]" />
+                <div>
+                  <h3 className="font-mono text-sm uppercase tracking-wider text-foreground font-semibold">
+                    Want to know more?
+                  </h3>
+                  <p className="font-mono text-xs text-muted-foreground">
+                    Ask our Techno Dog anything about techno.dog
+                  </p>
+                </div>
+              </div>
+              <div className="h-[400px]">
+                <DogChat />
+              </div>
             </div>
 
             {article.entity_tags && article.entity_tags.length > 0 && (
