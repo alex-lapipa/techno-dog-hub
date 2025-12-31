@@ -1,6 +1,12 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { 
+  withCircuitBreaker, 
+  getAvailableModel, 
+  recordSuccess, 
+  recordFailure 
+} from "../_shared/circuit-breaker.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,9 +15,15 @@ const corsHeaders = {
 
 const FIRECRAWL_API_KEY = Deno.env.get('FIRECRAWL_API_KEY');
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Multi-model configuration with fallback chain
+const MODEL_CONFIG = {
+  primary: 'google/gemini-2.5-flash',       // Fast, cost-effective
+  secondary: 'openai/gpt-5-mini',           // Strong fallback
+  tertiary: 'google/gemini-2.5-flash-lite', // Ultra-fast fallback
+};
 
 // Manufacturer site mappings for direct product page scraping
 const MANUFACTURER_URLS: Record<string, string> = {
@@ -47,6 +59,17 @@ const MANUFACTURER_URLS: Record<string, string> = {
   'mutable-instruments-modules': 'https://pichenettes.github.io/mutable-instruments-documentation/',
   'api-500-series': 'https://apiaudio.com/500-series/',
   'serge-modular-4u': 'https://www.serge-fans.com/',
+  // Extended manufacturer mappings for full coverage
+  'roland-tr-808': 'https://www.roland.com/global/promos/roland_classic/tr-808/',
+  'roland-tr-909': 'https://www.roland.com/global/promos/roland_classic/tr-909/',
+  'roland-tb-303': 'https://www.roland.com/global/promos/roland_classic/tb-303/',
+  'moog-minimoog': 'https://www.moogmusic.com/products/minimoog-model-d',
+  'moog-subsequent-37': 'https://www.moogmusic.com/products/subsequent-37',
+  'elektron-analog-rytm': 'https://www.elektron.se/products/analog-rytm-mkii/',
+  'elektron-octatrack': 'https://www.elektron.se/products/octatrack-mkii/',
+  'korg-ms-20': 'https://www.korg.com/us/products/synthesizers/ms_20mini/',
+  'korg-volca-series': 'https://www.korg.com/us/products/dj/volca_beats/',
+  'dave-smith-prophet-12': 'https://www.sequential.com/product/prophet-12-module/',
 };
 
 // Use Firecrawl web search to find product images
@@ -195,33 +218,30 @@ function isValidImageUrl(url: string): boolean {
   return hasExtension || isCdn;
 }
 
-// Use Groq (fast LLM) to analyze and select the best product image
-async function selectBestImageWithGroq(
+// Multi-model image selection with circuit breaker and fallback
+async function selectBestImageWithAI(
   gearName: string, 
   gearBrand: string, 
   images: string[],
   searchResults: any[]
-): Promise<{ imageUrl: string | null; confidence: number; reasoning: string }> {
-  // Use Lovable API (Gemini) - faster and more reliable for this task
+): Promise<{ imageUrl: string | null; confidence: number; reasoning: string; model: string }> {
   const apiKey = LOVABLE_API_KEY;
   const apiUrl = 'https://ai.gateway.lovable.dev/v1/chat/completions';
-  const model = 'google/gemini-2.5-flash';
 
   if (!apiKey) {
-    return { imageUrl: null, confidence: 0, reasoning: 'No API key configured' };
+    return { imageUrl: null, confidence: 0, reasoning: 'No API key configured', model: 'none' };
   }
 
   if (images.length === 0) {
-    return { imageUrl: null, confidence: 0, reasoning: 'No images found to analyze' };
+    return { imageUrl: null, confidence: 0, reasoning: 'No images found to analyze', model: 'none' };
   }
 
-  try {
-    // Build context from search results
-    const context = searchResults.slice(0, 3).map(r => 
-      `Source: ${r.url}\nTitle: ${r.title || 'N/A'}\n${(r.markdown || '').slice(0, 300)}`
-    ).join('\n\n---\n\n');
+  // Build context from search results
+  const context = searchResults.slice(0, 3).map(r => 
+    `Source: ${r.url}\nTitle: ${r.title || 'N/A'}\n${(r.markdown || '').slice(0, 300)}`
+  ).join('\n\n---\n\n');
 
-    const prompt = `Select the best product image for "${gearBrand} ${gearName}" music equipment.
+  const prompt = `Select the best product image for "${gearBrand} ${gearName}" music equipment.
 
 Images found:
 ${images.slice(0, 15).map((img, i) => `${i + 1}. ${img}`).join('\n')}
@@ -238,50 +258,66 @@ Criteria:
 Return ONLY JSON:
 {"imageUrl": "best URL or null", "confidence": 0-100, "reasoning": "brief reason"}`;
 
-    console.log(`Using ${GROQ_API_KEY ? 'Groq' : 'Lovable'} API for ${gearName}`);
+  // Try models in order with circuit breaker
+  const modelsToTry = [MODEL_CONFIG.primary, MODEL_CONFIG.secondary, MODEL_CONFIG.tertiary];
+  
+  for (const model of modelsToTry) {
+    const availableModel = getAvailableModel(model);
+    console.log(`[GearImageScraper] Trying ${availableModel} for ${gearName}`);
 
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: 'You are an expert at identifying product images. Respond with valid JSON only.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.1,
-      }),
-    });
+    try {
+      const response = await withCircuitBreaker(availableModel, async () => {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: availableModel,
+            messages: [
+              { role: 'system', content: 'You are an expert at identifying product images. Respond with valid JSON only.' },
+              { role: 'user', content: prompt }
+            ],
+            temperature: 0.1,
+          }),
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return res;
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API error:', errorText);
-      return { imageUrl: null, confidence: 0, reasoning: `API error: ${response.status}` };
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      
+      // Parse JSON response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const result = JSON.parse(jsonMatch[0]);
+        recordSuccess(availableModel);
+        return {
+          imageUrl: result.imageUrl || null,
+          confidence: result.confidence || 0,
+          reasoning: result.reasoning || 'No reasoning provided',
+          model: availableModel
+        };
+      }
+      
+      // Partial success - got response but no valid JSON
+      recordSuccess(availableModel);
+      continue; // Try next model
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error(`[GearImageScraper] ${availableModel} failed:`, errorMessage);
+      recordFailure(availableModel);
+      // Continue to next model
     }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
-    
-    // Parse JSON response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const result = JSON.parse(jsonMatch[0]);
-      return {
-        imageUrl: result.imageUrl || null,
-        confidence: result.confidence || 0,
-        reasoning: result.reasoning || 'No reasoning provided'
-      };
-    }
-
-    return { imageUrl: null, confidence: 0, reasoning: 'Failed to parse response' };
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Image selection error:', errorMessage);
-    return { imageUrl: null, confidence: 0, reasoning: errorMessage };
   }
+
+  return { imageUrl: null, confidence: 0, reasoning: 'All models failed', model: 'none' };
 }
 
 // Validate that an image URL is accessible and returns actual image content
@@ -425,8 +461,8 @@ serve(async (req) => {
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
-      // Use Groq to select best image
-      const geminiResult = await selectBestImageWithGroq(
+      // Use multi-model AI to select best image
+      const geminiResult = await selectBestImageWithAI(
         gear.name,
         gear.brand,
         images,
@@ -565,8 +601,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Analyze with Groq
-        const geminiResult = await selectBestImageWithGroq(
+        // Analyze with multi-model AI
+        const geminiResult = await selectBestImageWithAI(
           gear.name,
           gear.brand,
           images,
