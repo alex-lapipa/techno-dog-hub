@@ -321,3 +321,6 @@ verify_jwt = false
 
 [functions.gear-youtube-curator]
 verify_jwt = false
+
+[functions.send-admin-welcome]
+verify_jwt = false
