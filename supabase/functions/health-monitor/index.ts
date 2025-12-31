@@ -53,13 +53,14 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 2. Edge functions check (ping test)
+  // 2. Edge functions check (using system-health which doesn't require API key auth)
   const edgeStart = Date.now();
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/api-v1-ping`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/system-health`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json'
       }
     });
     
