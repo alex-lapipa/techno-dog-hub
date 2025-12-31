@@ -40,11 +40,26 @@ interface PageSEOProps {
   geoPosition?: string;
 }
 
+// Generate dynamic OG image URL based on route
+const getDynamicOGImage = (path: string, customImage?: string): string => {
+  // If a custom image is provided and it's a full URL, use it
+  if (customImage && customImage.startsWith('http')) {
+    return customImage;
+  }
+  // If custom image is a local path (not default), use it
+  if (customImage && customImage !== '/og-image.png') {
+    return `${BASE_URL}${customImage}`;
+  }
+  // Generate dynamic OG image via edge function
+  const encodedRoute = encodeURIComponent(path);
+  return `${BASE_URL}/api/og?route=${encodedRoute}`;
+};
+
 const PageSEO = ({
   title,
   description,
   path,
-  image = '/og-image.png',
+  image,
   imageWidth = 1200,
   imageHeight = 630,
   imageAlt,
@@ -64,7 +79,7 @@ const PageSEO = ({
   geoPosition,
 }: PageSEOProps) => {
   const fullUrl = `${BASE_URL}${path}`;
-  const imageUrl = image.startsWith('http') ? image : `${BASE_URL}${image}`;
+  const imageUrl = getDynamicOGImage(path, image);
   const fullTitle = title.includes('techno.dog') ? title : `${title} | techno.dog`;
   const altText = imageAlt || title;
   
