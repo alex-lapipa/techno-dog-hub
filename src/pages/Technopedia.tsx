@@ -134,12 +134,14 @@ const TechnopediaPage = () => {
               // Open Knowledge
             </div>
             <h1 className="font-mono text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase tracking-tight mb-6 text-foreground">
-              {content.title}
+              <span className="inline-block hover:animate-glitch hover:text-logo-green transition-colors cursor-default">
+                {content.title}
+              </span>
             </h1>
-            <p className="font-mono text-lg sm:text-xl text-logo-green mb-6">
+            <p className="font-mono text-lg sm:text-xl text-logo-green mb-6 hover:text-destructive transition-colors cursor-default">
               {content.subtitle}
             </p>
-            <p className="font-mono text-sm sm:text-base text-foreground/80 max-w-2xl leading-relaxed border-l-2 border-destructive pl-4">
+            <p className="font-mono text-sm sm:text-base text-foreground/80 max-w-2xl leading-relaxed border-l-2 border-destructive pl-4 hover:border-logo-green hover:text-foreground transition-all">
               {content.intro}
             </p>
           </div>
@@ -160,10 +162,12 @@ const TechnopediaPage = () => {
             <div className="relative flex items-start gap-4 mb-6">
               <Sparkles className="w-8 h-8 text-destructive flex-shrink-0 mt-1" />
               <div>
-                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-4 text-foreground">
-                  {content.mission.title}
+                <h2 className="font-mono text-2xl sm:text-3xl uppercase tracking-wide mb-4 text-foreground group-hover:text-logo-green transition-colors">
+                  <span className="inline-block hover:animate-glitch cursor-default">
+                    {content.mission.title}
+                  </span>
                 </h2>
-                <p className="font-mono text-sm text-foreground/70 leading-relaxed mb-6">
+                <p className="font-mono text-sm text-foreground/70 leading-relaxed mb-6 group-hover:text-foreground/90 transition-colors">
                   {content.mission.text}
                 </p>
                 <ul className="space-y-2">
