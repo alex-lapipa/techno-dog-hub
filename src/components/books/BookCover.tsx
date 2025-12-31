@@ -69,22 +69,42 @@ export function BookCover({
 
   return (
     <div className={cn(
-      "relative overflow-hidden border border-border",
+      "relative overflow-hidden border border-[rgba(220,38,38,0.2)] bg-zinc-900 group/cover",
       aspectClasses[aspectRatio],
       className
     )}>
-      {/* VHS Scanlines Overlay */}
+      {/* VHS Effects */}
       {vhsEffect && (
         <>
-          <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
-          <div className="absolute inset-0 z-10 pointer-events-none mix-blend-screen opacity-5 bg-gradient-to-r from-crimson via-transparent to-cyan-500" />
+          {/* VHS Scanlines */}
+          <div 
+            className="absolute inset-0 z-10 pointer-events-none opacity-100 group-hover/cover:opacity-70 transition-opacity duration-500"
+            style={{
+              background: `
+                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.2) 1px, rgba(0,0,0,0.2) 2px),
+                radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%),
+                linear-gradient(to top, rgba(220,38,38,0.05), rgba(220,38,38,0.05))
+              `,
+            }}
+          />
+          
+          {/* Red channel offset overlay */}
+          <div 
+            className="absolute inset-0 z-10 pointer-events-none opacity-0 group-hover/cover:opacity-20 mix-blend-multiply translate-x-[1px] group-hover/cover:translate-x-[2px] -translate-y-[1px] transition-all duration-700"
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(220,38,38,0.3), transparent)',
+            }}
+          />
+          
+          {/* Hover glow */}
+          <div className="absolute inset-0 z-[11] pointer-events-none bg-gradient-to-t from-[rgba(220,38,38,0.4)] via-[rgba(220,38,38,0.1)] to-transparent opacity-0 group-hover/cover:opacity-100 transition-opacity duration-500" />
         </>
       )}
       
       <img
         src={src}
         alt={`${title} cover`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover grayscale-[30%] contrast-110 brightness-105 group-hover/cover:grayscale-0 group-hover/cover:brightness-110 transition-all duration-700"
         loading="lazy"
         decoding="async"
         referrerPolicy="no-referrer"
@@ -94,7 +114,7 @@ export function BookCover({
       
       {/* Year Badge */}
       {showYearBadge && yearPublished && (
-        <div className="absolute bottom-0 right-0 bg-crimson text-white text-[9px] font-mono px-1.5 py-0.5 z-20">
+        <div className="absolute bottom-0 right-0 bg-black/90 text-crimson text-[9px] font-mono px-1.5 py-0.5 z-20 border-l border-t border-crimson/30">
           {yearPublished}
         </div>
       )}
