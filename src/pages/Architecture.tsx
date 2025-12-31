@@ -7,13 +7,12 @@ import {
   Database, 
   Server, 
   Activity,
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
   Layers,
   Zap,
   Shield,
-  Code
+  Code,
+  Bot,
+  Dog
 } from 'lucide-react';
 import { 
   sitemapSections, 
@@ -28,33 +27,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-// Mermaid diagram component
-const MermaidDiagram = ({ chart, title }: { chart: string; title: string }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  return (
-    <div className="border border-border bg-card rounded-lg overflow-hidden">
-      <button 
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-accent/50 transition-colors"
-      >
-        <span className="font-mono text-sm uppercase tracking-wider">{title}</span>
-        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-      </button>
-      {isExpanded && (
-        <div className="p-4 border-t border-border bg-background/50">
-          <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap text-muted-foreground">
-            {chart}
-          </pre>
-          <p className="text-xs text-muted-foreground mt-3 italic">
-            Render this diagram at mermaid.live or in any Mermaid-compatible viewer
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
+import MermaidDiagram from '@/components/MermaidDiagram';
 
 const Architecture = () => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['Core Content']));
@@ -102,8 +75,11 @@ const Architecture = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="sitemap" className="space-y-8">
+        <Tabs defaultValue="overview" className="space-y-8">
           <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent">
+            <TabsTrigger value="overview" className="font-mono text-xs uppercase data-[state=active]:bg-logo-green data-[state=active]:text-background">
+              <Layers className="w-4 h-4 mr-2" /> Overview
+            </TabsTrigger>
             <TabsTrigger value="sitemap" className="font-mono text-xs uppercase data-[state=active]:bg-logo-green data-[state=active]:text-background">
               <Map className="w-4 h-4 mr-2" /> Sitemap
             </TabsTrigger>
@@ -116,6 +92,9 @@ const Architecture = () => {
             <TabsTrigger value="system" className="font-mono text-xs uppercase data-[state=active]:bg-logo-green data-[state=active]:text-background">
               <Server className="w-4 h-4 mr-2" /> System
             </TabsTrigger>
+            <TabsTrigger value="agents" className="font-mono text-xs uppercase data-[state=active]:bg-logo-green data-[state=active]:text-background">
+              <Bot className="w-4 h-4 mr-2" /> Agents
+            </TabsTrigger>
             <TabsTrigger value="data" className="font-mono text-xs uppercase data-[state=active]:bg-logo-green data-[state=active]:text-background">
               <Database className="w-4 h-4 mr-2" /> Data
             </TabsTrigger>
@@ -123,6 +102,23 @@ const Architecture = () => {
               <Zap className="w-4 h-4 mr-2" /> API
             </TabsTrigger>
           </TabsList>
+
+          {/* OVERVIEW TAB */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Layers className="w-6 h-6 text-logo-green" />
+              <h2 className="font-mono text-xl uppercase tracking-wider">Complete Site Overview</h2>
+            </div>
+            
+            <MermaidDiagram chart={mermaidDiagrams.siteOverview} title="🌐 Complete Site Architecture" defaultExpanded />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <MermaidDiagram chart={mermaidDiagrams.systemArchitecture} title="☁️ System Architecture" />
+              <MermaidDiagram chart={mermaidDiagrams.aiAgentEcosystem} title="🤖 AI Agent Ecosystem" />
+              <MermaidDiagram chart={mermaidDiagrams.dataFlow} title="📊 Data Flow Pipeline" />
+              <MermaidDiagram chart={mermaidDiagrams.doggyEcosystem} title="🐕 Doggy Ecosystem" />
+            </div>
+          </TabsContent>
 
           {/* SITEMAP TAB */}
           <TabsContent value="sitemap" className="space-y-6">
@@ -303,12 +299,66 @@ const Architecture = () => {
             </div>
           </TabsContent>
 
+          {/* AGENTS TAB */}
+          <TabsContent value="agents" className="space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Bot className="w-6 h-6 text-logo-green" />
+              <h2 className="font-mono text-xl uppercase tracking-wider">AI Agent Ecosystem</h2>
+            </div>
+            
+            <MermaidDiagram chart={mermaidDiagrams.aiAgentEcosystem} title="🤖 Agent Hierarchy & Relationships" defaultExpanded />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+              <div className="border border-border bg-card p-6">
+                <h3 className="font-mono text-sm uppercase tracking-wider text-logo-green mb-4">Orchestrators</h3>
+                <ul className="space-y-2 text-sm font-mono">
+                  <li>AI Orchestrator</li>
+                  <li>Content Orchestrator</li>
+                  <li>Doggy Orchestrator</li>
+                </ul>
+              </div>
+              
+              <div className="border border-border bg-card p-6">
+                <h3 className="font-mono text-sm uppercase tracking-wider text-logo-green mb-4">Content Agents</h3>
+                <ul className="space-y-2 text-sm font-mono">
+                  <li>News Agent</li>
+                  <li>Media Curator</li>
+                  <li>Translation Agent</li>
+                  <li>YouTube Curator</li>
+                </ul>
+              </div>
+              
+              <div className="border border-border bg-card p-6">
+                <h3 className="font-mono text-sm uppercase tracking-wider text-logo-green mb-4">Research Agents</h3>
+                <ul className="space-y-2 text-sm font-mono">
+                  <li>Artist Research</li>
+                  <li>Gear Expert</li>
+                  <li>Labels Agent</li>
+                  <li>Collectives Agent</li>
+                </ul>
+              </div>
+              
+              <div className="border border-border bg-card p-6">
+                <h3 className="font-mono text-sm uppercase tracking-wider text-logo-green mb-4">Infrastructure</h3>
+                <ul className="space-y-2 text-sm font-mono">
+                  <li>Health Monitor</li>
+                  <li>Security Auditor</li>
+                  <li>API Guardian</li>
+                  <li>Data Integrity</li>
+                  <li>Analytics Reporter</li>
+                </ul>
+              </div>
+            </div>
+          </TabsContent>
+
           {/* DATA TAB */}
           <TabsContent value="data" className="space-y-6">
             <div className="flex items-center gap-2 mb-6">
               <Database className="w-6 h-6 text-logo-green" />
               <h2 className="font-mono text-xl uppercase tracking-wider">Data Model</h2>
             </div>
+            
+            <MermaidDiagram chart={mermaidDiagrams.databaseSchema} title="📊 Entity Relationship Diagram" />
             
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
