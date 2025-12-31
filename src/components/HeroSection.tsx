@@ -7,12 +7,17 @@ const HeroSection = () => {
   const { t } = useLanguage();
   
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-background noise">
+    <section 
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-background noise"
+      aria-labelledby="hero-title"
+      itemScope
+      itemType="https://schema.org/WebPageElement"
+    >
       {/* Scanlines overlay */}
-      <div className="absolute inset-0 scanlines pointer-events-none" />
+      <div className="absolute inset-0 scanlines pointer-events-none" aria-hidden="true" />
 
       {/* Background text decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
         <div className="absolute top-1/4 left-0 right-0 opacity-[0.03] text-[20vw] font-mono font-bold leading-none whitespace-nowrap">
           TECHNO.DOG
         </div>
@@ -25,7 +30,7 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-4 md:px-8 pt-20 pb-24">
         <div className="max-w-4xl space-y-12">
           {/* Terminal header */}
-          <div className="font-mono text-xs text-muted-foreground tracking-wider">
+          <div className="font-mono text-xs text-muted-foreground tracking-wider" aria-hidden="true">
             <span className="text-foreground">user@techno.dog</span>
             <span className="text-muted-foreground">:</span>
             <span className="text-foreground">~</span>
@@ -35,17 +40,24 @@ const HeroSection = () => {
           </div>
 
           {/* Main title */}
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]">
+          <header className="space-y-4">
+            <h1 
+              id="hero-title"
+              className="text-5xl md:text-7xl lg:text-8xl font-mono font-bold tracking-tight leading-[0.9]"
+              itemProp="headline"
+            >
               <span className="block text-foreground">
                 techno<span className="text-logo-green">.</span>dog
               </span>
               <span className="block text-foreground animate-glitch-hover text-2xl md:text-4xl lg:text-5xl mt-2">{t('hero.subtitle')}</span>
             </h1>
-          </div>
+          </header>
 
           {/* Mission tagline */}
-          <p className="font-mono text-sm md:text-lg text-foreground/90 max-w-2xl leading-relaxed border-l-2 border-primary pl-4">
+          <p 
+            className="font-mono text-sm md:text-lg text-foreground/90 max-w-2xl leading-relaxed border-l-2 border-primary pl-4"
+            itemProp="description"
+          >
             {t('hero.tagline')}
           </p>
 
@@ -77,8 +89,13 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 pt-12 border-t border-border">
-            <div>
+          <aside 
+            className="grid grid-cols-3 gap-8 pt-12 border-t border-border"
+            aria-label="Platform statistics"
+            itemScope
+            itemType="https://schema.org/AggregateRating"
+          >
+            <div itemProp="ratingCount">
               <div className="font-mono text-3xl md:text-4xl font-bold text-foreground">
                 150+
               </div>
@@ -102,7 +119,7 @@ const HeroSection = () => {
                 {t('hero.attendees')}
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
 
