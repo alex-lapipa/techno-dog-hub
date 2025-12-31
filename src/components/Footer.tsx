@@ -20,11 +20,18 @@ const Footer = () => {
     { label: 'Submit', path: '/submit' },
     { label: 'Developers', path: '/developer' },
   ];
+
+  const legalLinks = [
+    { label: 'Privacy Policy', path: '/privacy' },
+    { label: 'Cookie Policy', path: '/cookies' },
+    { label: 'Terms of Service', path: '/terms' },
+    { label: 'Sitemap', path: '/sitemap' },
+  ];
   
   return (
     <footer className="bg-background border-t border-border py-16 pb-24" role="contentinfo">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
             <Link to="/" className="flex items-center gap-2 group" aria-label="techno.dog home">
@@ -89,6 +96,25 @@ const Footer = () => {
             </h2>
             <ul className="space-y-2" role="list">
               {resourceLinks.map((link) => (
+                <li key={link.path}>
+                  <Link
+                    to={link.path}
+                    className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Legal Navigation */}
+          <nav aria-label="Legal navigation" className="space-y-4">
+            <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              // Legal
+            </h2>
+            <ul className="space-y-2" role="list">
+              {legalLinks.map((link) => (
                 <li key={link.path}>
                   <Link
                     to={link.path}

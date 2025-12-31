@@ -68,7 +68,7 @@ interface ThirdPartyIntegration {
 }
 
 const PrivacyAgentAdmin = () => {
-  const { isAdmin, isLoading: authLoading } = useAdminAuth();
+  const { isAdmin, loading: authLoading } = useAdminAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [alerts, setAlerts] = useState<PrivacyAlert[]>([]);
@@ -198,8 +198,7 @@ const PrivacyAgentAdmin = () => {
     return (
       <AdminPageLayout
         title="Privacy Agent"
-        subtitle="Loading..."
-        stats={[]}
+        description="Loading..."
         icon={Shield}
         isLoading={true}
       >
@@ -212,8 +211,7 @@ const PrivacyAgentAdmin = () => {
     return (
       <AdminPageLayout
         title="Privacy Agent"
-        subtitle="Access denied"
-        stats={[]}
+        description="Access denied"
         icon={Shield}
       >
         <Card>
@@ -239,8 +237,7 @@ const PrivacyAgentAdmin = () => {
   return (
     <AdminPageLayout
       title="Privacy Watchdog"
-      subtitle="GDPR compliance monitoring and privacy alerts"
-      stats={stats}
+      description="GDPR compliance monitoring and privacy alerts"
       icon={Shield}
       actions={
         <Button

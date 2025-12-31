@@ -104,12 +104,12 @@ export function useConsentManager() {
     }
     
     // Log to privacy audit
-    await supabase.from('privacy_audit_log').insert({
+    await supabase.from('privacy_audit_log').insert([{
       action_type: action === 'granted' ? 'consent_granted' : 'consent_revoked',
       session_id: sessionId,
       user_id: user?.id || null,
-      details: { preferences, consent_version: CONSENT_VERSION },
-    });
+      details: JSON.parse(JSON.stringify({ preferences, consent_version: CONSENT_VERSION })),
+    }]);
   }, [state.sessionId]);
 
   // Accept all cookies
