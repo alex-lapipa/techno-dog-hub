@@ -63,7 +63,16 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { action, data } = await req.json();
+    // Safe JSON parsing - handle empty body
+    let body: { action?: string; data?: any };
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+    const { action = 'analyze', data } = body;
+    console.log(`[doggy-self-heal] Action: ${action}`);
 
     switch (action) {
       case 'analyze':
