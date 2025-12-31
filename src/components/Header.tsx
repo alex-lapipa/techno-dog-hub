@@ -93,25 +93,32 @@ const Header = () => {
           <button
             onClick={() => navigateScene('prev')}
             className="fixed left-4 top-1/2 -translate-y-1/2 z-40 p-3 bg-background/90 border border-border hover:border-logo-green hover:bg-card transition-all group"
-            aria-label="Previous scene"
+            aria-label="Navigate to previous scene category"
+            title="Previous scene"
           >
-            <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+            <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" aria-hidden="true" />
           </button>
           <button
             onClick={() => navigateScene('next')}
             className="fixed right-4 top-1/2 -translate-y-1/2 z-40 p-3 bg-background/90 border border-border hover:border-logo-green hover:bg-card transition-all group"
-            aria-label="Next scene"
+            aria-label="Navigate to next scene category"
+            title="Next scene"
           >
-            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" />
+            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-logo-green transition-colors" aria-hidden="true" />
           </button>
         </>
       )}
 
-      <header className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
-        scrolled ? 'bg-background shadow-lg' : 'bg-background/80 backdrop-blur-sm'
-      }`}>
+      <header 
+        className={`fixed top-0 left-0 right-0 z-50 border-b border-border transition-all duration-300 ${
+          scrolled ? 'bg-background shadow-lg' : 'bg-background/80 backdrop-blur-sm'
+        }`}
+        role="banner"
+        itemScope
+        itemType="https://schema.org/WPHeader"
+      >
         <div className="container mx-auto px-4 md:px-6">
-          <nav className="flex items-center justify-between h-14">
+          <nav className="flex items-center justify-between h-14" role="navigation" aria-label="Main navigation" itemScope itemType="https://schema.org/SiteNavigationElement">
             {/* Logo Area */}
             <div className="flex items-center gap-3 shrink-0">
               {/* Icon - Opens Dog Chat */}

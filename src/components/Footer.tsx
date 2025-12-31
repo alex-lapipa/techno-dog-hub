@@ -29,7 +29,12 @@ const Footer = () => {
   ];
   
   return (
-    <footer className="bg-background border-t border-border py-16 pb-24" role="contentinfo">
+    <footer 
+      className="bg-background border-t border-border py-16 pb-24" 
+      role="contentinfo"
+      itemScope
+      itemType="https://schema.org/WPFooter"
+    >
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
