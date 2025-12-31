@@ -324,3 +324,6 @@ verify_jwt = false
 
 [functions.send-admin-welcome]
 verify_jwt = false
+
+[functions.labels-agent]
+verify_jwt = false

@@ -165,7 +165,7 @@ const LabelsAgentAdmin = () => {
     <AdminPageLayout
       title="Labels Agent"
       description="Techno record label researcher with multi-model AI orchestration"
-      icon={<Disc className="w-6 h-6" />}
+      icon={Disc}
       onRefresh={fetchData}
       isLoading={isLoading}
     >
