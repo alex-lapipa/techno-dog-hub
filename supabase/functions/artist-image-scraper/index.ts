@@ -8,6 +8,9 @@ const corsHeaders = {
 };
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+const XAI_KEY = Deno.env.get('XAI_KEY'); // Grok
 const FIRECRAWL_API_KEY = Deno.env.get('FIRECRAWL_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -20,6 +23,181 @@ interface ArtistToProcess {
   city: string | null;
 }
 
+interface ImageSearchResult {
+  url: string;
+  confidence: number;
+  source: string;
+  model: string;
+}
+
+// Multi-model image URL discovery using Grok (X.AI)
+async function discoverImagesWithGrok(artistName: string): Promise<string[]> {
+  if (!XAI_KEY) return [];
+  
+  try {
+    console.log(`[Grok] Searching for ${artistName} images...`);
+    
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${XAI_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'grok-3-latest',
+        messages: [{
+          role: 'user',
+          content: `Find real, working image URLs for the techno/electronic music artist "${artistName}". 
+          
+Search for:
+- Official press photos from their website
+- Resident Advisor artist page photos
+- Discogs artist images  
+- Wikipedia images
+- Festival/event photos
+
+Return ONLY a JSON array of direct image URLs (jpg, png, webp). No explanation, just the JSON array.
+Example: ["https://example.com/artist.jpg", "https://example2.com/photo.png"]
+
+If you cannot find real URLs, return: []`
+        }],
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('[Grok] API error:', await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Parse JSON array from response
+    const jsonMatch = content.match(/\[[\s\S]*?\]/);
+    if (jsonMatch) {
+      const urls = JSON.parse(jsonMatch[0]);
+      console.log(`[Grok] Found ${urls.length} URLs for ${artistName}`);
+      return urls.filter((url: string) => typeof url === 'string' && url.startsWith('http'));
+    }
+    return [];
+  } catch (error) {
+    console.error('[Grok] Error:', error);
+    return [];
+  }
+}
+
+// Multi-model image URL discovery using OpenAI
+async function discoverImagesWithOpenAI(artistName: string): Promise<string[]> {
+  if (!OPENAI_API_KEY) return [];
+  
+  try {
+    console.log(`[OpenAI] Searching for ${artistName} images...`);
+    
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{
+          role: 'user',
+          content: `You are helping find artist photos. For the techno DJ/producer "${artistName}", suggest WHERE to find their official photos.
+
+List the most likely sources:
+1. Their official website domain
+2. Their Resident Advisor page URL format
+3. Their Discogs artist page
+4. Any known festival appearances
+
+Return as JSON:
+{
+  "likely_sources": ["url1", "url2"],
+  "search_terms": ["term1", "term2"]
+}`
+        }],
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('[OpenAI] API error:', await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      console.log(`[OpenAI] Suggested sources for ${artistName}:`, result.likely_sources?.length || 0);
+      return result.likely_sources || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('[OpenAI] Error:', error);
+    return [];
+  }
+}
+
+// Multi-model image URL discovery using Anthropic Claude
+async function discoverImagesWithAnthropic(artistName: string): Promise<string[]> {
+  if (!ANTHROPIC_API_KEY) return [];
+  
+  try {
+    console.log(`[Anthropic] Searching for ${artistName} images...`);
+    
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': ANTHROPIC_API_KEY,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: `For techno artist "${artistName}", list commonly known image sources.
+
+Return JSON only:
+{
+  "ra_url": "https://ra.co/dj/slug",
+  "discogs_url": "https://discogs.com/artist/...",
+  "possible_domains": ["domain1.com", "domain2.com"]
+}`
+        }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('[Anthropic] API error:', await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+    const content = data.content?.[0]?.text || '';
+    
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      const urls: string[] = [];
+      if (result.ra_url) urls.push(result.ra_url);
+      if (result.discogs_url) urls.push(result.discogs_url);
+      console.log(`[Anthropic] Found ${urls.length} URLs for ${artistName}`);
+      return urls;
+    }
+    return [];
+  } catch (error) {
+    console.error('[Anthropic] Error:', error);
+    return [];
+  }
+}
+
 // Use Firecrawl to search for artist images
 async function searchArtistImages(artistName: string): Promise<string[]> {
   if (!FIRECRAWL_API_KEY) {
@@ -28,9 +206,8 @@ async function searchArtistImages(artistName: string): Promise<string[]> {
   }
 
   try {
-    // Search for artist press photos
     const query = `${artistName} techno DJ artist press photo official`;
-    console.log('Searching Firecrawl for:', query);
+    console.log('[Firecrawl] Searching:', query);
 
     const response = await fetch('https://api.firecrawl.dev/v1/search', {
       method: 'POST',
@@ -46,53 +223,48 @@ async function searchArtistImages(artistName: string): Promise<string[]> {
     });
 
     if (!response.ok) {
-      console.error('Firecrawl search error:', await response.text());
+      console.error('[Firecrawl] Search error:', await response.text());
       return [];
     }
 
     const data = await response.json();
     const results = data.data || [];
     
-    // Extract image URLs from results
     const imageUrls: string[] = [];
     for (const result of results) {
       const html = result.html || '';
-      // Extract image URLs from HTML
       const imgMatches = html.match(/https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|webp)/gi) || [];
       imageUrls.push(...imgMatches.slice(0, 3));
     }
 
-    console.log(`Found ${imageUrls.length} potential images for ${artistName}`);
+    console.log(`[Firecrawl] Found ${imageUrls.length} potential images for ${artistName}`);
     return [...new Set(imageUrls)].slice(0, 10);
   } catch (error) {
-    console.error('Firecrawl search error:', error);
+    console.error('[Firecrawl] Search error:', error);
     return [];
   }
 }
 
 // Use Gemini to select the best artist image from candidates
-async function selectBestImage(artistName: string, imageUrls: string[]): Promise<{ url: string; confidence: number } | null> {
-  if (!LOVABLE_API_KEY || imageUrls.length === 0) {
-    return null;
-  }
+async function selectBestImageWithGemini(artistName: string, imageUrls: string[]): Promise<ImageSearchResult | null> {
+  if (!LOVABLE_API_KEY || imageUrls.length === 0) return null;
 
   try {
     const prompt = `You are an expert at identifying electronic music artists.
 
-I need you to analyze these image URLs and determine which one is most likely a legitimate press/promotional photo of the techno/electronic music artist "${artistName}".
+Analyze these image URLs and determine which is most likely a legitimate press photo of "${artistName}":
 
-Image URLs to analyze:
 ${imageUrls.map((url, i) => `${i + 1}. ${url}`).join('\n')}
 
-CRITICAL RULES:
-1. Only select an image if you're confident it's the correct artist
-2. Prefer press photos, festival shots, or DJ booth photos
-3. Avoid stock photos, logos, album art, or crowd shots
-4. If no image seems appropriate, say so
+RULES:
+1. Only select if confident it's the correct artist
+2. Prefer press photos, festival shots, DJ booth photos
+3. Avoid stock photos, logos, album art, crowd shots
+4. If none suitable, say so
 
 Respond with JSON only:
 {
-  "selected_index": number (1-indexed) or null if none suitable,
+  "selected_index": number (1-indexed) or null,
   "confidence": number (0-1),
   "reasoning": "brief explanation"
 }`;
@@ -106,49 +278,99 @@ Respond with JSON only:
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.2,
       }),
     });
 
     if (!response.ok) {
-      console.error('Gemini API error:', await response.text());
+      console.error('[Gemini] API error:', await response.text());
       return null;
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
     
-    // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const result = JSON.parse(jsonMatch[0]);
-      if (result.selected_index && result.confidence >= 0.6) {
+      if (result.selected_index && result.confidence >= 0.5) {
         const selectedUrl = imageUrls[result.selected_index - 1];
         if (selectedUrl) {
-          console.log(`Selected image for ${artistName}: ${selectedUrl} (confidence: ${result.confidence})`);
-          return { url: selectedUrl, confidence: result.confidence };
+          console.log(`[Gemini] Selected for ${artistName}: ${selectedUrl} (${result.confidence})`);
+          return { url: selectedUrl, confidence: result.confidence, source: 'gemini-selection', model: 'gemini-2.5-flash' };
         }
       }
     }
     
     return null;
   } catch (error) {
-    console.error('Gemini selection error:', error);
+    console.error('[Gemini] Selection error:', error);
     return null;
   }
 }
 
-// Fallback: Search for Wikipedia/RA/Discogs images directly
-async function searchKnownSources(artistName: string): Promise<string | null> {
-  if (!FIRECRAWL_API_KEY) return null;
+// Orchestrated multi-model image finding
+async function findArtistImageOrchestrated(artistName: string): Promise<ImageSearchResult | null> {
+  console.log(`\n=== Orchestrated search for: ${artistName} ===`);
+  
+  // Step 1: Parallel discovery from all AI models
+  const [grokUrls, openaiUrls, anthropicUrls, firecrawlUrls] = await Promise.all([
+    discoverImagesWithGrok(artistName),
+    discoverImagesWithOpenAI(artistName),
+    discoverImagesWithAnthropic(artistName),
+    searchArtistImages(artistName),
+  ]);
 
-  const sources = [
-    `site:residentadvisor.net ${artistName}`,
-    `site:discogs.com ${artistName} artist`,
-    `site:wikipedia.org ${artistName} DJ`,
+  // Combine all discovered URLs
+  const allUrls = [...new Set([...grokUrls, ...openaiUrls, ...anthropicUrls, ...firecrawlUrls])];
+  console.log(`[Orchestrator] Combined ${allUrls.length} unique URLs from all sources`);
+
+  if (allUrls.length === 0) {
+    // Fallback: Try known source patterns
+    const knownPatterns = await tryKnownSourcePatterns(artistName);
+    if (knownPatterns) {
+      return knownPatterns;
+    }
+    return null;
+  }
+
+  // Step 2: Use Gemini to select the best image
+  const selectedImage = await selectBestImageWithGemini(artistName, allUrls);
+  
+  if (selectedImage) {
+    return selectedImage;
+  }
+
+  // Step 3: If Gemini couldn't decide, try the first valid-looking URL
+  for (const url of allUrls) {
+    if (url.includes('ra.co') || url.includes('residentadvisor') || 
+        url.includes('discogs') || url.includes('wikimedia')) {
+      console.log(`[Fallback] Using trusted source URL: ${url}`);
+      return { url, confidence: 0.6, source: 'trusted-fallback', model: 'none' };
+    }
+  }
+
+  // Return first URL as last resort
+  if (allUrls.length > 0) {
+    return { url: allUrls[0], confidence: 0.4, source: 'first-available', model: 'none' };
+  }
+
+  return null;
+}
+
+// Try known source patterns for major artists
+async function tryKnownSourcePatterns(artistName: string): Promise<ImageSearchResult | null> {
+  const slug = artistName.toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+  
+  // Known URL patterns for major platforms
+  const patterns = [
+    `https://ra.co/images/profiles/${slug}/`,
+    `https://www.residentadvisor.net/images/profiles/${slug}.jpg`,
   ];
 
-  for (const query of sources) {
+  // Try Wikimedia Commons search via Firecrawl
+  if (FIRECRAWL_API_KEY) {
     try {
       const response = await fetch('https://api.firecrawl.dev/v1/search', {
         method: 'POST',
@@ -157,7 +379,7 @@ async function searchKnownSources(artistName: string): Promise<string | null> {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query,
+          query: `site:commons.wikimedia.org ${artistName} DJ`,
           limit: 2,
           scrapeOptions: { formats: ['html'] }
         }),
@@ -169,65 +391,42 @@ async function searchKnownSources(artistName: string): Promise<string | null> {
         
         for (const result of results) {
           const html = result.html || '';
-          // Look for high-quality image URLs
-          const matches = html.match(/https?:\/\/[^\s"'<>]+\.(jpg|jpeg|png|webp)/gi) || [];
-          const goodUrls = matches.filter((url: string) => 
-            !url.includes('logo') && 
-            !url.includes('icon') && 
-            !url.includes('thumb') &&
-            !url.includes('avatar') &&
-            (url.includes('artist') || url.includes('profile') || url.includes('press') || matches.length === 1)
-          );
-          
-          if (goodUrls.length > 0) {
-            console.log(`Found image from known source for ${artistName}:`, goodUrls[0]);
-            return goodUrls[0];
+          const matches = html.match(/https:\/\/upload\.wikimedia\.org\/[^\s"'<>]+\.(jpg|jpeg|png)/gi) || [];
+          if (matches.length > 0) {
+            console.log(`[WikiCommons] Found image for ${artistName}: ${matches[0]}`);
+            return { url: matches[0], confidence: 0.75, source: 'wikimedia-commons', model: 'firecrawl' };
           }
         }
       }
     } catch (error) {
-      console.error(`Error searching ${query}:`, error);
+      console.error('[WikiCommons] Search error:', error);
     }
   }
 
   return null;
 }
 
-// Process a single artist
-async function processArtist(supabase: any, artist: ArtistToProcess): Promise<{ success: boolean; url?: string; error?: string }> {
-  console.log(`\n=== Processing: ${artist.canonical_name} ===`);
+// Process a single artist with orchestrated multi-model approach
+async function processArtist(supabase: any, artist: ArtistToProcess): Promise<{ success: boolean; url?: string; error?: string; model?: string }> {
+  console.log(`\n========================================`);
+  console.log(`Processing: ${artist.canonical_name}`);
+  console.log(`========================================`);
 
   try {
-    // Step 1: Search for images
-    let imageUrls = await searchArtistImages(artist.canonical_name);
-    
-    // Step 2: If found images, use Gemini to select best one
-    let selectedImage: { url: string; confidence: number } | null = null;
-    
-    if (imageUrls.length > 0) {
-      selectedImage = await selectBestImage(artist.canonical_name, imageUrls);
+    const result = await findArtistImageOrchestrated(artist.canonical_name);
+
+    if (!result) {
+      return { success: false, error: 'No suitable image found from any source' };
     }
 
-    // Step 3: Fallback to known sources if no good match
-    if (!selectedImage) {
-      const fallbackUrl = await searchKnownSources(artist.canonical_name);
-      if (fallbackUrl) {
-        selectedImage = { url: fallbackUrl, confidence: 0.7 };
-      }
-    }
-
-    if (!selectedImage) {
-      return { success: false, error: 'No suitable image found' };
-    }
-
-    // Step 4: Update database with the found image
+    // Update database with the found image
     const { error: updateError } = await supabase
       .from('canonical_artists')
       .update({
-        photo_url: selectedImage.url,
-        photo_verified: selectedImage.confidence >= 0.8,
-        photo_verification_models: ['gemini-2.5-flash'],
-        photo_source: 'firecrawl-search',
+        photo_url: result.url,
+        photo_verified: result.confidence >= 0.7,
+        photo_verification_models: [result.model],
+        photo_source: result.source,
         photo_verified_at: new Date().toISOString(),
       })
       .eq('artist_id', artist.artist_id);
@@ -237,28 +436,26 @@ async function processArtist(supabase: any, artist: ArtistToProcess): Promise<{ 
       return { success: false, error: updateError.message };
     }
 
-    // Also insert into artist_assets for normalized storage
-    const { error: assetError } = await supabase
+    // Also insert into artist_assets
+    await supabase
       .from('artist_assets')
       .upsert({
         artist_id: artist.artist_id,
         asset_type: 'photo',
-        url: selectedImage.url,
+        url: result.url,
         is_primary: true,
-        quality_score: selectedImage.confidence,
-        source_system: 'firecrawl-gemini',
-        source_name: 'Automated Search',
+        quality_score: result.confidence,
+        source_system: result.source,
+        source_name: `Multi-Model Orchestrated (${result.model})`,
         alt_text: `${artist.canonical_name} - Artist Photo`,
       }, {
         onConflict: 'artist_id,asset_type,is_primary'
       });
 
-    if (assetError) {
-      console.log('Asset insert note:', assetError.message);
-    }
-
-    console.log(`✓ Updated ${artist.canonical_name} with image: ${selectedImage.url}`);
-    return { success: true, url: selectedImage.url };
+    console.log(`✓ SUCCESS: ${artist.canonical_name} → ${result.url}`);
+    console.log(`  Source: ${result.source}, Model: ${result.model}, Confidence: ${result.confidence}`);
+    
+    return { success: true, url: result.url, model: result.model };
 
   } catch (error) {
     console.error(`Error processing ${artist.canonical_name}:`, error);
@@ -272,14 +469,20 @@ serve(async (req) => {
   }
 
   try {
-    const { action = 'batch', limit = 3, artist_id } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { action = 'batch', limit = 3, artist_id, slug } = body;
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Log available API keys
+    console.log('Available AI Models:');
+    console.log('  - Grok (X.AI):', XAI_KEY ? '✓' : '✗');
+    console.log('  - OpenAI:', OPENAI_API_KEY ? '✓' : '✗');
+    console.log('  - Anthropic:', ANTHROPIC_API_KEY ? '✓' : '✗');
+    console.log('  - Gemini (Lovable):', LOVABLE_API_KEY ? '✓' : '✗');
+    console.log('  - Firecrawl:', FIRECRAWL_API_KEY ? '✓' : '✗');
+
     if (action === 'status') {
-      // Get status of artist images
-      const { data: stats } = await supabase.rpc('get_artist_image_stats').single();
-      
       const { count: totalArtists } = await supabase
         .from('canonical_artists')
         .select('*', { count: 'exact', head: true });
@@ -301,17 +504,36 @@ serve(async (req) => {
           with_photos: withPhotos || 0,
           missing_photos: missingPhotos || 0,
           coverage: totalArtists ? Math.round((withPhotos || 0) / totalArtists * 100) : 0
+        },
+        models: {
+          grok: !!XAI_KEY,
+          openai: !!OPENAI_API_KEY,
+          anthropic: !!ANTHROPIC_API_KEY,
+          gemini: !!LOVABLE_API_KEY,
+          firecrawl: !!FIRECRAWL_API_KEY,
         }
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    if (action === 'single' && artist_id) {
-      // Process single artist by ID
-      const { data: artist } = await supabase
-        .from('canonical_artists')
-        .select('artist_id, canonical_name, slug, country, city')
-        .eq('artist_id', artist_id)
-        .single();
+    if (action === 'single') {
+      // Process single artist by ID or slug
+      let artist;
+      
+      if (artist_id) {
+        const { data } = await supabase
+          .from('canonical_artists')
+          .select('artist_id, canonical_name, slug, country, city')
+          .eq('artist_id', artist_id)
+          .single();
+        artist = data;
+      } else if (slug) {
+        const { data } = await supabase
+          .from('canonical_artists')
+          .select('artist_id, canonical_name, slug, country, city')
+          .eq('slug', slug)
+          .single();
+        artist = data;
+      }
 
       if (!artist) {
         return new Response(JSON.stringify({ success: false, error: 'Artist not found' }), {
@@ -326,7 +548,7 @@ serve(async (req) => {
       });
     }
 
-    // Batch processing - get artists missing photos
+    // Batch processing
     const { data: artists, error: fetchError } = await supabase
       .from('canonical_artists')
       .select('artist_id, canonical_name, slug, country, city')
@@ -335,7 +557,6 @@ serve(async (req) => {
       .limit(limit);
 
     if (fetchError) {
-      console.error('Fetch error:', fetchError);
       return new Response(JSON.stringify({ success: false, error: fetchError.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -350,19 +571,16 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    console.log(`Processing batch of ${artists.length} artists...`);
+    console.log(`\n>>> BATCH: Processing ${artists.length} artists <<<\n`);
     
-    const results: Array<{ name: string; success: boolean; url?: string; error?: string }> = [];
+    const results: Array<{ name: string; success: boolean; url?: string; error?: string; model?: string }> = [];
     
     for (const artist of artists) {
       const result = await processArtist(supabase, artist);
-      results.push({
-        name: artist.canonical_name,
-        ...result
-      });
+      results.push({ name: artist.canonical_name, ...result });
       
-      // Small delay between artists to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Delay between artists to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
     const successful = results.filter(r => r.success).length;
