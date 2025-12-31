@@ -158,9 +158,15 @@ export type Database = {
           event_name: string
           event_type: string
           id: string
+          latency_ms: number | null
           metadata: Json | null
+          model_selected: string | null
+          model_tier: string | null
           page_path: string | null
+          provider: string | null
+          routing_reason: string | null
           session_id: string | null
+          token_count: number | null
           user_id: string | null
         }
         Insert: {
@@ -168,9 +174,15 @@ export type Database = {
           event_name: string
           event_type: string
           id?: string
+          latency_ms?: number | null
           metadata?: Json | null
+          model_selected?: string | null
+          model_tier?: string | null
           page_path?: string | null
+          provider?: string | null
+          routing_reason?: string | null
           session_id?: string | null
+          token_count?: number | null
           user_id?: string | null
         }
         Update: {
@@ -178,9 +190,15 @@ export type Database = {
           event_name?: string
           event_type?: string
           id?: string
+          latency_ms?: number | null
           metadata?: Json | null
+          model_selected?: string | null
+          model_tier?: string | null
           page_path?: string | null
+          provider?: string | null
+          routing_reason?: string | null
           session_id?: string | null
+          token_count?: number | null
           user_id?: string | null
         }
         Relationships: []
@@ -3210,6 +3228,48 @@ export type Database = {
           source?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      dog_agent_config: {
+        Row: {
+          created_at: string | null
+          groq_enabled: boolean | null
+          groq_timeout_ms: number | null
+          id: string
+          max_tokens_balanced: number | null
+          max_tokens_complex: number | null
+          max_tokens_simple: number | null
+          updated_at: string | null
+          use_gpt5_for_complex: boolean | null
+          use_groq_for_simple: boolean | null
+          use_streaming: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          groq_enabled?: boolean | null
+          groq_timeout_ms?: number | null
+          id?: string
+          max_tokens_balanced?: number | null
+          max_tokens_complex?: number | null
+          max_tokens_simple?: number | null
+          updated_at?: string | null
+          use_gpt5_for_complex?: boolean | null
+          use_groq_for_simple?: boolean | null
+          use_streaming?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          groq_enabled?: boolean | null
+          groq_timeout_ms?: number | null
+          id?: string
+          max_tokens_balanced?: number | null
+          max_tokens_complex?: number | null
+          max_tokens_simple?: number | null
+          updated_at?: string | null
+          use_gpt5_for_complex?: boolean | null
+          use_groq_for_simple?: boolean | null
+          use_streaming?: boolean | null
         }
         Relationships: []
       }
