@@ -350,3 +350,9 @@ verify_jwt = false
 
 [functions.amazon-link]
 verify_jwt = false
+
+[functions.sitemap-xml]
+verify_jwt = false
+
+[functions.privacy-watchdog]
+verify_jwt = false
