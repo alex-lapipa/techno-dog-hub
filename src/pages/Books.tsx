@@ -202,34 +202,69 @@ const Books = () => {
           </div>
         </div>
 
-        {/* Category Tabs */}
-        <div className="mb-8 overflow-x-auto border-b border-logo-green/30">
-          <div className="flex gap-6 min-w-max">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className={cn(
-                "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all relative",
-                !activeCategory
-                  ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              All ({books.length})
-            </button>
-            {categoriesWithCounts.map((category) => (
+        {/* Category Tabs - Auto-scrolling */}
+        <div className="mb-8 border-b border-logo-green/30 overflow-hidden relative group">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex animate-scroll-x group-hover:[animation-play-state:paused]">
+            {/* First set */}
+            <div className="flex gap-6 shrink-0 pr-6">
               <button
-                key={category.id}
-                onClick={() => setActiveCategory(activeCategory === category.name ? null : category.name)}
+                onClick={() => setActiveCategory(null)}
                 className={cn(
-                  "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap relative",
-                  activeCategory === category.name
+                  "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all relative whitespace-nowrap",
+                  !activeCategory
                     ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {category.name} ({category.count})
+                All ({books.length})
               </button>
-            ))}
+              {categoriesWithCounts.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(activeCategory === category.name ? null : category.name)}
+                  className={cn(
+                    "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap relative",
+                    activeCategory === category.name
+                      ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {category.name} ({category.count})
+                </button>
+              ))}
+            </div>
+            {/* Duplicate set for seamless loop */}
+            <div className="flex gap-6 shrink-0 pr-6">
+              <button
+                onClick={() => setActiveCategory(null)}
+                className={cn(
+                  "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all relative whitespace-nowrap",
+                  !activeCategory
+                    ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                All ({books.length})
+              </button>
+              {categoriesWithCounts.map((category) => (
+                <button
+                  key={`dup-${category.id}`}
+                  onClick={() => setActiveCategory(activeCategory === category.name ? null : category.name)}
+                  className={cn(
+                    "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap relative",
+                    activeCategory === category.name
+                      ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {category.name} ({category.count})
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
