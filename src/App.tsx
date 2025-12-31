@@ -89,6 +89,7 @@ const KnowledgeGapAdmin = lazy(() => import("./pages/KnowledgeGapAdmin"));
 const TicketingAdmin = lazy(() => import("./pages/TicketingAdmin"));
 const DogAgentAdmin = lazy(() => import("./pages/DogAgentAdmin"));
 const TrainingCenter = lazy(() => import("./pages/TrainingCenter"));
+const UserTrainingCenter = lazy(() => import("./pages/UserTrainingCenter"));
 const DoggiesAdmin = lazy(() => import("./pages/DoggiesAdmin"));
 const DoggyWidget = lazy(() => import("./pages/DoggyWidget"));
 const TechnoDoggies = lazy(() => import("./pages/TechnoDoggies"));

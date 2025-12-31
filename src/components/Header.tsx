@@ -228,6 +228,12 @@ const Header = () => {
                 Support
               </Button>
             </Link>
+            <Link to="/training">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-foreground border border-foreground bg-foreground/5 hover:bg-foreground/15 hover:border-foreground px-2.5 py-1.5 h-auto">
+                <BookOpen className="w-3 h-3 mr-1.5" />
+                Training
+              </Button>
+            </Link>
             <Link to="/admin">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
                 <Shield className="w-3.5 h-3.5 mr-1.5" />
