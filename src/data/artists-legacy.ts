@@ -321,7 +321,8 @@ export const artists: Artist[] = [
     country: "UK",
     region: "Europe",
     active: "1994–present",
-    tags: ["industrial", "Birmingham sound", "hardware", "modular"],
+    tags: ["industrial", "Birmingham sound", "hardware", "modular", "Downwards"],
+    knownFor: "The Birmingham Blueprint",
     image: {
       url: "https://upload.wikimedia.org/wikipedia/commons/0/05/Surgeon_%28Anthony_Child%29.jpg",
       author: "Ali Wade",
@@ -330,12 +331,14 @@ export const artists: Artist[] = [
       sourceUrl: "https://commons.wikimedia.org/wiki/File:Surgeon_(Anthony_Child).jpg",
       sourceName: "Wikimedia Commons"
     },
-    bio: "One of the most influential figures in British techno. Co-founder of Counterbalance and Dynamic Tension. Raw, visceral sound and extended live sets. His modular synthesizer performances are legendary.",
-    labels: ["Tresor", "Dynamic Tension", "Counterbalance", "Blueprint"],
+    bio: "Pioneer of the Birmingham techno sound alongside Regis. Known for his 'surgical' precision and industrial textures. Co-founded Downwards Records, defining the raw industrial techno aesthetic. His modular synthesizer performances are legendary.",
+    labels: ["Downwards", "Dynamic Tension", "SRX", "Tresor", "Blueprint"],
     collaborators: ["Regis", "Lady Starlight", "British Murder Boys"],
+    topTracks: ["Magneze", "Bad Hands", "La Real"],
     careerHighlights: [
-      "Co-founded Birmingham techno scene",
+      "Co-founded Birmingham techno scene with Regis",
       "British Murder Boys with Regis",
+      "Co-founded Downwards Records",
       "Dynamic Tension label",
       "Tresor resident since 1990s",
       "Extended modular live sets"
@@ -374,11 +377,12 @@ export const artists: Artist[] = [
     country: "UK",
     region: "Europe",
     active: "1991–present",
-    tags: ["industrial", "Birmingham", "Sandwell District", "dark"],
-    // No photoUrl - requires licensed image
-    bio: "Co-founder of Downwards Records. Half of British Murder Boys. A key architect of the Birmingham sound and industrial techno movement. His productions are raw, uncompromising, and deeply influential.",
-    labels: ["Downwards", "Blackest Ever Black", "Sandwell District"],
-    collaborators: ["Surgeon", "Female", "British Murder Boys"],
+    tags: ["industrial", "Birmingham", "Sandwell District", "dark", "Downwards"],
+    knownFor: "The Birmingham Architect",
+    bio: "Co-founded Downwards Records with Surgeon, defining the industrial sound of Birmingham. Later formed the legendary Sandwell District collective. His productions are raw, uncompromising, and deeply influential in the industrial techno movement.",
+    labels: ["Downwards", "Sandwell District", "Blackest Ever Black"],
+    collaborators: ["Surgeon", "Female", "Silent Servant"],
+    topTracks: ["Speak to Me", "Blood Witness", "Application of Language"],
     careerHighlights: [
       "Founded Downwards Records 1993",
       "British Murder Boys with Surgeon",
@@ -1224,19 +1228,24 @@ export const artists: Artist[] = [
     country: "Spain",
     region: "Europe",
     active: "1989–present",
-    tags: ["Madrid", "PoleGroup", "hypnotic", "deep"],
+    tags: ["Madrid", "PoleGroup", "hypnotic", "deep", "industrial", "The Omen"],
+    knownFor: "Godfather of Spanish Techno",
     photoUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800",
-    bio: "Pioneer of Spanish techno. Co-founder of PoleGroup. His Warm Up club shaped Madrid's scene for decades. His extended sets are legendary.",
+    bio: "The most influential figure in Spanish techno since the 90s. His label Pole Group defined a generation. Resident at legendary clubs including The Omen. Connected Spain with the international techno circuit. Known for dark, hypnotic, industrial techno.",
     labels: ["PoleGroup", "Warm Up", "Semantica"],
+    topTracks: ["Grey Fades to Green", "About Discipline and Education", "Black Propaganda"],
     careerHighlights: [
       "Co-founded PoleGroup",
       "Warm Up club Madrid",
+      "The Omen residency",
       "35+ years in techno",
-      "Spanish techno godfather"
+      "Spanish techno godfather",
+      "Connected Spain to international techno circuit"
     ],
     keyReleases: [
       { title: "About Discipline and Education", label: "PoleGroup", year: 2013, format: "LP" },
-      { title: "Grey Fades to Green", label: "Warm Up", year: 2018, format: "LP" }
+      { title: "Grey Fades to Green", label: "Warm Up", year: 2018, format: "LP" },
+      { title: "Black Propaganda", label: "PoleGroup", year: 2016, format: "LP" }
     ],
     studioGear: [
       "Roland TR-909",
@@ -2523,22 +2532,26 @@ export const artists: Artist[] = [
     id: "carl-cox",
     name: "Carl Cox",
     realName: "Carl Cox",
-    city: "Brighton",
+    city: "Oldham",
     country: "UK",
     region: "Europe",
     active: "1985–present",
-    tags: ["Space Ibiza", "three-deck", "festival", "house", "techno"],
-    bio: "The King. Legendary three-deck DJ who bridged house and techno. His residency at Space Ibiza became legendary. One of techno's most beloved and enduring figures.",
+    tags: ["Space Ibiza", "three-deck", "festival", "house", "techno", "Intec", "high-energy"],
+    knownFor: "The King",
+    bio: "Known worldwide for decades of legendary performances. Founder of Intec Records. Famous for his mastery of three decks and inexhaustible energy in the booth. His 16-year Space Ibiza residency became the stuff of legend.",
     labels: ["Intec", "23rd Century"],
+    topTracks: ["I Want You (Forever)", "Phuture 2000", "The Player"],
     careerHighlights: [
       "16-year Space Ibiza residency",
       "Pioneer of three-deck mixing",
       "Founded Intec Records",
-      "Global festival headliner"
+      "Global festival headliner",
+      "Known as 'The King'"
     ],
     keyReleases: [
       { title: "Phuture 2000", label: "Edel", year: 1994, format: "12\"" },
-      { title: "I Want You (Forever)", label: "Edel", year: 1991, format: "12\"" }
+      { title: "I Want You (Forever)", label: "Edel", year: 1991, format: "12\"" },
+      { title: "The Player", label: "Intec", year: 2001, format: "12\"" }
     ],
     studioGear: [
       "Pioneer CDJ setup",
@@ -2562,19 +2575,25 @@ export const artists: Artist[] = [
     country: "France",
     region: "Europe",
     active: "1987–present",
-    tags: ["French", "F Communications", "eclectic", "jazz", "warehouse"],
-    bio: "French techno pioneer. Founded F Communications label. Known for eclectic DJ sets spanning jazz to hard techno. His 'Wake Up' nights at Rex Club defined French electronic music.",
-    labels: ["F Communications"],
+    tags: ["French", "F Communications", "eclectic", "jazz", "warehouse", "PIAS"],
+    knownFor: "The French Ambassador",
+    bio: "The greatest ambassador of French electronic music. Started at The Haçienda in Manchester, then brought techno to France. Known for legendary marathon sets. Author of the influential book 'Electrochoc'. Deep, eclectic, and emotional techno.",
+    labels: ["F Communications", "PIAS"],
+    topTracks: ["Crispy Bacon", "The Man with the Red Face", "Flashback"],
     careerHighlights: [
       "Founded F Communications",
+      "The Haçienda Manchester resident",
       "Rex Club Paris residency",
       "Wake Up parties series",
-      "French techno pioneer"
+      "Author of 'Electrochoc'",
+      "French techno pioneer",
+      "Legendary marathon sets"
     ],
     keyReleases: [
       { title: "Shot in the Dark", label: "F Communications", year: 1994, format: "LP" },
       { title: "30", label: "F Communications", year: 1997, format: "LP" },
-      { title: "Unreasonable Behaviour", label: "F Communications", year: 2000, format: "LP" }
+      { title: "Unreasonable Behaviour", label: "F Communications", year: 2000, format: "LP" },
+      { title: "The Man with the Red Face", label: "F Communications", year: 2000, format: "12\"" }
     ],
     studioGear: [
       "Roland TR-909",
@@ -2595,18 +2614,21 @@ export const artists: Artist[] = [
     country: "UK/Netherlands",
     region: "Europe",
     active: "1990–present",
-    tags: ["electro", "Baron of Techno", "Red", "ADE"],
-    bio: "The Baron of Techno. Known for his 'Red' series of EPs. Long-time Amsterdam resident and ADE fixture. His hard, driving style influenced countless producers.",
-    labels: ["White Noise", "Skint"],
+    tags: ["electro", "Baron of Techno", "Red", "ADE", "White Noise"],
+    knownFor: "The Baron of Techno",
+    bio: "Known as 'The Baron of Techno' for his legendary sets and influential White Noise radio program. His 'Red' series of EPs defined the techno-electro sound of the 90s. Long-time Amsterdam resident and ADE fixture.",
+    labels: ["White Noise", "Skint", "Deconstruction"],
+    topTracks: ["Red 1", "Red 2", "Red 3", "Wisdom to the Wise"],
     careerHighlights: [
-      "Red series defined 90s techno",
+      "Red series defined 90s techno-electro",
       "Amsterdam Dance Event regular",
       "BBC Radio 1 presenter",
-      "White Noise podcast"
+      "White Noise podcast/radio show"
     ],
     keyReleases: [
       { title: "Red 1", label: "Deconstruction", year: 1994, format: "12\"" },
       { title: "Red 2", label: "Deconstruction", year: 1994, format: "12\"" },
+      { title: "Red 3", label: "Deconstruction", year: 1995, format: "12\"" },
       { title: "Archive One", label: "Skint", year: 1996, format: "LP" }
     ],
     studioGear: [
@@ -2628,18 +2650,22 @@ export const artists: Artist[] = [
     country: "Germany",
     region: "Europe",
     active: "1990–present",
-    tags: ["Frankfurt", "CLR", "hard techno", "Spinclub"],
-    bio: "Frankfurt techno legend. Founded CLR label and podcast. Known for his pounding, industrial-tinged techno and marathon DJ sets.",
-    labels: ["CLR"],
+    tags: ["Frankfurt", "CLR", "hard techno", "Spinclub", "industrial", "Mute"],
+    knownFor: "The Frankfurt Hammer",
+    bio: "Pioneer of hard techno and founder of CLR label. His CLR podcast was a mandatory reference for hard techno fans. Key figure in the Frankfurt techno legacy alongside Sven Väth. Known for industrial-tinged techno and marathon DJ sets.",
+    labels: ["CLR", "Mute"],
+    topTracks: ["Atari", "Ping Pong", "Analogon"],
     careerHighlights: [
       "Founded CLR Records",
       "CLR Podcast pioneer",
       "Spinclub Frankfurt co-founder",
-      "Nature One festival resident"
+      "Nature One festival resident",
+      "Key figure in Frankfurt techno legacy"
     ],
     keyReleases: [
       { title: "Another Day", label: "CLR", year: 2010, format: "12\"" },
-      { title: "Stigmata", label: "CLR", year: 2011, format: "LP" }
+      { title: "Stigmata", label: "CLR", year: 2011, format: "LP" },
+      { title: "Burn Slow", label: "Mute", year: 2018, format: "LP" }
     ],
     studioGear: [
       "Native Instruments",
@@ -2651,6 +2677,43 @@ export const artists: Artist[] = [
       "Pioneer DJM-V10"
     ],
     riderNotes: "Extended sets preferred. Industrial venues."
+  },
+  {
+    id: "sven-vath",
+    name: "Sven Väth",
+    realName: "Sven Väth",
+    city: "Frankfurt",
+    country: "Germany",
+    region: "Europe",
+    active: "1982–present",
+    tags: ["Frankfurt", "Cocoon", "Eye Q", "Harthouse", "trance", "marathon"],
+    knownFor: "Papa Sven",
+    bio: "Godfather of Frankfurt techno and founder of Cocoon. Residency of over 20 years at Amnesia Ibiza. Known for 10+ hour marathon sets and chamanic stage presence. His labels Eye Q and Harthouse defined early German trance and techno.",
+    labels: ["Cocoon", "Eye Q", "Harthouse"],
+    topTracks: ["L'Esperanza", "An Accident in Paradise", "Harlequin (The Beauty and The Beast)"],
+    careerHighlights: [
+      "Founded Cocoon empire",
+      "Eye Q and Harthouse labels",
+      "20+ year Amnesia Ibiza residency",
+      "Frankfurt techno godfather",
+      "10+ hour marathon sets",
+      "Chamanic stage presence"
+    ],
+    keyReleases: [
+      { title: "Accident in Paradise", label: "Eye Q", year: 1993, format: "LP" },
+      { title: "The Harlequin, The Robot and The Ballet Dancer", label: "Eye Q", year: 1994, format: "LP" },
+      { title: "In the Mix: The Sound of the 1st Season", label: "Cocoon", year: 2000, format: "CD" }
+    ],
+    studioGear: [
+      "Roland Juno-60",
+      "Roland TR-909",
+      "Moog synthesizers"
+    ],
+    djSetup: [
+      "Pioneer CDJ-3000",
+      "Pioneer DJM-V10"
+    ],
+    riderNotes: "Extended marathon sets (10+ hours). Large stage presence space required."
   },
   {
     id: "adam-beyer",
