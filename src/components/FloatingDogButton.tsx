@@ -42,8 +42,10 @@ const FloatingDogButton = () => {
   const [dogChatOpen, setDogChatOpen] = useState(false);
   const [isPulsing, setIsPulsing] = useState(true);
   const [bubbleMessage, setBubbleMessage] = useState<string | null>(null);
+  const [displayedText, setDisplayedText] = useState('');
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const shownMessagesRef = useRef<Set<number>>(new Set());
+  const typewriterRef = useRef<NodeJS.Timeout | null>(null);
   const location = useLocation();
 
   // Hide on widget page - keep widget clean and self-contained
@@ -92,12 +94,31 @@ const FloatingDogButton = () => {
     let hideTimeout: NodeJS.Timeout;
 
     const showBubble = () => {
-      setBubbleMessage(pickRandomMessage());
+      const message = pickRandomMessage();
+      setBubbleMessage(message);
+      setDisplayedText('');
       setBubbleVisible(true);
       
-      // Hide after exactly 4 seconds
+      // Typewriter effect
+      let charIndex = 0;
+      const typeSpeed = 35; // ms per character
+      
+      const typeNextChar = () => {
+        if (charIndex < message.length) {
+          setDisplayedText(message.slice(0, charIndex + 1));
+          charIndex++;
+          typewriterRef.current = setTimeout(typeNextChar, typeSpeed);
+        }
+      };
+      
+      typewriterRef.current = setTimeout(typeNextChar, 100);
+      
+      // Hide after 4 seconds (starts after bubble appears)
       hideTimeout = setTimeout(() => {
         setBubbleVisible(false);
+        if (typewriterRef.current) {
+          clearTimeout(typewriterRef.current);
+        }
       }, 4000);
     };
 
@@ -114,6 +135,9 @@ const FloatingDogButton = () => {
       clearTimeout(initialTimeout);
       clearTimeout(bubbleTimeout);
       clearTimeout(hideTimeout);
+      if (typewriterRef.current) {
+        clearTimeout(typewriterRef.current);
+      }
     };
   }, [dogChatOpen, isWidgetPage, pickRandomMessage]);
 
@@ -139,7 +163,8 @@ const FloatingDogButton = () => {
           <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-background/95" />
           
           <p className="font-mono text-xs text-foreground/90 text-center leading-relaxed">
-            {bubbleMessage}
+            {displayedText}
+            <span className="inline-block w-0.5 h-3 bg-logo-green ml-0.5 animate-pulse" />
           </p>
         </div>
       </div>
