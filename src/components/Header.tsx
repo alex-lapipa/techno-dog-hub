@@ -43,6 +43,7 @@ const Header = () => {
       isScenes: true,
       sub: SCENES_ITEMS
     },
+    { label: 'Books', path: '/books' },
     { label: 'News', path: '/news' },
   ];
 
