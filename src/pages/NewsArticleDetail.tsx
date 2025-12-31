@@ -59,16 +59,93 @@ const NewsArticleDetail = () => {
     });
   };
 
+  // Parse inline markdown for bold, italic, inline code
+  const parseInlineMarkdown = (text: string): JSX.Element => {
+    const parts: (string | JSX.Element)[] = [];
+    let remaining = text;
+    let keyIndex = 0;
+
+    while (remaining.length > 0) {
+      // Bold **text**
+      const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+      // Italic *text* (not preceded by *)
+      const italicMatch = remaining.match(/(?<!\*)\*([^*]+?)\*(?!\*)/);
+      // Inline code `text`
+      const codeMatch = remaining.match(/`(.+?)`/);
+
+      const matches = [
+        boldMatch ? { type: 'bold', match: boldMatch, index: boldMatch.index! } : null,
+        italicMatch ? { type: 'italic', match: italicMatch, index: italicMatch.index! } : null,
+        codeMatch ? { type: 'code', match: codeMatch, index: codeMatch.index! } : null,
+      ].filter(Boolean).sort((a, b) => a!.index - b!.index);
+
+      if (matches.length === 0) {
+        parts.push(remaining);
+        break;
+      }
+
+      const first = matches[0]!;
+      if (first.index > 0) {
+        parts.push(remaining.substring(0, first.index));
+      }
+
+      if (first.type === 'bold') {
+        parts.push(
+          <strong key={keyIndex++} className="font-semibold text-foreground">
+            {first.match![1]}
+          </strong>
+        );
+      } else if (first.type === 'italic') {
+        parts.push(
+          <em key={keyIndex++} className="italic text-muted-foreground/90">
+            {first.match![1]}
+          </em>
+        );
+      } else if (first.type === 'code') {
+        parts.push(
+          <code key={keyIndex++} className="bg-muted px-1.5 py-0.5 text-sm text-primary">
+            {first.match![1]}
+          </code>
+        );
+      }
+
+      remaining = remaining.substring(first.index + first.match![0].length);
+    }
+
+    return <>{parts}</>;
+  };
+
   const renderMarkdown = (markdown: string) => {
     const lines = markdown.split('\n');
     const elements: JSX.Element[] = [];
     let currentParagraph: string[] = [];
+    let inList = false;
+    let listItems: string[] = [];
+    let listType: 'ul' | 'ol' = 'ul';
+
+    const flushList = () => {
+      if (listItems.length > 0) {
+        const ListTag = listType;
+        elements.push(
+          <ListTag key={elements.length} className={`${listType === 'ol' ? 'list-decimal' : 'list-none'} ml-4 my-4 space-y-2`}>
+            {listItems.map((item, i) => (
+              <li key={i} className="font-mono text-[15px] leading-relaxed text-foreground/90 pl-2 border-l border-muted-foreground/30">
+                {parseInlineMarkdown(item)}
+              </li>
+            ))}
+          </ListTag>
+        );
+        listItems = [];
+        inList = false;
+      }
+    };
 
     const flushParagraph = () => {
+      flushList();
       if (currentParagraph.length > 0) {
         elements.push(
-          <p key={elements.length} className="mb-4">
-            {currentParagraph.join(' ')}
+          <p key={elements.length} className="font-mono text-[15px] leading-[1.8] text-foreground/85 mb-5">
+            {parseInlineMarkdown(currentParagraph.join(' '))}
           </p>
         );
         currentParagraph = [];
@@ -83,42 +160,74 @@ const NewsArticleDetail = () => {
         return;
       }
 
+      // Main section headers (# )
       if (trimmedLine.startsWith('# ')) {
         flushParagraph();
         elements.push(
-          <h2 key={elements.length} className="font-mono text-2xl uppercase tracking-tight mt-8 mb-4">
+          <h2 key={elements.length} className="font-mono text-xl md:text-2xl font-semibold uppercase tracking-wide text-foreground mt-10 mb-4 border-b border-border pb-2">
             {trimmedLine.substring(2)}
           </h2>
         );
-      } else if (trimmedLine.startsWith('## ')) {
+      } 
+      // Subsection headers (## )
+      else if (trimmedLine.startsWith('## ')) {
         flushParagraph();
         elements.push(
-          <h3 key={elements.length} className="font-mono text-xl uppercase tracking-tight mt-6 mb-3">
+          <h3 key={elements.length} className="font-mono text-lg font-medium uppercase tracking-wider text-logo-green mt-8 mb-3">
             {trimmedLine.substring(3)}
           </h3>
         );
-      } else if (trimmedLine.startsWith('### ')) {
+      } 
+      // Minor headers (### )
+      else if (trimmedLine.startsWith('### ')) {
         flushParagraph();
         elements.push(
-          <h4 key={elements.length} className="font-mono text-lg uppercase tracking-tight mt-4 mb-2">
+          <h4 key={elements.length} className="font-mono text-base font-medium text-foreground/90 mt-6 mb-2">
             {trimmedLine.substring(4)}
           </h4>
         );
-      } else if (trimmedLine.startsWith('> ')) {
+      } 
+      // Blockquotes
+      else if (trimmedLine.startsWith('> ')) {
         flushParagraph();
         elements.push(
-          <blockquote key={elements.length} className="border-l-2 border-foreground pl-4 my-4 italic text-muted-foreground">
-            {trimmedLine.substring(2)}
+          <blockquote key={elements.length} className="border-l-2 border-logo-green/60 pl-5 py-2 my-6 italic text-muted-foreground text-[15px] leading-relaxed bg-muted/20">
+            {parseInlineMarkdown(trimmedLine.substring(2))}
           </blockquote>
         );
-      } else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
+      } 
+      // Numbered lists
+      else if (/^\d+\.\s/.test(trimmedLine)) {
+        flushParagraph();
+        if (!inList || listType !== 'ol') {
+          flushList();
+          listType = 'ol';
+        }
+        inList = true;
+        listItems.push(trimmedLine.replace(/^\d+\.\s/, ''));
+      }
+      // Bullet lists
+      else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
+        flushParagraph();
+        if (!inList || listType !== 'ul') {
+          flushList();
+          listType = 'ul';
+        }
+        inList = true;
+        listItems.push(trimmedLine.substring(2));
+      } 
+      // Signature line (starts with —)
+      else if (trimmedLine.startsWith('—') || trimmedLine.startsWith('--')) {
         flushParagraph();
         elements.push(
-          <li key={elements.length} className="ml-4 mb-1">
-            {trimmedLine.substring(2)}
-          </li>
+          <p key={elements.length} className="font-mono text-sm text-muted-foreground mt-8 pt-4 border-t border-border/50">
+            {trimmedLine}
+          </p>
         );
-      } else {
+      }
+      // Regular paragraph
+      else {
+        if (inList) flushList();
         currentParagraph.push(trimmedLine);
       }
     });
@@ -209,39 +318,39 @@ const NewsArticleDetail = () => {
             Back to News
           </Link>
 
-          <article className="max-w-3xl">
-            <header className="mb-8">
-              <div className="flex flex-wrap items-center gap-3 mb-4">
+          <article className="max-w-2xl lg:max-w-3xl">
+            <header className="mb-10">
+              <div className="flex flex-wrap items-center gap-3 mb-5">
                 {article.city_tags?.map(tag => (
-                  <Badge key={tag} variant="outline" className="font-mono text-xs uppercase">
+                  <Badge key={tag} variant="outline" className="font-mono text-[10px] uppercase tracking-widest">
                     {tag}
                   </Badge>
                 ))}
                 {article.genre_tags?.map(tag => (
-                  <Badge key={tag} variant="secondary" className="font-mono text-xs uppercase">
+                  <Badge key={tag} variant="secondary" className="font-mono text-[10px] uppercase tracking-widest">
                     {tag}
                   </Badge>
                 ))}
               </div>
 
-              <h1 className="font-mono text-3xl md:text-5xl uppercase tracking-tight mb-4">
+              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-tight mb-4 leading-tight">
                 {article.title}
               </h1>
 
               {article.subtitle && (
-                <p className="font-mono text-lg text-muted-foreground mb-6">
+                <p className="font-mono text-base md:text-lg font-light text-muted-foreground mb-6 leading-relaxed">
                   {article.subtitle}
                 </p>
               )}
 
-              <div className="flex items-center gap-4 font-mono text-sm text-muted-foreground border-t border-border pt-4">
-                <span>By {article.author_pseudonym}</span>
-                <span>•</span>
-                <span>{formatDate(article.published_at || article.created_at)}</span>
+              <div className="flex items-center gap-4 font-mono text-xs text-muted-foreground border-t border-border pt-4">
+                <span className="font-medium text-foreground/80">By {article.author_pseudonym}</span>
+                <span className="text-border">•</span>
+                <span className="font-light">{formatDate(article.published_at || article.created_at)}</span>
               </div>
             </header>
 
-            <div className="font-mono text-base leading-relaxed">
+            <div className="space-y-1">
               {renderMarkdown(article.body_markdown)}
             </div>
 
