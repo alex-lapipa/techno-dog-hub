@@ -6121,6 +6121,344 @@ export type Database = {
           },
         ]
       }
+      seo_content_calendar: {
+        Row: {
+          content_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          performance_notes: string | null
+          published_at: string | null
+          scheduled_date: string | null
+          seo_objective: string | null
+          status: string | null
+          target_keywords: string[] | null
+          target_page: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          performance_notes?: string | null
+          published_at?: string | null
+          scheduled_date?: string | null
+          seo_objective?: string | null
+          status?: string | null
+          target_keywords?: string[] | null
+          target_page?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          performance_notes?: string | null
+          published_at?: string | null
+          scheduled_date?: string | null
+          seo_objective?: string | null
+          status?: string | null
+          target_keywords?: string[] | null
+          target_page?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_keyword_strategy: {
+        Row: {
+          competition_level: string | null
+          content_strategy: string | null
+          created_at: string | null
+          current_ranking: string | null
+          id: string
+          keyword: string
+          keyword_type: string | null
+          notes: string | null
+          search_volume_estimate: string | null
+          status: string | null
+          target_pages: string[] | null
+          target_ranking: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          competition_level?: string | null
+          content_strategy?: string | null
+          created_at?: string | null
+          current_ranking?: string | null
+          id?: string
+          keyword: string
+          keyword_type?: string | null
+          notes?: string | null
+          search_volume_estimate?: string | null
+          status?: string | null
+          target_pages?: string[] | null
+          target_ranking?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          competition_level?: string | null
+          content_strategy?: string | null
+          created_at?: string | null
+          current_ranking?: string | null
+          id?: string
+          keyword?: string
+          keyword_type?: string | null
+          notes?: string | null
+          search_volume_estimate?: string | null
+          status?: string | null
+          target_pages?: string[] | null
+          target_ranking?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_page_analysis: {
+        Row: {
+          content_analysis: Json | null
+          core_web_vitals: Json | null
+          created_at: string | null
+          heading_analysis: Json | null
+          id: string
+          image_optimization: Json | null
+          internal_links_analysis: Json | null
+          keyword_opportunities: Json | null
+          last_analyzed_at: string | null
+          meta_description_analysis: Json | null
+          mobile_optimization: Json | null
+          page_name: string
+          page_path: string
+          recommendations: string[] | null
+          seo_score: number | null
+          structured_data_analysis: Json | null
+          title_analysis: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          content_analysis?: Json | null
+          core_web_vitals?: Json | null
+          created_at?: string | null
+          heading_analysis?: Json | null
+          id?: string
+          image_optimization?: Json | null
+          internal_links_analysis?: Json | null
+          keyword_opportunities?: Json | null
+          last_analyzed_at?: string | null
+          meta_description_analysis?: Json | null
+          mobile_optimization?: Json | null
+          page_name: string
+          page_path: string
+          recommendations?: string[] | null
+          seo_score?: number | null
+          structured_data_analysis?: Json | null
+          title_analysis?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          content_analysis?: Json | null
+          core_web_vitals?: Json | null
+          created_at?: string | null
+          heading_analysis?: Json | null
+          id?: string
+          image_optimization?: Json | null
+          internal_links_analysis?: Json | null
+          keyword_opportunities?: Json | null
+          last_analyzed_at?: string | null
+          meta_description_analysis?: Json | null
+          mobile_optimization?: Json | null
+          page_name?: string
+          page_path?: string
+          recommendations?: string[] | null
+          seo_score?: number | null
+          structured_data_analysis?: Json | null
+          title_analysis?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_strategy_actions: {
+        Row: {
+          action_name: string
+          action_type: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string | null
+          description: string | null
+          estimated_impact: string | null
+          id: string
+          implementation_notes: string | null
+          page_target: string | null
+          priority: string | null
+          section_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          action_name: string
+          action_type: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_impact?: string | null
+          id?: string
+          implementation_notes?: string | null
+          page_target?: string | null
+          priority?: string | null
+          section_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          action_name?: string
+          action_type?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_impact?: string | null
+          id?: string
+          implementation_notes?: string | null
+          page_target?: string | null
+          priority?: string | null
+          section_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_strategy_actions_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "seo_strategy_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_strategy_agent_runs: {
+        Row: {
+          actions_generated: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          pages_analyzed: number | null
+          results: Json | null
+          run_type: string
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          actions_generated?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          pages_analyzed?: number | null
+          results?: Json | null
+          run_type: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          actions_generated?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          pages_analyzed?: number | null
+          results?: Json | null
+          run_type?: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      seo_strategy_sections: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          last_analyzed_at: string | null
+          priority: number | null
+          section_key: string
+          section_name: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          priority?: number | null
+          section_key: string
+          section_name: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          last_analyzed_at?: string | null
+          priority?: number | null
+          section_key?: string
+          section_name?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_training_modules: {
+        Row: {
+          completed_at: string | null
+          completion_status: string | null
+          content: string | null
+          created_at: string | null
+          description: string | null
+          exercises: Json | null
+          id: string
+          learning_objectives: string[] | null
+          module_key: string
+          module_name: string
+          quiz_results: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_status?: string | null
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          exercises?: Json | null
+          id?: string
+          learning_objectives?: string[] | null
+          module_key: string
+          module_name: string
+          quiz_results?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completion_status?: string | null
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          exercises?: Json | null
+          id?: string
+          learning_objectives?: string[] | null
+          module_key?: string
+          module_name?: string
+          quiz_results?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       source_domain_registry: {
         Row: {
           category: string | null
