@@ -365,3 +365,12 @@ verify_jwt = false
 
 [functions.og-image]
 verify_jwt = false
+
+[functions.generate-book-cover]
+verify_jwt = false
+
+[functions.validate-documentaries]
+verify_jwt = false
+
+[functions.fix-documentaries]
+verify_jwt = false

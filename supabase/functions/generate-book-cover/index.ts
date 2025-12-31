@@ -164,7 +164,11 @@ function buildCoverPrompt(title: string, author?: string, year?: number): string
     styleHints = "modern minimalist, professional, music technology aesthetic";
   }
 
-  return `Generate a professional book cover image for a music production/synthesizer book titled "${title}"${author ? ` by ${author}` : ""}${year ? ` (${year})` : ""}.
+  return `Generate a professional book cover for a music production/synthesizer book.
+
+Book Title: "${title}"
+${author ? `Author: ${author}` : ""}
+${year ? `Year: ${year}` : ""}
 
 Theme elements: ${themeHints}
 
@@ -173,11 +177,11 @@ Visual style: ${styleHints}
 Requirements:
 - Vertical book cover format (2:3 aspect ratio)
 - Dark, moody background typical of techno/electronic music aesthetics
-- NO text or typography in the image (text will be added separately)
+- INCLUDE THE BOOK TITLE "${title}" prominently displayed on the cover in bold, stylish typography
+- ${author ? `Include author name "${author}" in smaller text below the title` : ""}
 - High quality, detailed, professional looking
 - Abstract or semi-abstract imagery that evokes the book's subject matter
 - Colors should include deep blacks, dark grays, with accent colors like crimson red, electric blue, or neon green
-- Should feel premium and authoritative
-
-The image should work as a book cover background that could have the title overlaid on it.`;
+- Typography should be modern, clean, and readable - white or light colored text works best against dark backgrounds
+- Should feel premium and authoritative like a real published book`;
 }
