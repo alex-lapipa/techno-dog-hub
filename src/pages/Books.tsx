@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { ExternalLink, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -7,12 +9,25 @@ interface Book {
   id: string;
   title: string;
   author: string;
-  category: string;
-  coverUrl: string;
-  description: string;
-  whyRead: string;
-  purchaseUrl: string;
-  year?: number;
+  category_id: string | null;
+  cover_url: string | null;
+  description: string | null;
+  why_read: string | null;
+  purchase_url: string | null;
+  year_published: number | null;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+    display_order: number;
+  };
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  display_order: number;
 }
 
 const books: Book[] = [

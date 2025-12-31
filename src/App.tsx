@@ -100,6 +100,7 @@ const SoundMachine = lazy(() => import("./pages/SoundMachine"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Books = lazy(() => import("./pages/Books"));
+const LibrarianAgentAdmin = lazy(() => import("./pages/LibrarianAgentAdmin"));
 const Community = lazy(() => import("./pages/Community"));
 const CommunityDocs = lazy(() => import("./pages/CommunityDocs"));
 const CommunityLeaderboard = lazy(() => import("./pages/CommunityLeaderboard"));
@@ -237,6 +238,7 @@ const App = () => (
                     <Route path="/admin/doggy-orchestrator" element={<DoggyOrchestratorAdmin />} />
                     <Route path="/admin/ai-orchestrator" element={<AIOrchestratorAdmin />} />
                     <Route path="/admin/translation-agent" element={<TranslationAgentAdmin />} />
+                    <Route path="/admin/librarian" element={<LibrarianAgentAdmin />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
