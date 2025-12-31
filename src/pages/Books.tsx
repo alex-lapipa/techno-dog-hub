@@ -172,15 +172,15 @@ const Books = () => {
         </div>
 
         {/* Category Tabs */}
-        <div className="mb-8 overflow-x-auto">
-          <div className="flex gap-2 pb-2 min-w-max">
+        <div className="mb-8 overflow-x-auto border-b border-logo-green/30">
+          <div className="flex gap-6 min-w-max">
             <button
               onClick={() => setActiveCategory(null)}
               className={cn(
-                "px-4 py-2 font-mono text-xs uppercase tracking-wider border transition-all",
+                "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all relative",
                 !activeCategory
-                  ? "bg-logo-green text-background border-logo-green"
-                  : "bg-transparent text-muted-foreground border-border hover:border-logo-green/50 hover:text-foreground"
+                  ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               All ({books.length})
@@ -190,10 +190,10 @@ const Books = () => {
                 key={category.id}
                 onClick={() => setActiveCategory(activeCategory === category.name ? null : category.name)}
                 className={cn(
-                  "px-4 py-2 font-mono text-xs uppercase tracking-wider border transition-all whitespace-nowrap",
+                  "px-1 py-3 font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap relative",
                   activeCategory === category.name
-                    ? "bg-logo-green text-background border-logo-green"
-                    : "bg-transparent text-muted-foreground border-border hover:border-logo-green/50 hover:text-foreground"
+                    ? "text-logo-green after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-logo-green"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {category.name} ({category.count})
