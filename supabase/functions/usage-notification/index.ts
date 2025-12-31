@@ -120,8 +120,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "ringleader@techno.dog <alex@rmtv.io>",
-          reply_to: "alex@rmtv.io",
+          from: "Techno.Dog <doggy@techno.dog>",
+          reply_to: "doggy@techno.dog",
           to: [notification.email],
           subject: `⚠️ API Usage Alert: ${usagePercent}% of daily limit reached`,
           html: `

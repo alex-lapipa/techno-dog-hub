@@ -36,9 +36,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification to project team
     const notificationResponse = await resend.emails.send({
-      from: "ringleader@techno.dog <alex@rmtv.io>",
-      reply_to: "alex@rmtv.io",
-      to: ["hello@technolog.club"],
+      from: "Techno.Dog <doggy@techno.dog>",
+      reply_to: "doggy@techno.dog",
+      to: ["doggy@techno.dog"],
       subject: `New Contributor: ${name} - ${skillsList}`,
       html: `
         <div style="font-family: monospace; background: #0a0a0a; color: #e5e5e5; padding: 32px;">
@@ -64,8 +64,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to contributor
     await resend.emails.send({
-      from: "ringleader@techno.dog <alex@rmtv.io>",
-      reply_to: "alex@rmtv.io",
+      from: "Techno.Dog <doggy@techno.dog>",
+      reply_to: "doggy@techno.dog",
       to: [email],
       subject: "Thanks for reaching out to techno.dog!",
       html: `

@@ -269,12 +269,12 @@ Return JSON:
 }
 
 // Send email via Resend
-async function sendEmail(to: string, subject: string, bodyHtml: string, bodyText: string, fromName: string = "Alex Lawton"): Promise<any> {
+async function sendEmail(to: string, subject: string, bodyHtml: string, bodyText: string, fromName: string = "Techno.Dog"): Promise<any> {
   console.log(`Sending email to ${to} with subject: ${subject}`);
   
   const emailResponse = await resend.emails.send({
-    from: "ringleader@techno.dog <alex@rmtv.io>",
-    reply_to: "alex@rmtv.io",
+    from: "Techno.Dog <doggy@techno.dog>",
+    reply_to: "doggy@techno.dog",
     to: [to],
     subject: subject,
     html: bodyHtml,

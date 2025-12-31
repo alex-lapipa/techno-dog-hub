@@ -156,8 +156,8 @@ const handler = async (req: Request): Promise<Response> => {
         });
 
         const { error: emailError } = await resend.emails.send({
-          from: "ringleader@techno.dog <alex@rmtv.io>",
-          reply_to: "alex@rmtv.io",
+          from: "Techno.Dog <doggy@techno.dog>",
+          reply_to: "doggy@techno.dog",
           to: [user.email],
           subject: `Your Weekly techno.dog Digest | ${weeklyPoints} XP earned`,
           html: emailHtml,
