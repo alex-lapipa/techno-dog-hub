@@ -1,5 +1,7 @@
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createServiceClient, getRequiredEnv, getEnv } from "../_shared/supabase.ts";
+import { getRoutingDecision, configFromDb, getTierLabel, type RoutingDecision, type RouterConfig } from "../_shared/model-router.ts";
+import { callGroq, isGroqAvailable } from "../_shared/groq-provider.ts";
 
 const GEN_Z_DOG_SLANG = `
 GEN Z + DOG LANGUAGE (blend these naturally - you're a chronically online pup):
@@ -624,137 +626,140 @@ ${d.content?.slice(0, 400)}...`
     ];
 
     // =================================================================
-    // 3-TIER INTELLIGENT MODEL ROUTING
-    // Tier 1: GPT-5 for complex reasoning (highest quality)
-    // Tier 2: Gemini Flash for medium complexity (balanced)
-    // Tier 3: Gemini Flash-Lite for ultra-fast simple queries (speed)
+    // 4-TIER INTELLIGENT MODEL ROUTING (READ-ONLY CONFIG)
+    // Tier ultra-fast: Groq LPU for sub-100ms responses (if enabled)
+    // Tier fast: Gemini Flash-Lite for simple queries
+    // Tier balanced: Gemini Flash for medium complexity
+    // Tier complex: GPT-5 for deep reasoning and comparisons
     // =================================================================
     
-    // Detect complex reasoning queries that benefit from GPT-5
-    const complexPatterns = [
-      /compare|versus|vs\.?|difference between|similarities/i,
-      /explain|analyze|breakdown|deep dive|in-depth/i,
-      /why|how does|what makes|philosophy|theory/i,
-      /history of|evolution of|origins of|trajectory/i,
-      /recommend.*based on|suggest.*considering|if i like/i,
-      /relationship between|connection|influence.*on/i,
-      /controversial|debate|opinion|perspective/i,
-      /technical|mechanism|architecture|design of/i,
-      /predict|future|trend|where.*heading/i,
-      /best|worst|top.*reason|rank.*why/i
-    ];
+    // Fetch config from database (READ-ONLY)
+    let routerConfig: RouterConfig | null = null;
+    try {
+      const { data: configRow } = await supabase
+        .from('dog_agent_config')
+        .select('*')
+        .eq('id', 'default')
+        .single();
+      routerConfig = configFromDb(configRow);
+    } catch (e) {
+      console.log('[DogAgent] Using default router config');
+    }
     
-    // Detect simple queries that can use ultra-fast model
-    const simplePatterns = [
-      /^(hi|hello|hey|yo|sup|what'?s up)/i,
-      /^(thanks|thank you|thx|cheers)/i,
-      /^(yes|no|ok|okay|sure|cool|nice)/i,
-      /^who is [a-z\s]+\??$/i,  // Simple "who is X?" questions
-      /^what is [a-z\s]+\??$/i, // Simple "what is X?" questions
-      /^when (is|was|did)/i,    // Simple time questions
-      /^where (is|was|are)/i,   // Simple location questions
-      /^list |^name /i,         // Simple list requests
-    ];
-    
-    const wordCount = queryText.split(' ').length;
-    const hasConversationDepth = (conversationHistory?.length || 0) > 4;
-    
-    // Determine query complexity tier
-    const isComplexQuery = complexPatterns.some(pattern => pattern.test(queryText)) ||
-      wordCount > 20 || // Long queries need more reasoning
-      hasConversationDepth; // Deep conversations need context
-    
-    const isSimpleQuery = !isComplexQuery && (
-      simplePatterns.some(pattern => pattern.test(queryText)) ||
-      wordCount <= 5 // Very short queries
+    // Get intelligent routing decision
+    const routing: RoutingDecision = getRoutingDecision(
+      queryText,
+      conversationHistory?.length || 0,
+      routerConfig || undefined
     );
     
-    // Select model based on tier
-    type ModelTier = 'complex' | 'balanced' | 'fast';
-    const tier: ModelTier = isComplexQuery ? 'complex' : (isSimpleQuery ? 'fast' : 'balanced');
-    
-    const modelConfig = {
-      complex: {
-        model: 'openai/gpt-5',
-        label: 'GPT-5 (complex reasoning)',
-        temperature: 0.7,
-        maxTokens: 2000
-      },
-      balanced: {
-        model: 'google/gemini-2.5-flash',
-        label: 'Gemini Flash (balanced)',
-        temperature: 0.8,
-        maxTokens: 1500
-      },
-      fast: {
-        model: 'google/gemini-2.5-flash-lite',
-        label: 'Gemini Flash-Lite (ultra-fast)',
-        temperature: 0.9,
-        maxTokens: 800
-      }
-    };
-    
-    const selectedConfig = modelConfig[tier];
+    const isComplexQuery = routing.tier === 'complex';
+    const isSimpleQuery = routing.tier === 'ultra-fast' || routing.tier === 'fast';
+    const tierLabel = getTierLabel(routing.tier);
 
-    console.log(`Dog Agent: Processing query with ${contextParts.length} knowledge sections`);
-    console.log(`Dog Agent: Query tier - ${tier} | Model - ${selectedConfig.label}`);
-    console.log(`Dog Agent: Word count: ${wordCount}, Conversation depth: ${conversationHistory?.length || 0}`);
+    const wordCount = queryText.split(' ').length;
+    console.log(`[DogAgent] Processing query with ${contextParts.length} knowledge sections`);
+    console.log(`[DogAgent] Routing: ${routing.tier} | Model: ${routing.model} | Reason: ${routing.reason}`);
+    console.log(`[DogAgent] Word count: ${wordCount}, Conversation depth: ${conversationHistory?.length || 0}`);
 
-    // Call Lovable AI Gateway with selected model
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: selectedConfig.model,
-        messages,
-        temperature: selectedConfig.temperature,
-        max_tokens: selectedConfig.maxTokens,
-      }),
-    });
+    const startTime = Date.now();
+    let dogResponse: string = '';
+    let actualProvider: string = routing.provider;
+    let actualModel: string = routing.model;
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ 
-          error: '*Sad whimper* Too many belly rubs... I mean requests! Please try again in a moment. 🐕' 
-        }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+    // =================================================================
+    // TRY GROQ FOR ULTRA-FAST TIER (if enabled and available)
+    // =================================================================
+    if (routing.provider === 'groq' && routing.tier === 'ultra-fast' && isGroqAvailable()) {
+      console.log('[DogAgent] Attempting Groq ultra-fast inference...');
+      const groqResult = await callGroq(
+        messages.map(m => ({ role: m.role as 'system' | 'user' | 'assistant', content: m.content })),
+        {
+          model: routing.model,
+          maxTokens: routing.maxTokens,
+          temperature: routing.temperature,
+          timeoutMs: routerConfig?.groqTimeoutMs || 5000
+        }
+      );
+      
+      if (groqResult?.content) {
+        dogResponse = groqResult.content;
+        actualProvider = 'groq';
+        actualModel = groqResult.model;
+        console.log(`[DogAgent] Groq success in ${groqResult.latencyMs}ms`);
+      } else {
+        console.log('[DogAgent] Groq failed, falling back to Lovable AI');
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ 
-          error: '*Confused head tilt* Seems like we need more treats (credits)! Please check the workspace settings.' 
-        }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-      throw new Error(`AI gateway error: ${response.status}`);
     }
 
-    const aiResponse = await response.json();
-    const dogResponse = aiResponse.choices[0]?.message?.content || "*Confused bark* Woof? Something went wrong!";
+    // =================================================================
+    // FALLBACK TO LOVABLE AI GATEWAY (primary path)
+    // =================================================================
+    if (!dogResponse) {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lovableApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: routing.model,
+          messages,
+          temperature: routing.temperature,
+          max_tokens: routing.maxTokens,
+        }),
+      });
 
-    // Log the interaction
+      if (!response.ok) {
+        if (response.status === 429) {
+          return new Response(JSON.stringify({ 
+            error: '*Sad whimper* Too many belly rubs... I mean requests! Please try again in a moment. 🐕' 
+          }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        if (response.status === 402) {
+          return new Response(JSON.stringify({ 
+            error: '*Confused head tilt* Seems like we need more treats (credits)! Please check the workspace settings.' 
+          }), {
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        throw new Error(`AI gateway error: ${response.status}`);
+      }
+
+      const aiResponse = await response.json();
+      dogResponse = aiResponse.choices[0]?.message?.content || "*Confused bark* Woof? Something went wrong!";
+      actualProvider = 'lovable-ai';
+      actualModel = routing.model;
+    }
+
+    const latencyMs = Date.now() - startTime;
+    console.log(`[DogAgent] Response generated in ${latencyMs}ms via ${actualProvider}`);
+
+    // Log the interaction (analytics only - not modifying core data)
     await supabase.from('analytics_events').insert({
       event_type: 'dog_agent_chat',
       event_name: 'dog_conversation',
+      model_selected: actualModel,
+      model_tier: routing.tier,
+      latency_ms: latencyMs,
+      provider: actualProvider,
+      routing_reason: routing.reason,
       metadata: { 
         message_length: message.length,
         response_length: dogResponse.length,
         knowledge_sections: contextParts.length,
         had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0,
-        model_used: selectedConfig.model,
-        model_tier: tier,
         is_complex_query: isComplexQuery,
-        is_simple_query: isSimpleQuery
+        is_simple_query: isSimpleQuery,
+        fallbacks_available: routing.fallbacks
       }
     });
 
-    // Update Dog agent status
+    // Update Dog agent status (operational status only)
     await supabase
       .from('agent_status')
       .upsert({ 
@@ -775,9 +780,12 @@ ${d.content?.slice(0, 400)}...`
           artists: ragArtists.length,
           documents: ragDocuments.length
         },
-        model: selectedConfig.model,
-        modelLabel: selectedConfig.label,
-        tier,
+        model: actualModel,
+        modelLabel: tierLabel,
+        tier: routing.tier,
+        provider: actualProvider,
+        latencyMs,
+        routingReason: routing.reason,
         isComplexQuery,
         isSimpleQuery
       }
