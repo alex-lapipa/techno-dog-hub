@@ -409,7 +409,7 @@ export default function Developer() {
                 <ul className="list-disc list-inside space-y-1">
                   <li>Accept only real techno: driving, hypnotic, raw</li>
                   <li>No EDM, hardstyle, or commercial schlag</li>
-                  <li>From Detroit to Tbilisi, Tokyo to Bogotá</li>
+                  <li>Global perspective — every underground scene matters</li>
                 </ul>
               </div>
             </div>

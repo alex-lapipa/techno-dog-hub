@@ -80,7 +80,7 @@ const FestivalsPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
         title="Techno Festivals Worldwide"
-        description="Discover techno festivals from Detroit to Tbilisi, Tokyo to Bogotá. Comprehensive guide to the global gatherings that matter."
+        description="Comprehensive guide to underground techno festivals worldwide. Community-curated and regularly updated."
         path="/festivals"
         structuredData={itemListSchema}
       />

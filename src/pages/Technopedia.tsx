@@ -46,7 +46,7 @@ const TechnopediaPage = () => {
         "Open source code and open data — everything is transparent",
         "Community-owned — every contribution is credited and valued",
         "Non-commercial — no ads, no data harvesting, no hidden agendas",
-        "Decentralized knowledge — from Detroit to Tbilisi, Tokyo to Bogotá",
+        "Global perspective — documenting scenes and movements worldwide",
         "Preservation first — documenting stories before they're lost to time"
       ]
     },

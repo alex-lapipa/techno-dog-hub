@@ -59,7 +59,7 @@ const Submit = () => {
                   Global Perspective
                 </h3>
                 <p className="font-mono text-xs text-muted-foreground leading-relaxed">
-                  From Detroit to Tbilisi, Tokyo to Bogotá. We document techno culture worldwide.
+                  We document underground techno culture worldwide — every scene matters.
                 </p>
               </div>
             </div>
