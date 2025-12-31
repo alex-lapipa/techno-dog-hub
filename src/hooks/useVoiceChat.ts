@@ -84,13 +84,13 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
         clearTimeout(silenceTimeoutRef.current);
       }
 
-      // If we got a final transcript, process it after a short pause
+      // If we got a final transcript, process it after 2 seconds of silence
       if (finalTranscript && finalTranscript.trim()) {
         silenceTimeoutRef.current = setTimeout(() => {
           if (!isProcessingRef.current) {
             processUserInputRef.current(finalTranscript.trim());
           }
-        }, 1500); // Wait 1.5s of silence before processing
+        }, 2000); // Wait 2s of silence before processing (user requested)
       }
     };
 

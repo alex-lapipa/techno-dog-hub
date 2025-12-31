@@ -132,15 +132,18 @@ MULTILINGUAL GOOD BOY:
 - Spanish? "No cap, eso está perrisimo, guau guau!"
 - Adapt the dog/Gen Z energy to that language's internet culture
 
-YOUR KNOWLEDGE BASE (you have FULL ACCESS to):
+YOUR KNOWLEDGE BASE (you have FULL READ-ONLY ACCESS to):
 - **200+ DJ/Artists**: From the dj_artists RAG database with rankings, subgenres, labels, tracks
 - **Canonical Artists**: Verified artist profiles with bios, social links, collaborators
 - **Gear Catalog**: TR-808, TR-909, TB-303, synths, drum machines — the squeaky toys of legends
 - **Venues**: Berghain, Fabric, Bassiani, Tresor, Khidi — the dog parks of techno
 - **Festivals**: Awakenings, Dekmantel, Movement, Sónar — outdoor zoomies for ravers  
 - **Labels**: Underground Resistance, Ostgut Ton, Tresor, Mord, Token — the pack leaders
+- **Books**: Essential techno reading - Techno Rebels, Energy Flash, and more
+- **Documentaries**: High Tech Soul, Pump Up The Volume, SubBerlin, and other essential films
 - **News**: Latest techno news and articles
-- **Knowledge Entities**: Cities, scenes, collectives, promoters
+- **Collectives**: Underground crews, promoters, and movements worldwide
+- **Knowledge Entities**: Cities, scenes, promoters, and all site RAG documents
 
 CORE VALUES (the pack code):
 1. **Open Source** — All knowledge is free, no cap, just paws
@@ -365,6 +368,76 @@ Deno.serve(async (req: Request) => {
         .then(r => r)
     );
 
+    // Books
+    if (queryText.match(/book|read|author|techno rebels|energy flash|literature|recommend.*read/i)) {
+      fetchPromises.push(
+        supabase.from('books')
+          .select('title, author, description, why_read, year_published, category:book_categories(name)')
+          .eq('status', 'published')
+          .order('is_featured', { ascending: false })
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Documentaries
+    if (queryText.match(/documentary|film|movie|watch|video|high tech soul|pump up|submarine|visual/i)) {
+      fetchPromises.push(
+        supabase.from('documentaries')
+          .select('title, director, year, description, genre_tags, youtube_id, vimeo_id')
+          .eq('status', 'published')
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Labels
+    if (queryText.match(/label|record|release|imprint|underground resistance|ostgut|tresor|mord|token|semantica|pole group/i)) {
+      fetchPromises.push(
+        supabase.from('labels')
+          .select('label_name, founded_year, location_city, location_country, description, website_url, style_tags, key_artists')
+          .limit(15)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Collectives
+    if (queryText.match(/collective|crew|movement|group|promoter|community|scene/i)) {
+      fetchPromises.push(
+        supabase.from('collectives')
+          .select('collective_name, collective_type, city, country, philosophy_summary, what_they_like, website_url')
+          .eq('status', 'active')
+          .limit(10)
+          .then(r => r)
+      );
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
+    // Artist documents for deeper RAG
+    if (queryText.match(/artist|dj|producer|bio|history|story/i) && ragArtists.length > 0) {
+      const artistIds = ragArtists.slice(0, 3).map((a: any) => a.artist_id).filter(Boolean);
+      if (artistIds.length > 0) {
+        fetchPromises.push(
+          supabase.from('artist_documents')
+            .select('title, content, document_type')
+            .in('artist_id', artistIds)
+            .limit(5)
+            .then(r => r)
+        );
+      } else {
+        fetchPromises.push(Promise.resolve({ data: null }));
+      }
+    } else {
+      fetchPromises.push(Promise.resolve({ data: null }));
+    }
+
     const [
       agentsData,
       djArtistsData,
@@ -373,7 +446,12 @@ Deno.serve(async (req: Request) => {
       entitiesData,
       contentSyncData,
       newsData,
-      documentsData
+      documentsData,
+      booksData,
+      documentariesData,
+      labelsData,
+      collectivesData,
+      artistDocsData
     ] = await Promise.all(fetchPromises);
 
     // =================================================================
@@ -473,6 +551,61 @@ ${ragDocuments.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 500)}...`)
     } else if (documentsData.data?.length) {
       contextParts.push(`## KNOWLEDGE BASE
 ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)}...`).join('\n\n')}`);
+    }
+
+    // Books
+    if (booksData?.data?.length) {
+      contextParts.push(`## ESSENTIAL TECHNO BOOKS
+${booksData.data.map((b: any) => 
+  `**${b.title}** by ${b.author} (${b.year_published || 'N/A'})
+  - Category: ${b.category?.name || 'General'}
+  ${b.description ? `- ${b.description.slice(0, 200)}...` : ''}
+  ${b.why_read ? `- Why read: ${b.why_read}` : ''}`
+).join('\n\n')}`);
+    }
+
+    // Documentaries
+    if (documentariesData?.data?.length) {
+      contextParts.push(`## TECHNO DOCUMENTARIES & FILMS
+${documentariesData.data.map((d: any) => 
+  `**${d.title}** (${d.year || 'N/A'}) ${d.director ? `dir. ${d.director}` : ''}
+  - ${d.description || 'No description'}
+  - Tags: ${d.genre_tags?.join(', ') || 'Documentary'}
+  ${d.youtube_id ? '- Available on YouTube' : ''}`
+).join('\n\n')}`);
+    }
+
+    // Labels
+    if (labelsData?.data?.length) {
+      contextParts.push(`## RECORD LABELS
+${labelsData.data.map((l: any) => 
+  `**${l.label_name}** (${l.founded_year || 'N/A'}, ${l.location_city || ''} ${l.location_country || ''})
+  ${l.description ? `- ${l.description.slice(0, 200)}` : ''}
+  - Style: ${l.style_tags?.join(', ') || 'Techno'}
+  ${l.key_artists?.length ? `- Key artists: ${l.key_artists.slice(0, 5).join(', ')}` : ''}
+  ${l.website_url ? `- Website: ${l.website_url}` : ''}`
+).join('\n\n')}`);
+    }
+
+    // Collectives
+    if (collectivesData?.data?.length) {
+      contextParts.push(`## COLLECTIVES & CREWS
+${collectivesData.data.map((c: any) => 
+  `**${c.collective_name}** (${c.city || ''}, ${c.country || ''})
+  - Type: ${c.collective_type?.join(', ') || 'Collective'}
+  ${c.philosophy_summary ? `- Philosophy: ${c.philosophy_summary}` : ''}
+  ${c.what_they_like ? `- They like: ${c.what_they_like}` : ''}
+  ${c.website_url ? `- Website: ${c.website_url}` : ''}`
+).join('\n\n')}`);
+    }
+
+    // Artist Documents (deep RAG)
+    if (artistDocsData?.data?.length) {
+      contextParts.push(`## ARTIST DEEP KNOWLEDGE
+${artistDocsData.data.map((d: any) => 
+  `### ${d.title || d.document_type}
+${d.content?.slice(0, 400)}...`
+).join('\n\n')}`);
     }
 
     knowledgeContext = contextParts.join('\n\n---\n\n');
