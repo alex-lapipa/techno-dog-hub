@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Target channel - La Pipa is La Pipa
+// Target channel - LA PIPA is LA PIPA
 const CHANNEL_HANDLE = "@lapipaislapipa";
 const CHANNEL_ID = "UCYourChannelId"; // Will be resolved dynamically
 
@@ -147,7 +147,7 @@ Analyze each video and return matches in JSON format.`;
     `${i + 1}. [${v.playlistTitle}] "${v.title}" - ${v.description?.slice(0, 100)}...`
   ).join('\n');
 
-  const userPrompt = `Analyze these videos from La Pipa is La Pipa channel and match them to relevant techno.dog pages:
+  const userPrompt = `Analyze these videos from LA PIPA is LA PIPA channel and match them to relevant techno.dog pages:
 
 ${videoSummary}
 

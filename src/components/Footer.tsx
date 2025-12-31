@@ -78,9 +78,9 @@ const Footer = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-foreground hover:underline"
-                onClick={() => trackFooterNav('La PiPa', 'https://lapipa.io', 'brand')}
+                onClick={() => trackFooterNav('LA PIPA', 'https://lapipa.io', 'brand')}
               >
-                La PiPa
+                LA PIPA
               </a>
             </p>
           </div>
