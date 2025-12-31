@@ -362,3 +362,6 @@ verify_jwt = false
 
 [functions.elevenlabs-scribe-token]
 verify_jwt = false
+
+[functions.og-image]
+verify_jwt = false
