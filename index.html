@@ -30,21 +30,60 @@
     <!-- Google Search Console Verification - Replace with your actual code -->
     <meta name="google-site-verification" content="Pz5JPf20fLEWalmMX3QwvDBty9k0Wq0V5qjlW0sE87w" />
 
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    <!-- Google Tag Manager - Enhanced Configuration -->
+    <script>
+      // Initialize dataLayer with enhanced defaults
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        'event': 'gtm.js',
+        'site_name': 'techno.dog',
+        'site_version': '2.0',
+        'environment': 'production',
+        'default_currency': 'EUR',
+        'content_language': 'en'
+      });
+    </script>
+    <script>(function(w,d,s,l,i){var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-532T46V5');</script>
     <!-- End Google Tag Manager -->
 
-    <!-- Google Analytics 4 -->
+    <!-- Google Analytics 4 - Enhanced Configuration -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1EMPVR3WST"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag(){window.dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-1EMPVR3WST');
+      
+      // Enhanced GA4 configuration
+      gtag('config', 'G-1EMPVR3WST', {
+        'send_page_view': false, // Handled by React
+        'cookie_flags': 'SameSite=None;Secure',
+        'allow_google_signals': true,
+        'allow_ad_personalization_signals': true,
+        'linker': {
+          'domains': ['techno.dog']
+        },
+        'custom_map': {
+          'dimension1': 'content_type',
+          'dimension2': 'content_group',
+          'dimension3': 'user_type',
+          'dimension4': 'device_category',
+          'metric1': 'scroll_depth',
+          'metric2': 'engagement_time'
+        }
+      });
+      
+      // Default consent mode (updated by consent manager)
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
     </script>
     <!-- End Google Analytics 4 -->
   </head>

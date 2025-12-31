@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AdminAuthProvider } from "@/hooks/useAdminAuth";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AnalyticsProvider } from "@/providers/AnalyticsProvider";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import PageTransition from "@/components/PageTransition";
@@ -137,13 +138,14 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ParticleBackground />
-              <FilmGrainOverlay />
-              <ScrollToTop />
-              <ScrollToTopButton />
-              <FloatingDogButton />
-              <CookieConsentBanner />
-              <Suspense fallback={<PageLoader />}>
+              <AnalyticsProvider>
+                <ParticleBackground />
+                <FilmGrainOverlay />
+                <ScrollToTop />
+                <ScrollToTopButton />
+                <FloatingDogButton />
+                <CookieConsentBanner />
+                <Suspense fallback={<PageLoader />}>
                 <PageTransition>
                   <Routes>
                     {/* Main */}
@@ -288,7 +290,8 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </PageTransition>
-              </Suspense>
+                </Suspense>
+              </AnalyticsProvider>
             </BrowserRouter>
             </TooltipProvider>
           </AdminAuthProvider>
