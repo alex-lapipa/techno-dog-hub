@@ -1934,6 +1934,63 @@ export type Database = {
         }
         Relationships: []
       }
+      changelog_entries: {
+        Row: {
+          author: string | null
+          category: string
+          created_at: string
+          description: string | null
+          diagram_code: string | null
+          files_changed: string[] | null
+          id: string
+          is_breaking_change: boolean | null
+          performance_impact: Json | null
+          released_at: string | null
+          scope: string
+          search_vector: unknown
+          source: string | null
+          technical_details: Json | null
+          title: string
+          version: string
+        }
+        Insert: {
+          author?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          diagram_code?: string | null
+          files_changed?: string[] | null
+          id?: string
+          is_breaking_change?: boolean | null
+          performance_impact?: Json | null
+          released_at?: string | null
+          scope: string
+          search_vector?: unknown
+          source?: string | null
+          technical_details?: Json | null
+          title: string
+          version?: string
+        }
+        Update: {
+          author?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          diagram_code?: string | null
+          files_changed?: string[] | null
+          id?: string
+          is_breaking_change?: boolean | null
+          performance_impact?: Json | null
+          released_at?: string | null
+          scope?: string
+          search_vector?: unknown
+          source?: string | null
+          technical_details?: Json | null
+          title?: string
+          version?: string
+        }
+        Relationships: []
+      }
       collaboration_programs: {
         Row: {
           brand_id: string | null
@@ -7839,6 +7896,22 @@ export type Database = {
       is_verified_community_member: {
         Args: { p_user_id: string }
         Returns: boolean
+      }
+      log_changelog_entry: {
+        Args: {
+          p_author?: string
+          p_category: string
+          p_description?: string
+          p_diagram_code?: string
+          p_files_changed?: string[]
+          p_is_breaking?: boolean
+          p_scope: string
+          p_source?: string
+          p_technical_details?: Json
+          p_title: string
+          p_version: string
+        }
+        Returns: string
       }
       match_documents: {
         Args: {
