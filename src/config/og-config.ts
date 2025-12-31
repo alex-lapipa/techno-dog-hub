@@ -45,10 +45,10 @@ export function getRouteHash(route: string): number {
 
 // Core route configurations
 export const OG_ROUTE_CONFIG: OGRouteConfig[] = [
-  // Homepage
+  // Homepage - uses main techno.dog logo
   {
     route: '/',
-    doggy: 'happy',
+    doggy: 'logo', // Main techno.dog hexagon logo
     icon: 'home',
     skin: 'minimal',
     primaryColor: '142 71% 45%', // logo-green
@@ -56,6 +56,19 @@ export const OG_ROUTE_CONFIG: OGRouteConfig[] = [
     defaultHeadline: 'techno.dog',
     tagline: 'Global Techno Culture Archive',
     type: 'website'
+  },
+  
+  // Alex Lawton Launch Letter - uses main techno.dog logo
+  {
+    route: '/news/article/a0000001-0001-0001-0001-000000000001',
+    doggy: 'logo', // Main techno.dog hexagon logo
+    icon: 'news',
+    skin: 'minimal',
+    primaryColor: '142 71% 45%',
+    accentColor: '0 0% 100%',
+    defaultHeadline: 'A Letter from the Founder',
+    tagline: 'The story behind techno.dog',
+    type: 'article'
   },
   
   // Artists
