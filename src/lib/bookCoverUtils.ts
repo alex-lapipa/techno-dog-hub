@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+
 /**
  * Normalize cover URL to ensure it's valid
  */
@@ -16,12 +18,76 @@ export function normalizeCoverUrl(url?: string | null): string | null {
 }
 
 /**
+ * Get a safe cover URL that uses our proxy to bypass hotlinking restrictions.
+ * Returns null if no valid URL provided.
+ */
+export function getSafeCoverUrl(coverUrl?: string | null): string | null {
+  const normalized = normalizeCoverUrl(coverUrl);
+  if (!normalized) return null;
+
+  // If it's already our Supabase storage URL, no proxy needed
+  if (normalized.includes("supabase.co/storage")) {
+    return normalized;
+  }
+
+  // Use the image proxy edge function
+  return `${SUPABASE_URL}/functions/v1/image-proxy?url=${encodeURIComponent(normalized)}`;
+}
+
+/**
+ * Build an Amazon search URL for a book
+ */
+export function buildAmazonSearchUrl(
+  title: string,
+  author?: string | null,
+  locale: "es" | "uk" | "us" = "es"
+): string {
+  const query = encodeURIComponent(`${title} ${author || ""}`.trim());
+  const domain =
+    locale === "uk" ? "amazon.co.uk" :
+    locale === "us" ? "amazon.com" :
+    "amazon.es";
+
+  return `https://${domain}/s?k=${query}&i=stripbooks`;
+}
+
+/**
+ * Save purchase_url ONLY if it's missing in DB (never overwrites an existing one)
+ */
+export async function ensurePurchaseUrlSaved(
+  bookId: string,
+  title: string,
+  author?: string | null
+): Promise<boolean> {
+  if (!bookId || !title) return false;
+
+  try {
+    const { data: existing, error: readErr } = await supabase
+      .from("books")
+      .select("id, purchase_url")
+      .eq("id", bookId)
+      .maybeSingle();
+
+    if (readErr || !existing) return false;
+    if (existing.purchase_url && existing.purchase_url.trim() !== "") return false;
+
+    // Generate Amazon search URL as fallback
+    const amazonUrl = buildAmazonSearchUrl(title, author, "es");
+
+    const { error: updateErr } = await supabase
+      .from("books")
+      .update({ purchase_url: amazonUrl })
+      .eq("id", bookId);
+
+    return !updateErr;
+  } catch (error) {
+    console.error("Error saving purchase URL:", error);
+    return false;
+  }
+}
+
+/**
  * Save cover_url ONLY if it's missing in DB (never overwrites an existing one)
- * Call this right after your book insert succeeds.
- * 
- * @example
- * const { data: book } = await supabase.from("books").insert(payload).select().single();
- * await ensureCoverUrlSaved(book.id, payload.cover_url);
  */
 export async function ensureCoverUrlSaved(
   bookId: string,
@@ -31,7 +97,6 @@ export async function ensureCoverUrlSaved(
   if (!bookId || !url) return false;
 
   try {
-    // 1) Read current value
     const { data: existing, error: readErr } = await supabase
       .from("books")
       .select("id, cover_url")
@@ -39,10 +104,7 @@ export async function ensureCoverUrlSaved(
       .maybeSingle();
 
     if (readErr || !existing) return false;
-
-    // 2) Only update if cover_url is missing/blank (NO overwrite)
-    const existingUrl = normalizeCoverUrl(existing.cover_url);
-    if (existingUrl) return false; // Already has a cover
+    if (existing.cover_url && normalizeCoverUrl(existing.cover_url)) return false;
 
     const { error: updateErr } = await supabase
       .from("books")

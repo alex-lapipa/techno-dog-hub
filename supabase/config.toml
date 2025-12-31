@@ -342,3 +342,6 @@ verify_jwt = false
 
 [functions.book-cover-proxy]
 verify_jwt = false
+
+[functions.image-proxy]
+verify_jwt = false
