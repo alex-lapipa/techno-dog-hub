@@ -9,6 +9,7 @@ const corsHeaders = {
 
 const FIRECRAWL_API_KEY = Deno.env.get('FIRECRAWL_API_KEY');
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -194,15 +195,20 @@ function isValidImageUrl(url: string): boolean {
   return hasExtension || isCdn;
 }
 
-// Use Gemini to analyze and select the best product image
-async function selectBestImageWithGemini(
+// Use Groq (fast LLM) to analyze and select the best product image
+async function selectBestImageWithGroq(
   gearName: string, 
   gearBrand: string, 
   images: string[],
   searchResults: any[]
 ): Promise<{ imageUrl: string | null; confidence: number; reasoning: string }> {
-  if (!LOVABLE_API_KEY) {
-    return { imageUrl: null, confidence: 0, reasoning: 'Lovable API key not configured' };
+  // Use Lovable API (Gemini) - faster and more reliable for this task
+  const apiKey = LOVABLE_API_KEY;
+  const apiUrl = 'https://ai.gateway.lovable.dev/v1/chat/completions';
+  const model = 'google/gemini-2.5-flash';
+
+  if (!apiKey) {
+    return { imageUrl: null, confidence: 0, reasoning: 'No API key configured' };
   }
 
   if (images.length === 0) {
@@ -212,44 +218,38 @@ async function selectBestImageWithGemini(
   try {
     // Build context from search results
     const context = searchResults.slice(0, 3).map(r => 
-      `Source: ${r.url}\nTitle: ${r.title || 'N/A'}\n${(r.markdown || '').slice(0, 500)}`
+      `Source: ${r.url}\nTitle: ${r.title || 'N/A'}\n${(r.markdown || '').slice(0, 300)}`
     ).join('\n\n---\n\n');
 
-    const prompt = `You are selecting the best product image for "${gearBrand} ${gearName}" music equipment.
+    const prompt = `Select the best product image for "${gearBrand} ${gearName}" music equipment.
 
-Found ${images.length} potential images. Here are the URLs:
-${images.slice(0, 20).map((img, i) => `${i + 1}. ${img}`).join('\n')}
+Images found:
+${images.slice(0, 15).map((img, i) => `${i + 1}. ${img}`).join('\n')}
 
-Context from search results:
+Context:
 ${context}
 
-Select the BEST image URL that shows the actual "${gearBrand} ${gearName}" product:
-
 Criteria:
-1. Must be the actual product (synth, drum machine, mixer, etc.) - NOT a logo or icon
-2. Prefer official manufacturer images or professional product shots
-3. Prefer larger, high-quality images (look for "large", "1200", "full", "product" in URL)
-4. Prefer URLs from manufacturer sites or reputable music gear retailers
-5. Avoid thumbnails (small dimensions in URL), social media icons, navigation elements
-6. Wikimedia Commons images are excellent if verified
+1. Must show actual product (synth, mixer, turntable) - NOT logos/icons
+2. Prefer manufacturer or professional product shots
+3. Prefer larger images (look for "large", "1200", "product" in URL)
+4. Avoid thumbnails, social icons, navigation elements
 
-Return ONLY valid JSON (no markdown formatting):
-{
-  "imageUrl": "the best image URL or null if none are suitable",
-  "confidence": 0-100,
-  "reasoning": "why this image was selected"
-}`;
+Return ONLY JSON:
+{"imageUrl": "best URL or null", "confidence": 0-100, "reasoning": "brief reason"}`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    console.log(`Using ${GROQ_API_KEY ? 'Groq' : 'Lovable'} API for ${gearName}`);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model,
         messages: [
-          { role: 'system', content: 'You are an expert at identifying product images. Always respond with valid JSON only, no markdown.' },
+          { role: 'system', content: 'You are an expert at identifying product images. Respond with valid JSON only.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.1,
@@ -258,7 +258,7 @@ Return ONLY valid JSON (no markdown formatting):
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', errorText);
+      console.error('API error:', errorText);
       return { imageUrl: null, confidence: 0, reasoning: `API error: ${response.status}` };
     }
 
@@ -276,10 +276,10 @@ Return ONLY valid JSON (no markdown formatting):
       };
     }
 
-    return { imageUrl: null, confidence: 0, reasoning: 'Failed to parse Gemini response' };
+    return { imageUrl: null, confidence: 0, reasoning: 'Failed to parse response' };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Gemini analysis error:', errorMessage);
+    console.error('Image selection error:', errorMessage);
     return { imageUrl: null, confidence: 0, reasoning: errorMessage };
   }
 }
@@ -425,8 +425,8 @@ serve(async (req) => {
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
-      // Use Gemini to select best image
-      const geminiResult = await selectBestImageWithGemini(
+      // Use Groq to select best image
+      const geminiResult = await selectBestImageWithGroq(
         gear.name,
         gear.brand,
         images,
@@ -565,8 +565,8 @@ serve(async (req) => {
           continue;
         }
 
-        // Analyze with Gemini
-        const geminiResult = await selectBestImageWithGemini(
+        // Analyze with Groq
+        const geminiResult = await selectBestImageWithGroq(
           gear.name,
           gear.brand,
           images,
