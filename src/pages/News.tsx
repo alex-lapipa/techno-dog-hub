@@ -6,7 +6,20 @@ import Footer from "@/components/Footer";
 import PublishedNewsArticles from "@/components/PublishedNewsArticles";
 import TrendingTopics from "@/components/TrendingTopics";
 
+// Alex's launch letter - pinned as the primary featured article
+const launchLetter = {
+  id: "a0000001-0001-0001-0001-000000000001",
+  category: "ANNOUNCEMENT",
+  title: "A Quiet Launch for Techno.Dog",
+  excerpt: "A personal note from Alex, creator of Techno.Dog, to the community. Today we're opening techno.dog – a public, growing archive of global techno culture.",
+  date: "2025-12-31",
+  readTime: "8 min",
+  featured: true,
+  isPrimaryFeature: true
+};
+
 const newsItems = [
+  launchLetter,
   {
     id: "bassiani-anniversary",
     category: "SCENE",
@@ -65,7 +78,8 @@ const newsItems = [
 
 const NewsPage = () => {
   const { user } = useAuth();
-  const featured = newsItems.filter(n => n.featured);
+  const primaryFeature = newsItems.find(n => (n as any).isPrimaryFeature);
+  const featured = newsItems.filter(n => n.featured && !(n as any).isPrimaryFeature);
   const regular = newsItems.filter(n => !n.featured);
 
   return (
@@ -118,32 +132,37 @@ const NewsPage = () => {
               )}
             </div>
 
-            {/* Right: Featured Article */}
-            {featured[0] && (
+            {/* Right: Featured Article - Alex's Launch Letter */}
+            {primaryFeature && (
               <Link
-                to={`/news/${featured[0].id}`}
-                className="group block border border-border p-6 md:p-8 hover:bg-card transition-colors bg-card/30"
+                to={`/news/article/${primaryFeature.id}`}
+                className="group block border-2 border-logo-green/50 p-6 md:p-8 hover:bg-card transition-colors bg-card/30 hover:border-logo-green"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-mono text-xs uppercase tracking-[0.3em] text-primary border border-primary px-2 py-1">
+                  <span className="font-mono text-xs uppercase tracking-[0.3em] text-logo-green border border-logo-green px-2 py-1">
                     Featured
                   </span>
                   <span className="font-mono text-xs text-muted-foreground">
-                    {featured[0].readTime}
+                    {primaryFeature.readTime}
                   </span>
                 </div>
-                <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
-                  {featured[0].category}
+                <span className="font-mono text-xs text-crimson uppercase tracking-wider mb-2 block">
+                  {primaryFeature.category}
                 </span>
-                <h2 className="font-mono text-xl md:text-2xl uppercase tracking-tight mb-3 group-hover:animate-glitch">
-                  {featured[0].title}
+                <h2 className="font-mono text-xl md:text-2xl uppercase tracking-tight mb-3 group-hover:text-logo-green transition-colors">
+                  {primaryFeature.title}
                 </h2>
                 <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-4">
-                  {featured[0].excerpt}
+                  {primaryFeature.excerpt}
                 </p>
-                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground">
-                  <span>Read Now</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    {primaryFeature.date} — by Alex Lawton
+                  </span>
+                  <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-logo-green group-hover:text-foreground">
+                    <span>Read Now</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </Link>
             )}
@@ -159,7 +178,7 @@ const NewsPage = () => {
 
           {/* Featured (excluding hero featured) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-            {featured.slice(1).map((item) => (
+            {featured.map((item) => (
               <Link
                 key={item.id}
                 to={`/news/${item.id}`}
