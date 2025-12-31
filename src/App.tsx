@@ -101,6 +101,7 @@ const SoundMachine = lazy(() => import("./pages/SoundMachine"));
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Books = lazy(() => import("./pages/Books"));
 const BookDetail = lazy(() => import("./pages/BookDetail"));
+const Documentaries = lazy(() => import("./pages/Documentaries"));
 const LibrarianAgentAdmin = lazy(() => import("./pages/LibrarianAgentAdmin"));
 const AdminBookKnowledge = lazy(() => import("./pages/AdminBookKnowledge"));
 const Community = lazy(() => import("./pages/Community"));
@@ -253,6 +254,7 @@ const App = () => (
                     <Route path="/technopedia" element={<Technopedia />} />
                     <Route path="/books" element={<Books />} />
                     <Route path="/books/:id" element={<BookDetail />} />
+                    <Route path="/documentaries" element={<Documentaries />} />
                     
                     {/* Support */}
                     <Route path="/support" element={<Support />} />

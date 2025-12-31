@@ -2980,6 +2980,119 @@ export type Database = {
         }
         Relationships: []
       }
+      documentaries: {
+        Row: {
+          category_id: string | null
+          channel_id: string | null
+          channel_name: string | null
+          created_at: string
+          curator_notes: string | null
+          description: string | null
+          discovery_source: string | null
+          duration: string | null
+          featured_order: number | null
+          id: string
+          is_featured: boolean | null
+          published_at: string | null
+          relevance_score: number | null
+          status: string
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          view_count: number | null
+          why_watch: string | null
+          youtube_video_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          channel_id?: string | null
+          channel_name?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          description?: string | null
+          discovery_source?: string | null
+          duration?: string | null
+          featured_order?: number | null
+          id?: string
+          is_featured?: boolean | null
+          published_at?: string | null
+          relevance_score?: number | null
+          status?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+          why_watch?: string | null
+          youtube_video_id: string
+        }
+        Update: {
+          category_id?: string | null
+          channel_id?: string | null
+          channel_name?: string | null
+          created_at?: string
+          curator_notes?: string | null
+          description?: string | null
+          discovery_source?: string | null
+          duration?: string | null
+          featured_order?: number | null
+          id?: string
+          is_featured?: boolean | null
+          published_at?: string | null
+          relevance_score?: number | null
+          status?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+          why_watch?: string | null
+          youtube_video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentaries_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "documentary_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentary_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           chunk_index: number | null
