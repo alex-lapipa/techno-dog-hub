@@ -90,6 +90,15 @@ const Books = () => {
       );
     }
     
+    // Sort with "Techno Rebels" first
+    result = [...result].sort((a, b) => {
+      const isTechnoRebelsA = a.title.toLowerCase().includes("techno rebels");
+      const isTechnoRebelsB = b.title.toLowerCase().includes("techno rebels");
+      if (isTechnoRebelsA && !isTechnoRebelsB) return -1;
+      if (!isTechnoRebelsA && isTechnoRebelsB) return 1;
+      return a.title.localeCompare(b.title);
+    });
+    
     return result;
   }, [books, activeCategory, searchQuery]);
 
