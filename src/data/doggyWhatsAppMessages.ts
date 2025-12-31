@@ -496,6 +496,11 @@ export const doggyMessages: Record<string, DoggyMessage> = {
     intro: "I'm the Richard Dog — steel factory legend by day, Paranoox underground king by night",
     quote: "8 hours forging metal in Gijón, 8 hours forging memories at Paranoox. The beard grows longer with every kick drum.",
     packInvite: "Join the Paranoox family"
+  },
+  'fran': {
+    intro: "I'm the Fran Dog — showjumping legend from Gijón, now raving in Bali til sunrise",
+    quote: "90s clubs taught me how to fly without a horse. Big smile, bigger beats, the dancefloor is my arena.",
+    packInvite: "Jump into the pack"
   }
 };
 
