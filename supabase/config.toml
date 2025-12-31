@@ -345,3 +345,6 @@ verify_jwt = false
 
 [functions.image-proxy]
 verify_jwt = false
+
+[functions.amazon-link]
+verify_jwt = false
