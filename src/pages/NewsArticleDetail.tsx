@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import PageSEO from '@/components/PageSEO';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft } from 'lucide-react';
 
@@ -165,8 +166,38 @@ const NewsArticleDetail = () => {
     );
   }
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "description": article.subtitle || article.title,
+    "url": `https://techno.dog/news/${article.id}`,
+    "datePublished": article.published_at || article.created_at,
+    "author": {
+      "@type": "Person",
+      "name": article.author_pseudonym || "techno.dog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "techno.dog",
+      "url": "https://techno.dog"
+    },
+    "keywords": [...article.genre_tags, ...article.city_tags, ...article.entity_tags].join(", ")
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <PageSEO
+        title={article.title}
+        description={article.subtitle || `Techno news: ${article.title}`}
+        path={`/news/${article.id}`}
+        type="article"
+        articlePublishedTime={article.published_at || article.created_at}
+        articleAuthor={article.author_pseudonym || "techno.dog"}
+        articleSection="Techno News"
+        articleTags={[...article.genre_tags, ...article.city_tags]}
+        structuredData={articleSchema}
+      />
       <Header />
       <main className="pt-24 lg:pt-16 pb-16">
         <div className="container mx-auto px-4 md:px-8">

@@ -141,8 +141,31 @@ const BookDetail = () => {
   const quotablePassages = knowledgeChunks.find(c => (c.metadata as any)?.section === 'quotable_passages');
   const technoConnections = knowledgeChunks.find(c => (c.metadata as any)?.section === 'techno_connections');
 
+  const bookSchema = {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "name": book.title,
+    "author": {
+      "@type": "Person",
+      "name": book.author
+    },
+    "description": book.description || book.why_read,
+    "url": `https://techno.dog/books/${id}`,
+    ...(book.isbn && { "isbn": book.isbn }),
+    ...(book.publisher && { "publisher": { "@type": "Organization", "name": book.publisher } }),
+    ...(book.year_published && { "datePublished": book.year_published.toString() }),
+    ...(book.pages && { "numberOfPages": book.pages }),
+    ...(book.cover_url && { "image": book.cover_url }),
+    ...(book.category && { "genre": book.category.name })
+  };
+
   return (
-    <PageLayout title={book.title} path={`/books/${id}`}>
+    <PageLayout 
+      title={`${book.title} by ${book.author}`} 
+      description={book.description || book.why_read || `${book.title} - essential reading for techno culture`}
+      path={`/books/${id}`}
+      structuredData={bookSchema}
+    >
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Link */}
         <Link 
