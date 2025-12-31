@@ -39,35 +39,53 @@ const DoggyOrchestratorAdmin = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // Fetch doggy-related stats from agent reports
-      const { data: doggyReports, count: reportCount } = await supabase
-        .from('agent_reports')
-        .select('*', { count: 'exact' })
-        .ilike('agent_name', '%doggy%')
-        .order('created_at', { ascending: false })
-        .limit(20);
+      // Fetch actual doggy variant count
+      const { count: variantCount } = await supabase
+        .from('doggy_variants')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
 
-      const totalDoggies = reportCount || 0;
-      const shares = 0; // Shares tracked via analytics
+      // Fetch share count from doggy_share_events
+      const { count: shareCount } = await supabase
+        .from('doggy_share_events')
+        .select('*', { count: 'exact', head: true });
 
-      // Fetch recent orchestrator reports
-      const { data: reports } = await supabase
-        .from('agent_reports')
+      // Fetch recent agent runs from doggy_agent_runs
+      const { data: runs } = await supabase
+        .from('doggy_agent_runs')
         .select('*')
-        .or('agent_name.eq.doggy-orchestrator,agent_name.eq.doggy-self-heal')
-        .order('created_at', { ascending: false })
+        .order('started_at', { ascending: false })
         .limit(10);
 
+      // Fetch analytics summary
+      const { count: analyticsCount } = await supabase
+        .from('doggy_analytics')
+        .select('*', { count: 'exact', head: true });
+
       setStats({
-        totalDoggies: totalDoggies || 0,
-        activeDoggies: 0, // Would need active session tracking
-        shares: shares || 0,
-        lastOrchestration: reports?.[0]?.created_at 
-          ? new Date(reports[0].created_at).toLocaleDateString() 
+        totalDoggies: variantCount || 0,
+        activeDoggies: analyticsCount || 0,
+        shares: shareCount || 0,
+        lastOrchestration: runs?.[0]?.started_at 
+          ? new Date(runs[0].started_at).toLocaleDateString() 
           : 'Never'
       });
 
-      setRecentActions(reports || []);
+      // Map agent runs to recent actions format
+      const mappedRuns = (runs || []).map((run: any) => ({
+        id: run.id,
+        title: `${run.run_type} - ${run.status}`,
+        agent_name: run.run_type,
+        severity: run.status === 'completed' ? 'info' : (run.status === 'failed' ? 'error' : 'warning'),
+        created_at: run.started_at,
+        details: {
+          issues_detected: run.issues_detected,
+          issues_auto_fixed: run.issues_auto_fixed,
+          performance_score: run.performance_score
+        }
+      }));
+
+      setRecentActions(mappedRuns);
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
