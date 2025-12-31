@@ -1,21 +1,24 @@
-import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, MapPin } from "lucide-react";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight, Search, Calendar, MapPin, Music, Loader2 } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useFestivals, usePrefetchFestival } from "@/hooks/useData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useRef, useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 
 const FestivalsPage = () => {
-  const directoryRef = useRef<HTMLDivElement>(null);
-  
-  const prefetchFestival = usePrefetchFestival();
-  const [selectedCountry, setSelectedCountry] = useState<string>('all');
-
+  const { trackClick, trackSearch } = useAnalytics();
   const { data: festivals = [], isLoading } = useFestivals();
+  const prefetchFestival = usePrefetchFestival();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Sync country from URL
+  const countryFromUrl = searchParams.get("country");
+  const [selectedCountry, setSelectedCountry] = useState<string>(countryFromUrl || "all");
 
   // Get unique countries sorted alphabetically
   const countries = useMemo(() => {
@@ -23,32 +26,29 @@ const FestivalsPage = () => {
     return uniqueCountries;
   }, [festivals]);
 
-  // Filter festivals by selected country
+  // Update URL when country changes
+  useEffect(() => {
+    if (selectedCountry === "all") {
+      searchParams.delete("country");
+    } else {
+      searchParams.set("country", selectedCountry);
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [selectedCountry, searchParams, setSearchParams]);
+
   const filteredFestivals = useMemo(() => {
-    if (selectedCountry === 'all') return festivals;
-    return festivals.filter(f => f.country === selectedCountry);
-  }, [festivals, selectedCountry]);
-
-  // Featured festivals - derived from data with fallback strategy
-  const featured = useMemo(() => {
-    // Sort by founded date (oldest first) as a proxy for importance, limit to 5
-    const sorted = [...filteredFestivals].sort((a, b) => {
-      const aYear = parseInt(String(a.founded)) || 9999;
-      const bYear = parseInt(String(b.founded)) || 9999;
-      return aYear - bYear;
+    return festivals.filter(festival => {
+      const matchesSearch = searchQuery === "" || 
+        festival.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        festival.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        festival.country?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        festival.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesCountry = selectedCountry === "all" || festival.country === selectedCountry;
+      
+      return matchesSearch && matchesCountry;
     });
-    return sorted.slice(0, 5);
-  }, [filteredFestivals]);
-  
-  const featuredIds = useMemo(() => new Set(featured.map(f => f.id)), [featured]);
-  const others = useMemo(() => filteredFestivals.filter(f => !featuredIds.has(f.id)), [filteredFestivals, featuredIds]);
-
-  const rowVirtualizer = useVirtualizer({
-    count: others.length,
-    getScrollElement: () => directoryRef.current,
-    estimateSize: () => 72,
-    overscan: 5,
-  });
+  }, [festivals, searchQuery, selectedCountry]);
 
   const itemListSchema = {
     "@context": "https://schema.org",
@@ -76,201 +76,202 @@ const FestivalsPage = () => {
     }))
   };
 
+  // Get festival image - check for dedicated festival images
+  const getFestivalImage = (festival: typeof festivals[0]) => {
+    // Check for festival-specific images in public/festivals folder
+    const festivalSlug = festival.id.toLowerCase().replace(/\s+/g, '-');
+    // Return null to show placeholder - actual images would be in public/festivals/
+    return null;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <GlitchSVGFilter />
       <PageSEO
         title="Techno Festivals Worldwide"
-        description="Comprehensive guide to underground techno festivals worldwide. Community-curated and regularly updated."
+        description="Comprehensive guide to underground techno festivals worldwide. From Detroit to Tbilisi, Tokyo to Bogotá. Community-curated."
         path="/festivals"
         structuredData={itemListSchema}
       />
       <Header />
-      <main className="pt-16 pb-16">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="mb-8 space-y-4">
-            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em]">
+      <main className="pt-16 pb-12 sm:pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Hero */}
+          <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
+            <div className="font-mono text-[10px] sm:text-xs text-muted-foreground uppercase tracking-[0.2em] sm:tracking-[0.3em]">
               // Global gatherings
             </div>
-            <h1 className="font-mono text-4xl md:text-6xl uppercase tracking-tight">
+            <h1 className="font-mono text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight">
               Festivals
             </h1>
-            <p className="font-mono text-sm text-muted-foreground max-w-2xl">
+            <p className="font-mono text-xs sm:text-sm text-muted-foreground max-w-2xl">
               From Detroit to Tbilisi, Tokyo to Bogotá. The gatherings that matter.
             </p>
           </div>
 
-          {/* Country Tabs */}
-          <Tabs value={selectedCountry} onValueChange={setSelectedCountry} className="mb-10">
-            <TabsList className="h-auto flex flex-wrap gap-2 bg-transparent p-0 justify-start">
-              <TabsTrigger 
-                value="all" 
-                className="font-mono text-xs uppercase tracking-wider border border-border px-4 py-2 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground hover:bg-card transition-colors"
+          {/* Search & Filter */}
+          <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search festivals..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onBlur={() => {
+                  if (searchQuery.trim()) {
+                    trackSearch(searchQuery, filteredFestivals.length);
+                  }
+                }}
+                className="pl-10 font-mono text-xs sm:text-sm bg-transparent border-border"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              <button
+                onClick={() => {
+                  setSelectedCountry("all");
+                  trackClick("festivals_filter_all");
+                }}
+                className={`font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 border transition-colors ${
+                  selectedCountry === "all"
+                    ? 'bg-foreground text-background border-foreground'
+                    : 'bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground'
+                }`}
               >
-                All
-                <span className="ml-2 text-muted-foreground data-[state=active]:text-background/70">
-                  ({festivals.length})
-                </span>
-              </TabsTrigger>
-              {countries.map(country => {
+                All ({festivals.length})
+              </button>
+              {countries.map((country) => {
                 const count = festivals.filter(f => f.country === country).length;
                 return (
-                  <TabsTrigger 
+                  <button
                     key={country}
-                    value={country}
-                    className="font-mono text-xs uppercase tracking-wider border border-border px-4 py-2 data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground hover:bg-card transition-colors"
+                    onClick={() => {
+                      setSelectedCountry(country);
+                      trackClick(`festivals_filter_${country}`);
+                    }}
+                    className={`font-mono text-[10px] sm:text-xs uppercase tracking-wider px-2 sm:px-3 py-1 sm:py-1.5 border transition-colors ${
+                      selectedCountry === country
+                        ? 'bg-foreground text-background border-foreground'
+                        : 'bg-transparent text-muted-foreground border-border hover:border-foreground hover:text-foreground'
+                    }`}
                   >
-                    {country}
-                    <span className="ml-2 text-muted-foreground data-[state=active]:text-background/70">
-                      ({count})
-                    </span>
-                  </TabsTrigger>
+                    {country} ({count})
+                  </button>
                 );
               })}
-            </TabsList>
-          </Tabs>
+            </div>
+          </div>
 
-          {/* Featured festivals - not virtualized as it's a small fixed set */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="border border-border p-6 space-y-4">
-                  <div className="flex justify-between">
-                    <Skeleton className="h-5 w-16" />
-                    <Skeleton className="h-4 w-12" />
-                  </div>
-                  <Skeleton className="h-7 w-40" />
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              ))
-            ) : (
-              featured.map((festival, index) => (
+          {/* Festivals Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            {filteredFestivals.map((festival, index) => {
+              const festivalImage = getFestivalImage(festival);
+              
+              return (
                 <Link
                   key={festival.id}
                   to={`/festivals/${festival.id}`}
                   onMouseEnter={() => prefetchFestival(festival.id)}
-                  className="group block border border-border p-6 hover:bg-card transition-colors"
+                  className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground border border-border px-2 py-1">
-                      {festival.type}
-                    </span>
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {festival.founded}
-                    </span>
-                  </div>
-                  
-                  <h2 className="font-mono text-2xl uppercase tracking-tight mb-2 group-hover:animate-glitch">
-                    {festival.name}
-                  </h2>
-                  
-                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                    <MapPin className="w-4 h-4" />
-                    <span className="font-mono text-sm">{festival.city}, {festival.country}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                    <Calendar className="w-4 h-4" />
-                    <span className="font-mono text-xs">{festival.months.join(' / ')}</span>
-                  </div>
-
-                  {festival.description && (
-                    <p className="font-mono text-xs text-muted-foreground line-clamp-2 mb-4">
-                      {festival.description}
-                    </p>
-                  )}
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {festival.tags.slice(0, 3).map(tag => (
-                      <span key={tag} className="font-mono text-xs text-muted-foreground border border-border px-2 py-0.5">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground group-hover:text-foreground">
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-
-          {/* Directory with virtual scrolling */}
-          <div className="mb-12">
-            <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-6">
-              // Full directory
-            </div>
-            <div className="border-t border-border">
-              {isLoading ? (
-                Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="border-b border-border py-4 px-4">
-                    <div className="flex items-center gap-6">
-                      <Skeleton className="h-4 w-8" />
-                      <div className="space-y-1">
-                        <Skeleton className="h-5 w-40" />
-                        <Skeleton className="h-3 w-24" />
+                  {/* Festival Image */}
+                  <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
+                    {festivalImage ? (
+                      <GlitchImage 
+                        src={festivalImage} 
+                        alt={festival.name}
+                        className="w-full h-full"
+                        frameNumber={String(index + 1).padStart(2, '0')}
+                        size="thumbnail"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center relative">
+                        {/* VHS Frame for placeholder */}
+                        <div className="absolute inset-0 border-2 border-muted-foreground/10" />
+                        <div className="absolute top-2 left-2 font-mono text-[8px] text-muted-foreground/30">
+                          {String(index + 1).padStart(2, '0')}
+                        </div>
+                        <div className="absolute top-2 right-2 font-mono text-[8px] text-red-500/50">
+                          ● REC
+                        </div>
+                        <Music className="w-12 h-12 text-muted-foreground/20" />
+                        <div className="absolute bottom-2 left-2 right-2 flex justify-between font-mono text-[8px] text-muted-foreground/30">
+                          <span>{festival.founded || '—'}</span>
+                          <span>{festival.type?.toUpperCase() || 'FESTIVAL'}</span>
+                        </div>
                       </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-3 sm:p-4">
+                    <div className="flex justify-between items-start mb-2 sm:mb-3">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
+                          {festival.type || 'Festival'}
+                        </span>
+                        <h2 className="font-mono text-sm sm:text-lg uppercase tracking-wide group-hover:animate-glitch truncate">
+                          {festival.name}
+                        </h2>
+                      </div>
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all mt-1 flex-shrink-0" />
+                    </div>
+                      
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {festival.city}, {festival.country}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3 font-mono text-[10px] sm:text-xs text-muted-foreground">
+                      <Calendar className="w-3 h-3" />
+                      <span>{festival.months?.join(' / ') || '—'}</span>
+                      {festival.founded && (
+                        <>
+                          <span className="text-border">|</span>
+                          <span>Est. {festival.founded}</span>
+                        </>
+                      )}
+                    </div>
+
+                    {festival.description && (
+                      <p className="font-mono text-[10px] sm:text-xs text-muted-foreground line-clamp-2 mb-2 sm:mb-3">
+                        {festival.description}
+                      </p>
+                    )}
+
+                    <div className="flex flex-wrap gap-1">
+                      {(festival.tags || []).slice(0, 3).map(tag => (
+                        <span 
+                          key={tag} 
+                          className="font-mono text-[9px] sm:text-[10px] text-muted-foreground border border-border/50 px-1 sm:px-1.5 py-0.5"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div
-                  ref={directoryRef}
-                  className="h-[50vh] overflow-auto"
-                >
-                  <div
-                    style={{
-                      height: `${rowVirtualizer.getTotalSize()}px`,
-                      width: '100%',
-                      position: 'relative',
-                    }}
-                  >
-                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                      const festival = others[virtualRow.index];
-                      return (
-                        <Link
-                          key={festival.id}
-                          to={`/festivals/${festival.id}`}
-                          onMouseEnter={() => prefetchFestival(festival.id)}
-                          data-index={virtualRow.index}
-                          ref={rowVirtualizer.measureElement}
-                          className="group absolute left-0 right-0 flex items-center justify-between gap-4 border-b border-border py-4 hover:bg-card transition-colors px-4"
-                          style={{
-                            transform: `translateY(${virtualRow.start}px)`,
-                          }}
-                        >
-                          <div className="flex items-center gap-6">
-                            <span className="font-mono text-xs text-muted-foreground w-8">
-                              {String(virtualRow.index + 1).padStart(2, "0")}
-                            </span>
-                            <div>
-                              <h3 className="font-mono text-lg uppercase tracking-tight group-hover:animate-glitch">
-                                {festival.name}
-                              </h3>
-                              <span className="font-mono text-xs text-muted-foreground">
-                                {festival.city}, {festival.country}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <span className="font-mono text-xs text-muted-foreground hidden md:block">
-                              {festival.months[0]}
-                            </span>
-                            <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+                </Link>
+              );
+            })}
           </div>
 
-          <div className="border border-border p-6">
+          {/* Count */}
+          <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
+            {filteredFestivals.length} festivals in archive
+          </div>
+
+          {/* Go Deeper */}
+          <div className="mt-12 border border-border p-6">
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-[0.3em] mb-4">
               // Go deeper
             </div>
@@ -278,14 +279,14 @@ const FestivalsPage = () => {
               <Link to="/venues" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
                 → Venues
               </Link>
-              <Link to="/mad/calendar" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → Calendar
-              </Link>
-              <Link to="/mad/map" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
-                → Map
-              </Link>
               <Link to="/artists" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
                 → Artists
+              </Link>
+              <Link to="/labels" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → Labels
+              </Link>
+              <Link to="/crews" className="font-mono text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground hover:animate-glitch">
+                → Crews
               </Link>
             </div>
           </div>
