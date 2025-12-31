@@ -119,6 +119,7 @@ const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 const PrivacyAgentAdmin = lazy(() => import("./pages/PrivacyAgentAdmin"));
+const OGPreview = lazy(() => import("./pages/OGPreview"));
 
 const queryClient = new QueryClient();
 
@@ -275,6 +276,7 @@ const App = () => (
                     <Route path="/terms" element={<TermsOfService />} />
                     <Route path="/sitemap" element={<Sitemap />} />
                     <Route path="/admin/privacy-agent" element={<PrivacyAgentAdmin />} />
+                    <Route path="/admin/og-preview" element={<OGPreview />} />
                     
                     {/* Support */}
                     <Route path="/support" element={<Support />} />
