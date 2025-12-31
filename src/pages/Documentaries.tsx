@@ -264,8 +264,13 @@ const Documentaries = () => {
                 key={doc.id}
                 className="group flex flex-col md:flex-row gap-4 p-4 border border-border/50 bg-card/30 hover:border-logo-green/30 transition-colors"
               >
-                {/* Thumbnail */}
-                <div className="relative w-full md:w-64 aspect-video overflow-hidden bg-black shrink-0">
+                {/* Thumbnail - VHS Style */}
+                <div className="relative w-full md:w-64 aspect-video overflow-hidden bg-black shrink-0 border border-logo-green/30">
+                  {/* VHS Frame Number */}
+                  <div className="absolute top-1 left-1 z-20 font-mono text-[8px] text-logo-green/70 tracking-widest">
+                    REC●{String(filteredDocs.indexOf(doc) + 1).padStart(2, "0")}
+                  </div>
+                  
                   {playingVideo === doc.youtube_video_id ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${doc.youtube_video_id}?autoplay=1`}
@@ -282,19 +287,38 @@ const Documentaries = () => {
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
+                      
+                      {/* VHS Scan Lines Overlay */}
+                      <div 
+                        className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay"
+                        style={{
+                          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)',
+                        }}
+                      />
+                      
+                      {/* Green tint overlay */}
+                      <div className="absolute inset-0 bg-logo-green/5 pointer-events-none" />
+                      
+                      {/* Play Button */}
                       <button
                         onClick={() => setPlayingVideo(doc.youtube_video_id)}
                         className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <div className="w-12 h-12 rounded-full bg-crimson/90 flex items-center justify-center">
-                          <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+                        <div className="w-12 h-12 border-2 border-logo-green bg-black/60 flex items-center justify-center group-hover:bg-logo-green/20 transition-colors">
+                          <Play className="w-5 h-5 text-logo-green ml-0.5" fill="currentColor" />
                         </div>
                       </button>
+                      
+                      {/* Duration Badge */}
                       {doc.duration && (
-                        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-mono px-1.5 py-0.5">
+                        <div className="absolute bottom-1 right-1 bg-black/90 text-logo-green text-[9px] font-mono px-1.5 py-0.5 border border-logo-green/50">
                           {formatDuration(doc.duration)}
                         </div>
                       )}
+                      
+                      {/* Corner Accents */}
+                      <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-crimson/50" />
+                      <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-crimson/50" />
                     </>
                   )}
                 </div>
