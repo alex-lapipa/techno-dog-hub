@@ -4641,6 +4641,348 @@ export type Database = {
           },
         ]
       }
+      kl_cached_search: {
+        Row: {
+          cache_type: string | null
+          created_at: string | null
+          expires_at: string
+          filters_json: Json | null
+          hit_count: number | null
+          id: string
+          last_accessed_at: string | null
+          query_hash: string
+          query_text: string | null
+          result_json: Json
+        }
+        Insert: {
+          cache_type?: string | null
+          created_at?: string | null
+          expires_at: string
+          filters_json?: Json | null
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          query_hash: string
+          query_text?: string | null
+          result_json: Json
+        }
+        Update: {
+          cache_type?: string | null
+          created_at?: string | null
+          expires_at?: string
+          filters_json?: Json | null
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          query_hash?: string
+          query_text?: string | null
+          result_json?: Json
+        }
+        Relationships: []
+      }
+      kl_change_log: {
+        Row: {
+          action: string
+          actor: string
+          after_json: Json | null
+          before_json: Json | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          record_id: string
+          reversed_at: string | null
+          reversed_by: string | null
+          reversible: boolean | null
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor: string
+          after_json?: Json | null
+          before_json?: Json | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          record_id: string
+          reversed_at?: string | null
+          reversed_by?: string | null
+          reversible?: boolean | null
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          after_json?: Json | null
+          before_json?: Json | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          record_id?: string
+          reversed_at?: string | null
+          reversed_by?: string | null
+          reversible?: boolean | null
+          table_name?: string
+        }
+        Relationships: []
+      }
+      kl_documents: {
+        Row: {
+          checksum: string | null
+          content_type: string | null
+          created_at: string | null
+          error_message: string | null
+          extracted_json: Json | null
+          fetched_at: string | null
+          id: string
+          raw_content: string | null
+          source_id: string | null
+          status: string | null
+          url: string
+        }
+        Insert: {
+          checksum?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          extracted_json?: Json | null
+          fetched_at?: string | null
+          id?: string
+          raw_content?: string | null
+          source_id?: string | null
+          status?: string | null
+          url: string
+        }
+        Update: {
+          checksum?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          extracted_json?: Json | null
+          fetched_at?: string | null
+          id?: string
+          raw_content?: string | null
+          source_id?: string | null
+          status?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kl_documents_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "kl_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kl_enrichment_jobs: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          entity_id: string | null
+          error: string | null
+          finished_at: string | null
+          id: string
+          job_type: string
+          max_attempts: number | null
+          params: Json | null
+          priority: number | null
+          result: Json | null
+          scheduled_for: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          entity_id?: string | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_type: string
+          max_attempts?: number | null
+          params?: Json | null
+          priority?: number | null
+          result?: Json | null
+          scheduled_for?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          entity_id?: string | null
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          job_type?: string
+          max_attempts?: number | null
+          params?: Json | null
+          priority?: number | null
+          result?: Json | null
+          scheduled_for?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kl_enrichment_jobs_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "kl_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kl_entities: {
+        Row: {
+          canonical_name: string
+          created_at: string | null
+          entity_type: string
+          external_refs: Json | null
+          id: string
+          metadata: Json | null
+          normalized_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          canonical_name: string
+          created_at?: string | null
+          entity_type: string
+          external_refs?: Json | null
+          id?: string
+          metadata?: Json | null
+          normalized_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          canonical_name?: string
+          created_at?: string | null
+          entity_type?: string
+          external_refs?: Json | null
+          id?: string
+          metadata?: Json | null
+          normalized_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      kl_facts: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          document_id: string | null
+          entity_id: string
+          evidence_snippet: string | null
+          id: string
+          predicate: string
+          source_id: string | null
+          source_url: string | null
+          status: string | null
+          supersedes_id: string | null
+          value_json: Json | null
+          value_text: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          entity_id: string
+          evidence_snippet?: string | null
+          id?: string
+          predicate: string
+          source_id?: string | null
+          source_url?: string | null
+          status?: string | null
+          supersedes_id?: string | null
+          value_json?: Json | null
+          value_text?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          entity_id?: string
+          evidence_snippet?: string | null
+          id?: string
+          predicate?: string
+          source_id?: string | null
+          source_url?: string | null
+          status?: string | null
+          supersedes_id?: string | null
+          value_json?: Json | null
+          value_text?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kl_facts_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "kl_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kl_facts_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "kl_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kl_facts_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "kl_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kl_facts_supersedes_id_fkey"
+            columns: ["supersedes_id"]
+            isOneToOne: false
+            referencedRelation: "kl_facts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kl_sources: {
+        Row: {
+          base_url: string | null
+          config: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_url?: string | null
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_url?: string | null
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       label_contacts: {
         Row: {
           best_approach_notes: string | null
