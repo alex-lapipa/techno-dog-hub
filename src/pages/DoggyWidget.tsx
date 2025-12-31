@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { dogVariants } from "@/components/DogPack";
+import { getWhatsAppShareText, getDoggyHashtag } from "@/data/doggyWhatsAppMessages";
 
 // Simple Mobile-First Widget
 // - Scrolling images that auto-change
@@ -49,9 +50,9 @@ const DoggyWidget = () => {
     }, 200);
   }, [currentDogIndex]);
 
-  // WhatsApp share
+  // WhatsApp share with full personalized message + hashtag
   const shareWhatsApp = useCallback(() => {
-    const text = `🖤 Meet my Techno Doggy: ${currentDog.name}! Get yours at techno.dog/doggies`;
+    const text = getWhatsAppShareText(currentDog.name);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   }, [currentDog.name]);
