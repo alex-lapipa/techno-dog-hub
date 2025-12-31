@@ -8,11 +8,12 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DogChat from "@/components/admin/DogChat";
 
-// Scenes group: Festivals, Venues, Crews with horizontal navigation
+// Scenes group: Festivals, Venues, Crews, Labels with horizontal navigation
 const SCENES_ITEMS = [
   { label: 'Festivals', path: '/festivals' },
   { label: 'Venues', path: '/venues' },
   { label: 'Crews', path: '/crews' },
+  { label: 'Labels', path: '/labels' },
 ];
 
 const Header = () => {
@@ -42,7 +43,6 @@ const Header = () => {
       isScenes: true,
       sub: SCENES_ITEMS
     },
-    { label: 'Labels', path: '/labels' },
     { label: 'News', path: '/news' },
   ];
 
