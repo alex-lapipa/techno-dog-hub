@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2, Search, X } from "lucide-react";
+import { ExternalLink, BookOpen, ChevronDown, ChevronUp, Loader2, Search, X, LayoutGrid, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { BookSuggestionForm } from "@/components/books/BookSuggestionForm";
@@ -31,6 +32,7 @@ const Books = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"list" | "gallery">("list");
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -149,9 +151,9 @@ const Books = () => {
           </div>
         </div>
 
-        {/* Search Box */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
+        {/* Search Box & View Toggle */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
@@ -168,6 +170,34 @@ const Books = () => {
                 <X className="w-4 h-4" />
               </button>
             )}
+          </div>
+          
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 border border-border/50">
+            <button
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "p-2 font-mono text-xs transition-colors",
+                viewMode === "list"
+                  ? "bg-logo-green/20 text-logo-green"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="List View"
+            >
+              <List className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("gallery")}
+              className={cn(
+                "p-2 font-mono text-xs transition-colors",
+                viewMode === "gallery"
+                  ? "bg-logo-green/20 text-logo-green"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Cover Gallery"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -231,8 +261,54 @@ const Books = () => {
           </div>
         )}
 
-        {/* Categories */}
-        {!isLoading && (
+        {/* Gallery View */}
+        {!isLoading && viewMode === "gallery" && (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+            {filteredBooks.map((book) => (
+              <Link
+                key={book.id}
+                to={`/books/${book.id}`}
+                className="group relative aspect-[2/3] overflow-hidden border border-border bg-card hover:border-logo-green/50 transition-all hover:scale-[1.02]"
+              >
+                {/* VHS Scanlines */}
+                <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
+                
+                {book.cover_url ? (
+                  <img
+                    src={book.cover_url}
+                    alt={book.title}
+                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-500"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-muted-foreground/20" />
+                  </div>
+                )}
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                  <p className="font-mono text-[9px] text-foreground line-clamp-2 leading-tight">
+                    {book.title}
+                  </p>
+                  <p className="font-mono text-[8px] text-muted-foreground truncate">
+                    {book.author}
+                  </p>
+                </div>
+                
+                {/* Year Badge */}
+                {book.year_published && (
+                  <div className="absolute top-0 right-0 bg-crimson text-white text-[8px] font-mono px-1 py-0.5">
+                    {book.year_published}
+                  </div>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* List View - Categories */}
+        {!isLoading && viewMode === "list" && (
           <div className="space-y-8">
             {displayCategories.map((category) => {
               const categoryBooks = filteredBooks.filter(b => b.category?.name === category.name);
@@ -312,8 +388,8 @@ const BookCard = ({ book }: BookCardProps) => {
   return (
     <article className="group flex flex-col md:flex-row gap-6 p-4 border border-border/50 bg-background/50 hover:border-logo-green/30 transition-colors">
       {/* Cover Image - VHS Style */}
-      <div className="relative shrink-0 w-full md:w-32 lg:w-40">
-        <div className="relative aspect-[2/3] overflow-hidden border border-border">
+      <Link to={`/books/${book.id}`} className="relative shrink-0 w-full md:w-32 lg:w-40">
+        <div className="relative aspect-[2/3] overflow-hidden border border-border group-hover:border-logo-green/50 transition-colors">
           {/* VHS Scanlines Overlay */}
           <div className="absolute inset-0 z-10 pointer-events-none opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.3)_2px,rgba(0,0,0,0.3)_4px)]" />
           {/* VHS Color Aberration Effect */}
@@ -339,15 +415,17 @@ const BookCard = ({ book }: BookCardProps) => {
             </div>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="flex-1 flex flex-col">
         {/* Title & Author */}
         <div className="mb-3">
-          <h3 className="text-base font-mono text-foreground group-hover:text-logo-green transition-colors leading-tight">
-            {book.title}
-          </h3>
+          <Link to={`/books/${book.id}`}>
+            <h3 className="text-base font-mono text-foreground group-hover:text-logo-green transition-colors leading-tight hover:underline">
+              {book.title}
+            </h3>
+          </Link>
           <p className="text-xs font-mono text-muted-foreground mt-1">
             by {book.author}
           </p>
