@@ -2119,6 +2119,61 @@ export const PireDog = ({ className, animated = false }: DogVariantProps) => (
   </svg>
 );
 
+// Alberto Dog - Argentinian chef-raver, London life, long hair, glow sticks, always smiling
+export const AlbertoDog = ({ className, animated = false }: DogVariantProps) => (
+  <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="hsl(var(--logo-green))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
+      {/* Floppy friendly ears */}
+      <path d="M8 28 Q2 18 6 8 Q14 12 16 26" />
+      <path d="M56 28 Q62 18 58 8 Q50 12 48 26" />
+      {/* Long flowing hair - Argentinian mane */}
+      <path d="M16 16 Q12 8 18 4 Q22 2 20 12" />
+      <path d="M20 12 Q16 4 24 2 Q28 0 26 10" />
+      <path d="M26 10 Q22 2 30 0 Q34 -2 32 8" />
+      <path d="M32 8 Q28 0 36 0 Q40 2 38 10" />
+      <path d="M38 10 Q34 2 42 2 Q46 4 44 12" />
+      <path d="M44 12 Q40 4 48 4 Q52 8 48 16" />
+      {/* Extra long strands flowing down */}
+      <path d="M12 20 Q8 28 10 36" strokeWidth="1.5" opacity="0.6" />
+      <path d="M52 20 Q56 28 54 36" strokeWidth="1.5" opacity="0.6" />
+      <path d="M14 24 Q10 32 12 40" strokeWidth="1" opacity="0.4" />
+      <path d="M50 24 Q54 32 52 40" strokeWidth="1" opacity="0.4" />
+      {/* Round friendly head */}
+      <ellipse cx="32" cy="36" rx="16" ry="14" />
+      {/* Warm happy eyes */}
+      <circle cx="24" cy="32" r="4" strokeWidth="1.5" />
+      <circle cx="40" cy="32" r="4" strokeWidth="1.5" />
+      <circle cx="24" cy="31" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="23" cy="30" r="0.8" fill="hsl(var(--background))" />
+      <circle cx="40" cy="31" r="2" fill="hsl(var(--logo-green))" />
+      <circle cx="39" cy="30" r="0.8" fill="hsl(var(--background))" />
+      {/* Friendly raised eyebrows */}
+      <path d="M20 26 Q24 23 28 26" strokeWidth="1.5" />
+      <path d="M36 26 Q40 23 44 26" strokeWidth="1.5" />
+      {/* Nose */}
+      <ellipse cx="32" cy="40" rx="2.5" ry="2" fill="hsl(var(--logo-green))" />
+      {/* Big warm smile - always smiling */}
+      <path d="M22 46 Q32 56 42 46" strokeWidth="2.5" />
+      {/* Smile showing teeth - genuine warmth */}
+      <path d="M26 48 L38 48" strokeWidth="1" opacity="0.4" />
+      {/* Glow sticks - one in each ear area */}
+      <path d="M4 32 L4 44" strokeWidth="2.5" opacity="0.8" />
+      <path d="M60 32 L60 44" strokeWidth="2.5" opacity="0.8" />
+      {/* Glow stick glow effect */}
+      <circle cx="4" cy="38" r="3" strokeWidth="0.5" opacity="0.3" />
+      <circle cx="60" cy="38" r="3" strokeWidth="0.5" opacity="0.3" />
+      {/* Steak/chef spatula hint - best steaks */}
+      <path d="M54 52 L58 56 L60 54 L56 50" strokeWidth="1.5" opacity="0.5" />
+      {/* Argentine sun symbol - small */}
+      <circle cx="6" cy="18" r="2" strokeWidth="1" opacity="0.5" />
+      <path d="M6 14 L6 16" strokeWidth="0.8" opacity="0.4" />
+      <path d="M6 20 L6 22" strokeWidth="0.8" opacity="0.4" />
+      <path d="M2 18 L4 18" strokeWidth="0.8" opacity="0.4" />
+      <path d="M8 18 L10 18" strokeWidth="0.8" opacity="0.4" />
+    </g>
+  </svg>
+);
+
 export const dogVariants = [
   { name: 'Happy', Component: HappyDog, personality: 'Tail wagging at 128 BPM since birth', status: 'good boy' },
   { name: 'Sleepy', Component: SleepyDog, personality: 'Professional napper, occasional raver', status: 'zzz mode' },
@@ -2216,4 +2271,5 @@ export const dogVariants = [
   { name: 'Ron', Component: RonDog, personality: 'Mad LA technologist, guitar hero, open source legend', status: 'shipping code' },
   { name: 'Julieta', Component: JulietaDog, personality: 'Madrid party queen, ex-London raver, absolutely unhinged', status: 'partying' },
   { name: 'Pire', Component: PireDog, personality: 'Globe-trotting acid head, business by day, party legend by night', status: 'squelching' },
+  { name: 'Alberto', Component: AlbertoDog, personality: 'Argentinian chef-raver, best steaks by day, glow sticks til sunrise', status: 'grilling & dancing' },
 ];
