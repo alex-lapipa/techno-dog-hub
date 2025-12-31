@@ -343,6 +343,8 @@ verify_jwt = false
 [functions.book-cover-proxy]
 verify_jwt = false
 
+[functions.generate-launch-article]
+verify_jwt = false
 [functions.image-proxy]
 verify_jwt = false
 
