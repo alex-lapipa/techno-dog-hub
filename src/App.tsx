@@ -14,6 +14,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import ParticleBackground from "@/components/ParticleBackground";
 import FilmGrainOverlay from "@/components/FilmGrainOverlay";
 import FloatingDogButton from "@/components/FloatingDogButton";
+import CookieConsentBanner from "@/components/privacy/CookieConsentBanner";
 
 // Eager load - critical path
 import Index from "./pages/Index";
@@ -111,6 +112,11 @@ const CommunityLeaderboard = lazy(() => import("./pages/CommunityLeaderboard"));
 const CommunityProfile = lazy(() => import("./pages/CommunityProfile"));
 const MySubmissions = lazy(() => import("./pages/MySubmissions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Sitemap = lazy(() => import("./pages/Sitemap"));
+const PrivacyAgentAdmin = lazy(() => import("./pages/PrivacyAgentAdmin"));
 
 const queryClient = new QueryClient();
 
@@ -136,6 +142,7 @@ const App = () => (
               <ScrollToTop />
               <ScrollToTopButton />
               <FloatingDogButton />
+              <CookieConsentBanner />
               <Suspense fallback={<PageLoader />}>
                 <PageTransition>
                   <Routes>
@@ -257,6 +264,13 @@ const App = () => (
                     <Route path="/books" element={<Books />} />
                     <Route path="/books/:id" element={<BookDetail />} />
                     <Route path="/documentaries" element={<Documentaries />} />
+                    
+                    {/* Legal & Privacy */}
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/cookies" element={<CookiePolicy />} />
+                    <Route path="/terms" element={<TermsOfService />} />
+                    <Route path="/sitemap" element={<Sitemap />} />
+                    <Route path="/admin/privacy-agent" element={<PrivacyAgentAdmin />} />
                     
                     {/* Support */}
                     <Route path="/support" element={<Support />} />
