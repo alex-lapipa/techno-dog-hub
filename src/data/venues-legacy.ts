@@ -461,8 +461,39 @@ export const venues: Venue[] = [
     tags: ["warehouse", "Pervert collective", "raw", "immersive"],
     atmosphere: "Warehouse-style event series associated with the Pervert collective, focused on raw, immersive techno experiences.",
     coords: { lat: 19.4284, lng: -99.1276 }
+  },
+
+  // SPAIN
+  {
+    id: "lana-gijon",
+    name: "Lana",
+    city: "Gijón",
+    country: "Spain",
+    type: "club",
+    active: "2010–present",
+    capacity: 300,
+    tags: ["underground", "local scene", "intimate", "Asturias"],
+    soundSystem: "Custom sound system focused on clarity and warmth",
+    atmosphere: "Intimate underground club in the heart of Asturias. A key space for the local techno scene with strong community ties and authentic programming.",
+    coords: { lat: 43.5322, lng: -5.6611 },
+    image: {
+      url: "https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=800",
+      author: "Unsplash",
+      license: "Unsplash License",
+      licenseUrl: "https://unsplash.com/license",
+      sourceUrl: "https://unsplash.com",
+      sourceName: "Unsplash"
+    }
   }
 ];
+
+// Helper to determine if venue is currently open
+export const isVenueOpen = (venue: Venue): boolean => {
+  return venue.active.toLowerCase().includes('present');
+};
+
+// Get all closed venues
+export const getClosedVenues = () => venues.filter(v => !isVenueOpen(v));
 
 export const getVenueById = (id: string) => venues.find(v => v.id === id);
 export const getVenuesByCity = (city: string) => venues.filter(v => v.city === city);
