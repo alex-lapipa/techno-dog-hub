@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useGlobalStatsWithMetrics } from "@/hooks/useGlobalStats";
 import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -266,40 +266,7 @@ const UserManualSection = () => {
 
 // ===== TECHNICAL OVERVIEW SECTION =====
 const TechnicalOverviewSection = () => {
-  const [stats, setStats] = useState<{
-    artists: number;
-    gear: number;
-    labels: number;
-    news: number;
-    books: number;
-    documentaries: number;
-  } | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const [artistsRes, gearRes, labelsRes, newsRes, booksRes, docsRes] = await Promise.all([
-        supabase.from('dj_artists').select('id', { count: 'exact', head: true }),
-        supabase.from('gear_catalog').select('id', { count: 'exact', head: true }),
-        supabase.from('labels').select('id', { count: 'exact', head: true }),
-        supabase.from('td_news_articles').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-        supabase.from('books').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-        supabase.from('documentaries').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-      ]);
-      setStats({
-        artists: artistsRes.count || 0,
-        gear: gearRes.count || 0,
-        labels: labelsRes.count || 0,
-        news: newsRes.count || 0,
-        books: booksRes.count || 0,
-        documentaries: docsRes.count || 0,
-      });
-    };
-    fetchStats();
-  }, []);
-
-  // Calculate real percentages from actual data
-  const total = stats ? (stats.artists + stats.gear + stats.labels + stats.news + stats.books + stats.documentaries) : 0;
-  const pct = (val: number) => total > 0 ? Math.round((val / total) * 100) : 0;
+  const { data: stats, isLoading, total, pct } = useGlobalStatsWithMetrics();
 
   // Platform structure data for pie chart - REAL DATA
   const platformData = stats ? [
