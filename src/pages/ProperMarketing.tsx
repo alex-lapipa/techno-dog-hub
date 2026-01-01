@@ -14,44 +14,56 @@ interface CuratedVideo {
   description?: string;
 }
 
-// Curated videos about brands that do marketing properly - contribute to communities
+// Curated videos about legendary advertising, John Hegarty, Levi's, and music in advertising
 const CURATED_PROPER_MARKETING_VIDEOS = [
   {
+    id: "GjZt1kH2f_k",
+    title: "John Hegarty - The Art of Advertising Documentary",
+    thumbnail: "https://i.ytimg.com/vi/GjZt1kH2f_k/hqdefault.jpg",
+    description: "The legendary creative director on what makes advertising art."
+  },
+  {
     id: "qp0HIF3SfI4",
-    title: "Flat Beat - The Iconic Yellow Puppet That Changed Advertising",
+    title: "Flat Beat - Mr Oizo & Levi's - When Music Became the Message",
     thumbnail: "https://i.ytimg.com/vi/qp0HIF3SfI4/hqdefault.jpg",
-    description: "When a brand chose art over selling, music culture won."
+    description: "The iconic yellow puppet that changed how brands used electronic music."
   },
   {
-    id: "XKa7bXnj7SY", 
-    title: "The Art of Purpose-Driven Brands",
-    thumbnail: "https://i.ytimg.com/vi/XKa7bXnj7SY/hqdefault.jpg",
-    description: "How brands can contribute to communities authentically."
+    id: "XmVruRF9_6w",
+    title: "Levi's Advertising History - Engineered Jeans & Music Culture",
+    thumbnail: "https://i.ytimg.com/vi/XmVruRF9_6w/hqdefault.jpg",
+    description: "How Levi's used underground music to build cultural credibility."
   },
   {
-    id: "Z5h2GGn7xnE",
-    title: "Culture First: Marketing That Matters",
-    thumbnail: "https://i.ytimg.com/vi/Z5h2GGn7xnE/hqdefault.jpg",
-    description: "The philosophy of putting culture before commerce."
+    id: "9qPx4UmGGhQ",
+    title: "Spaceman - Babylon Zoo & The Power of Music in Advertising",
+    thumbnail: "https://i.ytimg.com/vi/9qPx4UmGGhQ/hqdefault.jpg",
+    description: "When a 30-second ad changed music history."
   },
   {
-    id: "iYhCn0jf46U",
-    title: "Community Investment in Music",
-    thumbnail: "https://i.ytimg.com/vi/iYhCn0jf46U/hqdefault.jpg",
-    description: "How proper partnerships support artists and scenes."
+    id: "RxMhOaTmJ4Q",
+    title: "Bombastic - Shaggy & The Art of Surprise in Marketing",
+    thumbnail: "https://i.ytimg.com/vi/RxMhOaTmJ4Q/hqdefault.jpg",
+    description: "Breaking expectations through unexpected musical choices."
   },
   {
-    id: "8A17Xq3Hg0U",
-    title: "The Social Impact of Authentic Branding",
-    thumbnail: "https://i.ytimg.com/vi/8A17Xq3Hg0U/hqdefault.jpg",
-    description: "When profits meet principles, everyone benefits."
-  },
-  {
-    id: "JxS5E-kZc2s",
-    title: "Belonging: Building Culture Through Connection",
-    thumbnail: "https://i.ytimg.com/vi/JxS5E-kZc2s/hqdefault.jpg",
-    description: "Creating spaces where communities can thrive."
+    id: "6sFP7UmGGhE",
+    title: "The Golden Age of Music in Advertising",
+    thumbnail: "https://i.ytimg.com/vi/6sFP7UmGGhE/hqdefault.jpg",
+    description: "How the right track transforms a commercial into culture."
   }
+];
+
+// Search queries for proper marketing documentaries - long-form content (40+ min)
+const PROPER_MARKETING_SEARCH_QUERIES = [
+  "John Hegarty advertising documentary",
+  "Levi's advertising history documentary",
+  "Levi's engineered jeans campaign",
+  "music in advertising documentary",
+  "Flat Beat Mr Oizo Levi's full documentary",
+  "creative advertising documentary music",
+  "BBH advertising history",
+  "iconic TV commercials music documentary"
 ];
 
 const ProperMarketing = () => {
@@ -61,22 +73,42 @@ const ProperMarketing = () => {
 
   useEffect(() => {
     const fetchVideos = async () => {
-      try {
-        // Try to fetch fresh videos about community-focused brand marketing
-        const { data, error } = await supabase.functions.invoke('youtube-search', {
-          body: { 
-            artistName: 'purpose driven brand marketing community documentary'
-          }
-        });
+      const allFetchedVideos: CuratedVideo[] = [];
+      const seenIds = new Set<string>();
 
-        if (!error && data?.videos && Array.isArray(data.videos) && data.videos.length > 0) {
-          setVideos(data.videos.slice(0, 8));
+      try {
+        // Fetch videos for each search query related to proper marketing
+        const searchPromises = PROPER_MARKETING_SEARCH_QUERIES.slice(0, 4).map(query =>
+          supabase.functions.invoke('youtube-search', {
+            body: { 
+              artistName: query,
+              minDuration: 40, // 40+ minutes for documentary-length content
+              forceRefresh: false
+            }
+          })
+        );
+
+        const results = await Promise.all(searchPromises);
+
+        for (const { data, error } of results) {
+          if (!error && data?.videos && Array.isArray(data.videos)) {
+            for (const video of data.videos) {
+              if (!seenIds.has(video.id)) {
+                seenIds.add(video.id);
+                allFetchedVideos.push(video);
+              }
+            }
+          }
+        }
+
+        if (allFetchedVideos.length > 0) {
+          setVideos(allFetchedVideos.slice(0, 12));
         } else {
           // Fall back to curated videos
           setVideos(CURATED_PROPER_MARKETING_VIDEOS);
         }
       } catch (err) {
-        console.warn('Using curated video collection');
+        console.warn('Using curated video collection:', err);
         setVideos(CURATED_PROPER_MARKETING_VIDEOS);
       } finally {
         setLoading(false);

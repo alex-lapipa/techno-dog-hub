@@ -72,18 +72,55 @@ function scoreVideo(video: any, artistName: string): number {
   return score;
 }
 
+// Parse ISO 8601 duration to minutes
+function parseDurationToMinutes(duration: string): number {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  const hours = parseInt(match[1] || '0', 10);
+  const minutes = parseInt(match[2] || '0', 10);
+  const seconds = parseInt(match[3] || '0', 10);
+  return hours * 60 + minutes + seconds / 60;
+}
+
+// Get video details including duration
+async function getVideoDetails(videoIds: string[], apiKey: string): Promise<Map<string, number>> {
+  const durationMap = new Map<string, number>();
+  if (videoIds.length === 0) return durationMap;
+
+  const detailsUrl = new URL('https://www.googleapis.com/youtube/v3/videos');
+  detailsUrl.searchParams.set('part', 'contentDetails');
+  detailsUrl.searchParams.set('id', videoIds.join(','));
+  detailsUrl.searchParams.set('key', apiKey);
+
+  try {
+    const response = await fetch(detailsUrl.toString());
+    if (!response.ok) return durationMap;
+    
+    const data = await response.json();
+    for (const item of data.items || []) {
+      const minutes = parseDurationToMinutes(item.contentDetails?.duration || '');
+      durationMap.set(item.id, minutes);
+    }
+  } catch (error) {
+    console.error('Error fetching video details:', error);
+  }
+  
+  return durationMap;
+}
+
 // Search YouTube with a query
-async function searchYouTubeQuery(query: string, apiKey: string): Promise<any[]> {
+async function searchYouTubeQuery(query: string, apiKey: string, minDurationMinutes: number = 0): Promise<any[]> {
   const searchUrl = new URL('https://www.googleapis.com/youtube/v3/search');
   searchUrl.searchParams.set('part', 'snippet');
   searchUrl.searchParams.set('q', query);
   searchUrl.searchParams.set('type', 'video');
-  searchUrl.searchParams.set('maxResults', '15');
+  searchUrl.searchParams.set('maxResults', '25'); // Fetch more to filter by duration
   searchUrl.searchParams.set('order', 'relevance');
-  searchUrl.searchParams.set('videoDuration', 'long');
+  // Use 'long' duration filter (>20 min) if requesting 40+ min videos
+  searchUrl.searchParams.set('videoDuration', minDurationMinutes >= 20 ? 'long' : 'medium');
   searchUrl.searchParams.set('key', apiKey);
 
-  console.log(`Searching: ${query}`);
+  console.log(`Searching: ${query} (minDuration: ${minDurationMinutes}min)`);
   
   try {
     const response = await fetch(searchUrl.toString());
@@ -93,7 +130,7 @@ async function searchYouTubeQuery(query: string, apiKey: string): Promise<any[]>
     }
 
     const data = await response.json();
-    return (data.items || []).map((item: any) => ({
+    let videos = (data.items || []).map((item: any) => ({
       id: item.id?.videoId,
       title: item.snippet?.title,
       description: item.snippet?.description,
@@ -101,6 +138,21 @@ async function searchYouTubeQuery(query: string, apiKey: string): Promise<any[]>
       channelTitle: item.snippet?.channelTitle,
       publishedAt: item.snippet?.publishedAt,
     })).filter((v: any) => v.id);
+
+    // If minDuration is specified (40+ min), filter by actual duration
+    if (minDurationMinutes >= 40 && videos.length > 0) {
+      const videoIds = videos.map((v: any) => v.id);
+      const durationMap = await getVideoDetails(videoIds, apiKey);
+      
+      videos = videos.filter((v: any) => {
+        const duration = durationMap.get(v.id) || 0;
+        return duration >= minDurationMinutes;
+      });
+      
+      console.log(`Filtered to ${videos.length} videos >= ${minDurationMinutes} minutes`);
+    }
+
+    return videos;
   } catch (error) {
     console.error(`Search error:`, error);
     return [];
@@ -174,7 +226,7 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
-    const { artistName, realName, maxResults = 6, forceRefresh = false } = await req.json();
+    const { artistName, realName, maxResults = 6, forceRefresh = false, minDuration = 0 } = await req.json();
     
     if (!artistName) {
       return errorResponse('Artist name is required', 400);
@@ -255,8 +307,8 @@ serve(async (req) => {
     const allVideos: any[] = [];
     const seenIds = new Set<string>();
 
-    // Search with multiple queries in parallel
-    const searchPromises = searchQueries.slice(0, 4).map(q => searchYouTubeQuery(q, YOUTUBE_API_KEY));
+    // Search with multiple queries in parallel, passing minDuration
+    const searchPromises = searchQueries.slice(0, 4).map(q => searchYouTubeQuery(q, YOUTUBE_API_KEY, minDuration));
     const searchResults = await Promise.all(searchPromises);
 
     for (const videos of searchResults) {
