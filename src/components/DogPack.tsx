@@ -1503,8 +1503,8 @@ export const SubClubDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
-// Aquasella Dog - Asturian festival, river Sella, mountains, nature
-export const AquasellaDog = ({ className, animated = false }: DogVariantProps) => (
+// Asturian Raver Dog - Asturian festivals, river Sella, mountains, nature
+export const AsturianRaverDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ shapeRendering: 'geometricPrecision' }}>
     <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-pulse" : ""}>
       {/* Ears */}
@@ -1566,8 +1566,8 @@ export const DawlessDog = ({ className, animated = false }: DogVariantProps) => 
   </svg>
 );
 
-// Aquia Real Raver Dog - La Real + Aquasella hybrid, party legend, hands in the air
-export const AquiaRealRaverDog = ({ className, animated = false }: DogVariantProps) => (
+// La Pipa Raver Dog - Asturian festival legend, party mode, hands in the air
+export const LaPipaRaverDog = ({ className, animated = false }: DogVariantProps) => (
   <svg viewBox="0 0 64 64" className={cn("w-10 h-10", className)} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ shapeRendering: 'geometricPrecision' }}>
     <g stroke="hsl(var(--logo-green))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" className={animated ? "animate-bounce" : ""}>
       {/* Ears UP - maximum excitement */}
@@ -2586,8 +2586,8 @@ export const dogVariants = [
   { name: 'Bartender', Component: BartenderDog, personality: 'Hydrating ravers since forever', status: 'mixing' },
   { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'The door is a philosophy', status: 'judging' },
   // FESTIVAL DOGS
-  { name: 'Asturian Raver', Component: AquasellaDog, personality: 'River raving in the mountains with cider', status: 'outdoor vibes' },
-  { name: 'La Pipa Raver', Component: AquiaRealRaverDog, personality: 'Dancing until legs give out', status: 'peak festival mode' },
+  { name: 'Asturian Raver', Component: AsturianRaverDog, personality: 'River raving in the mountains with cider', status: 'outdoor vibes' },
+  { name: 'La Pipa Raver', Component: LaPipaRaverDog, personality: 'Dancing until legs give out', status: 'peak festival mode' },
   // GEAR/STYLE DOGS
   { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, no safety net, pure chaos', status: 'patching' },
   // SPANISH LEGENDS
