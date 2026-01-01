@@ -463,13 +463,15 @@ Check for regressions and security issues. Respond with JSON only.`;
 
 // ============ HELPER FUNCTIONS ============
 
-const AI_TIMEOUT_MS = 45000; // 45 second timeout before fallback (edge functions have ~60s limit)
+// Reduced timeout per step to allow for 3 sequential steps within ~50s total (edge functions have ~60s limit)
+const AI_TIMEOUT_MS = 15000; // 15 second timeout per step
+const FALLBACK_TIMEOUT_MS = 12000; // 12 second timeout for fallback calls
 
 async function callWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => 
-      setTimeout(() => reject(new Error("Request timeout")), timeoutMs)
+      setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
     )
   ]);
 }
@@ -533,11 +535,19 @@ async function callClaudeWithFallback(
     }
   }
 
-  // Fallback to Lovable AI
+  // Fallback to Lovable AI with its own timeout
   if (lovableKey) {
     console.log("Using Lovable AI as fallback...");
-    const result = await callLovableAI(lovableKey, systemPrompt, userPrompt);
-    return { result, usedFallback: true };
+    try {
+      const result = await callWithTimeout(
+        callLovableAI(lovableKey, systemPrompt, userPrompt),
+        FALLBACK_TIMEOUT_MS
+      );
+      return { result, usedFallback: true };
+    } catch (fallbackError) {
+      console.error("Lovable AI fallback also failed:", fallbackError instanceof Error ? fallbackError.message : "Unknown error");
+      throw fallbackError;
+    }
   }
 
   throw new Error("No AI provider available");
@@ -562,11 +572,19 @@ async function callGPTWithFallback(
     }
   }
 
-  // Fallback to Lovable AI
+  // Fallback to Lovable AI with its own timeout
   if (lovableKey) {
     console.log("Using Lovable AI as fallback...");
-    const result = await callLovableAI(lovableKey, systemPrompt, userPrompt);
-    return { result, usedFallback: true };
+    try {
+      const result = await callWithTimeout(
+        callLovableAI(lovableKey, systemPrompt, userPrompt),
+        FALLBACK_TIMEOUT_MS
+      );
+      return { result, usedFallback: true };
+    } catch (fallbackError) {
+      console.error("Lovable AI fallback also failed:", fallbackError instanceof Error ? fallbackError.message : "Unknown error");
+      throw fallbackError;
+    }
   }
 
   throw new Error("No AI provider available");
