@@ -73,7 +73,7 @@ const PageSEO = ({
   articleTags,
   keywords = [],
   locale = 'en_US',
-  alternateLocales = ['en_GB', 'de_DE', 'es_ES', 'fr_FR', 'pt_BR', 'ja_JP'],
+  alternateLocales = ['en_GB', 'de_DE', 'fr_FR', 'pt_BR', 'ja_JP'],
   geoRegion,
   geoPlacename,
   geoPosition,
