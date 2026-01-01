@@ -248,6 +248,7 @@ const App = () => (
                     
                     {/* Analytics (Admin only) */}
                     <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/admin/analytics" element={<Analytics />} />
                     <Route path="/admin/artist-migration" element={<ArtistMigrationAdmin />} />
                     <Route path="/admin/data-audit" element={<DataAudit />} />
                     <Route path="/admin/gear-agent" element={<GearAgentAdmin />} />
