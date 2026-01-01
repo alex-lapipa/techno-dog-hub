@@ -386,3 +386,6 @@ verify_jwt = false
 
 [functions.customer-portal]
 verify_jwt = false
+
+[functions.send-launch-announcement]
+verify_jwt = false
