@@ -23,13 +23,13 @@ export const GlitchImage = ({
   const effectiveSrc = useProxy ? getSafeImageUrl(src) ?? src : src;
 
   return (
-    <div className={`relative bg-zinc-800 p-1 h-full ${className}`}>
+    <div className={`relative bg-frame-bg p-1 h-full ${className}`}>
       {/* Sprocket holes left */}
       <div className="absolute left-0 top-0 bottom-0 w-2 flex flex-col justify-around py-1">
         {[...Array(sprocketCount)].map((_, i) => (
           <div
             key={i}
-            className={`${isThumbnail ? "w-1 h-1.5" : "w-1.5 h-2"} bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto`}
+            className={`${isThumbnail ? "w-1 h-1.5" : "w-1.5 h-2"} bg-background/80 rounded-sm mx-auto`}
           />
         ))}
       </div>
@@ -39,16 +39,15 @@ export const GlitchImage = ({
         {[...Array(sprocketCount)].map((_, i) => (
           <div
             key={i}
-            className={`${isThumbnail ? "w-1 h-1.5" : "w-1.5 h-2"} bg-[hsl(0,0%,4%)]/80 rounded-sm mx-auto`}
+            className={`${isThumbnail ? "w-1 h-1.5" : "w-1.5 h-2"} bg-background/80 rounded-sm mx-auto`}
           />
         ))}
       </div>
 
       {/* Image container */}
       <div
-        className="group/film relative overflow-hidden mx-2 border transition-all duration-500 h-full"
+        className="group/film relative overflow-hidden mx-2 border border-crimson/20 transition-all duration-500 h-full"
         style={{
-          borderColor: "rgba(220,38,38,0.2)",
           width: "calc(100% - 16px)",
         }}
       >
@@ -57,9 +56,9 @@ export const GlitchImage = ({
           className="absolute inset-0 z-10 pointer-events-none opacity-100 group-hover/film:opacity-70 transition-opacity duration-500"
           style={{
             background: `
-              repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.2) 1px, rgba(0,0,0,0.2) 2px),
-              radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 100%),
-              linear-gradient(to top, rgba(220,38,38,0.05), rgba(220,38,38,0.05))
+              repeating-linear-gradient(0deg, transparent, transparent 1px, hsl(var(--background) / 0.2) 1px, hsl(var(--background) / 0.2) 2px),
+              radial-gradient(ellipse at center, transparent 50%, hsl(var(--background) / 0.3) 100%),
+              linear-gradient(to top, hsl(var(--crimson) / 0.05), hsl(var(--crimson) / 0.05))
             `,
           }}
         />
@@ -90,18 +89,18 @@ export const GlitchImage = ({
         />
 
         {/* Hover glow */}
-        <div className="absolute inset-0 z-[11] pointer-events-none bg-gradient-to-t from-[rgba(220,38,38,0.4)] via-[rgba(220,38,38,0.15)] to-transparent opacity-0 group-hover/film:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 z-[11] pointer-events-none bg-gradient-to-t from-crimson/40 via-crimson/15 to-transparent opacity-0 group-hover/film:opacity-100 transition-opacity duration-500" />
 
         {/* Frame number */}
         <div
           className={`absolute top-1 left-1 z-20 ${
             isThumbnail ? "px-1 py-0.5" : "px-1.5 py-1"
-          } bg-black/70 border border-[rgba(220,38,38,0.4)]`}
+          } bg-background/70 border border-crimson/40`}
         >
           <span
             className={`${
               isThumbnail ? "text-[8px]" : "text-xs"
-            } text-[hsl(348,75%,52%)] tracking-wider font-bold font-mono`}
+            } text-crimson tracking-wider font-bold font-mono`}
           >
             {frameNumber}
           </span>
