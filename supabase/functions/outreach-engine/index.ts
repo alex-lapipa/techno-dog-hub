@@ -268,9 +268,11 @@ Return JSON:
   return tryParseJSON(result);
 }
 
-// Send email via Resend
+// Send email via Resend - DISABLED
 async function sendEmail(to: string, subject: string, bodyHtml: string, bodyText: string, fromName: string = "Techno.Dog"): Promise<any> {
-  console.log(`Sending email to ${to} with subject: ${subject}`);
+  // EMAIL SENDING DISABLED - Requires explicit authorization
+  console.log(`[outreach-engine] Email sending BLOCKED to ${to} - requires authorization`);
+  return { id: null, blocked: true, message: "Email sending disabled - requires authorization" };
   
   const emailResponse = await resend.emails.send({
     from: "Techno.Dog <doggy@techno.dog>",

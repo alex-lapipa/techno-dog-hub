@@ -277,6 +277,11 @@ async function sendEmailNotification(
   issues: HealthCheck[],
   overall: string
 ): Promise<void> {
+  // EMAIL SENDING DISABLED - Requires explicit authorization
+  console.log("[system-health] Email notification BLOCKED - requires authorization");
+  console.log(`Would have sent alert: ${overall.toUpperCase()} - ${issues.length} issues`);
+  return;
+
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   if (!resendApiKey) {
     console.log("RESEND_API_KEY not configured, skipping email notification");
