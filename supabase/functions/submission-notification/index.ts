@@ -20,6 +20,13 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // EMAIL SENDING DISABLED - Requires explicit authorization
+  console.log("[submission-notification] Email sending is currently disabled");
+  return new Response(
+    JSON.stringify({ success: false, message: "Email sending disabled - requires authorization" }),
+    { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+  );
+
   try {
     const { email, submissionName, status, adminNotes }: SubmissionEmailRequest = await req.json();
 
