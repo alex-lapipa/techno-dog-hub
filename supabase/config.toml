@@ -389,3 +389,6 @@ verify_jwt = false
 
 [functions.send-launch-announcement]
 verify_jwt = false
+
+[functions.daily-analytics-sync]
+verify_jwt = false

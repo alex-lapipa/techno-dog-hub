@@ -78,6 +78,8 @@ const Analytics = () => {
 
   const [liveEventCount, setLiveEventCount] = useState(0);
   const [lastEventTime, setLastEventTime] = useState<string | null>(null);
+  const [ga4DailyData, setGa4DailyData] = useState<any[]>([]);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
   // Process events into stats
   const processEvents = (events: { created_at: string }[]) => {
@@ -98,8 +100,30 @@ const Analytics = () => {
   useEffect(() => {
     if (isAdmin) {
       fetchEventStats();
+      fetchGA4DailyReports();
     }
   }, [isAdmin]);
+
+  // Fetch GA4 daily sync reports
+  const fetchGA4DailyReports = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('analytics_insights')
+        .select('*')
+        .in('insight_type', ['daily_ga4_sync', 'daily_internal_sync'])
+        .order('generated_at', { ascending: false })
+        .limit(7);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setGa4DailyData(data);
+        setLastSyncTime(new Date(data[0].generated_at).toLocaleString());
+      }
+    } catch (error) {
+      console.error('Failed to fetch GA4 daily reports:', error);
+    }
+  };
 
   // Real-time subscription for live analytics
   useEffect(() => {
@@ -296,17 +320,69 @@ const Analytics = () => {
           </Button>
         </div>
 
-        {/* Real-time Indicator */}
-        <Card className="mb-8 border-green-500/30 bg-green-500/5">
+        {/* Data Source Indicators */}
+        <div className="grid gap-4 md:grid-cols-2 mb-8">
+          {/* GA4 Real-time on Google */}
+          <Card className="border-blue-500/30 bg-blue-500/5">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                  </span>
+                  <div>
+                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                      GA4 Real-time on Google
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      Live tracking via gtag → Google Analytics
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="border-blue-500/50 text-blue-600">
+                  Live
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Daily Supabase Sync */}
+          <Card className="border-green-500/30 bg-green-500/5">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="relative flex h-3 w-3">
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  </span>
+                  <div>
+                    <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                      Daily Supabase Sync
+                    </span>
+                    <p className="text-xs text-muted-foreground">
+                      {lastSyncTime ? `Last sync: ${lastSyncTime}` : 'Syncs daily at 2:00 AM UTC'}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="border-green-500/50 text-green-600">
+                  {ga4DailyData.length} days
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Internal Real-time Indicator */}
+        <Card className="mb-8 border-amber-500/30 bg-amber-500/5">
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
                 </span>
-                <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                  Real-time tracking active
+                <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  Internal real-time tracking (backup)
                 </span>
               </div>
               <div className="text-sm text-muted-foreground">
