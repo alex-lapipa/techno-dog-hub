@@ -202,15 +202,17 @@ const handler = async (req: Request): Promise<Response> => {
                 <!-- Primary CTA Button - Green -->
                 <tr>
                   <td style="padding: 32px 0; text-align: center;">
-                    <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                      <tr>
-                        <td style="background-color: #39ff14; padding: 16px 40px;">
-                          <a href="https://techno.dog" target="_blank" style="color: #000000; text-decoration: none; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; font-family: 'Courier New', Consolas, monospace;">
-                            Explore Techno.Dog →
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://techno.dog" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#39ff14" fillcolor="#39ff14">
+                      <w:anchorlock/>
+                      <center style="color:#000000;font-family:'Courier New',Consolas,monospace;font-size:13px;font-weight:bold;">EXPLORE TECHNO.DOG →</center>
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-->
+                    <a href="https://techno.dog" target="_blank" style="background-color: #39ff14; color: #000000; text-decoration: none; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; font-family: 'Courier New', Consolas, monospace; padding: 16px 40px; display: inline-block; mso-padding-alt: 0; text-align: center;">
+                      Explore Techno.Dog →
+                    </a>
+                    <!--<![endif]-->
                   </td>
                 </tr>
 
@@ -266,15 +268,17 @@ const handler = async (req: Request): Promise<Response> => {
                 <!-- Secondary CTA - Red/Collaboration -->
                 <tr>
                   <td style="padding: 24px 0; text-align: center;">
-                    <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                      <tr>
-                        <td style="background-color: #dc2626; padding: 16px 40px;">
-                          <a href="https://techno.dog/contribute" target="_blank" style="color: #ffffff; text-decoration: none; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; font-family: 'Courier New', Consolas, monospace;">
-                            Join the Project →
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://techno.dog/contribute" style="height:50px;v-text-anchor:middle;width:280px;" arcsize="0%" strokecolor="#dc2626" fillcolor="#dc2626">
+                      <w:anchorlock/>
+                      <center style="color:#ffffff;font-family:'Courier New',Consolas,monospace;font-size:13px;font-weight:bold;">JOIN THE PROJECT →</center>
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-->
+                    <a href="https://techno.dog/contribute" target="_blank" style="background-color: #dc2626; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; font-family: 'Courier New', Consolas, monospace; padding: 16px 40px; display: inline-block; mso-padding-alt: 0; text-align: center;">
+                      Join the Project →
+                    </a>
+                    <!--<![endif]-->
                   </td>
                 </tr>
 
