@@ -128,8 +128,8 @@ const ArtistsPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <GlitchSVGFilter />
       <PageSEO
-        title="Techno Artists Directory"
-        description="The producers, DJs, and live performers shaping techno culture. From Detroit pioneers to Berlin residents."
+        title="Techno Artists"
+        description="Techno producers, DJs, and live performers. Detroit pioneers to Berlin residents."
         path="/artists"
         structuredData={itemListSchema}
       />

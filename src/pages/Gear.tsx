@@ -78,8 +78,8 @@ const GearPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <GlitchSVGFilter />
       <PageSEO
-        title="Techno Gear & Equipment"
-        description="The synthesizers, drum machines, samplers, and tools that shaped techno. From Detroit basements to Berlin warehouses."
+        title="Techno Gear"
+        description="Synthesizers, drum machines, samplers that shaped techno. Studio essentials."
         path="/gear"
         structuredData={itemListSchema}
       />
