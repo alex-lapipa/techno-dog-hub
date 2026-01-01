@@ -81,13 +81,16 @@ const HeroSection = () => {
             </div>
 
             {/* Secondary links */}
-            <div className="flex flex-wrap gap-6 font-mono text-xs text-muted-foreground">
-              <Link to="/submit" className="hover:text-foreground transition-colors underline underline-offset-4">
-                Contribute
-              </Link>
+            <div className="flex flex-wrap gap-6 font-mono text-xs text-muted-foreground items-center">
               <Link to="/doggies" className="hover:text-foreground transition-colors underline underline-offset-4 flex items-center gap-1">
                 <DogSilhouette className="w-3 h-3" />
                 Doggies
+              </Link>
+              <Link 
+                to="/support" 
+                className="text-destructive hover:text-destructive/80 transition-colors underline underline-offset-4"
+              >
+                Support
               </Link>
             </div>
 
