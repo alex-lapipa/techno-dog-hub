@@ -118,8 +118,8 @@ const TechnopediaPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title={`${content.title} | ${content.subtitle}`}
-        description={content.intro}
+        title="Technopedia"
+        description="Open techno encyclopedia. Culture, history, and underground knowledge."
         path="/technopedia"
         structuredData={structuredData}
       />

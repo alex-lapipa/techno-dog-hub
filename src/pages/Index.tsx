@@ -156,8 +156,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
-        title="Global Techno Culture Archive"
-        description="Discover the global techno archive. Artists, festivals, venues, labels, and history from Detroit to Tbilisi, Tokyo to Bogotá."
+        title="Techno Archive"
+        description="Open-source techno encyclopedia. Artists, labels, festivals, venues, gear from Detroit to Berlin."
         path="/"
         structuredData={combinedSchema}
       />

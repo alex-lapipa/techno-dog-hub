@@ -137,8 +137,8 @@ const Books = () => {
 
   return (
     <PageLayout
-      title="Books – Essential Reading"
-      description="Curated underground techno culture reading list. Detroit origins, UK free party movement, synthesizer history, live coding, and sound art philosophy."
+      title="Techno Books"
+      description="Essential techno reading. Detroit origins, UK rave culture, synthesizers, sound art."
       path="/books"
       structuredData={structuredData}
     >
