@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -11,6 +12,8 @@ interface AnnouncementRequest {
   to: string;
   recipientName?: string;
   isTest?: boolean;
+  contactType?: string; // 'journalist', 'collective', 'gear_brand', 'label', 'other'
+  sourceDb?: string; // source database/table
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -19,7 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { to, recipientName, isTest }: AnnouncementRequest = await req.json();
+    const { to, recipientName, isTest, contactType, sourceDb }: AnnouncementRequest = await req.json();
 
     if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       return new Response(
@@ -27,6 +30,12 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    // Initialize Supabase client for CRM tracking
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     const greeting = recipientName ? `Hey ${recipientName},` : "Hey,";
     const testBanner = isTest ? `
@@ -418,12 +427,69 @@ https://techno.dog — The Global Techno Knowledge Hub
     const emailResponse = await res.json();
     console.log("Email sent successfully:", emailResponse);
 
+    // Track in CRM if not a test
+    if (!isTest) {
+      try {
+        // Ensure contact exists in crm_contacts
+        const { data: existingContact } = await supabase
+          .from('crm_contacts')
+          .select('id')
+          .eq('email', to)
+          .maybeSingle();
+
+        let contactId = existingContact?.id;
+
+        if (!contactId) {
+          // Create new CRM contact
+          const { data: newContact } = await supabase
+            .from('crm_contacts')
+            .insert({
+              email: to,
+              full_name: recipientName || null,
+              contact_source_db: sourceDb || 'launch_announcement',
+              contact_type: contactType || 'other',
+              suppression_status: 'active'
+            })
+            .select('id')
+            .single();
+          
+          contactId = newContact?.id;
+          console.log("Created new CRM contact:", contactId);
+        }
+
+        // Log to outreach_messages for tracking
+        if (contactId) {
+          const { error: messageError } = await supabase
+            .from('outreach_messages')
+            .insert({
+              contact_id: contactId,
+              resend_message_id: emailResponse.id,
+              subject: subject,
+              body_html: htmlContent.substring(0, 10000), // Truncate if too long
+              body_text: textContent.substring(0, 5000),
+              status: 'sent',
+              sent_at: new Date().toISOString()
+            });
+
+          if (messageError) {
+            console.error("Failed to log outreach message:", messageError);
+          } else {
+            console.log("Outreach message tracked for contact:", contactId);
+          }
+        }
+      } catch (trackingError) {
+        console.error("CRM tracking error (non-fatal):", trackingError);
+        // Don't fail the request if tracking fails
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         id: emailResponse.id,
         to: to,
-        isTest: isTest 
+        isTest: isTest,
+        tracked: !isTest
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
