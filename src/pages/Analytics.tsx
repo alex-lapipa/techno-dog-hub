@@ -33,8 +33,16 @@ import {
   Eye,
   Brain,
   RefreshCw,
-  Lock
+  Lock,
+  Search,
+  AlertTriangle,
+  CheckCircle,
+  Info,
+  Globe
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Progress } from '@/components/ui/progress';
 
 interface AnalyticsData {
   summary: string;
@@ -80,6 +88,8 @@ const Analytics = () => {
   const [lastEventTime, setLastEventTime] = useState<string | null>(null);
   const [ga4DailyData, setGa4DailyData] = useState<any[]>([]);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [seoAuditData, setSeoAuditData] = useState<any | null>(null);
+  const [runningSeoAudit, setRunningSeoAudit] = useState(false);
 
   // Process events into stats
   const processEvents = (events: { created_at: string }[]) => {
@@ -222,6 +232,63 @@ const Analytics = () => {
       toast.error('Failed to generate AI insights');
     } finally {
       setGeneratingInsights(false);
+    }
+  };
+
+  // SEO Audit function
+  const runSeoAudit = async () => {
+    setRunningSeoAudit(true);
+    toast.info('Starting SEO audit... This may take a minute.');
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/seo-audit`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ strategy: 'mobile' }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to run SEO audit');
+      }
+
+      const data = await response.json();
+      setSeoAuditData(data);
+      toast.success(`SEO audit complete: ${data.summary?.issueCount?.errors || 0} errors found`);
+    } catch (error) {
+      console.error('Failed to run SEO audit:', error);
+      toast.error('Failed to run SEO audit');
+    } finally {
+      setRunningSeoAudit(false);
+    }
+  };
+
+  // Fetch last SEO audit on load
+  useEffect(() => {
+    if (isAdmin) {
+      fetchLastSeoAudit();
+    }
+  }, [isAdmin]);
+
+  const fetchLastSeoAudit = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('analytics_insights')
+        .select('*')
+        .eq('insight_type', 'seo_audit')
+        .order('generated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data && !error) {
+        setSeoAuditData(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch last SEO audit:', error);
     }
   };
 
@@ -577,7 +644,7 @@ const Analytics = () => {
 
         {/* AI Insights */}
         {analyticsData?.insights && analyticsData.insights.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-4 mb-8">
             <h2 className="text-xl font-semibold text-foreground">AI-Generated Insights</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {analyticsData.insights.map((insight, index) => (
@@ -598,6 +665,244 @@ const Analytics = () => {
             </div>
           </div>
         )}
+
+        {/* SEO Audit Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Technical SEO Audit
+                </CardTitle>
+                <CardDescription>
+                  Google PageSpeed Insights & tag analysis
+                </CardDescription>
+              </div>
+              <Button 
+                onClick={runSeoAudit} 
+                disabled={runningSeoAudit}
+                variant="outline"
+                className="gap-2"
+              >
+                {runningSeoAudit ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+                Run SEO Audit
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {seoAuditData ? (
+              <Tabs defaultValue="summary" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="summary">Summary</TabsTrigger>
+                  <TabsTrigger value="scores">Page Scores</TabsTrigger>
+                  <TabsTrigger value="tags">Tag Audit</TabsTrigger>
+                  <TabsTrigger value="issues">Issues</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="summary" className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-4 mt-4">
+                    <Card>
+                      <CardContent className="pt-4">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-primary">
+                            {seoAuditData.summary?.averageScores?.seo || 0}
+                          </div>
+                          <p className="text-sm text-muted-foreground">Avg SEO Score</p>
+                          <Progress value={seoAuditData.summary?.averageScores?.seo || 0} className="mt-2" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-4">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-blue-500">
+                            {seoAuditData.summary?.averageScores?.performance || 0}
+                          </div>
+                          <p className="text-sm text-muted-foreground">Avg Performance</p>
+                          <Progress value={seoAuditData.summary?.averageScores?.performance || 0} className="mt-2" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-4">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-green-500">
+                            {seoAuditData.summary?.averageScores?.accessibility || 0}
+                          </div>
+                          <p className="text-sm text-muted-foreground">Accessibility</p>
+                          <Progress value={seoAuditData.summary?.averageScores?.accessibility || 0} className="mt-2" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-4">
+                        <div className="text-center">
+                          <Badge 
+                            variant={seoAuditData.summary?.overallHealth === 'good' ? 'default' : seoAuditData.summary?.overallHealth === 'needs-improvement' ? 'secondary' : 'destructive'}
+                            className="text-lg py-1 px-3"
+                          >
+                            {seoAuditData.summary?.overallHealth || 'Unknown'}
+                          </Badge>
+                          <p className="text-sm text-muted-foreground mt-2">Overall Health</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div className="flex gap-4 justify-center text-sm">
+                    <span className="flex items-center gap-1">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      {seoAuditData.summary?.issueCount?.errors || 0} Errors
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Info className="h-4 w-4 text-amber-500" />
+                      {seoAuditData.summary?.issueCount?.warnings || 0} Warnings
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-blue-500" />
+                      {seoAuditData.summary?.issueCount?.info || 0} Info
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground text-center">
+                    Last audit: {seoAuditData.timestamp ? new Date(seoAuditData.timestamp).toLocaleString() : 'N/A'}
+                  </p>
+                </TabsContent>
+                
+                <TabsContent value="scores">
+                  <ScrollArea className="h-[400px] mt-4">
+                    <div className="space-y-3">
+                      {seoAuditData.pageSpeedResults?.map((page: any, index: number) => (
+                        <Card key={index} className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <code className="text-sm font-medium">{page.url}</code>
+                            <Badge variant={page.scores.seo >= 90 ? 'default' : page.scores.seo >= 70 ? 'secondary' : 'destructive'}>
+                              SEO: {page.scores.seo}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 text-xs">
+                            <div>
+                              <span className="text-muted-foreground">Performance:</span>
+                              <span className={`ml-1 font-medium ${page.scores.performance >= 70 ? 'text-green-500' : page.scores.performance >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                                {page.scores.performance}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Accessibility:</span>
+                              <span className="ml-1 font-medium">{page.scores.accessibility}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">LCP:</span>
+                              <span className={`ml-1 font-medium ${page.coreWebVitals?.lcp?.rating === 'good' ? 'text-green-500' : page.coreWebVitals?.lcp?.rating === 'needs-improvement' ? 'text-amber-500' : 'text-red-500'}`}>
+                                {((page.coreWebVitals?.lcp?.value || 0) / 1000).toFixed(2)}s
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">CLS:</span>
+                              <span className={`ml-1 font-medium ${page.coreWebVitals?.cls?.rating === 'good' ? 'text-green-500' : 'text-amber-500'}`}>
+                                {(page.coreWebVitals?.cls?.value || 0).toFixed(3)}
+                              </span>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+                
+                <TabsContent value="tags">
+                  <ScrollArea className="h-[400px] mt-4">
+                    <div className="space-y-3">
+                      {seoAuditData.tagAuditResults?.map((page: any, index: number) => (
+                        <Card key={index} className="p-4">
+                          <code className="text-sm font-medium block mb-3">{page.url}</code>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                            <div className="flex items-center gap-1">
+                              {page.title?.present ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-red-500" />}
+                              <span>Title ({page.title?.length || 0} chars)</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.metaDescription?.present ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-red-500" />}
+                              <span>Meta Desc ({page.metaDescription?.length || 0} chars)</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.h1?.count === 1 ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-amber-500" />}
+                              <span>H1 ({page.h1?.count || 0})</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.canonical?.present ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-amber-500" />}
+                              <span>Canonical</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.ogTags?.present ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-amber-500" />}
+                              <span>OG Tags</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.structuredData?.present ? <CheckCircle className="h-3 w-3 text-green-500" /> : <Info className="h-3 w-3 text-blue-500" />}
+                              <span>Schema ({page.structuredData?.types?.join(', ') || 'None'})</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {page.robots?.indexable ? <CheckCircle className="h-3 w-3 text-green-500" /> : <AlertTriangle className="h-3 w-3 text-red-500" />}
+                              <span>Indexable</span>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+                
+                <TabsContent value="issues">
+                  <ScrollArea className="h-[400px] mt-4">
+                    <div className="space-y-2">
+                      {seoAuditData.issues?.map((issue: any, index: number) => (
+                        <Card key={index} className={`p-3 border-l-4 ${
+                          issue.severity === 'error' ? 'border-l-red-500 bg-red-500/5' : 
+                          issue.severity === 'warning' ? 'border-l-amber-500 bg-amber-500/5' : 
+                          'border-l-blue-500 bg-blue-500/5'
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            {issue.severity === 'error' ? (
+                              <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5" />
+                            ) : issue.severity === 'warning' ? (
+                              <Info className="h-4 w-4 text-amber-500 mt-0.5" />
+                            ) : (
+                              <Info className="h-4 w-4 text-blue-500 mt-0.5" />
+                            )}
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm">{issue.issue}</span>
+                                <Badge variant="outline" className="text-xs">{issue.page}</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">{issue.recommendation}</p>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                      {(!seoAuditData.issues || seoAuditData.issues.length === 0) && (
+                        <div className="text-center text-muted-foreground py-8">
+                          <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                          No issues found
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Globe className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Click "Run SEO Audit" to analyze your pages</p>
+                <p className="text-xs mt-1">Uses Google PageSpeed Insights API</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
       
       <Footer />
