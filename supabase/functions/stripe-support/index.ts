@@ -1,11 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// Helper logging function for debugging
+const logStep = (step: string, details?: unknown) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[stripe-support] ${step}${detailsStr}`);
 };
 
 // Validation schemas
@@ -50,20 +56,26 @@ function determineTier(mode: string, amount_cents: number): string {
   return "custom";
 }
 
+// Default production URL for fallback
+const DEFAULT_BASE_URL = "https://techno.dog";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    logStep("Function started");
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
+      logStep("ERROR: Stripe secret key not configured");
       throw new Error("Stripe secret key not configured");
     }
+    logStep("Stripe key verified");
 
     const stripe = new Stripe(stripeKey, {
-      apiVersion: "2023-10-16",
-      httpClient: Stripe.createFetchHttpClient(),
+      apiVersion: "2025-08-27.basil",
     });
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -71,17 +83,50 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse and validate request body
-    const rawBody = await req.json();
+    let rawBody;
+    try {
+      rawBody = await req.json();
+      logStep("Request body received", { mode: rawBody.mode, amount_cents: rawBody.amount_cents });
+    } catch {
+      logStep("ERROR: Failed to parse request body");
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const validationResult = checkoutRequestSchema.safeParse(rawBody);
     
     if (!validationResult.success) {
-      console.error("[stripe-support] Validation error:", validationResult.error.errors);
+      logStep("ERROR: Validation failed", validationResult.error.errors);
       return new Response(
         JSON.stringify({ 
           error: validationResult.error.errors[0]?.message || "Invalid request data" 
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // CRITICAL FIX: Handle missing origin header gracefully
+    const origin = req.headers.get("origin");
+    const referer = req.headers.get("referer");
+    
+    // Extract base URL from referer if origin is missing
+    let baseUrl = origin;
+    if (!baseUrl && referer) {
+      try {
+        const refererUrl = new URL(referer);
+        baseUrl = refererUrl.origin;
+        logStep("Using referer as base URL", { referer, baseUrl });
+      } catch {
+        baseUrl = null;
+      }
+    }
+    
+    // Fall back to production URL if no origin available
+    if (!baseUrl) {
+      baseUrl = DEFAULT_BASE_URL;
+      logStep("WARNING: No origin header, falling back to default", { baseUrl });
     }
 
     const {
@@ -92,15 +137,16 @@ serve(async (req) => {
       company_name,
       vat_number,
       notes,
-      success_url = `${req.headers.get("origin")}/support?success=true`,
-      cancel_url = `${req.headers.get("origin")}/support?cancelled=true`,
+      success_url = `${baseUrl}/support?success=true`,
+      cancel_url = `${baseUrl}/support?cancelled=true`,
     } = validationResult.data;
 
-    console.log(`[stripe-support] Creating ${mode} checkout for ${amount_cents} cents`);
+    logStep(`Creating ${mode} checkout`, { amount_cents, email: email ? "provided" : "not provided", baseUrl });
 
     // Handle corporate sponsor request (no Stripe checkout, just log request)
     if (mode === "corporate") {
       if (!company_name || !email) {
+        logStep("ERROR: Missing corporate info", { company_name: !!company_name, email: !!email });
         return new Response(
           JSON.stringify({ error: "Company name and email required for corporate sponsorship" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -123,11 +169,11 @@ serve(async (req) => {
         .single();
 
       if (error) {
-        console.error("[stripe-support] Error creating corporate request:", error);
+        logStep("ERROR: Database insert failed", error);
         throw new Error("Failed to submit corporate request");
       }
 
-      console.log(`[stripe-support] Corporate sponsor request created: ${data.id}`);
+      logStep("Corporate sponsor request created", { id: data.id });
 
       return new Response(
         JSON.stringify({
@@ -143,9 +189,11 @@ serve(async (req) => {
     // Get or create Stripe customer
     let customerId: string | undefined;
     if (email) {
+      logStep("Looking up Stripe customer", { email });
       const customers = await stripe.customers.list({ email, limit: 1 });
       if (customers.data.length > 0) {
         customerId = customers.data[0].id;
+        logStep("Found existing customer", { customerId });
       } else {
         const customer = await stripe.customers.create({
           email,
@@ -156,6 +204,7 @@ serve(async (req) => {
           },
         });
         customerId = customer.id;
+        logStep("Created new customer", { customerId });
       }
     }
 
@@ -174,6 +223,7 @@ serve(async (req) => {
     let sessionParams: Stripe.Checkout.SessionCreateParams;
 
     if (mode === "recurring") {
+      logStep("Creating recurring subscription price");
       // Create a dynamic price for recurring subscription
       const price = await stripe.prices.create({
         unit_amount: amount_cents,
@@ -185,6 +235,7 @@ serve(async (req) => {
         },
         metadata: { tier: determinedTier },
       });
+      logStep("Price created", { priceId: price.id });
 
       sessionParams = {
         mode: "subscription",
@@ -197,6 +248,8 @@ serve(async (req) => {
         subscription_data: {
           metadata,
         },
+        // Allow all payment methods
+        payment_method_types: undefined,
       };
     } else {
       // One-time payment
@@ -224,12 +277,28 @@ serve(async (req) => {
         payment_intent_data: {
           metadata,
         },
+        // Allow all payment methods
+        payment_method_types: undefined,
       };
     }
 
+    logStep("Creating Stripe checkout session", { 
+      mode: sessionParams.mode,
+      success_url,
+      cancel_url
+    });
+
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    console.log(`[stripe-support] Checkout session created: ${session.id}`);
+    logStep("Checkout session created successfully", { 
+      sessionId: session.id,
+      url: session.url ? "present" : "missing"
+    });
+
+    if (!session.url) {
+      logStep("ERROR: No checkout URL in session response");
+      throw new Error("Stripe did not return a checkout URL");
+    }
 
     return new Response(
       JSON.stringify({
@@ -242,9 +311,18 @@ serve(async (req) => {
     );
   } catch (error: unknown) {
     const err = error as Error;
-    console.error("[stripe-support] Error:", err);
+    logStep("ERROR", { message: err.message, stack: err.stack });
+    
+    // Provide more helpful error messages
+    let userMessage = err.message;
+    if (err.message.includes("Invalid URL")) {
+      userMessage = "Configuration error. Please try again or contact support.";
+    } else if (err.message.includes("Stripe")) {
+      userMessage = "Payment service error. Please try again in a moment.";
+    }
+    
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: userMessage }),
       {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
