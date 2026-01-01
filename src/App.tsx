@@ -34,6 +34,7 @@ const Labels = lazy(() => import("./pages/Labels"));
 const LabelDetail = lazy(() => import("./pages/LabelDetail"));
 const Releases = lazy(() => import("./pages/Releases"));
 const Crews = lazy(() => import("./pages/Crews"));
+const ProperMarketing = lazy(() => import("./pages/ProperMarketing"));
 const CrewDetail = lazy(() => import("./pages/CrewDetail"));
 const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
@@ -228,6 +229,9 @@ const App = () => (
                     {/* Crews */}
                     <Route path="/crews" element={<Crews />} />
                     <Route path="/crews/:id" element={<CrewDetail />} />
+                    
+                    {/* Proper Marketing */}
+                    <Route path="/scenes/proper-marketing" element={<ProperMarketing />} />
                     
                     {/* User Stories (under News) */}
                     <Route path="/news/your-stories" element={<UserStories />} />

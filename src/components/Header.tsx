@@ -8,12 +8,13 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DogChat from "@/components/admin/DogChat";
 
-// Scenes group: Festivals, Venues, Crews, Labels with horizontal navigation
+// Scenes group: Festivals, Venues, Crews, Labels, Proper Marketing with horizontal navigation
 const SCENES_ITEMS = [
   { label: 'Festivals', path: '/festivals' },
   { label: 'Venues', path: '/venues' },
   { label: 'Crews', path: '/crews' },
   { label: 'Labels', path: '/labels' },
+  { label: 'Proper Marketing', path: '/scenes/proper-marketing' },
 ];
 
 const Header = () => {
