@@ -2586,8 +2586,8 @@ export const dogVariants = [
   { name: 'Bartender', Component: BartenderDog, personality: 'Hydrating ravers since forever', status: 'mixing' },
   { name: 'Sven Marquardt', Component: SvenMarquardtDog, personality: 'The door is a philosophy', status: 'judging' },
   // FESTIVAL DOGS
-  { name: 'Aquasella', Component: AquasellaDog, personality: 'River raving in Asturias with cider', status: 'outdoor vibes' },
-  { name: 'Aquia Real Raver', Component: AquiaRealRaverDog, personality: 'La Real until legs give out', status: 'peak festival mode' },
+  { name: 'Asturian Raver', Component: AquasellaDog, personality: 'River raving in the mountains with cider', status: 'outdoor vibes' },
+  { name: 'La Pipa Raver', Component: AquiaRealRaverDog, personality: 'Dancing until legs give out', status: 'peak festival mode' },
   // GEAR/STYLE DOGS
   { name: 'Dawless', Component: DawlessDog, personality: 'No laptop, no safety net, pure chaos', status: 'patching' },
   // SPANISH LEGENDS

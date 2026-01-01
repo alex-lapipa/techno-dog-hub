@@ -81,10 +81,10 @@ const FestivalsSection = () => {
         {/* Header */}
         <div className="mb-12 space-y-4">
           <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-            // Próximos eventos
+            // Upcoming events
           </div>
           <h2 className="font-mono text-3xl md:text-4xl uppercase tracking-wide text-foreground">
-            Festivales 2025
+            Festivals 2025
           </h2>
         </div>
 

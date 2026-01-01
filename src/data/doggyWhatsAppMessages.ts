@@ -411,13 +411,13 @@ export const doggyMessages: Record<string, DoggyMessage> = {
   },
   
   // FESTIVAL DOGS
-  'aquasella': {
-    intro: "I'm the Aquasella Dog — river raving in Asturias with cider",
-    quote: "Mountains. Rivers. Techno. Sidra. Three decades of magic. Still going.",
+  'asturian raver': {
+    intro: "I'm the Asturian Raver Dog — river raving in the mountains with cider",
+    quote: "Mountains. Rivers. Techno. Sidra. Magic in nature. Still going.",
     packInvite: "Find nature and bass"
   },
-  'aquia real raver': {
-    intro: "I'm the Aquia Real Raver Dog — La Real until my legs give out",
+  'la pipa raver': {
+    intro: "I'm the La Pipa Raver Dog — dancing until my legs give out",
     quote: "Hands up from dusk til dawn. Repeat every summer. No negotiation.",
     packInvite: "Rave forever"
   },

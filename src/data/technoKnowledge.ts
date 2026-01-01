@@ -1,41 +1,5 @@
 // Extracted content from uploaded documents for RAG ingestion
 
-export const aquasellaDocument = {
-  title: "Aquasella Festival: Three Decades of Underground Techno in Asturias",
-  source: "aquasella-history",
-  content: `Aquasella is a renowned electronic music festival held annually in Arriondas (Asturias, northern Spain). Since its inception in 1997, it has evolved from a small local gathering into a flagship techno festival in Europe. Aquasella's growth and persistence over nearly 30 years mirror the broader evolution of electronic music festivals in Spain and Europe.
-
-Aquasella was founded in 1997 by Francisco de Borja Arboleya Becerra and is organized by the local promoter La Real Producciones. The very first edition was essentially a friends-and-fans gathering created by techno enthusiasts, held in the rural Finca Merediz valley near Arriondas. Attendance at Aquasella's debut was modest – roughly 1,000 people in 1997 – but the intimate, community atmosphere set the tone. The festival initially coincided with the famous International Sella River Descent (a canoeing event in Arriondas) as a way to attract younger crowds during that traditional fiesta period.
-
-Even in its humble beginnings, Aquasella focused on techno – a genre then still mostly underground in Spain. The 1997 lineup consisted of regional DJs and collectives (names like DJ Pepo, Celine, The Frogmen, Toni Rox, etc.), showcasing local talent and a "for the friends" vibe. Aquasella's origin as an offshoot of local club culture (La Real was a legendary techno club in nearby Oviedo) imbued it with an authentic underground spirit that would become its hallmark.
-
-GROWTH AND EVOLUTION:
-- 1997: Foundation with about 1,000 attendees
-- Late 1990s: Gained popularity with Spanish techno pioneers like Óscar Mulero, Cristian Varela, and DJ Pepo
-- Early 2000s: International DJs like Marco Carola, Kenny Larkin, and Claude Young
-- Mid-2000s: Dave Clarke, Richie Hawtin, Chris Liebing joined the lineups
-- 2019: Record 40,000 people over four days
-- 2022: "25+1" edition post-pandemic with 40,000+ attendees
-- 2023: Surpassed 50,000 attendees
-- 2024: Over 80,000 people across four days, €8+ million economic impact
-
-The COVID-19 pandemic forced cancellation of 2020 and postponement of 2021. The festival returned stronger, with 2023-2025 editions selling out in advance.
-
-MUSICAL IDENTITY:
-Aquasella bills itself as an authentic electronic music festival with core focus on underground techno. Local DJs like DJ Pepo (virtually every edition) and pioneers Óscar Mulero and Cristian Varela anchor the festival. International legends include Carl Cox (2009), Richie Hawtin (2006), Sven Väth (2008), Jeff Mills, Dave Clarke, Ben Sims, Kevin Saunderson, Chris Liebing, Marco Carola, Adam Beyer, Luciano, Loco Dice, Paul Kalkbrenner, Vitalic, Derrick May, Miss Kittin, Helena Hauff, Amelie Lens, and more.
-
-The festival has multiple stages: Open Air (big-room techno and headliners), El Bosque (harder or experimental techno), and Carpa La Real (club roots). Aquasella has resisted booking mainstream pop or EDM acts, keeping its lineup 100% electronic and largely underground.
-
-LOCATION AND ATMOSPHERE:
-Set in the scenic Sella valley (nicknamed El Prau or "the meadow"), surrounded by misty green mountains and the Sella River. The choice to stay in rural Asturias rather than move to a big city preserved its unique atmosphere.
-
-BUSINESS MODEL:
-Remains independently owned by La Real Producciones, the same local promoter since the 90s. No stake sold to Live Nation, Superstruct, or other international event conglomerates. Revenue from ticket sales (4-day passes €80-120, day tickets €40-50). Limited but curated sponsorship. The festival received Next Generation EU funding for digital modernization.
-
-ECONOMIC IMPACT:
-In 2024, estimated €8+ million for local economy and 650 direct jobs. Local hotels, campgrounds, restaurants, supermarkets, and bars boom during festival weekend. Regional government and municipalities of Parres and Cangas de Onís are official collaborators.`
-};
-
 export const technoUndergroundDocument = {
   title: "European Underground Techno: History, Scenes, and Resistance to Mainstream",
   source: "techno-underground-europe",
@@ -77,7 +41,7 @@ FESTIVALS THAT MAINTAIN THEIR ESSENCE:
 
 Boom Festival (Portugal): 100% independent, no corporate logos or public funding.
 Draaimolen (Netherlands): No sponsor banners.
-Aquasella (Spain): Independent, not sold to conglomerates.
+La Pipa (Spain): Independent, not sold to conglomerates.
 Fusion Festival (Germany): Organized by volunteers, no advertising.
 
 The tension between commercialization and underground continues to define the scene. As Simon Reynolds wrote: "Rave was always utopian in the most literal sense: a no-place, a space outside the ordinary social order where the usual rules were suspended." This temporary utopia remains the heart of European underground techno.`
@@ -147,4 +111,4 @@ KEY LABELS MENTIONED: Underground Resistance, Basic Channel, Chain Reaction, Met
 METHODOLOGY: This ranking prioritizes artists who embodied techno's core values: innovation without compromise, community over commerce, and artistic integrity across decades. Label infrastructure builders, hardware purists, scene service through mentorship and distribution, anonymity as resistance, and geographic diversity all weighted heavily. Artists received deductions for mainstream crossover that compromised artistic vision, major label deals that didn't serve the underground, and trend-chasing that diluted core sound.`
 };
 
-export const allDocuments = [aquasellaDocument, technoUndergroundDocument, greatestTechnoArtistsDocument];
+export const allDocuments = [technoUndergroundDocument, greatestTechnoArtistsDocument];
