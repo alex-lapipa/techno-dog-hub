@@ -392,3 +392,6 @@ verify_jwt = false
 
 [functions.daily-analytics-sync]
 verify_jwt = false
+
+[functions.seo-audit]
+verify_jwt = false
