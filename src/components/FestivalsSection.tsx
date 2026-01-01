@@ -76,7 +76,7 @@ const FestivalsSection = () => {
   const featuredFestivals = getFeaturedFestivals();
 
   return (
-    <section id="festivales" className="py-24 bg-background border-t border-border">
+    <section id="festivals" className="py-24 bg-background border-t border-border">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-12 space-y-4">
