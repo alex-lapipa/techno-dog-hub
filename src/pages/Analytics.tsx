@@ -76,10 +76,71 @@ const Analytics = () => {
     }
   }, [isAdmin, authLoading, navigate]);
 
+  const [liveEventCount, setLiveEventCount] = useState(0);
+  const [lastEventTime, setLastEventTime] = useState<string | null>(null);
+
+  // Process events into stats
+  const processEvents = (events: { created_at: string }[]) => {
+    const grouped: Record<string, number> = {};
+    events?.forEach((event) => {
+      const date = new Date(event.created_at).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      grouped[date] = (grouped[date] || 0) + 1;
+    });
+
+    return Object.entries(grouped)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
   useEffect(() => {
     if (isAdmin) {
       fetchEventStats();
     }
+  }, [isAdmin]);
+
+  // Real-time subscription for live analytics
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const channel = supabase
+      .channel('analytics-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'analytics_events'
+        },
+        (payload) => {
+          console.log('Real-time analytics event:', payload);
+          setLiveEventCount((prev) => prev + 1);
+          setLastEventTime(new Date().toLocaleTimeString());
+          
+          // Update event stats with new event
+          setEventStats((prev) => {
+            const today = new Date().toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric' 
+            });
+            const existing = prev.find(s => s.date === today);
+            if (existing) {
+              return prev.map(s => 
+                s.date === today ? { ...s, count: s.count + 1 } : s
+              );
+            } else {
+              return [...prev, { date: today, count: 1 }];
+            }
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [isAdmin]);
 
   const fetchEventStats = async () => {
@@ -94,21 +155,8 @@ const Analytics = () => {
 
       if (error) throw error;
 
-      // Group by date
-      const grouped: Record<string, number> = {};
-      data?.forEach((event) => {
-        const date = new Date(event.created_at).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric' 
-        });
-        grouped[date] = (grouped[date] || 0) + 1;
-      });
-
-      const stats = Object.entries(grouped)
-        .map(([date, count]) => ({ date, count }))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-      setEventStats(stats);
+      setEventStats(processEvents(data || []));
+      setLiveEventCount(data?.length || 0);
     } catch (error) {
       console.error('Failed to fetch event stats:', error);
     } finally {
@@ -248,6 +296,28 @@ const Analytics = () => {
           </Button>
         </div>
 
+        {/* Real-time Indicator */}
+        <Card className="mb-8 border-green-500/30 bg-green-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                  Real-time tracking active
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {lastEventTime && (
+                  <span>Last event: {lastEventTime}</span>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Metric Cards */}
         <div className="grid gap-6 md:grid-cols-4 mb-8">
           <Card>
@@ -257,9 +327,9 @@ const Analytics = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {analyticsData?.rawData.totalEvents || eventStats.reduce((a, b) => a + b.count, 0)}
+                {analyticsData?.rawData.totalEvents || liveEventCount || eventStats.reduce((a, b) => a + b.count, 0)}
               </div>
-              <p className="text-xs text-muted-foreground">Last 7 days</p>
+              <p className="text-xs text-muted-foreground">Last 7 days (live)</p>
             </CardContent>
           </Card>
 
