@@ -75,8 +75,8 @@ const HeroSection = () => {
                 {t('hero.explore')}
                 <ArrowRight className="w-4 h-4" />
               </Button>
-              <Button variant="terminal" size="lg">
-                Aquasella 2025
+              <Button variant="destructive" size="lg" asChild>
+                <Link to="/support">Support</Link>
               </Button>
             </div>
 
