@@ -380,3 +380,9 @@ verify_jwt = false
 
 [functions.extract-playlist-documentaries]
 verify_jwt = false
+
+[functions.send-supporter-welcome]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false

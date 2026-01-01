@@ -17,11 +17,17 @@ import {
   Check,
   Loader2,
   ArrowRight,
+  Settings,
+  CheckCircle2,
+  PartyPopper,
 } from "lucide-react";
 
 const Support = () => {
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Success state
+  const [showSuccess, setShowSuccess] = useState(false);
   
   // One-time support state
   const [oneTimeAmount, setOneTimeAmount] = useState<number>(20);
@@ -41,21 +47,63 @@ const Support = () => {
   const [corporateVat, setCorporateVat] = useState("");
   const [corporateNotes, setCorporateNotes] = useState("");
   const [corporateLoading, setCorporateLoading] = useState(false);
+  
+  // Portal state
+  const [portalEmail, setPortalEmail] = useState("");
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
-      toast({
-        title: "Thank you for your support",
-        description: "Your contribution helps keep techno.dog alive.",
-      });
+      setShowSuccess(true);
+      // Clear the query param without triggering a reload
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("success");
+      setSearchParams(newParams, { replace: true });
     } else if (searchParams.get("cancelled") === "true") {
       toast({
         title: "Payment cancelled",
         description: "No worries. Come back anytime.",
         variant: "destructive",
       });
+      // Clear the query param
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("cancelled");
+      setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, toast]);
+  }, [searchParams, setSearchParams, toast]);
+
+  const handleManageSubscription = async () => {
+    if (!portalEmail) {
+      toast({
+        title: "Email required",
+        description: "Please enter the email you used to subscribe",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal", {
+        body: { email: portalEmail },
+      });
+
+      if (error) throw error;
+
+      if (data.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (e: unknown) {
+      const error = e as Error;
+      toast({
+        title: "Error",
+        description: error.message || "Could not open subscription portal",
+        variant: "destructive",
+      });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleCheckout = async (mode: "one_time" | "recurring", amount: number) => {
     const setLoading = mode === "one_time" ? setOneTimeLoading : setRecurringLoading;
@@ -150,6 +198,38 @@ const Support = () => {
       <Header />
 
       <main className="pt-16">
+        {/* Success Panel */}
+        {showSuccess && (
+          <section className="border-b border-logo-green bg-logo-green/5">
+            <div className="container mx-auto px-4 md:px-8 py-12">
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-logo-green/20 flex items-center justify-center">
+                    <PartyPopper className="w-8 h-8 text-logo-green" />
+                  </div>
+                </div>
+                <h2 className="font-mono text-2xl md:text-3xl uppercase tracking-tight mb-4 text-logo-green">
+                  Thank You for Your Support
+                </h2>
+                <p className="font-mono text-sm text-muted-foreground mb-6 leading-relaxed">
+                  Your contribution has been received. A confirmation email is on its way to your inbox.<br />
+                  You're now part of the crew keeping independent techno culture alive.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    variant="outline"
+                    className="font-mono uppercase tracking-wider"
+                    onClick={() => setShowSuccess(false)}
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Continue Exploring
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Hero Section */}
         <section className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-16 md:py-24">
@@ -472,6 +552,43 @@ const Support = () => {
               Support is a commercial contribution to Project La PIPA, operated by Miramonte Somió SL (Spain).
               It is not presented as a tax-deductible donation.
             </p>
+          </div>
+        </section>
+
+        {/* Manage Subscription */}
+        <section className="border-b border-border">
+          <div className="container mx-auto px-4 md:px-8 py-12">
+            <div className="max-w-md">
+              <div className="flex items-center gap-3 mb-6">
+                <Settings className="w-5 h-5 text-muted-foreground" />
+                <h2 className="font-mono text-xl uppercase tracking-tight">Manage Subscription</h2>
+              </div>
+              <p className="font-mono text-xs text-muted-foreground mb-6">
+                Already a supporter? Enter your email to manage your subscription, update payment methods, or cancel.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  type="email"
+                  placeholder="Your email address"
+                  value={portalEmail}
+                  onChange={(e) => setPortalEmail(e.target.value)}
+                  className="font-mono flex-1"
+                />
+                <Button
+                  variant="outline"
+                  className="font-mono uppercase tracking-wider shrink-0"
+                  onClick={handleManageSubscription}
+                  disabled={portalLoading}
+                >
+                  {portalLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                  )}
+                  Manage
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
 
