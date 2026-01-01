@@ -14,56 +14,54 @@ interface CuratedVideo {
   description?: string;
 }
 
-// Curated videos about legendary advertising, John Hegarty, Levi's, and music in advertising
+// Curated videos about legendary advertising that gives to communities
 const CURATED_PROPER_MARKETING_VIDEOS = [
   {
-    id: "GjZt1kH2f_k",
-    title: "John Hegarty - The Art of Advertising Documentary",
-    thumbnail: "https://i.ytimg.com/vi/GjZt1kH2f_k/hqdefault.jpg",
-    description: "The legendary creative director on what makes advertising art."
-  },
-  {
-    id: "qp0HIF3SfI4",
-    title: "Flat Beat - Mr Oizo & Levi's - When Music Became the Message",
-    thumbnail: "https://i.ytimg.com/vi/qp0HIF3SfI4/hqdefault.jpg",
-    description: "The iconic yellow puppet that changed how brands used electronic music."
+    id: "6sFP7UmGGhE",
+    title: "John Hegarty: The Art of Creative Advertising",
+    thumbnail: "https://i.ytimg.com/vi/6sFP7UmGGhE/hqdefault.jpg",
+    description: "Legendary creative director on making advertising that resonates with culture."
   },
   {
     id: "XmVruRF9_6w",
-    title: "Levi's Advertising History - Engineered Jeans & Music Culture",
+    title: "Levi's Engineered Jeans Campaign - Music Meets Fashion",
     thumbnail: "https://i.ytimg.com/vi/XmVruRF9_6w/hqdefault.jpg",
-    description: "How Levi's used underground music to build cultural credibility."
+    description: "How Levi's used underground music to build authentic cultural credibility."
+  },
+  {
+    id: "qp0HIF3SfI4",
+    title: "Flat Beat - When Electronic Music Changed Advertising",
+    thumbnail: "https://i.ytimg.com/vi/qp0HIF3SfI4/hqdefault.jpg",
+    description: "The iconic yellow puppet that gave electronic music a mainstream platform."
+  },
+  {
+    id: "p2JK7IaQEko",
+    title: "Xbox Launch - The Marketing That Changed Gaming",
+    thumbnail: "https://i.ytimg.com/vi/p2JK7IaQEko/hqdefault.jpg",
+    description: "Microsoft's bold entry into gaming and how they built community first."
   },
   {
     id: "9qPx4UmGGhQ",
     title: "Spaceman - Babylon Zoo & The Power of Music in Advertising",
     thumbnail: "https://i.ytimg.com/vi/9qPx4UmGGhQ/hqdefault.jpg",
-    description: "When a 30-second ad changed music history."
+    description: "When 30 seconds of advertising launched a number one hit."
   },
   {
     id: "RxMhOaTmJ4Q",
-    title: "Bombastic - Shaggy & The Art of Surprise in Marketing",
+    title: "Bombastic - Shaggy & Unexpected Cultural Moments",
     thumbnail: "https://i.ytimg.com/vi/RxMhOaTmJ4Q/hqdefault.jpg",
-    description: "Breaking expectations through unexpected musical choices."
-  },
-  {
-    id: "6sFP7UmGGhE",
-    title: "The Golden Age of Music in Advertising",
-    thumbnail: "https://i.ytimg.com/vi/6sFP7UmGGhE/hqdefault.jpg",
-    description: "How the right track transforms a commercial into culture."
+    description: "Breaking expectations through bold musical choices."
   }
 ];
 
-// Search queries for proper marketing documentaries - long-form content (40+ min)
+// Search queries for proper marketing documentaries - community-first brands (40+ min)
 const PROPER_MARKETING_SEARCH_QUERIES = [
-  "John Hegarty advertising documentary",
-  "Levi's advertising history documentary",
-  "Levi's engineered jeans campaign",
-  "music in advertising documentary",
-  "Flat Beat Mr Oizo Levi's full documentary",
-  "creative advertising documentary music",
-  "BBH advertising history",
-  "iconic TV commercials music documentary"
+  "John Hegarty advertising documentary interview",
+  "Levi's engineered jeans campaign documentary",
+  "Xbox launch marketing documentary",
+  "brands giving back to community documentary",
+  "music in advertising history documentary",
+  "creative advertising that changed culture"
 ];
 
 const ProperMarketing = () => {
