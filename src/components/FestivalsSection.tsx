@@ -51,9 +51,9 @@ const FestivalCard = ({ id, name, location, date, index }: FestivalCardProps) =>
 // Helper to format month for display
 const formatMonthsForDisplay = (months: string[]): string => {
   const monthAbbrev: { [key: string]: string } = {
-    'January': 'Ene', 'February': 'Feb', 'March': 'Mar', 'April': 'Abr',
-    'May': 'May', 'June': 'Jun', 'July': 'Jul', 'August': 'Ago',
-    'September': 'Sep', 'October': 'Oct', 'November': 'Nov', 'December': 'Dic'
+    'January': 'Jan', 'February': 'Feb', 'March': 'Mar', 'April': 'Apr',
+    'May': 'May', 'June': 'Jun', 'July': 'Jul', 'August': 'Aug',
+    'September': 'Sep', 'October': 'Oct', 'November': 'Nov', 'December': 'Dec'
   };
   const first = months[0];
   return `${monthAbbrev[first] || first} 2025`;
@@ -98,13 +98,13 @@ const FestivalsSection = () => {
         {/* Footer - show actual count from database */}
         <div className="mt-8 flex items-center justify-between">
           <span className="font-mono text-xs text-muted-foreground">
-            Mostrando {featuredFestivals.length} de {allFestivals.length} festivales
+            Showing {featuredFestivals.length} of {allFestivals.length} festivals
           </span>
           <Link 
             to="/festivals" 
             className="font-mono text-xs text-crimson hover:text-crimson/80 transition-colors flex items-center gap-1"
           >
-            Ver todos <ArrowUpRight className="w-3 h-3" />
+            View all <ArrowUpRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
