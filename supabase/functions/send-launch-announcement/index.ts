@@ -172,12 +172,22 @@ const handler = async (req: Request): Promise<Response> => {
                       </tr>
                       <tr>
                         <td style="padding: 10px 0; color: #b0b0b0; font-size: 13px; font-family: 'Courier New', Consolas, monospace; border-left: 2px solid rgba(220,38,38,0.4); padding-left: 12px;">
-                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">Artist & Scene Database</strong> – People, places, connections
+                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">Gear & Tools</strong> – Machines, software, setups producers use
                         </td>
                       </tr>
                       <tr>
                         <td style="padding: 10px 0; color: #b0b0b0; font-size: 13px; font-family: 'Courier New', Consolas, monospace; border-left: 2px solid rgba(220,38,38,0.4); padding-left: 12px;">
-                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">Gear & Tools</strong> – Machines, software, setups
+                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">Bookstore</strong> – Curated reading on techno history and culture
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 10px 0; color: #b0b0b0; font-size: 13px; font-family: 'Courier New', Consolas, monospace; border-left: 2px solid rgba(220,38,38,0.4); padding-left: 12px;">
+                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">Documentaries</strong> – Films and deep dives into the scene
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 10px 0; color: #b0b0b0; font-size: 13px; font-family: 'Courier New', Consolas, monospace; border-left: 2px solid rgba(220,38,38,0.4); padding-left: 12px;">
+                          <span style="color: #39ff14;">→</span> <strong style="color: #ffffff;">News</strong> – Stories, interviews, and updates from the underground
                         </td>
                       </tr>
                       <tr>
@@ -337,8 +347,10 @@ Techno.dog is here to help keep track of the culture as it actually is today, kn
 › WHAT YOU'LL FIND
 
 → Culture Archive – Artists, festivals, venues, crews, labels
-→ Artist & Scene Database – People, places, connections
-→ Gear & Tools – Machines, software, setups
+→ Gear & Tools – Machines, software, setups producers use
+→ Bookstore – Curated reading on techno history and culture
+→ Documentaries – Films and deep dives into the scene
+→ News – Stories, interviews, and updates from the underground
 → Audio Lab – Spaces to experiment with sound
 
 ▶ EXPLORE: https://techno.dog
