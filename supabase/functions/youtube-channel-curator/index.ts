@@ -369,7 +369,7 @@ serve(async (req) => {
       const siteContent = {
         crews: ["spiral-tribe", "teknival", "underground-resistance-crew", "mord-crew", "bassiani-crew", "sandwell-district"],
         venues: ["berghain", "tresor", "about-blank", "bassiani", "concrete", "de-school"],
-        festivals: ["awakenings", "dekmantel", "time-warp", "atonal", "sonar", "lev", "aquasella", "unsound"],
+        festivals: ["awakenings", "dekmantel", "time-warp", "atonal", "sonar", "lev", "unsound"],
         artists: ["jeff-mills", "robert-hood", "ben-klock", "helena-hauff"],
       };
 
