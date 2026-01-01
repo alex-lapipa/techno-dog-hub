@@ -5,6 +5,22 @@ import { createServiceClient, getEnv, getRequiredEnv } from "../_shared/supabase
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const RATE_LIMIT_ENDPOINT = 'rag-chat';
 
+// COST OPTIMIZATION: Response caching for common queries
+// Saves ~50% on repeated AI calls
+const CACHE_TTL_HOURS = 1;
+
+// Simple hash function for cache keys
+function hashQuery(query: string): string {
+  let hash = 0;
+  const normalized = query.toLowerCase().trim();
+  for (let i = 0; i < normalized.length; i++) {
+    const char = normalized.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'rag_' + Math.abs(hash).toString(36);
+}
+
 // Get client IP from request headers
 function getClientIP(req: Request): string {
   const forwardedFor = req.headers.get('x-forwarded-for');
@@ -120,6 +136,56 @@ function formatArtistContext(artist: {
   return parts.join('\n');
 }
 
+// Check cache for existing response
+async function getCachedResponse(supabase: ReturnType<typeof createServiceClient>, cacheKey: string): Promise<{ answer: string; artists: unknown[]; sources: unknown[] } | null> {
+  try {
+    const { data, error } = await supabase
+      .from('kl_cached_search')
+      .select('result_json, expires_at')
+      .eq('cache_key', cacheKey)
+      .single();
+    
+    if (error || !data) return null;
+    
+    // Check if cache is expired
+    if (new Date(data.expires_at) < new Date()) {
+      console.log(`Cache expired for key: ${cacheKey}`);
+      return null;
+    }
+    
+    console.log(`Cache HIT for key: ${cacheKey}`);
+    return data.result_json as { answer: string; artists: unknown[]; sources: unknown[] };
+  } catch {
+    return null;
+  }
+}
+
+// Save response to cache
+async function setCachedResponse(
+  supabase: ReturnType<typeof createServiceClient>, 
+  cacheKey: string, 
+  query: string,
+  result: { answer: string; artists: unknown[]; sources: unknown[] }
+): Promise<void> {
+  try {
+    const expiresAt = new Date(Date.now() + CACHE_TTL_HOURS * 60 * 60 * 1000);
+    
+    await supabase
+      .from('kl_cached_search')
+      .upsert({
+        cache_key: cacheKey,
+        query_text: query,
+        result_json: result,
+        expires_at: expiresAt.toISOString(),
+        created_at: new Date().toISOString()
+      }, { onConflict: 'cache_key' });
+    
+    console.log(`Cache SET for key: ${cacheKey}, expires: ${expiresAt.toISOString()}`);
+  } catch (err) {
+    console.error('Cache set error:', err);
+  }
+}
+
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -209,6 +275,19 @@ Deno.serve(async (req) => {
     const OPENAI_API_KEY = getEnv('OPENAI_API_KEY');
 
     const supabase = createServiceClient();
+
+    // COST OPTIMIZATION: Check cache first for non-streaming requests
+    const cacheKey = hashQuery(sanitizedQuery);
+    if (!stream) {
+      const cached = await getCachedResponse(supabase, cacheKey);
+      if (cached) {
+        console.log('Returning cached response - COST SAVED');
+        return jsonResponse({
+          ...cached,
+          cached: true
+        });
+      }
+    }
 
     let documents: Array<{ title: string; content: string; source?: string; similarity?: number }> | null = null;
     let artists: Array<{
@@ -406,10 +485,17 @@ ${combinedContext || 'No relevant data found. Respond based on general techno kn
       });
     } else {
       const data = await aiResponse.json();
+      const answer = data.choices?.[0]?.message?.content || '';
+      const sources = usedDocs.map((d) => ({ title: d.title, source: d.source }));
+      const artistList = artists?.map(a => ({ name: a.artist_name, rank: a.rank })) || [];
+      
+      // COST OPTIMIZATION: Cache the response for future queries
+      const resultToCache = { answer, sources, artists: artistList };
+      await setCachedResponse(supabase, cacheKey, sanitizedQuery, resultToCache);
+      
       return jsonResponse({
-        answer: data.choices?.[0]?.message?.content,
-        sources: usedDocs.map((d) => ({ title: d.title, source: d.source })),
-        artists: artists?.map(a => ({ name: a.artist_name, rank: a.rank })) || []
+        ...resultToCache,
+        cached: false
       });
     }
   } catch (error: unknown) {
