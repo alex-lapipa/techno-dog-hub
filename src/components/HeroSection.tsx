@@ -23,7 +23,7 @@ const HeroSection = () => {
           TECHNO.DOG
         </div>
         <div className="absolute top-1/2 left-0 right-0 opacity-[0.02] text-[15vw] font-mono leading-none whitespace-nowrap animate-marquee">
-          AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL • AQUASELLA • L.E.V. • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL •
+          BERGHAIN • TRESOR • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL • BERGHAIN • TRESOR • AWAKENINGS • SÓNAR • TIME WARP • DEKMANTEL •
         </div>
       </div>
 

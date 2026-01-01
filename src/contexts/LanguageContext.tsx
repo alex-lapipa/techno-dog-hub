@@ -4,8 +4,6 @@ import React, { createContext, useContext, ReactNode } from 'react';
 const translations: Record<string, string> = {
   // Header
   'nav.festivals': 'Festivals',
-  'nav.aquasella': 'Aquasella',
-  'nav.lev': 'L.E.V.',
   'nav.chat': 'AI Chat',
   'nav.login': 'Login',
   'nav.logout': 'Logout',
@@ -25,10 +23,6 @@ const translations: Record<string, string> = {
   // Festivals Section
   'festivals.title': 'Festival Guide',
   'festivals.subtitle': 'Essential European Events',
-  
-  // Aquasella
-  'aquasella.title': 'Aquasella',
-  'aquasella.subtitle': 'Asturias, Spain',
   
   // LEV
   'lev.title': 'L.E.V. Festival',
