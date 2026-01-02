@@ -46,7 +46,7 @@ const Header = () => {
     },
     { label: 'Books', path: '/books' },
     { label: 'Documentaries', path: '/documentaries' },
-    { label: 'News', path: '/news' },
+    { label: 'Info', path: '/info' },
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
