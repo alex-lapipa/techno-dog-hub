@@ -9,6 +9,7 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { supabase } from "@/integrations/supabase/client";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -259,9 +260,15 @@ const ArtistsPage = () => {
             ))}
           </div>
 
-          {/* Count */}
-          <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
-            {filteredArtists.length} artists in archive
+          {/* Count & Contribute Widget */}
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+              {filteredArtists.length} artists in archive
+            </span>
+            <ContributeWidget 
+              entityType="artist" 
+              variant="compact"
+            />
           </div>
         </div>
       </main>

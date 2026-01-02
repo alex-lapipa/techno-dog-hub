@@ -6,6 +6,7 @@ import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import GearSection from "@/components/artist/GearSection";
@@ -462,6 +463,16 @@ const ArtistDetail = () => {
               </div>
             </section>
           )}
+
+          {/* Contribute Widget */}
+          <aside className="mt-12 border-t border-border pt-8">
+            <ContributeWidget 
+              entityType="artist" 
+              entityId={artist.id}
+              entityName={artist.name}
+              variant="default"
+            />
+          </aside>
 
           {/* Deep Links */}
           <section className="mt-12 border-t border-border pt-8">
