@@ -39,6 +39,8 @@ const CrewDetail = lazy(() => import("./pages/CrewDetail"));
 const Gear = lazy(() => import("./pages/Gear"));
 const GearDetail = lazy(() => import("./pages/GearDetail"));
 const UserStories = lazy(() => import("./pages/UserStories"));
+const Info = lazy(() => import("./pages/Info"));
+const Archives = lazy(() => import("./pages/Archives"));
 
 const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const SubmissionsAdmin = lazy(() => import("./pages/SubmissionsAdmin"));
@@ -158,6 +160,10 @@ const App = () => (
                     <Route path="/" element={<Index />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/auth" element={<Navigate to="/admin" replace />} />
+                    
+                    {/* Info - Hub for News & Archives */}
+                    <Route path="/info" element={<Info />} />
+                    <Route path="/archives" element={<Archives />} />
                     
                     {/* News */}
                     <Route path="/news" element={<News />} />
