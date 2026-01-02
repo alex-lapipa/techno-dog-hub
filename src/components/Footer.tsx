@@ -20,7 +20,7 @@ const Footer = () => {
     { label: 'Labels', path: '/labels' },
     { label: 'Releases', path: '/releases' },
     { label: 'Gear', path: '/gear' },
-    { label: 'Submit', path: '/submit' },
+    { label: 'Contribute', path: '/contribute' },
     { label: 'Developers', path: '/developer' },
   ];
 
