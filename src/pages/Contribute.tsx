@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { 
@@ -18,7 +18,17 @@ import {
   ChevronDown,
   Edit3,
   Plus,
-  ExternalLink
+  ExternalLink,
+  Camera,
+  MessageSquare,
+  Users,
+  MapPin,
+  Disc,
+  Building2,
+  PartyPopper,
+  Tag,
+  Wrench,
+  ArrowRight
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -143,23 +153,23 @@ const Contribute = () => {
   }, [user, form]);
 
   const contributionTypes = {
-    artist: { label: "Artist / DJ", icon: Music },
-    venue: { label: "Venue / Club", icon: ExternalLink },
-    festival: { label: "Festival", icon: Music },
-    label: { label: "Record Label", icon: FileText },
-    release: { label: "Release / Track", icon: Music },
-    gear: { label: "Equipment / Gear", icon: Music },
-    collective: { label: "Collective / Crew", icon: Music },
-    event: { label: "Event / Party", icon: Music },
-    other: { label: "Other", icon: HelpCircle },
+    artist: { label: "Artist / DJ", icon: Users, color: "text-primary" },
+    venue: { label: "Venue / Club", icon: Building2, color: "text-logo-red" },
+    festival: { label: "Festival", icon: PartyPopper, color: "text-yellow-500" },
+    label: { label: "Record Label", icon: Disc, color: "text-purple-500" },
+    release: { label: "Release / Track", icon: Music, color: "text-blue-500" },
+    gear: { label: "Equipment / Gear", icon: Wrench, color: "text-orange-500" },
+    collective: { label: "Collective / Crew", icon: Users, color: "text-pink-500" },
+    event: { label: "Event / Party", icon: MapPin, color: "text-cyan-500" },
+    other: { label: "Other", icon: HelpCircle, color: "text-muted-foreground" },
   };
 
   const actionTypes = {
-    add_new: { label: "Add New Entry", description: "Submit something new to the archive" },
-    correction: { label: "Propose Amendment", description: "Correct or update existing information" },
-    photo: { label: "Upload Photos", description: "Add images to existing entries" },
-    document: { label: "Share Document", description: "Flyers, articles, historical records" },
-    story: { label: "Share Story", description: "Personal experience or memory" },
+    add_new: { label: "Add New Entry", description: "Submit something new to the archive", icon: Plus },
+    correction: { label: "Propose Amendment", description: "Correct or update existing information", icon: Edit3 },
+    photo: { label: "Upload Photos", description: "Add images to existing entries", icon: Camera },
+    document: { label: "Share Document", description: "Flyers, articles, historical records", icon: FileText },
+    story: { label: "Share Story", description: "Personal experience or memory", icon: MessageSquare },
   };
 
   const getAllowedTypes = () => {
@@ -446,37 +456,63 @@ const Contribute = () => {
 
       <main className="pt-16">
         {/* Hero Header */}
-        <section className="border-b border-border bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4 md:px-8 py-16 md:py-20">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 border border-primary/30 bg-primary/10 rounded-full mb-6">
-                <Plus className="w-3 h-3 text-primary" />
-                <span className="font-mono text-xs uppercase tracking-wider text-primary">Contribute</span>
+        <section className="relative border-b border-border overflow-hidden">
+          {/* Background grid effect */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(34,197,94,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,197,94,0.03)_1px,transparent_1px)] bg-[size:50px_50px] opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+          
+          <div className="container relative mx-auto px-4 md:px-8 py-16 md:py-24">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 border border-primary/40 bg-primary/10 mb-8">
+                <Plus className="w-4 h-4 text-primary" />
+                <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary">Community Archive</span>
               </div>
-              <h1 className="font-mono text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight mb-6">
-                Help Build the Archive
+              <h1 className="font-mono text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight mb-6 leading-tight">
+                Contribute to the
+                <span className="block text-primary">Underground Archive</span>
               </h1>
-              <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Upload photos, submit corrections, add new entries, or share your stories. 
-                Every contribution helps preserve underground techno culture.
+              <p className="font-mono text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
+                Share your knowledge, upload photos, submit corrections, or tell your stories. 
+                Every contribution helps preserve and grow the global techno culture database.
               </p>
+              
+              {/* Quick action cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 max-w-3xl mx-auto">
+                {Object.entries(actionTypes).map(([key, { label, icon: Icon }]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      form.setValue("actionType", key as ContributionFormData["actionType"]);
+                      document.getElementById("contribution-form")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="group p-4 border border-border hover:border-primary/50 bg-card/50 hover:bg-primary/5 transition-all duration-200"
+                  >
+                    <Icon className="w-6 h-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">{label.split(' ')[0]}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Main Form */}
-        <section className="border-b border-border">
+        <section id="contribution-form" className="border-b border-border">
           <div className="container mx-auto px-4 md:px-8 py-12 md:py-16">
             <div className="max-w-2xl mx-auto">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                   
                   {/* Step 1: What are you contributing? */}
-                  <Card className="border-border">
-                    <CardHeader className="border-b border-border pb-4">
+                  <Card className="border-border overflow-hidden">
+                    <CardHeader className="border-b border-border pb-4 bg-gradient-to-r from-primary/5 to-transparent">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-mono text-sm text-primary">1</div>
-                        <CardTitle className="font-mono text-lg uppercase tracking-wider">What are you contributing?</CardTitle>
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-mono text-sm font-bold text-primary">1</div>
+                        <div>
+                          <CardTitle className="font-mono text-lg uppercase tracking-wider">What are you contributing?</CardTitle>
+                          <CardDescription className="font-mono text-xs text-muted-foreground">Select category and action type</CardDescription>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-6">
@@ -488,20 +524,22 @@ const Contribute = () => {
                             <FormLabel className="font-mono text-xs uppercase tracking-wider">
                               Category *
                             </FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="font-mono h-12">
-                                  <SelectValue placeholder="Select category..." />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-card border-border">
-                                {Object.entries(contributionTypes).map(([value, { label }]) => (
-                                  <SelectItem key={value} value={value} className="font-mono">
-                                    {label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
+                              {Object.entries(contributionTypes).map(([value, { label, icon: Icon, color }]) => (
+                                <div
+                                  key={value}
+                                  onClick={() => field.onChange(value)}
+                                  className={`p-3 border cursor-pointer transition-all text-center ${
+                                    field.value === value 
+                                      ? "border-primary bg-primary/10" 
+                                      : "border-border hover:border-primary/50 hover:bg-card"
+                                  }`}
+                                >
+                                  <Icon className={`w-5 h-5 mx-auto mb-1 ${field.value === value ? "text-primary" : color}`} />
+                                  <span className="font-mono text-[10px] uppercase tracking-wider block truncate">{label.split(' ')[0]}</span>
+                                </div>
+                              ))}
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -516,18 +554,25 @@ const Contribute = () => {
                               What would you like to do? *
                             </FormLabel>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                              {Object.entries(actionTypes).map(([value, { label, description }]) => (
+                              {Object.entries(actionTypes).map(([value, { label, description, icon: Icon }]) => (
                                 <div
                                   key={value}
                                   onClick={() => field.onChange(value)}
-                                  className={`p-4 border cursor-pointer transition-all ${
+                                  className={`group p-4 border cursor-pointer transition-all flex items-start gap-3 ${
                                     field.value === value 
                                       ? "border-primary bg-primary/5" 
                                       : "border-border hover:border-primary/50"
                                   }`}
                                 >
-                                  <div className="font-mono text-sm mb-1">{label}</div>
-                                  <div className="font-mono text-xs text-muted-foreground">{description}</div>
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                                    field.value === value ? "bg-primary/20" : "bg-muted"
+                                  }`}>
+                                    <Icon className={`w-4 h-4 ${field.value === value ? "text-primary" : "text-muted-foreground"}`} />
+                                  </div>
+                                  <div>
+                                    <div className="font-mono text-sm mb-0.5">{label}</div>
+                                    <div className="font-mono text-xs text-muted-foreground">{description}</div>
+                                  </div>
                                 </div>
                               ))}
                             </div>
@@ -539,11 +584,14 @@ const Contribute = () => {
                   </Card>
 
                   {/* Step 2: Details */}
-                  <Card className="border-border">
-                    <CardHeader className="border-b border-border pb-4">
+                  <Card className="border-border overflow-hidden">
+                    <CardHeader className="border-b border-border pb-4 bg-gradient-to-r from-logo-red/5 to-transparent">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-mono text-sm text-primary">2</div>
-                        <CardTitle className="font-mono text-lg uppercase tracking-wider">Details</CardTitle>
+                        <div className="w-10 h-10 rounded-full bg-logo-red/20 flex items-center justify-center font-mono text-sm font-bold text-logo-red">2</div>
+                        <div>
+                          <CardTitle className="font-mono text-lg uppercase tracking-wider">Details</CardTitle>
+                          <CardDescription className="font-mono text-xs text-muted-foreground">Tell us more about your contribution</CardDescription>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-6">
@@ -739,10 +787,10 @@ const Contribute = () => {
                   </Card>
 
                   {/* Step 3: Files */}
-                  <Card className="border-border">
-                    <CardHeader className="border-b border-border pb-4">
+                  <Card className="border-border overflow-hidden">
+                    <CardHeader className="border-b border-border pb-4 bg-gradient-to-r from-blue-500/5 to-transparent">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-mono text-sm text-primary">3</div>
+                        <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center font-mono text-sm font-bold text-blue-500">3</div>
                         <div>
                           <CardTitle className="font-mono text-lg uppercase tracking-wider">Attach Files</CardTitle>
                           <CardDescription className="font-mono text-xs text-muted-foreground">Optional • Photos, documents, videos, audio</CardDescription>
@@ -876,22 +924,35 @@ const Contribute = () => {
         </section>
 
         {/* Guidelines */}
-        <section className="border-b border-border">
-          <div className="container mx-auto px-4 md:px-8 py-12">
+        <section className="border-b border-border bg-gradient-to-b from-muted/30 to-transparent">
+          <div className="container mx-auto px-4 md:px-8 py-16">
+            <div className="text-center mb-10">
+              <h2 className="font-mono text-2xl uppercase tracking-wider mb-3">Contribution Guidelines</h2>
+              <p className="font-mono text-sm text-muted-foreground">What we're looking for</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <div className="border border-border p-6 text-center">
+              <div className="border border-primary/20 bg-primary/5 p-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <Disc className="w-6 h-6 text-primary" />
+                </div>
                 <h3 className="font-mono text-sm uppercase tracking-wider mb-3">Underground Only</h3>
                 <p className="font-mono text-xs text-muted-foreground leading-relaxed">
                   We focus on underground techno culture. No mainstream EDM or commercial content.
                 </p>
               </div>
-              <div className="border border-border p-6 text-center">
+              <div className="border border-logo-red/20 bg-logo-red/5 p-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-logo-red/20 flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-6 h-6 text-logo-red" />
+                </div>
                 <h3 className="font-mono text-sm uppercase tracking-wider mb-3">Quality Matters</h3>
                 <p className="font-mono text-xs text-muted-foreground leading-relaxed">
                   Detail and context make contributions valuable. Tell us why it matters.
                 </p>
               </div>
-              <div className="border border-border p-6 text-center">
+              <div className="border border-blue-500/20 bg-blue-500/5 p-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-6 h-6 text-blue-500" />
+                </div>
                 <h3 className="font-mono text-sm uppercase tracking-wider mb-3">Global Archive</h3>
                 <p className="font-mono text-xs text-muted-foreground leading-relaxed">
                   We document techno worldwide. Every scene and story matters.
