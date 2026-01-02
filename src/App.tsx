@@ -41,6 +41,7 @@ const GearDetail = lazy(() => import("./pages/GearDetail"));
 const UserStories = lazy(() => import("./pages/UserStories"));
 const Info = lazy(() => import("./pages/Info"));
 const Archives = lazy(() => import("./pages/Archives"));
+const Contribute = lazy(() => import("./pages/Contribute"));
 
 const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const SubmissionsAdmin = lazy(() => import("./pages/SubmissionsAdmin"));
@@ -164,6 +165,7 @@ const App = () => (
                     {/* Info - Hub for News & Archives */}
                     <Route path="/info" element={<Info />} />
                     <Route path="/archives" element={<Archives />} />
+                    <Route path="/contribute" element={<Contribute />} />
                     
                     {/* News */}
                     <Route path="/news" element={<News />} />
