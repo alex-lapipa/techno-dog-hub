@@ -6,6 +6,7 @@ import { PageLayout } from "@/components/layout";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import GearYouTubeVideos from "@/components/GearYouTubeVideos";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 
 const GearDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -527,6 +528,16 @@ const GearDetail = () => {
               gearName={gearItem.name} 
             />
           )}
+
+          {/* Contribute Widget */}
+          <aside className="mt-8 sm:mt-12">
+            <ContributeWidget 
+              entityType="gear" 
+              entityId={gearItem.id}
+              entityName={gearItem.name}
+              variant="default"
+            />
+          </aside>
         </div>
       </PageLayout>
     );

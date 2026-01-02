@@ -5,6 +5,7 @@ import { PageLayout } from "@/components/layout";
 import FilmFrame from "@/components/FilmFrame";
 import DetailBreadcrumb from "@/components/DetailBreadcrumb";
 import { CommunityWidgetPhoto, CommunityWidgetCorrection } from "@/components/community";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 import YouTubeVideos from "@/components/YouTubeVideos";
 import { cn } from "@/lib/utils";
 
@@ -345,6 +346,16 @@ const VenueDetail = () => {
               </div>
             </section>
           )}
+
+          {/* Contribute Widget */}
+          <aside className="mt-8 sm:mt-12">
+            <ContributeWidget 
+              entityType="venue" 
+              entityId={venue.id}
+              entityName={venue.name}
+              variant="default"
+            />
+          </aside>
         </div>
       </PageLayout>
     );

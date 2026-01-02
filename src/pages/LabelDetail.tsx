@@ -9,6 +9,7 @@ import PageSEO from "@/components/PageSEO";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 
 interface LabelData {
   id: string;
@@ -394,6 +395,14 @@ const LabelDetail = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Contribute Widget */}
+              <ContributeWidget 
+                entityType="label" 
+                entityId={label.id}
+                entityName={label.label_name}
+                variant="default"
+              />
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { ContributeWidget } from "@/components/community/ContributeWidget";
 const GearPage = () => {
   const { trackClick, trackSearch } = useAnalytics();
   const { data: gear = [], isLoading } = useGearData();
@@ -203,9 +204,15 @@ const GearPage = () => {
             ))}
           </div>
 
-          {/* Count */}
-          <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
-            {filteredGear.length} items in archive
+          {/* Count & Contribute Widget */}
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span className="font-mono text-[10px] sm:text-xs text-muted-foreground">
+              {filteredGear.length} items in archive
+            </span>
+            <ContributeWidget 
+              entityType="gear" 
+              variant="compact"
+            />
           </div>
         </div>
       </main>
