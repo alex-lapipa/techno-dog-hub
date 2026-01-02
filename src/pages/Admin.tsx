@@ -8,7 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert, BookOpen } from "lucide-react";
+import { Lock, LogOut, Loader2, Play, CheckCircle2, XCircle, AlertCircle, Mail, ShieldAlert, BookOpen, Menu } from "lucide-react";
 import { LoadingState } from "@/components/ui/loading-state";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +19,9 @@ import RealtimeActivityFeed from "@/components/admin/RealtimeActivityFeed";
 import ScheduledJobsStatus from "@/components/admin/ScheduledJobsStatus";
 import AgentHealthSummary from "@/components/admin/AgentHealthSummary";
 import AdminAIAssistant from "@/components/admin/AdminAIAssistant";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import { LeaderboardWidget } from "@/components/gamification";
+import { cn } from "@/lib/utils";
 
 const AdminLoginForm = () => {
   const [email, setEmail] = useState("");
@@ -132,7 +134,11 @@ interface AgentRunState {
   error?: string;
 }
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ sidebarCollapsed, onToggleSidebar, onOpenMobileSidebar }: {
+  sidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+  onOpenMobileSidebar: () => void;
+}) => {
   const { logout, userEmail } = useAdminAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -461,6 +467,8 @@ const AdminDashboard = () => {
 const Admin = () => {
   const { isAdmin, loading: adminLoading } = useAdminAuth();
   const { user, loading: authLoading } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Development mode bypass - skip all auth checks
   const isDevelopment = import.meta.env.DEV;
@@ -490,12 +498,66 @@ const Admin = () => {
         path="/admin"
         noindex={true}
       />
+      
+      {/* Sidebar for dashboard view */}
+      {showDashboard && (
+        <>
+          {/* Desktop sidebar */}
+          <div className="hidden lg:block">
+            <AdminSidebar 
+              isCollapsed={sidebarCollapsed} 
+              onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
+          </div>
+          
+          {/* Mobile sidebar overlay */}
+          {mobileSidebarOpen && (
+            <div 
+              className="lg:hidden fixed inset-0 bg-black/50 z-30"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+          )}
+          
+          {/* Mobile sidebar */}
+          <div className={cn(
+            "lg:hidden fixed inset-y-0 left-0 z-40 transition-transform duration-300",
+            mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          )}>
+            <AdminSidebar 
+              isCollapsed={false} 
+              onToggle={() => setMobileSidebarOpen(false)} 
+            />
+          </div>
+        </>
+      )}
+      
       <Header />
-      <main className="flex-1 px-4 py-8 md:py-12">
+      <main className={cn(
+        "flex-1 px-4 py-8 md:py-12 transition-all duration-300",
+        showDashboard && !sidebarCollapsed && "lg:ml-64",
+        showDashboard && sidebarCollapsed && "lg:ml-16"
+      )}>
         <div className="container mx-auto max-w-7xl">
+          {/* Mobile menu button */}
+          {showDashboard && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setMobileSidebarOpen(true)}
+              className="lg:hidden mb-4 hover:bg-muted"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+          )}
           {showLogin && <AdminLoginForm />}
           {showAccessDenied && <AccessDenied />}
-          {showDashboard && <AdminDashboard />}
+          {showDashboard && (
+            <AdminDashboard 
+              sidebarCollapsed={sidebarCollapsed}
+              onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+            />
+          )}
         </div>
       </main>
       <Footer />
