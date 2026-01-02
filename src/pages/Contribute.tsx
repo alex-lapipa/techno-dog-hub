@@ -28,7 +28,13 @@ import {
   PartyPopper,
   Tag,
   Wrench,
-  ArrowRight
+  ArrowRight,
+  BookOpen,
+  Info,
+  Lightbulb,
+  Shield,
+  Clock,
+  Star
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,6 +76,17 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 // File upload constants
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -153,23 +170,23 @@ const Contribute = () => {
   }, [user, form]);
 
   const contributionTypes = {
-    artist: { label: "Artist / DJ", icon: Users, color: "text-primary" },
-    venue: { label: "Venue / Club", icon: Building2, color: "text-logo-red" },
-    festival: { label: "Festival", icon: PartyPopper, color: "text-yellow-500" },
-    label: { label: "Record Label", icon: Disc, color: "text-purple-500" },
-    release: { label: "Release / Track", icon: Music, color: "text-blue-500" },
-    gear: { label: "Equipment / Gear", icon: Wrench, color: "text-orange-500" },
-    collective: { label: "Collective / Crew", icon: Users, color: "text-pink-500" },
-    event: { label: "Event / Party", icon: MapPin, color: "text-cyan-500" },
-    other: { label: "Other", icon: HelpCircle, color: "text-muted-foreground" },
+    artist: { label: "Artist / DJ", icon: Users, color: "text-primary", tip: "Submit DJs, producers, live acts, or collaborations active in the underground techno scene" },
+    venue: { label: "Venue / Club", icon: Building2, color: "text-logo-red", tip: "Add clubs, warehouses, or underground spaces known for hosting techno events" },
+    festival: { label: "Festival", icon: PartyPopper, color: "text-yellow-500", tip: "Submit techno festivals, outdoor events, or multi-day gatherings" },
+    label: { label: "Record Label", icon: Disc, color: "text-purple-500", tip: "Add record labels or imprints releasing underground techno music" },
+    release: { label: "Release / Track", icon: Music, color: "text-blue-500", tip: "Submit vinyl releases, EPs, albums, or significant tracks" },
+    gear: { label: "Equipment / Gear", icon: Wrench, color: "text-orange-500", tip: "Add synthesizers, drum machines, mixers, or other music production equipment" },
+    collective: { label: "Collective / Crew", icon: Users, color: "text-pink-500", tip: "Submit artist collectives, booking agencies, or underground crews" },
+    event: { label: "Event / Party", icon: MapPin, color: "text-cyan-500", tip: "Add specific parties, rave series, or recurring underground events" },
+    other: { label: "Other", icon: HelpCircle, color: "text-muted-foreground", tip: "Anything else relevant to underground techno culture" },
   };
 
   const actionTypes = {
-    add_new: { label: "Add New Entry", description: "Submit something new to the archive", icon: Plus },
-    correction: { label: "Propose Amendment", description: "Correct or update existing information", icon: Edit3 },
-    photo: { label: "Upload Photos", description: "Add images to existing entries", icon: Camera },
-    document: { label: "Share Document", description: "Flyers, articles, historical records", icon: FileText },
-    story: { label: "Share Story", description: "Personal experience or memory", icon: MessageSquare },
+    add_new: { label: "Add New Entry", description: "Submit something new to the archive", icon: Plus, tip: "Create a brand new entry that doesn't exist yet in our database" },
+    correction: { label: "Propose Amendment", description: "Correct or update existing information", icon: Edit3, tip: "Fix errors, update outdated info, or add missing details to existing entries" },
+    photo: { label: "Upload Photos", description: "Add images to existing entries", icon: Camera, tip: "Share high-quality photos of artists, venues, events, or gear" },
+    document: { label: "Share Document", description: "Flyers, articles, historical records", icon: FileText, tip: "Upload historical materials like flyers, press articles, or archival documents" },
+    story: { label: "Share Story", description: "Personal experience or memory", icon: MessageSquare, tip: "Tell your personal stories, memories, or experiences from the scene" },
   };
 
   const getAllowedTypes = () => {
@@ -476,23 +493,215 @@ const Contribute = () => {
                 Every contribution helps preserve and grow the global techno culture database.
               </p>
               
-              {/* Quick action cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 max-w-3xl mx-auto">
-                {Object.entries(actionTypes).map(([key, { label, icon: Icon }]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => {
-                      form.setValue("actionType", key as ContributionFormData["actionType"]);
-                      document.getElementById("contribution-form")?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="group p-4 border border-border hover:border-primary/50 bg-card/50 hover:bg-primary/5 transition-all duration-200"
-                  >
-                    <Icon className="w-6 h-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">{label.split(' ')[0]}</span>
-                  </button>
-                ))}
-              </div>
+              {/* Quick action cards with tooltips */}
+              <TooltipProvider delayDuration={200}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 max-w-3xl mx-auto">
+                  {Object.entries(actionTypes).map(([key, { label, icon: Icon, tip }]) => (
+                    <Tooltip key={key}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            form.setValue("actionType", key as ContributionFormData["actionType"]);
+                            document.getElementById("contribution-form")?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className="group p-4 border border-border hover:border-primary/50 bg-card/50 hover:bg-primary/5 transition-all duration-200"
+                        >
+                          <Icon className="w-6 h-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">{label.split(' ')[0]}</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[200px] text-center">
+                        <p className="text-xs">{tip}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
+              </TooltipProvider>
+            </div>
+          </div>
+        </section>
+
+        {/* Instructions Tabs Section */}
+        <section className="border-b border-border bg-muted/20">
+          <div className="container mx-auto px-4 md:px-8 py-8">
+            <div className="max-w-4xl mx-auto">
+              <Tabs defaultValue="how-it-works" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+                  <TabsTrigger value="how-it-works" className="font-mono text-xs uppercase tracking-wider py-2.5 data-[state=active]:bg-primary/10">
+                    <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                    How It Works
+                  </TabsTrigger>
+                  <TabsTrigger value="tips" className="font-mono text-xs uppercase tracking-wider py-2.5 data-[state=active]:bg-primary/10">
+                    <Lightbulb className="w-3.5 h-3.5 mr-1.5" />
+                    Tips
+                  </TabsTrigger>
+                  <TabsTrigger value="what-we-accept" className="font-mono text-xs uppercase tracking-wider py-2.5 data-[state=active]:bg-primary/10">
+                    <Star className="w-3.5 h-3.5 mr-1.5" />
+                    What We Accept
+                  </TabsTrigger>
+                  <TabsTrigger value="review-process" className="font-mono text-xs uppercase tracking-wider py-2.5 data-[state=active]:bg-primary/10">
+                    <Shield className="w-3.5 h-3.5 mr-1.5" />
+                    Review Process
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="how-it-works" className="mt-6">
+                  <Card className="border-border">
+                    <CardContent className="pt-6">
+                      <div className="grid gap-6 md:grid-cols-3">
+                        <div className="flex flex-col items-center text-center p-4">
+                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-3">
+                            <span className="font-mono text-lg font-bold text-primary">1</span>
+                          </div>
+                          <h4 className="font-mono text-sm uppercase tracking-wider mb-2">Choose Category</h4>
+                          <p className="font-mono text-xs text-muted-foreground">Select what type of content you're submitting (artist, venue, gear, etc.)</p>
+                        </div>
+                        <div className="flex flex-col items-center text-center p-4">
+                          <div className="w-12 h-12 rounded-full bg-logo-red/20 flex items-center justify-center mb-3">
+                            <span className="font-mono text-lg font-bold text-logo-red">2</span>
+                          </div>
+                          <h4 className="font-mono text-sm uppercase tracking-wider mb-2">Add Details</h4>
+                          <p className="font-mono text-xs text-muted-foreground">Fill in the information, upload photos or documents, and provide context</p>
+                        </div>
+                        <div className="flex flex-col items-center text-center p-4">
+                          <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3">
+                            <span className="font-mono text-lg font-bold text-blue-500">3</span>
+                          </div>
+                          <h4 className="font-mono text-sm uppercase tracking-wider mb-2">Submit & Wait</h4>
+                          <p className="font-mono text-xs text-muted-foreground">Our team reviews submissions and adds quality content to the archive</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="tips" className="mt-6">
+                  <Card className="border-border">
+                    <CardContent className="pt-6">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Be Specific</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Include dates, locations, and context. "Berlin-based since 2015" is better than "lives in Germany"</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <Camera className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">High-Quality Photos</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Clear, well-lit images work best. No watermarks or heavily edited photos</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <ExternalLink className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Provide Sources</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Link to Discogs, Resident Advisor, Bandcamp, or official websites when possible</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg">
+                          <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Use AI Enhancement</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Click the "Enhance" button to improve your description with AI assistance</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="what-we-accept" className="mt-6">
+                  <Card className="border-border">
+                    <CardContent className="pt-6">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <h4 className="font-mono text-sm uppercase tracking-wider mb-3 text-primary flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" /> We Accept
+                          </h4>
+                          <ul className="space-y-2">
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary">•</span> Underground techno artists, DJs, and producers
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary">•</span> Independent clubs, warehouses, and venues
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary">•</span> Record labels focused on techno/electronic
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary">•</span> Historical documents, flyers, and photos
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary">•</span> Synthesizers, drum machines, and gear
+                            </li>
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="font-mono text-sm uppercase tracking-wider mb-3 text-logo-red flex items-center gap-2">
+                            <X className="w-4 h-4" /> We Don't Accept
+                          </h4>
+                          <ul className="space-y-2">
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-logo-red">•</span> Mainstream EDM or commercial content
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-logo-red">•</span> Self-promotion without historical significance
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-logo-red">•</span> Copyrighted content you don't own rights to
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-logo-red">•</span> Duplicate submissions of existing entries
+                            </li>
+                            <li className="font-mono text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-logo-red">•</span> Low-quality or irrelevant content
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="review-process" className="mt-6">
+                  <Card className="border-border">
+                    <CardContent className="pt-6">
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-4">
+                          <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center shrink-0">
+                            <Clock className="w-4 h-4 text-yellow-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Review Timeline</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Most submissions are reviewed within 48-72 hours. Complex entries may take longer.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                            <Shield className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Quality Control</h4>
+                            <p className="font-mono text-xs text-muted-foreground">Our AI-assisted review checks for duplicates, validates information, and ensures underground authenticity.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                          <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                            <Send className="w-4 h-4 text-blue-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-mono text-sm mb-1">Email Notifications</h4>
+                            <p className="font-mono text-xs text-muted-foreground">You'll receive an email when your submission is approved, rejected, or if we need more information.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </section>
@@ -521,25 +730,43 @@ const Contribute = () => {
                         name="contributionType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="font-mono text-xs uppercase tracking-wider">
+                            <FormLabel className="font-mono text-xs uppercase tracking-wider flex items-center gap-2">
                               Category *
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="w-3 h-3 text-muted-foreground cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right">
+                                    <p className="text-xs">Select the type of content you're submitting</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </FormLabel>
-                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
-                              {Object.entries(contributionTypes).map(([value, { label, icon: Icon, color }]) => (
-                                <div
-                                  key={value}
-                                  onClick={() => field.onChange(value)}
-                                  className={`p-3 border cursor-pointer transition-all text-center ${
-                                    field.value === value 
-                                      ? "border-primary bg-primary/10" 
-                                      : "border-border hover:border-primary/50 hover:bg-card"
-                                  }`}
-                                >
-                                  <Icon className={`w-5 h-5 mx-auto mb-1 ${field.value === value ? "text-primary" : color}`} />
-                                  <span className="font-mono text-[10px] uppercase tracking-wider block truncate">{label.split(' ')[0]}</span>
-                                </div>
-                              ))}
-                            </div>
+                            <TooltipProvider delayDuration={200}>
+                              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
+                                {Object.entries(contributionTypes).map(([value, { label, icon: Icon, color, tip }]) => (
+                                  <Tooltip key={value}>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        onClick={() => field.onChange(value)}
+                                        className={`p-3 border cursor-pointer transition-all text-center ${
+                                          field.value === value 
+                                            ? "border-primary bg-primary/10" 
+                                            : "border-border hover:border-primary/50 hover:bg-card"
+                                        }`}
+                                      >
+                                        <Icon className={`w-5 h-5 mx-auto mb-1 ${field.value === value ? "text-primary" : color}`} />
+                                        <span className="font-mono text-[10px] uppercase tracking-wider block truncate">{label.split(' ')[0]}</span>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="max-w-[200px]">
+                                      <p className="text-xs">{tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ))}
+                              </div>
+                            </TooltipProvider>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -550,32 +777,50 @@ const Contribute = () => {
                         name="actionType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="font-mono text-xs uppercase tracking-wider">
+                            <FormLabel className="font-mono text-xs uppercase tracking-wider flex items-center gap-2">
                               What would you like to do? *
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Info className="w-3 h-3 text-muted-foreground cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="right">
+                                    <p className="text-xs">Choose the type of contribution you want to make</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </FormLabel>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                              {Object.entries(actionTypes).map(([value, { label, description, icon: Icon }]) => (
-                                <div
-                                  key={value}
-                                  onClick={() => field.onChange(value)}
-                                  className={`group p-4 border cursor-pointer transition-all flex items-start gap-3 ${
-                                    field.value === value 
-                                      ? "border-primary bg-primary/5" 
-                                      : "border-border hover:border-primary/50"
-                                  }`}
-                                >
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                                    field.value === value ? "bg-primary/20" : "bg-muted"
-                                  }`}>
-                                    <Icon className={`w-4 h-4 ${field.value === value ? "text-primary" : "text-muted-foreground"}`} />
-                                  </div>
-                                  <div>
-                                    <div className="font-mono text-sm mb-0.5">{label}</div>
-                                    <div className="font-mono text-xs text-muted-foreground">{description}</div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                            <TooltipProvider delayDuration={200}>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                {Object.entries(actionTypes).map(([value, { label, description, icon: Icon, tip }]) => (
+                                  <Tooltip key={value}>
+                                    <TooltipTrigger asChild>
+                                      <div
+                                        onClick={() => field.onChange(value)}
+                                        className={`group p-4 border cursor-pointer transition-all flex items-start gap-3 ${
+                                          field.value === value 
+                                            ? "border-primary bg-primary/5" 
+                                            : "border-border hover:border-primary/50"
+                                        }`}
+                                      >
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                                          field.value === value ? "bg-primary/20" : "bg-muted"
+                                        }`}>
+                                          <Icon className={`w-4 h-4 ${field.value === value ? "text-primary" : "text-muted-foreground"}`} />
+                                        </div>
+                                        <div>
+                                          <div className="font-mono text-sm mb-0.5">{label}</div>
+                                          <div className="font-mono text-xs text-muted-foreground">{description}</div>
+                                        </div>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-[220px]">
+                                      <p className="text-xs">{tip}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ))}
+                              </div>
+                            </TooltipProvider>
                             <FormMessage />
                           </FormItem>
                         )}
