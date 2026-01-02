@@ -418,6 +418,17 @@ const Contribute = () => {
     };
   }, []);
 
+  // Get return URL from query params
+  const returnTo = searchParams.get("returnTo");
+
+  const handleReturnToOrigin = () => {
+    if (returnTo && returnTo !== "/contribute") {
+      navigate(returnTo);
+    } else {
+      navigate("/");
+    }
+  };
+
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -447,10 +458,10 @@ const Contribute = () => {
                     Submit another
                   </Button>
                   <Button
-                    onClick={() => navigate("/")}
+                    onClick={handleReturnToOrigin}
                     className="font-mono text-xs uppercase"
                   >
-                    Back to archive
+                    {returnTo ? "Return to page" : "Back to archive"}
                   </Button>
                 </div>
               </div>
