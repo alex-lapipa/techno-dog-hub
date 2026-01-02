@@ -22,7 +22,6 @@ const EntityImage = ({
 }: EntityImageProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [jobEnqueued, setJobEnqueued] = useState(false);
   
   // Check for doggy placeholder
   const { data: doggyPlaceholder } = useDoggyPlaceholder(entityType, entityId);
@@ -30,7 +29,7 @@ const EntityImage = ({
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        // Check for existing curated image
+        // Check for existing curated image in media_assets table
         const { data } = await supabase
           .from('media_assets')
           .select('storage_url, source_url')
@@ -41,31 +40,17 @@ const EntityImage = ({
 
         if (data) {
           setImageUrl(data.storage_url || data.source_url);
-        } else if (!jobEnqueued) {
-          // Enqueue job for missing image (fire and forget)
-          enqueueJob();
         }
+        // NOTE: Auto-enqueueing disabled - photos are manually curated and persist once added
       } catch (error) {
-        // No image found, try to enqueue
-        if (!jobEnqueued) enqueueJob();
+        // No curated image found - will fall back to fallbackImage or placeholder
       } finally {
         setLoading(false);
       }
     };
 
-    const enqueueJob = async () => {
-      setJobEnqueued(true);
-      try {
-        await supabase.functions.invoke('media-curator', {
-          body: { action: 'enqueue', entityType, entityId, entityName }
-        });
-      } catch {
-        // Silently fail - media job enqueueing is non-critical
-      }
-    };
-
     fetchImage();
-  }, [entityType, entityId, entityName, jobEnqueued]);
+  }, [entityType, entityId]);
 
   // If we have an image, show it
   if (imageUrl) {
