@@ -12,6 +12,7 @@ export { default as AdminPageLayout } from './AdminPageLayout';
 export { default as AdminStatsCard } from './AdminStatsCard';
 export { default as AdminDataTable } from './AdminDataTable';
 export { default as AdminAIAssistant } from './AdminAIAssistant';
+export { default as AdminSidebar } from './AdminSidebar';
 
 // Shared Agent Admin Components (Phase 2.1)
 export { 
