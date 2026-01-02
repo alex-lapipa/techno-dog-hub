@@ -43,6 +43,9 @@ export const ContributeButton = ({
     if (entityId) params.set("entityId", entityId);
     if (entityName) params.set("entityName", entityName);
     if (action) params.set("action", action);
+    // Store origin URL for return navigation after submission
+    const currentPath = window.location.pathname + window.location.hash;
+    params.set("returnTo", currentPath);
     const queryString = params.toString();
     return `/contribute${queryString ? `?${queryString}` : ""}`;
   };
