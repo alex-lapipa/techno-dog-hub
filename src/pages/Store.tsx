@@ -8,6 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { ProductCard } from "@/components/store/ProductCard";
 import { CartDrawer, CartButton } from "@/components/store/CartDrawer";
 import { GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { FilterHeroHeader } from "@/components/store/FilterHeroHeader";
 import { fetchProducts, fetchCollections, ShopifyProductEdge, ShopifyCollection } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -264,8 +265,16 @@ const Store = () => {
           </section>
         )}
 
-        {/* Eulogio Collaboration Section */}
-        {products?.some(p => p.node.title.toLowerCase().includes('eulogio')) && (
+        {/* Filter-specific Hero Header */}
+        {selectedType !== null && (
+          <FilterHeroHeader 
+            filterType={selectedType} 
+            productCount={filteredProducts?.length} 
+          />
+        )}
+
+        {/* Eulogio Collaboration Section - only show when no filter selected */}
+        {selectedType === null && products?.some(p => p.node.title.toLowerCase().includes('eulogio')) && (
           <section className="border-b border-border overflow-hidden">
             {/* Hero Image Banner */}
             <div className="relative h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
@@ -378,7 +387,7 @@ const Store = () => {
         )}
 
         {/* Techno Doggies Collection Section */}
-        {hasTechnoDoggies && technoDoggiesProducts && technoDoggiesProducts.length > 0 && (
+        {selectedType === null && hasTechnoDoggies && technoDoggiesProducts && technoDoggiesProducts.length > 0 && (
           <section className="border-b border-border overflow-hidden">
             {/* Hero Banner */}
             <div className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-br from-background via-logo-green/5 to-background">
