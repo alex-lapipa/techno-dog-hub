@@ -6,6 +6,7 @@ import { Film, Play, Search, X, Loader2, LayoutGrid, List, ExternalLink } from "
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { VHSDocumentaryCard } from "@/components/documentaries/VHSDocumentaryCard";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 
 interface Category {
   id: string;
@@ -420,9 +421,34 @@ const Documentaries = () => {
 
         {/* Footer Note */}
         <div className="mt-16 pt-8 border-t border-border/30">
-          <p className="font-mono text-[10px] text-muted-foreground/60 text-center">
+          <p className="font-mono text-[10px] text-muted-foreground/60 text-center mb-8">
             All documentaries are sourced from YouTube. Content rights belong to their respective creators.
           </p>
+        </div>
+
+        {/* Internal Linking - Hub/Spoke SEO Structure */}
+        <div className="space-y-4">
+          <TopicalClusterLinks
+            title="Related Learning"
+            description="Continue exploring techno culture"
+            links={[
+              { label: "Books", path: "/books", count: 49 },
+              { label: "Timeline", path: "/timeline" },
+              { label: "News", path: "/news" },
+            ]}
+          />
+          
+          <TopicalClusterLinks
+            title="Explore the Archive"
+            description="Artists, gear, venues, and more"
+            links={[
+              { label: "Artists", path: "/artists", count: 182 },
+              { label: "Gear", path: "/gear", count: 99 },
+              { label: "Labels", path: "/labels", count: 12 },
+              { label: "Venues", path: "/venues" },
+              { label: "Festivals", path: "/festivals" },
+            ]}
+          />
         </div>
       </div>
     </PageLayout>

@@ -10,6 +10,7 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { ContributeWidget } from "@/components/community/ContributeWidget";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 const GearPage = () => {
   const { trackClick, trackSearch } = useAnalytics();
   const { data: gear = [], isLoading } = useGearData();
@@ -212,6 +213,41 @@ const GearPage = () => {
             <ContributeWidget 
               entityType="gear" 
               variant="compact"
+            />
+          </div>
+
+          {/* Internal Linking - Hub/Spoke SEO Structure */}
+          <div className="mt-8 sm:mt-12 space-y-4">
+            <TopicalClusterLinks
+              title="Gear by Category"
+              description="Filter equipment by type"
+              links={[
+                { label: "Synthesizers", path: "/gear?category=synth" },
+                { label: "Drum Machines", path: "/gear?category=drum-machine" },
+                { label: "Samplers", path: "/gear?category=sampler" },
+                { label: "Sequencers", path: "/gear?category=sequencer" },
+                { label: "Effects", path: "/gear?category=effect" },
+              ]}
+            />
+            
+            <TopicalClusterLinks
+              title="Artists & Equipment"
+              description="See who uses what in the studio"
+              links={[
+                { label: "Artists Archive", path: "/artists", count: 182 },
+                { label: "Labels", path: "/labels", count: 12 },
+                { label: "Venues", path: "/venues" },
+              ]}
+            />
+
+            <TopicalClusterLinks
+              title="Learn More"
+              description="Deep dive into techno production culture"
+              links={[
+                { label: "Books", path: "/books", count: 49 },
+                { label: "Documentaries", path: "/documentaries", count: 31 },
+                { label: "Timeline", path: "/timeline" },
+              ]}
             />
           </div>
         </div>

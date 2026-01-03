@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { supabase } from "@/integrations/supabase/client";
 import { ContributeWidget } from "@/components/community/ContributeWidget";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -268,6 +269,42 @@ const ArtistsPage = () => {
             <ContributeWidget 
               entityType="artist" 
               variant="compact"
+            />
+          </div>
+
+          {/* Internal Linking - Hub/Spoke SEO Structure */}
+          <div className="mt-8 sm:mt-12 space-y-4">
+            <TopicalClusterLinks
+              title="Explore by Context"
+              description="Discover artists through their equipment, venues, and labels"
+              links={[
+                { label: "Gear Archive", path: "/gear", count: 99 },
+                { label: "Labels", path: "/labels", count: 12 },
+                { label: "Venues", path: "/venues" },
+                { label: "Festivals", path: "/festivals" },
+              ]}
+            />
+            
+            <TopicalClusterLinks
+              title="Regional Scenes"
+              description="Explore techno by geographic region"
+              links={[
+                { label: "Europe", path: "/artists?region=europe" },
+                { label: "North America", path: "/artists?region=north-america" },
+                { label: "South America", path: "/artists?region=south-america" },
+                { label: "Asia", path: "/artists?region=asia" },
+              ]}
+            />
+
+            <TopicalClusterLinks
+              title="Deep Dives"
+              description="Learn more about techno culture"
+              links={[
+                { label: "Books", path: "/books", count: 49 },
+                { label: "Documentaries", path: "/documentaries", count: 31 },
+                { label: "News", path: "/news" },
+                { label: "Timeline", path: "/timeline" },
+              ]}
             />
           </div>
         </div>
