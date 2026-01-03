@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { BookSuggestionForm } from "@/components/books/BookSuggestionForm";
 import { BookCover } from "@/components/books/BookCover";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 
 interface Category {
   id: string;
@@ -414,10 +415,35 @@ const Books = () => {
 
         {/* Footer Note */}
         <div className="mt-12 border-t border-border pt-8">
-          <p className="font-mono text-xs text-muted-foreground text-center max-w-xl mx-auto">
+          <p className="font-mono text-xs text-muted-foreground text-center max-w-xl mx-auto mb-8">
             This list is curated to align with techno.dog's mission: culture, movements, gear, and art. 
             No affiliate links. Support your local bookshop when possible.
           </p>
+        </div>
+
+        {/* Internal Linking - Hub/Spoke SEO Structure */}
+        <div className="space-y-4">
+          <TopicalClusterLinks
+            title="Related Learning"
+            description="Continue exploring techno culture"
+            links={[
+              { label: "Documentaries", path: "/documentaries", count: 31 },
+              { label: "Timeline", path: "/timeline" },
+              { label: "News", path: "/news" },
+            ]}
+          />
+          
+          <TopicalClusterLinks
+            title="Explore the Archive"
+            description="Artists, gear, venues, and more"
+            links={[
+              { label: "Artists", path: "/artists", count: 182 },
+              { label: "Gear", path: "/gear", count: 99 },
+              { label: "Labels", path: "/labels", count: 12 },
+              { label: "Venues", path: "/venues" },
+              { label: "Festivals", path: "/festivals" },
+            ]}
+          />
         </div>
       </div>
     </PageLayout>

@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -220,6 +221,31 @@ const LabelsPage = () => {
           {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
             {filteredLabels.length} labels in archive
+          </div>
+
+          {/* Internal Linking - Hub/Spoke SEO Structure */}
+          <div className="mt-8 sm:mt-12 space-y-4">
+            <TopicalClusterLinks
+              title="Explore Related"
+              description="Discover the artists, venues, and gear connected to these labels"
+              links={[
+                { label: "Artists", path: "/artists", count: 182 },
+                { label: "Gear Archive", path: "/gear", count: 99 },
+                { label: "Venues", path: "/venues" },
+                { label: "Festivals", path: "/festivals" },
+              ]}
+            />
+            
+            <TopicalClusterLinks
+              title="Learn More"
+              description="Deep dive into techno culture and history"
+              links={[
+                { label: "Books", path: "/books", count: 49 },
+                { label: "Documentaries", path: "/documentaries", count: 31 },
+                { label: "News", path: "/news" },
+                { label: "Timeline", path: "/timeline" },
+              ]}
+            />
           </div>
         </div>
       </main>

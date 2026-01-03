@@ -8,6 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { cn } from "@/lib/utils";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 type StatusFilter = "all" | "open" | "closed";
@@ -348,6 +349,31 @@ const VenuesPage = () => {
           {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
             {filteredVenues.length} venues in archive
+          </div>
+
+          {/* Internal Linking - Hub/Spoke SEO Structure */}
+          <div className="mt-8 sm:mt-12 space-y-4">
+            <TopicalClusterLinks
+              title="Explore by Scene"
+              description="Discover the artists, festivals, and labels connected to these venues"
+              links={[
+                { label: "Artists", path: "/artists", count: 182 },
+                { label: "Festivals", path: "/festivals" },
+                { label: "Labels", path: "/labels", count: 12 },
+                { label: "Collectives", path: "/collectives" },
+              ]}
+            />
+            
+            <TopicalClusterLinks
+              title="Deep Dives"
+              description="Learn more about techno culture"
+              links={[
+                { label: "Books", path: "/books", count: 49 },
+                { label: "Documentaries", path: "/documentaries", count: 31 },
+                { label: "Gear", path: "/gear", count: 99 },
+                { label: "Timeline", path: "/timeline" },
+              ]}
+            />
           </div>
         </div>
       </main>
