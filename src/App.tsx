@@ -85,6 +85,7 @@ const AIOrchestratorAdmin = lazy(() => import("./pages/AIOrchestratorAdmin"));
 const TranslationAgentAdmin = lazy(() => import("./pages/TranslationAgentAdmin"));
 const GoogleOrganicStrategyAdmin = lazy(() => import("./pages/GoogleOrganicStrategyAdmin"));
 const ChangelogAdmin = lazy(() => import("./pages/ChangelogAdmin"));
+const SEOCommandCenter = lazy(() => import("./pages/admin/SEOCommandCenter"));
 const Architecture = lazy(() => import("./pages/Architecture"));
 
 // Agent Admin Pages
@@ -272,6 +273,7 @@ const App = () => (
                     <Route path="/admin/ai-orchestrator" element={<AIOrchestratorAdmin />} />
                     <Route path="/admin/translation-agent" element={<TranslationAgentAdmin />} />
                     <Route path="/admin/google-organic-strategy" element={<GoogleOrganicStrategyAdmin />} />
+                    <Route path="/admin/seo-command-center" element={<SEOCommandCenter />} />
                     <Route path="/admin/librarian" element={<LibrarianAgentAdmin />} />
                     <Route path="/admin/book-knowledge" element={<AdminBookKnowledge />} />
                     <Route path="/admin/changelog" element={<ChangelogAdmin />} />
