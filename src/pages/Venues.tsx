@@ -156,7 +156,7 @@ const VenuesPage = () => {
       <GlitchSVGFilter />
       <PageSEO
         title="Techno Venues & Clubs"
-        description="The clubs, warehouses, and spaces where techno lives. From Berghain to Bassiani, Tresor to Khidi."
+        description="Techno clubs and warehouses worldwide. Berghain, Bassiani, Tresor, Khidi. Active and historic venues."
         path="/venues"
         structuredData={itemListSchema}
       />

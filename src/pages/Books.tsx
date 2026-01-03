@@ -124,10 +124,24 @@ const Books = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "CollectionPage",
+    "@type": "ItemList",
     "name": "Essential Techno Culture Books",
     "description": "Curated reading list covering Detroit techno, UK rave culture, synthesizers, live coding, and sound art philosophy.",
-    "url": "https://techno.dog/books"
+    "url": "https://techno.dog/books",
+    "numberOfItems": books.length,
+    "itemListElement": books.slice(0, 20).map((book, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Book",
+        "name": book.title,
+        "author": { "@type": "Person", "name": book.author },
+        "url": `https://techno.dog/books/${book.id}`,
+        ...(book.cover_url && { "image": book.cover_url }),
+        ...(book.year_published && { "datePublished": book.year_published.toString() }),
+        ...(book.category && { "genre": book.category.name })
+      }
+    }))
   };
 
   // Group filtered books by category for display
