@@ -96,8 +96,8 @@ const FestivalsPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <GlitchSVGFilter />
       <PageSEO
-        title="Techno Festivals Worldwide"
-        description="Comprehensive guide to underground techno festivals worldwide. From Detroit to Tbilisi, Tokyo to Bogotá. Community-curated."
+        title="Techno Festivals"
+        description="Underground techno festivals worldwide. Detroit to Tbilisi, Tokyo to Bogotá. Community-curated."
         path="/festivals"
         structuredData={itemListSchema}
       />

@@ -8228,17 +8228,18 @@ export type Database = {
         }[]
       }
       grant_admin_role: { Args: { target_user_id: string }; Returns: boolean }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_verified_community_member: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
+      has_role:
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | { Args: { check_role: string }; Returns: boolean }
+      is_verified_community_member:
+        | { Args: never; Returns: boolean }
+        | { Args: { p_user_id: string }; Returns: boolean }
       log_changelog_entry: {
         Args: {
           p_author?: string

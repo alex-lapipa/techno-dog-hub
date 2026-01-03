@@ -113,11 +113,39 @@ const Documentaries = () => {
     return `${count} views`;
   };
 
+  // Generate ItemList schema with VideoObject items
+  const documentariesSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Techno Documentaries",
+    "description": "Essential techno documentaries covering Detroit origins, Berlin's golden era, and underground culture.",
+    "url": "https://techno.dog/documentaries",
+    "numberOfItems": documentaries.length,
+    "itemListElement": documentaries.slice(0, 20).map((doc, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "VideoObject",
+        "name": doc.title,
+        "description": doc.why_watch || doc.description,
+        "thumbnailUrl": `https://img.youtube.com/vi/${doc.youtube_video_id}/hqdefault.jpg`,
+        "uploadDate": doc.published_at,
+        "embedUrl": `https://www.youtube.com/embed/${doc.youtube_video_id}`,
+        "contentUrl": `https://www.youtube.com/watch?v=${doc.youtube_video_id}`,
+        ...(doc.duration && { "duration": doc.duration }),
+        ...(doc.channel_name && { 
+          "publisher": { "@type": "Organization", "name": doc.channel_name }
+        })
+      }
+    }))
+  };
+
   return (
     <PageLayout 
       title="Techno Documentaries" 
-      description="Essential viewing for the underground. Documentaries covering Detroit origins, Berlin's golden era, warehouse raves, and the machines that shaped the sound."
+      description="Essential techno documentaries. Detroit origins, Berlin's golden era, warehouse raves, and the machines."
       path="/documentaries"
+      structuredData={documentariesSchema}
     >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
