@@ -101,14 +101,24 @@ const Store = () => {
     p.node.vendor === 'Techno Doggies' || p.node.tags?.some(tag => tag.toLowerCase() === 'techno-doggies')
   );
 
+  // Helper to check if product is Eulogio collaboration
+  const isEulogioProduct = (p: ShopifyProductEdge) => 
+    p.node.title.toLowerCase().includes('eulogio') || 
+    p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration'));
+
+  // Helper to check if product is Techno Doggies
+  const isTechnoDoggiesProduct = (p: ShopifyProductEdge) => 
+    p.node.vendor === 'Techno Doggies' || 
+    p.node.tags?.some(tag => tag.toLowerCase() === 'techno-doggies');
+
   // Filter products by type or special filters
   const filteredProducts = selectedType === "collaborations"
-    ? products?.filter(p => p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration')))
+    ? products?.filter(p => isEulogioProduct(p))
     : selectedType === "techno-doggies"
     ? technoDoggiesProducts
     : selectedType
-      ? products?.filter(p => p.node.productType === selectedType)
-      : products;
+      ? products?.filter(p => p.node.productType === selectedType && !isEulogioProduct(p) && !isTechnoDoggiesProduct(p))
+      : products?.filter(p => !isEulogioProduct(p) && !isTechnoDoggiesProduct(p));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
