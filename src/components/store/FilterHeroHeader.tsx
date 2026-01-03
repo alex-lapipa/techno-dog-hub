@@ -1,7 +1,6 @@
 import { Sparkles, Zap, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DJDog, RavingDog, NinjaDog, SpaceDog, GrumpyDog } from "@/components/DogPack";
-import eulogioIcon from "@/assets/eulogio-e-icon.jpg";
+import { DJDog, NinjaDog, SpaceDog, GrumpyDog } from "@/components/DogPack";
 
 // Hero images for each filter
 import heroAllProducts from "@/assets/products/hero-all-products.jpg";
@@ -9,8 +8,6 @@ import heroCaps from "@/assets/products/hero-caps.jpg";
 import heroTshirts from "@/assets/products/hero-tshirts.jpg";
 import heroHoodies from "@/assets/products/hero-hoodies.jpg";
 import heroTechnoDoggies from "@/assets/products/hero-techno-doggies.jpg";
-import heroCollaborations from "@/assets/products/hero-collaborations.jpg";
-import eulogioHeroImage from "@/assets/products/lifestyle-eulogio-crew-festival.jpg";
 
 interface FilterHeroConfig {
   image: string;
@@ -22,7 +19,6 @@ interface FilterHeroConfig {
   accentColor: string;
   buttonText?: string;
   showDoggies?: boolean;
-  showEulogioLogo?: boolean;
 }
 
 const filterHeroConfigs: Record<string, FilterHeroConfig> = {
@@ -36,21 +32,11 @@ const filterHeroConfigs: Record<string, FilterHeroConfig> = {
     accentColor: "logo-green",
     buttonText: "Browse All",
   },
-  collaborations: {
-    image: heroCollaborations,
-    title: "Artist Collaborations",
-    subtitle: "Limited Edition",
-    description: "Exclusive pieces created with underground techno artists. When they're gone, they're gone.",
-    badge: "Limited Drops",
-    badgeIcon: "sparkles",
-    accentColor: "amber-500",
-    buttonText: "Shop Collabs",
-  },
   "techno-doggies": {
     image: heroTechnoDoggies,
     title: "Techno Doggies",
     subtitle: "The Pack Collection",
-    description: "5 unique characters. 15 pieces. Fun meets underground attitude.",
+    description: "4 unique characters. 12 pieces. Fun meets underground attitude.",
     badge: "New Collection",
     badgeIcon: "zap",
     accentColor: "logo-green",
@@ -83,18 +69,6 @@ const filterHeroConfigs: Record<string, FilterHeroConfig> = {
     badge: "Layers",
     accentColor: "logo-green",
     buttonText: "Shop Hoodies",
-  },
-  // Eulogio special config
-  "eulogio": {
-    image: eulogioHeroImage,
-    title: "Eulogio × techno.dog",
-    subtitle: "Berlin Heritage",
-    description: "Berlin techno heritage meets underground culture. Two exclusive pieces celebrating the raw energy of warehouse nights.",
-    badge: "Limited Collaboration",
-    badgeIcon: "sparkles",
-    accentColor: "amber-500",
-    buttonText: "Shop Collection",
-    showEulogioLogo: true,
   },
 };
 
@@ -155,15 +129,6 @@ export function FilterHeroHeader({ filterType, productCount }: FilterHeroHeaderP
               <div className="max-w-xl">
                 {/* Badge */}
                 <div className="flex items-center gap-3 mb-4">
-                  {config.showEulogioLogo && (
-                    <div className="bg-[#1a1a1a] p-2">
-                      <img 
-                        src={eulogioIcon}
-                        alt="Eulogio" 
-                        className="h-6 md:h-8 w-auto object-contain"
-                      />
-                    </div>
-                  )}
                   <div className={`inline-flex items-center gap-2 px-3 py-1.5 border ${accentColorClass}`}>
                     <BadgeIcon className="w-3 h-3" />
                     <span className="font-mono text-[9px] uppercase tracking-widest">
@@ -181,7 +146,7 @@ export function FilterHeroHeader({ filterType, productCount }: FilterHeroHeaderP
                     {config.title}
                   </h2>
                   {config.showDoggies && (
-                    <RavingDog className="w-8 h-8 md:w-10 md:h-10 shrink-0 hidden sm:block" animated />
+                    <NinjaDog className="w-8 h-8 md:w-10 md:h-10 shrink-0 hidden sm:block" animated />
                   )}
                 </div>
                 

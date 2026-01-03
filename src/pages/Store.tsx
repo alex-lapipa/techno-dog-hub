@@ -14,10 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import eulogioIcon from "@/assets/eulogio-e-icon.jpg";
-import eulogioHeroImage from "@/assets/products/lifestyle-eulogio-crew-festival.jpg";
-import eulogioHoodieClub from "@/assets/products/lifestyle-eulogio-hoodie-club.jpg";
-import { DJDog, RavingDog, NinjaDog, SpaceDog, GrumpyDog } from "@/components/DogPack";
+import { DJDog, NinjaDog, SpaceDog, GrumpyDog } from "@/components/DogPack";
 
 const Store = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -86,11 +83,6 @@ const Store = () => {
     ? [...new Set(products.map(p => p.node.productType).filter(Boolean))]
     : [];
 
-  // Check if there are any collaboration products
-  const hasCollaborations = products?.some(p => 
-    p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration'))
-  );
-
   // Check if there are Techno Doggies products
   const hasTechnoDoggies = products?.some(p => 
     p.node.vendor === 'Techno Doggies' || p.node.tags?.some(tag => tag.toLowerCase() === 'techno-doggies')
@@ -101,24 +93,17 @@ const Store = () => {
     p.node.vendor === 'Techno Doggies' || p.node.tags?.some(tag => tag.toLowerCase() === 'techno-doggies')
   );
 
-  // Helper to check if product is Eulogio collaboration
-  const isEulogioProduct = (p: ShopifyProductEdge) => 
-    p.node.title.toLowerCase().includes('eulogio') || 
-    p.node.tags?.some(tag => tag.toLowerCase().includes('collaboration'));
-
   // Helper to check if product is Techno Doggies
   const isTechnoDoggiesProduct = (p: ShopifyProductEdge) => 
     p.node.vendor === 'Techno Doggies' || 
     p.node.tags?.some(tag => tag.toLowerCase() === 'techno-doggies');
 
   // Filter products by type or special filters
-  const filteredProducts = selectedType === "collaborations"
-    ? products?.filter(p => isEulogioProduct(p))
-    : selectedType === "techno-doggies"
+  const filteredProducts = selectedType === "techno-doggies"
     ? technoDoggiesProducts
     : selectedType
-      ? products?.filter(p => p.node.productType === selectedType && !isEulogioProduct(p) && !isTechnoDoggiesProduct(p))
-      : products?.filter(p => !isEulogioProduct(p) && !isTechnoDoggiesProduct(p));
+      ? products?.filter(p => p.node.productType === selectedType && !isTechnoDoggiesProduct(p))
+      : products?.filter(p => !isTechnoDoggiesProduct(p));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -209,7 +194,7 @@ const Store = () => {
         </section>
 
         {/* Filters */}
-        {(productTypes.length > 0 || hasCollaborations) && (
+        {(productTypes.length > 0 || hasTechnoDoggies) && (
           <section className="border-b border-border">
             <div className="container mx-auto px-4 md:px-8 py-4">
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
@@ -224,23 +209,6 @@ const Store = () => {
                 >
                   All
                 </Button>
-                
-                {/* Collaborations filter - shown first if exists */}
-                {hasCollaborations && (
-                  <Button
-                    variant={selectedType === "collaborations" ? "default" : "outline"}
-                    size="sm"
-                    className={`font-mono text-[10px] uppercase tracking-wider shrink-0 ${
-                      selectedType === "collaborations" 
-                        ? "" 
-                        : "border-logo-green/50 text-logo-green hover:bg-logo-green/10"
-                    }`}
-                    onClick={() => setSelectedType("collaborations")}
-                  >
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    Collaborations
-                  </Button>
-                )}
 
                 {/* Techno Doggies filter */}
                 {hasTechnoDoggies && (
@@ -283,119 +251,6 @@ const Store = () => {
           />
         )}
 
-        {/* Eulogio Collaboration Section - only show when no filter selected */}
-        {selectedType === null && products?.some(p => p.node.title.toLowerCase().includes('eulogio')) && (
-          <section className="border-b border-border overflow-hidden">
-            {/* Hero Image Banner */}
-            <div className="relative h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
-              <div className="absolute inset-0">
-                <img 
-                  src={eulogioHeroImage}
-                  alt="Eulogio × techno.dog collaboration at festival"
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
-              </div>
-              
-              {/* Content Overlay */}
-              <div className="absolute inset-0 flex items-end">
-                <div className="container mx-auto px-4 md:px-8 pb-8 md:pb-12">
-                  <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                    <div className="max-w-xl">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="bg-[#1a1a1a] p-2">
-                          <img 
-                            src={eulogioIcon}
-                            alt="Eulogio" 
-                            className="h-8 md:h-10 w-auto object-contain"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-amber-400" />
-                          <span className="font-mono text-[10px] text-amber-400 uppercase tracking-widest">
-                            Limited Collaboration
-                          </span>
-                        </div>
-                      </div>
-                      <h2 className="font-mono text-3xl md:text-4xl lg:text-5xl uppercase tracking-tight text-foreground drop-shadow-lg">
-                        Eulogio × techno.dog
-                      </h2>
-                      <p className="font-mono text-sm text-foreground/80 mt-3 max-w-md leading-relaxed drop-shadow-md">
-                        Berlin techno heritage meets underground culture. Two exclusive pieces celebrating the raw energy of warehouse nights.
-                      </p>
-                    </div>
-                    
-                    <div className="shrink-0">
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="font-mono text-xs uppercase tracking-wider bg-amber-500 text-background hover:bg-amber-400"
-                        onClick={() => setSelectedType("collaborations")}
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Shop Collection
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Decorative Elements */}
-              <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-amber-500/50" />
-              <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-amber-500/50" />
-            </div>
-            
-            {/* Products Grid */}
-            <div className="container mx-auto px-4 md:px-8 py-12 bg-gradient-to-b from-background to-amber-950/5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                {products
-                  ?.filter(p => p.node.title.toLowerCase().includes('eulogio'))
-                  .map((product, index) => (
-                    <div key={product.node.id} className="relative group">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 to-amber-600/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="relative">
-                        <ProductCard product={product.node} index={index} />
-                      </div>
-                    </div>
-                  ))}
-              </div>
-              
-              {/* Lifestyle Preview */}
-              <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="aspect-square overflow-hidden border border-amber-500/20">
-                  <img 
-                    src={eulogioHoodieClub}
-                    alt="Eulogio hoodie in warehouse"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="aspect-square overflow-hidden border border-amber-500/20 hidden md:block">
-                  <img 
-                    src={eulogioHeroImage}
-                    alt="Eulogio crew at festival"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <Link 
-                  to="/store/lookbook"
-                  className="aspect-square border border-amber-500/30 bg-amber-950/10 flex flex-col items-center justify-center text-center p-4 hover:bg-amber-950/20 transition-colors col-span-2 md:col-span-2"
-                >
-                  <span className="font-mono text-[10px] text-amber-500 uppercase tracking-widest mb-2">
-                    // Lookbook
-                  </span>
-                  <span className="font-mono text-lg uppercase tracking-tight">
-                    See the full story
-                  </span>
-                  <span className="font-mono text-xs text-muted-foreground mt-2">
-                    Festival shots, club nights, warehouse vibes →
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Techno Doggies Collection Section */}
         {selectedType === null && hasTechnoDoggies && technoDoggiesProducts && technoDoggiesProducts.length > 0 && (
           <section className="border-b border-border overflow-hidden">
@@ -414,7 +269,7 @@ const Store = () => {
                 <DJDog className="w-24 h-24" animated />
               </div>
               <div className="absolute top-12 right-12 opacity-20 hidden lg:block">
-                <RavingDog className="w-20 h-20" animated />
+                <NinjaDog className="w-20 h-20" animated />
               </div>
               <div className="absolute bottom-8 left-1/4 opacity-20 hidden lg:block">
                 <SpaceDog className="w-16 h-16" animated />
@@ -439,11 +294,11 @@ const Store = () => {
                     <h2 className="font-mono text-4xl md:text-5xl lg:text-6xl uppercase tracking-tight text-foreground">
                       Techno Doggies
                     </h2>
-                    <RavingDog className="w-12 h-12 md:w-16 md:h-16 shrink-0" animated />
+                    <NinjaDog className="w-12 h-12 md:w-16 md:h-16 shrink-0" animated />
                   </div>
                   
                   <p className="font-mono text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed mb-8">
-                    5 unique characters. 15 pieces. The pack is here.
+                    4 unique characters. 12 pieces. The pack is here.
                     <br />
                     <span className="text-logo-green">Caps. Tees. Hoodies.</span>
                   </p>
@@ -455,12 +310,6 @@ const Store = () => {
                         <DJDog className="w-8 h-8 md:w-10 md:h-10" />
                       </div>
                       <span className="font-mono text-[8px] md:text-[10px] text-muted-foreground uppercase tracking-wider">DJ</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2 group cursor-pointer" onClick={() => setSelectedType("techno-doggies")}>
-                      <div className="p-3 bg-logo-green/10 border border-logo-green/30 group-hover:border-logo-green/60 transition-colors">
-                        <RavingDog className="w-8 h-8 md:w-10 md:h-10" />
-                      </div>
-                      <span className="font-mono text-[8px] md:text-[10px] text-muted-foreground uppercase tracking-wider">Raving</span>
                     </div>
                     <div className="flex flex-col items-center gap-2 group cursor-pointer" onClick={() => setSelectedType("techno-doggies")}>
                       <div className="p-3 bg-logo-green/10 border border-logo-green/30 group-hover:border-logo-green/60 transition-colors">
