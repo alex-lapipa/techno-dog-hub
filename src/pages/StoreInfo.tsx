@@ -153,8 +153,9 @@ const StoreInfo = () => {
                       The techno.dog store is operated by:
                     </p>
                     <div className="border border-border p-4 bg-card">
-                      <p className="text-foreground mb-1">Miramonte Somío SL</p>
+                      <p className="text-foreground mb-1">Miramonte Somió SL</p>
                       <p className="text-xs">CIF: B67299438</p>
+                      <p className="text-xs">Cam. Nogales, 318, Periurbano - Rural, 33203 Gijón, Asturias</p>
                       <p className="text-xs mt-2">Commercial name: Project La PIPA</p>
                       <p className="text-xs">
                         <a 

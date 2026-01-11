@@ -180,7 +180,7 @@ const handler = async (req: Request): Promise<Response> => {
           <tr>
             <td style="padding-top: 30px; border-top: 1px solid #222;">
               <p style="margin: 0 0 10px; color: #666; font-size: 11px;">
-                This is a commercial contribution to Project La PIPA, operated by Miramonte Somío SL (Spain).
+                This is a commercial contribution to Project La PIPA, operated by Miramonte Somió SL (Spain).
               </p>
               <p style="margin: 0; color: #444; font-size: 11px;">
                 techno.dog — Pure Warehouse Truth, Zero Fluff

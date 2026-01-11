@@ -61,11 +61,11 @@ const TermsOfService = () => {
               2. Service Provider
             </h2>
             <div className="bg-card border border-border p-4 rounded-none">
-              <p className="text-foreground font-medium">Miramonte Somío SL</p>
+              <p className="text-foreground font-medium">Miramonte Somió SL</p>
               <p className="text-muted-foreground text-xs">
-                Calle Celestino Junquera 2, Bajo<br />
+                Cam. Nogales, 318, Periurbano - Rural<br />
                 33203 Gijón, Asturias, Spain<br />
-                CIF: B56291521
+                CIF: B67299438
               </p>
             </div>
           </section>
