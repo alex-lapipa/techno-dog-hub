@@ -3974,6 +3974,51 @@ export type Database = {
           },
         ]
       }
+      gdpr_subject_requests: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string | null
+          email: string
+          id: string
+          notes: string | null
+          request_type: string
+          status: string
+          updated_at: string | null
+          user_id: string | null
+          verification_token: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          notes?: string | null
+          request_type: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          verification_token?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          notes?: string | null
+          request_type?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          verification_token?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       gear_agent_runs: {
         Row: {
           brands_processed: number | null

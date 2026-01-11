@@ -383,12 +383,12 @@ const FlexibleSubmissionForm = () => {
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Consent Checkbox */}
+          {/* GDPR Consent Checkbox */}
           <FormField
             control={form.control}
             name="consent"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-border bg-muted/30">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
@@ -396,9 +396,17 @@ const FlexibleSubmissionForm = () => {
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel className="font-mono text-xs text-muted-foreground">
-                    I confirm this information is accurate and I have rights to share it *
+                  <FormLabel className="font-mono text-xs text-foreground">
+                    I consent to the processing of my data *
                   </FormLabel>
+                  <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+                    I confirm this information is accurate and I have rights to share it. 
+                    I consent to techno.dog storing and processing my email and submission data 
+                    as described in the{' '}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+                      Privacy Policy
+                    </a>. I understand I can withdraw consent or request data deletion at any time.
+                  </p>
                   <FormMessage />
                 </div>
               </FormItem>
