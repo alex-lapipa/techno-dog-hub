@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PageLayout } from '@/components/layout/PageLayout';
-import { ArrowLeft, Shield, Mail, Calendar } from 'lucide-react';
+import { ArrowLeft, Shield, Mail, Calendar, Globe, Scale, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { GDPRRequestForm } from '@/components/privacy/GDPRRequestForm';
+import { CCPARequestForm } from '@/components/privacy/CCPARequestForm';
+import { DoNotSellLink } from '@/components/privacy/DoNotSellLink';
 
 const PrivacyPolicy = () => {
   // Log policy view for compliance
@@ -317,6 +319,152 @@ const PrivacyPolicy = () => {
               We ensure appropriate safeguards are in place, including Standard Contractual 
               Clauses approved by the European Commission.
             </p>
+          </section>
+
+          {/* CCPA/CPRA Section */}
+          <section className="border-2 border-logo-green/30 p-6 rounded-lg bg-logo-green/5">
+            <div className="flex items-center gap-3 mb-4">
+              <Scale className="w-6 h-6 text-logo-green" />
+              <h2 className="text-xl uppercase tracking-wider text-foreground">
+                California Privacy Rights (CCPA/CPRA)
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              If you are a California resident, the California Consumer Privacy Act (CCPA) and 
+              California Privacy Rights Act (CPRA) provide you with specific rights regarding 
+              your personal information.
+            </p>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Your California Privacy Rights</h3>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• <strong>Right to Know:</strong> Request disclosure of personal information we collect, use, disclose, and sell</li>
+              <li>• <strong>Right to Delete:</strong> Request deletion of your personal information</li>
+              <li>• <strong>Right to Correct:</strong> Request correction of inaccurate personal information</li>
+              <li>• <strong>Right to Opt-Out of Sale/Sharing:</strong> Opt-out of the sale or sharing of your personal information</li>
+              <li>• <strong>Right to Limit:</strong> Limit the use of sensitive personal information</li>
+              <li>• <strong>Right to Non-Discrimination:</strong> Not be discriminated against for exercising your rights</li>
+              <li>• <strong>Right to Portability:</strong> Receive your data in a portable format</li>
+            </ul>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Categories of Personal Information</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              In the preceding 12 months, we have collected the following categories of personal information:
+            </p>
+            <div className="border border-border mb-4">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left p-3 font-medium">Category</th>
+                    <th className="text-left p-3 font-medium">Collected</th>
+                    <th className="text-left p-3 font-medium">Sold/Shared</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Identifiers (email, username)</td>
+                    <td className="p-3 text-logo-green">Yes</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Internet activity (browsing, search)</td>
+                    <td className="p-3 text-logo-green">Yes (with consent)</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Geolocation data</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Commercial information (purchases)</td>
+                    <td className="p-3 text-logo-green">Yes (store users)</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 text-foreground">Inferences (preferences, behavior)</td>
+                    <td className="p-3 text-logo-green">Yes (with consent)</td>
+                    <td className="p-3 text-muted-foreground">No</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Do Not Sell or Share My Personal Information</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              We do not sell your personal information. However, we provide you with the ability 
+              to opt-out of any future sale or sharing:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <DoNotSellLink />
+            </div>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Submit a CCPA Request</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              To exercise your California privacy rights, you can submit a verifiable consumer request:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <CCPARequestForm />
+            </div>
+            <p className="text-muted-foreground text-xs mt-4">
+              We will respond to verifiable requests within 45 days. You may also designate an 
+              authorized agent to make a request on your behalf.
+            </p>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Global Privacy Control (GPC)</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              We honor Global Privacy Control (GPC) signals. If your browser sends a GPC signal, 
+              we will automatically treat it as a valid opt-out request for the sale and sharing 
+              of your personal information.
+            </p>
+          </section>
+
+          {/* ePrivacy Section */}
+          <section className="border-2 border-blue-500/30 p-6 rounded-lg bg-blue-500/5">
+            <div className="flex items-center gap-3 mb-4">
+              <Globe className="w-6 h-6 text-blue-400" />
+              <h2 className="text-xl uppercase tracking-wider text-foreground">
+                ePrivacy Directive Compliance
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              In compliance with the EU ePrivacy Directive (2002/58/EC as amended by 2009/136/EC), 
+              we adhere to strict requirements regarding electronic communications and cookies.
+            </p>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Cookie Consent</h3>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• We obtain prior informed consent before placing non-essential cookies</li>
+              <li>• Essential/strictly necessary cookies are placed without consent as permitted</li>
+              <li>• You can withdraw consent at any time via our <Link to="/cookies" className="text-logo-green hover:underline">Cookie Settings</Link></li>
+              <li>• We provide clear information about each cookie's purpose and duration</li>
+            </ul>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Electronic Communications</h3>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• Marketing emails are only sent with your explicit prior consent</li>
+              <li>• Every marketing email includes an unsubscribe link</li>
+              <li>• We do not use automated calling systems or unsolicited fax marketing</li>
+              <li>• We maintain suppression lists to honor opt-out requests</li>
+            </ul>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Traffic & Location Data</h3>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• Traffic data is anonymized after it is no longer needed for transmission</li>
+              <li>• We do not process precise location data without explicit consent</li>
+              <li>• Any location-based services would require separate opt-in consent</li>
+            </ul>
+
+            <h3 className="text-lg text-foreground mt-6 mb-3">Security of Communications</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              We implement appropriate technical and organizational measures to ensure the 
+              confidentiality and security of electronic communications, including:
+            </p>
+            <ul className="text-muted-foreground space-y-2 mt-2">
+              <li>• TLS/SSL encryption for all data in transit</li>
+              <li>• Encryption of data at rest</li>
+              <li>• Regular security audits and vulnerability assessments</li>
+              <li>• Access controls and authentication mechanisms</li>
+            </ul>
           </section>
 
           <section>

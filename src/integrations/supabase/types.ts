@@ -1934,6 +1934,48 @@ export type Database = {
         }
         Relationships: []
       }
+      ccpa_subject_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          notes: string | null
+          request_type: string
+          response_sent_at: string | null
+          status: string
+          updated_at: string
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          notes?: string | null
+          request_type: string
+          response_sent_at?: string | null
+          status?: string
+          updated_at?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          notes?: string | null
+          request_type?: string
+          response_sent_at?: string | null
+          status?: string
+          updated_at?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       changelog_entries: {
         Row: {
           author: string | null
@@ -2620,10 +2662,14 @@ export type Database = {
           consent_type: string
           consent_version: string | null
           created_at: string | null
+          do_not_sell: boolean | null
+          do_not_share: boolean | null
           granted_at: string | null
           id: string
           ip_hash: string | null
           is_granted: boolean
+          jurisdiction: string | null
+          limit_sensitive_data: boolean | null
           revoked_at: string | null
           session_id: string
           updated_at: string | null
@@ -2634,10 +2680,14 @@ export type Database = {
           consent_type: string
           consent_version?: string | null
           created_at?: string | null
+          do_not_sell?: boolean | null
+          do_not_share?: boolean | null
           granted_at?: string | null
           id?: string
           ip_hash?: string | null
           is_granted?: boolean
+          jurisdiction?: string | null
+          limit_sensitive_data?: boolean | null
           revoked_at?: string | null
           session_id: string
           updated_at?: string | null
@@ -2648,10 +2698,14 @@ export type Database = {
           consent_type?: string
           consent_version?: string | null
           created_at?: string | null
+          do_not_sell?: boolean | null
+          do_not_share?: boolean | null
           granted_at?: string | null
           id?: string
           ip_hash?: string | null
           is_granted?: boolean
+          jurisdiction?: string | null
+          limit_sensitive_data?: boolean | null
           revoked_at?: string | null
           session_id?: string
           updated_at?: string | null
@@ -4516,6 +4570,33 @@ export type Database = {
           recommended_variant_notes?: string | null
           risks?: string | null
           sources_json?: Json | null
+        }
+        Relationships: []
+      }
+      gpc_signals: {
+        Row: {
+          created_at: string
+          gpc_enabled: boolean
+          id: string
+          session_id: string
+          user_agent_hash: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          gpc_enabled?: boolean
+          id?: string
+          session_id: string
+          user_agent_hash?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          gpc_enabled?: boolean
+          id?: string
+          session_id?: string
+          user_agent_hash?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

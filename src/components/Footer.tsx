@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavAnalytics } from "@/hooks/useAdvancedAnalytics";
 import HexagonLogo from "./HexagonLogo";
+import { DoNotSellLink } from "./privacy/DoNotSellLink";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -142,6 +143,10 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
+              {/* CCPA Do Not Sell Link */}
+              <li>
+                <DoNotSellLink />
+              </li>
             </ul>
           </nav>
         </div>
