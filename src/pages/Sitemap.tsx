@@ -14,7 +14,8 @@ import {
   ShoppingBag,
   Code,
   Shield,
-  FileText
+  FileText,
+  Search
 } from 'lucide-react';
 
 const Sitemap = () => {
@@ -24,6 +25,7 @@ const Sitemap = () => {
       icon: Home,
       links: [
         { path: '/', label: 'Home' },
+        { path: '/search', label: 'Search' },
         { path: '/news', label: 'News' },
         { path: '/news/archive', label: 'News Archive' },
         { path: '/news/your-stories', label: 'User Stories' },
