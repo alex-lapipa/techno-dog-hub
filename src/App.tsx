@@ -132,10 +132,15 @@ const OGPreview = lazy(() => import("./pages/OGPreview"));
 
 const queryClient = new QueryClient();
 
-// Loading fallback
+// Loading fallback - VHS aesthetic loader
 const PageLoader = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="font-mono text-xs text-muted-foreground animate-pulse">Loading...</div>
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 border-2 border-logo-green/30 border-t-logo-green animate-spin" />
+      <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+        Loading...
+      </div>
+    </div>
   </div>
 );
 
