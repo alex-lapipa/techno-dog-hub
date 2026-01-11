@@ -267,7 +267,7 @@ serve(async (req) => {
         ...corsHeaders,
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600, s-maxage=3600",
-        "X-Robots-Tag": "noindex", // Sitemap itself shouldn't be indexed
+        // Note: Removed X-Robots-Tag as it can confuse Google Search Console validation
       },
     });
   } catch (error) {
