@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { ArrowLeft, Shield, Mail, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { GDPRRequestForm } from '@/components/privacy/GDPRRequestForm';
 
 const PrivacyPolicy = () => {
   // Log policy view for compliance
@@ -241,10 +242,16 @@ const PrivacyPolicy = () => {
               <li>• <strong>Objection:</strong> Object to processing based on legitimate interests</li>
               <li>• <strong>Withdraw Consent:</strong> Withdraw consent at any time via cookie settings</li>
             </ul>
-            <p className="text-muted-foreground leading-relaxed mt-4">
-              To exercise these rights, contact us at{' '}
-              <a href="mailto:privacy@techno.dog" className="text-logo-green hover:underline">
-                privacy@techno.dog
+            <div className="mt-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <p className="text-muted-foreground leading-relaxed">
+                To exercise these rights:
+              </p>
+              <GDPRRequestForm />
+            </div>
+            <p className="text-muted-foreground text-xs mt-4">
+              Or contact us directly at{' '}
+              <a href="mailto:alex.lawton@miramonte.io" className="text-logo-green hover:underline">
+                alex.lawton@miramonte.io
               </a>
             </p>
           </section>
@@ -253,12 +260,52 @@ const PrivacyPolicy = () => {
             <h2 className="text-xl uppercase tracking-wider text-foreground border-b border-border pb-2">
               8. Data Retention
             </h2>
-            <ul className="text-muted-foreground space-y-2">
-              <li>• <strong>Account Data:</strong> Retained while your account is active</li>
-              <li>• <strong>Analytics Data:</strong> Anonymized after 14 months</li>
-              <li>• <strong>Consent Records:</strong> Retained for 7 years for legal compliance</li>
-              <li>• <strong>Transaction Data:</strong> Retained as required by tax laws (typically 7 years)</li>
-            </ul>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              We retain personal data only as long as necessary for the purposes described in this policy:
+            </p>
+            <div className="border border-border">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left p-3 font-medium">Data Type</th>
+                    <th className="text-left p-3 font-medium">Retention Period</th>
+                    <th className="text-left p-3 font-medium">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Account Data</td>
+                    <td className="p-3 text-muted-foreground">Until account deletion + 30 days</td>
+                    <td className="p-3 text-muted-foreground">Deleted</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Community Submissions</td>
+                    <td className="p-3 text-muted-foreground">5 years</td>
+                    <td className="p-3 text-muted-foreground">Email anonymized, content retained</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Analytics Data</td>
+                    <td className="p-3 text-muted-foreground">12 months</td>
+                    <td className="p-3 text-muted-foreground">Anonymized</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Consent Records</td>
+                    <td className="p-3 text-muted-foreground">7 years</td>
+                    <td className="p-3 text-muted-foreground">Retained for legal compliance</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Transaction Data</td>
+                    <td className="p-3 text-muted-foreground">7 years</td>
+                    <td className="p-3 text-muted-foreground">PII anonymized after period</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 text-foreground">GDPR Requests</td>
+                    <td className="p-3 text-muted-foreground">7 years</td>
+                    <td className="p-3 text-muted-foreground">Retained for compliance records</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section>

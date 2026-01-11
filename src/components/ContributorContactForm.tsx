@@ -161,6 +161,17 @@ const ContributorContactForm = () => {
           </p>
         </div>
 
+        {/* GDPR Notice */}
+        <div className="p-3 rounded-lg border border-border bg-muted/30">
+          <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
+            By submitting this form, you consent to techno.dog storing and processing your contact 
+            information as described in our{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+              Privacy Policy
+            </a>. You can request data deletion at any time.
+          </p>
+        </div>
+
         <Button
           type="submit"
           disabled={isSubmitting}
