@@ -220,7 +220,7 @@ const CookiePolicy = () => {
             <p className="text-muted-foreground text-xs mt-4">
               For questions about our data processing agreements or to request copies, contact our 
               Data Protection Officer at{' '}
-              <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline">dpo@techno.dog</a>.
+              <a href="mailto:alex.lawton@miramonte.io" className="text-logo-green hover:underline">alex.lawton@miramonte.io</a>.
             </p>
           </section>
 
