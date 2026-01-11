@@ -93,7 +93,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     setupPerformanceTracking();
   }, []);
 
-  // Track page views with enhanced context
+  // Track page views with enhanced context - CRITICAL: Send to both GTM and GA4
   useEffect(() => {
     engagementState.current = {
       pageEntryTime: Date.now(),
@@ -121,7 +121,21 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
       },
     };
 
+    // Push to GTM dataLayer
     window.dataLayer?.push(pageData);
+
+    // CRITICAL: Also send directly to GA4 for SPA navigation
+    // This ensures page views are tracked even when consent is pending
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_path: location.pathname,
+        page_location: window.location.href,
+        page_title: document.title,
+        content_group: getContentGroup(location.pathname),
+        content_type: getPageType(location.pathname),
+        user_type: getUserType(),
+      });
+    }
     
     if (GTM_CONFIG.enableDebug) {
       console.log('[GTM Enhanced] Page View:', pageData);
