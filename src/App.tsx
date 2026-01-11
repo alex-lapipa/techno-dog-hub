@@ -42,6 +42,7 @@ const UserStories = lazy(() => import("./pages/UserStories"));
 const Info = lazy(() => import("./pages/Info"));
 const Archives = lazy(() => import("./pages/Archives"));
 const Contribute = lazy(() => import("./pages/Contribute"));
+const Search = lazy(() => import("./pages/Search"));
 
 const NewsAgentAdmin = lazy(() => import("./pages/NewsAgentAdmin"));
 const SubmissionsAdmin = lazy(() => import("./pages/SubmissionsAdmin"));
@@ -160,6 +161,7 @@ const App = () => (
                   <Routes>
                     {/* Main */}
                     <Route path="/" element={<Index />} />
+                    <Route path="/search" element={<Search />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/auth" element={<Navigate to="/admin" replace />} />
                     
