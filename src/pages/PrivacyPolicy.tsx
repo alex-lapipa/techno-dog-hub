@@ -279,14 +279,86 @@ const PrivacyPolicy = () => {
                     <td className="p-3 text-muted-foreground">USA (SCCs)</td>
                     <td className="p-3 text-logo-green">✓ Signed</td>
                   </tr>
-                  <tr>
+                  <tr className="border-b border-border">
                     <td className="p-3 text-logo-green">ElevenLabs Inc.</td>
                     <td className="p-3 text-muted-foreground">Voice AI Services</td>
                     <td className="p-3 text-muted-foreground">USA (SCCs)</td>
                     <td className="p-3 text-logo-green">✓ Signed</td>
                   </tr>
+                  <tr>
+                    <td className="p-3 text-logo-green">Musikaze S.L.</td>
+                    <td className="p-3 text-muted-foreground">Consent Management (MusikazePro)</td>
+                    <td className="p-3 text-muted-foreground">Spain (EU)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+            
+            {/* MusikazePro Detailed Disclosure */}
+            <div className="mt-6 bg-card border border-border p-4 rounded-none">
+              <h4 className="text-foreground font-medium mb-3 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-logo-green" />
+                Third Party: MusikazePro Consent Manager
+              </h4>
+              <p className="text-muted-foreground text-xs mb-3">
+                We use MusikazePro to manage cookie consent and GDPR compliance on this website.
+              </p>
+              
+              <div className="space-y-3 text-xs">
+                <div>
+                  <p className="text-foreground font-medium">Data Controller:</p>
+                  <p className="text-muted-foreground">MusikazePro (operated by Musikaze S.L.)</p>
+                  <p className="text-muted-foreground">Contact: <a href="mailto:privacy@musikazepro.com" className="text-logo-green hover:underline">privacy@musikazepro.com</a></p>
+                </div>
+                
+                <div>
+                  <p className="text-foreground font-medium">Data Collected:</p>
+                  <ul className="text-muted-foreground list-disc list-inside ml-2">
+                    <li>Consent preferences (accept/reject)</li>
+                    <li>With your consent: pages viewed, scroll behavior, time on page</li>
+                    <li>Device information (browser, operating system)</li>
+                    <li>Anonymized IP address (hashed, not stored raw)</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <p className="text-foreground font-medium">Purpose:</p>
+                  <ul className="text-muted-foreground list-disc list-inside ml-2">
+                    <li>Comply with GDPR cookie consent requirements</li>
+                    <li>Analyze website usage (with your consent)</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <p className="text-foreground font-medium">Legal Basis:</p>
+                  <p className="text-muted-foreground">Your consent (GDPR Article 6(1)(a))</p>
+                </div>
+                
+                <div>
+                  <p className="text-foreground font-medium">Data Retention:</p>
+                  <ul className="text-muted-foreground list-disc list-inside ml-2">
+                    <li>Consent records: 3 years (GDPR requirement)</li>
+                    <li>Behavioral data: 13 months</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <p className="text-foreground font-medium">Your Rights:</p>
+                  <p className="text-muted-foreground">
+                    You can withdraw consent at any time by clicking the "Privacy" button on our website. 
+                    For other rights (access, deletion, portability), contact{' '}
+                    <a href="mailto:privacy@musikazepro.com" className="text-logo-green hover:underline">privacy@musikazepro.com</a>.
+                  </p>
+                </div>
+                
+                <p className="text-muted-foreground">
+                  More information:{' '}
+                  <a href="https://musikazepro.com/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+                    https://musikazepro.com/privacy
+                  </a>
+                </p>
+              </div>
             </div>
             <p className="text-muted-foreground text-xs mt-4">
               SCCs = Standard Contractual Clauses approved by the European Commission for international data transfers.
