@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
     });
   }, []);
 
-  const lastUpdated = '2024-12-31';
+  const lastUpdated = '2025-01-11';
 
   return (
     <PageLayout
@@ -67,18 +67,33 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-xl uppercase tracking-wider text-foreground border-b border-border pb-2">
-              2. Data Controller
+              2. Data Controller & Data Protection Officer
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               The data controller responsible for your personal data is:
             </p>
-            <div className="bg-card border border-border p-4 rounded-none">
+            <div className="bg-card border border-border p-4 rounded-none mb-4">
               <p className="text-foreground font-medium">Miramonte Somío SL</p>
               <p className="text-muted-foreground text-xs">
                 Calle Celestino Junquera 2, Bajo<br />
                 33203 Gijón, Asturias, Spain<br />
                 CIF: B56291521
               </p>
+            </div>
+            
+            <h3 className="text-lg text-foreground mt-6">Data Protection Officer (DPO)</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              We have appointed a Data Protection Officer to oversee compliance with data protection 
+              regulations and to be your point of contact for all privacy-related inquiries:
+            </p>
+            <div className="bg-card border border-border p-4 rounded-none flex items-center gap-3">
+              <Mail className="w-5 h-5 text-logo-green" />
+              <div>
+                <p className="text-foreground font-medium text-sm">Data Protection Officer</p>
+                <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline text-sm">
+                  dpo@techno.dog
+                </a>
+              </div>
             </div>
           </section>
 
@@ -133,7 +148,7 @@ const PrivacyPolicy = () => {
 
           <section>
             <h2 className="text-xl uppercase tracking-wider text-foreground border-b border-border pb-2">
-              6. Data Sharing
+              6. Data Sharing & Data Processing Agreements
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               We do not sell your personal data. We may share data with:
@@ -143,6 +158,71 @@ const PrivacyPolicy = () => {
               <li>• <strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
               <li>• <strong>Business Transfers:</strong> In connection with any merger or acquisition</li>
             </ul>
+            
+            <h3 className="text-lg text-foreground mt-6">Data Processing Agreements (DPAs)</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              We have executed Data Processing Agreements (DPAs) with all our sub-processors 
+              to ensure GDPR-compliant handling of your personal data. These agreements establish:
+            </p>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• The scope and purpose of data processing</li>
+              <li>• Security and confidentiality obligations</li>
+              <li>• Data subject rights assistance requirements</li>
+              <li>• Sub-processor notification and approval procedures</li>
+              <li>• Data breach notification timelines (within 72 hours)</li>
+              <li>• Data deletion upon termination of services</li>
+            </ul>
+            
+            <h3 className="text-lg text-foreground mt-6">List of Sub-Processors</h3>
+            <div className="border border-border">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left p-3 font-medium">Provider</th>
+                    <th className="text-left p-3 font-medium">Purpose</th>
+                    <th className="text-left p-3 font-medium">Location</th>
+                    <th className="text-left p-3 font-medium">DPA Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-logo-green">Supabase Inc.</td>
+                    <td className="p-3 text-muted-foreground">Database & Authentication</td>
+                    <td className="p-3 text-muted-foreground">USA (SCCs)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-logo-green">Shopify Inc.</td>
+                    <td className="p-3 text-muted-foreground">E-commerce Platform</td>
+                    <td className="p-3 text-muted-foreground">Canada (Adequacy)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-logo-green">Google LLC</td>
+                    <td className="p-3 text-muted-foreground">Analytics (with consent)</td>
+                    <td className="p-3 text-muted-foreground">USA (SCCs)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-logo-green">Resend Inc.</td>
+                    <td className="p-3 text-muted-foreground">Transactional Email</td>
+                    <td className="p-3 text-muted-foreground">USA (SCCs)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 text-logo-green">ElevenLabs Inc.</td>
+                    <td className="p-3 text-muted-foreground">Voice AI Services</td>
+                    <td className="p-3 text-muted-foreground">USA (SCCs)</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-muted-foreground text-xs mt-4">
+              SCCs = Standard Contractual Clauses approved by the European Commission for international data transfers.
+              For a copy of our DPAs or sub-processor agreements, contact our DPO at{' '}
+              <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline">dpo@techno.dog</a>.
+            </p>
           </section>
 
           <section>
