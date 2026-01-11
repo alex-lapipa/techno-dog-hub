@@ -27,13 +27,37 @@
     <meta name="twitter:description" content="Discover the global techno archive. Artists, festivals, venues, labels, and history." />
     <meta name="twitter:image" content="https://techno.dog/og-image.png" />
 
-    <!-- Google Search Console Verification - Replace with your actual code -->
+    <!-- Google Search Console Verification -->
     <meta name="google-site-verification" content="Pz5JPf20fLEWalmMX3QwvDBty9k0Wq0V5qjlW0sE87w" />
 
-    <!-- Google Tag Manager - Enhanced Configuration -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- 📍 Google Consent Mode v2 (BEFORE any Google scripts)           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <script>
-      // Initialize dataLayer with enhanced defaults
       window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Consent Mode v2 - Default to denied until user provides consent
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- 📍 Musikaze Pro Consent SDK                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <link rel="preconnect" href="https://csqipkrgfkmqeyzdhmpy.supabase.co" crossorigin />
+    <script src="https://csqipkrgfkmqeyzdhmpy.supabase.co/functions/v1/consent-sdk?site=techno-dog&lang=en&theme=dark&position=bottom&color=%23fa0000" async></script>
+
+    <!-- Google Tag Manager -->
+    <script>
       window.dataLayer.push({
         'gtm.start': new Date().getTime(),
         'event': 'gtm.js',
@@ -50,15 +74,14 @@
     })(window,document,'script','dataLayer','GTM-532T46V5');</script>
     <!-- End Google Tag Manager -->
 
-    <!-- Google Analytics 4 - Enhanced Configuration -->
+    <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1EMPVR3WST"></script>
     <script>
-      function gtag(){window.dataLayer.push(arguments);}
       gtag('js', new Date());
       
-      // Enhanced GA4 configuration
+      // GA4 configuration
       gtag('config', 'G-1EMPVR3WST', {
-        'send_page_view': false, // Handled by React
+        'send_page_view': false,
         'cookie_flags': 'SameSite=None;Secure',
         'allow_google_signals': true,
         'allow_ad_personalization_signals': true,
@@ -74,16 +97,6 @@
           'metric2': 'engagement_time'
         }
       });
-      
-      // Default consent mode (updated by consent manager)
-      gtag('consent', 'default', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
-        'functionality_storage': 'granted',
-        'personalization_storage': 'denied',
-        'security_storage': 'granted',
-        'wait_for_update': 500
-      });
     </script>
     <!-- End Google Analytics 4 -->
   </head>
@@ -96,5 +109,29 @@
     
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- 📍 Musikaze Consent SDK Event Listener                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <script>
+      window.addEventListener('mzk:consent:change', function(e) {
+        // Update Google Consent Mode v2
+        gtag('consent', 'update', {
+          'analytics_storage': e.detail.consent.analytics ? 'granted' : 'denied',
+          'ad_storage': e.detail.consent.marketing ? 'granted' : 'denied',
+          'ad_user_data': e.detail.consent.marketing ? 'granted' : 'denied',
+          'ad_personalization': e.detail.consent.marketing ? 'granted' : 'denied'
+        });
+        
+        // Push consent update event to dataLayer
+        dataLayer.push({
+          'event': 'consent_update',
+          'consent_analytics': e.detail.consent.analytics,
+          'consent_marketing': e.detail.consent.marketing,
+          'consent_essential': e.detail.consent.essential || true,
+          'consent_personalization': e.detail.consent.personalization || false
+        });
+      });
+    </script>
   </body>
 </html>
