@@ -56,10 +56,19 @@
     </script>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- 📍 Musikaze Pro Consent Manager                                 -->
+    <!-- 📍 Musikaze Pro Consent Manager & Analytics                       -->
+    <!-- Data flows to: musikazepro.app for consent & behavior analytics   -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <link rel="preconnect" href="https://csqipkrgfkmqeyzdhmpy.supabase.co" crossorigin />
-    <script src="https://csqipkrgfkmqeyzdhmpy.supabase.co/functions/v1/consent-sdk?site=techno-dog&lang=en&theme=dark&position=bottom&color=%23fa0000" async></script>
+    <link rel="preconnect" href="https://musikazepro.app" crossorigin />
+    <script 
+      src="https://csqipkrgfkmqeyzdhmpy.supabase.co/functions/v1/consent-sdk?site=techno-dog&lang=en&theme=dark&position=bottom&color=%23fa0000" 
+      data-site-id="techno-dog"
+      data-analytics="true"
+      data-behavior="true"
+      data-endpoint="https://musikazepro.app/api/collect"
+      async
+    ></script>
 
     <!-- Google Tag Manager -->
     <script>
@@ -124,14 +133,61 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- 📍 Unified Consent Synchronization Layer                         -->
-    <!-- Synchronizes: Musikaze Pro SDK ↔ React CookieConsent Component   -->
+    <!-- 📍 Unified Consent & Analytics Synchronization Layer              -->
+    <!-- Synchronizes: Musikaze Pro SDK ↔ React ↔ Google ↔ musikazepro.app -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <script>
       (function() {
         var MZK_KEY = 'mzk_consent';
         var LEGACY_KEY = 'technodog_consent_preferences';
+        var SITE_ID = 'techno-dog';
+        var MZK_ENDPOINT = 'https://musikazepro.app/api/collect';
         var lastProcessedEvent = null;
+        var sessionId = null;
+        
+        // Generate or retrieve session ID
+        function getSessionId() {
+          if (sessionId) return sessionId;
+          sessionId = sessionStorage.getItem('mzk_session_id');
+          if (!sessionId) {
+            sessionId = 'mzk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('mzk_session_id', sessionId);
+          }
+          return sessionId;
+        }
+        
+        // Helper: Send data to Musikaze Pro
+        function sendToMusikazePro(eventType, data) {
+          try {
+            var payload = {
+              site_id: SITE_ID,
+              session_id: getSessionId(),
+              event_type: eventType,
+              timestamp: new Date().toISOString(),
+              url: window.location.href,
+              path: window.location.pathname,
+              referrer: document.referrer,
+              user_agent: navigator.userAgent,
+              screen: { w: screen.width, h: screen.height },
+              viewport: { w: window.innerWidth, h: window.innerHeight },
+              data: data
+            };
+            
+            // Use sendBeacon for reliability, fallback to fetch
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon(MZK_ENDPOINT, JSON.stringify(payload));
+            } else {
+              fetch(MZK_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true
+              }).catch(function() {});
+            }
+          } catch (e) {
+            // Silent fail - don't break the page
+          }
+        }
         
         // Helper: Update Google Consent Mode
         function updateGoogleConsent(consent) {
@@ -164,6 +220,12 @@
               'page_title': document.title,
               'consent_granted': true
             });
+            
+            // Also send to Musikaze Pro
+            sendToMusikazePro('page_view', {
+              title: document.title,
+              consent: consent
+            });
           }
         }
         
@@ -182,6 +244,12 @@
           
           // Push to dataLayer
           pushToDataLayer(consent);
+          
+          // Send consent event to Musikaze Pro
+          sendToMusikazePro('consent_update', {
+            consent: consent,
+            source: source
+          });
           
           // Send page view if analytics was just granted
           sendPageViewIfAnalytics(consent);
@@ -210,7 +278,25 @@
           }
         });
         
-        // On page load: Check for existing consent in either storage
+        // Track page views for SPA navigation
+        window.addEventListener('popstate', function() {
+          var consent = null;
+          try {
+            var stored = localStorage.getItem(MZK_KEY);
+            if (stored) {
+              consent = JSON.parse(stored).preferences;
+            }
+          } catch (e) {}
+          
+          if (consent && consent.analytics) {
+            sendToMusikazePro('page_view', {
+              title: document.title,
+              type: 'spa_navigation'
+            });
+          }
+        });
+        
+        // On page load: Check for existing consent and initialize
         document.addEventListener('DOMContentLoaded', function() {
           try {
             var mzkStored = localStorage.getItem(MZK_KEY);
@@ -242,10 +328,65 @@
             // Apply existing consent to Google
             if (consent && (consent.analytics || consent.marketing)) {
               updateGoogleConsent(consent);
+              
+              // Send session start to Musikaze Pro
+              sendToMusikazePro('session_start', {
+                consent: consent,
+                returning: !!mzkStored
+              });
             }
           } catch (e) {
             // Ignore parse errors
           }
+        });
+        
+        // Track scroll depth (if analytics consent granted)
+        var maxScroll = 0;
+        var scrollThresholds = [25, 50, 75, 90];
+        var scrollSent = {};
+        
+        window.addEventListener('scroll', function() {
+          try {
+            var consent = null;
+            var stored = localStorage.getItem(MZK_KEY);
+            if (stored) consent = JSON.parse(stored).preferences;
+            if (!consent || !consent.analytics) return;
+            
+            var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            var scrollPercent = Math.round((window.scrollY / scrollHeight) * 100);
+            
+            if (scrollPercent > maxScroll) {
+              maxScroll = scrollPercent;
+              
+              scrollThresholds.forEach(function(threshold) {
+                if (scrollPercent >= threshold && !scrollSent[threshold]) {
+                  scrollSent[threshold] = true;
+                  sendToMusikazePro('scroll_depth', {
+                    threshold: threshold,
+                    max_scroll: maxScroll
+                  });
+                }
+              });
+            }
+          } catch (e) {}
+        }, { passive: true });
+        
+        // Track time on page (send on unload)
+        var pageLoadTime = Date.now();
+        
+        window.addEventListener('beforeunload', function() {
+          try {
+            var consent = null;
+            var stored = localStorage.getItem(MZK_KEY);
+            if (stored) consent = JSON.parse(stored).preferences;
+            if (!consent || !consent.analytics) return;
+            
+            var timeOnPage = Date.now() - pageLoadTime;
+            sendToMusikazePro('page_exit', {
+              time_on_page_ms: timeOnPage,
+              max_scroll: maxScroll
+            });
+          } catch (e) {}
         });
       })();
     </script>
