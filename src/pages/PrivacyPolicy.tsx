@@ -18,11 +18,78 @@ const PrivacyPolicy = () => {
 
   const lastUpdated = '2025-01-11';
 
+  // JSON-LD structured data for privacy policy
+  const privacySchemaData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy Policy",
+    "description": "Learn how techno.dog collects, uses, and protects your personal information. GDPR, CCPA, and ePrivacy compliant.",
+    "url": "https://techno.dog/privacy",
+    "dateModified": lastUpdated,
+    "inLanguage": "en",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "techno.dog",
+      "url": "https://techno.dog"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Privacy and Data Protection"
+    },
+    "mainEntity": {
+      "@type": "Article",
+      "headline": "Privacy Policy - techno.dog",
+      "datePublished": "2024-01-01",
+      "dateModified": lastUpdated,
+      "author": {
+        "@type": "Organization",
+        "name": "Miramonte Somió SL",
+        "url": "https://techno.dog"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "techno.dog",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://techno.dog/og-image.png"
+        }
+      }
+    }
+  };
+
+  const gdprComplianceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "techno.dog",
+    "legalName": "Miramonte Somió SL",
+    "url": "https://techno.dog",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Cam. Nogales, 318, Periurbano - Rural",
+      "addressLocality": "Gijón",
+      "addressRegion": "Asturias",
+      "postalCode": "33203",
+      "addressCountry": "ES"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Data Protection Officer",
+      "email": "alex.lawton@miramonte.io",
+      "name": "Alex Lawton"
+    },
+    "sameAs": [
+      "https://techno.dog/privacy",
+      "https://techno.dog/cookies",
+      "https://techno.dog/terms"
+    ]
+  };
+
   return (
     <PageLayout
       title="Privacy Policy"
-      description="Learn how techno.dog collects, uses, and protects your personal information. GDPR compliant."
+      description="Learn how techno.dog collects, uses, and protects your personal information. GDPR, CCPA, and ePrivacy compliant."
       path="/privacy"
+      structuredData={[privacySchemaData, gdprComplianceSchema]}
     >
       <div className="container mx-auto px-4 md:px-8 py-8 max-w-4xl">
         {/* Back link */}

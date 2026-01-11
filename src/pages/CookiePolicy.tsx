@@ -49,11 +49,32 @@ const CookiePolicy = () => {
     },
   ];
 
+  // JSON-LD structured data for cookie policy
+  const cookieSchemaData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Cookie Policy",
+    "description": "Learn about the cookies we use on techno.dog and how to manage your preferences. GDPR, CCPA, and ePrivacy compliant.",
+    "url": "https://techno.dog/cookies",
+    "dateModified": lastUpdated,
+    "inLanguage": "en",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "techno.dog",
+      "url": "https://techno.dog"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "Cookies and Tracking Technologies"
+    }
+  };
+
   return (
     <PageLayout
       title="Cookie Policy"
-      description="Learn about the cookies we use on techno.dog and how to manage your preferences."
+      description="Learn about the cookies we use on techno.dog and how to manage your preferences. GDPR, CCPA, and ePrivacy compliant."
       path="/cookies"
+      structuredData={[cookieSchemaData]}
     >
       <div className="container mx-auto px-4 md:px-8 py-8 max-w-4xl">
         <Link 
