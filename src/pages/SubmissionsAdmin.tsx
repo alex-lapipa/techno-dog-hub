@@ -387,6 +387,7 @@ const SubmissionsAdmin = () => {
         title="Submissions Admin"
         description="Review and manage community submissions"
         path="/admin/submissions"
+        noindex={true}
       />
       <Header />
 

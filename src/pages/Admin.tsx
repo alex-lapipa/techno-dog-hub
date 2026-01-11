@@ -470,10 +470,8 @@ const Admin = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Development mode bypass - skip all auth checks
-  const isDevelopment = import.meta.env.DEV;
-
-  if (!isDevelopment && (adminLoading || authLoading)) {
+  // Show loading state while checking auth
+  if (adminLoading || authLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
@@ -485,10 +483,10 @@ const Admin = () => {
     );
   }
 
-  // In development mode, always show dashboard
-  const showDashboard = isDevelopment || isAdmin;
-  const showAccessDenied = !isDevelopment && user && !isAdmin;
-  const showLogin = !isDevelopment && !user;
+  // Determine what to show based on auth state
+  const showDashboard = isAdmin;
+  const showAccessDenied = user && !isAdmin;
+  const showLogin = !user;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
