@@ -199,7 +199,7 @@ serve(async (req) => {
           email,
           metadata: {
             project: "techno.dog",
-            operator: "Miramonte Somío SL",
+            operator: "Miramonte Somió SL",
             commercial_name: "Project La PIPA",
           },
         });
@@ -213,7 +213,7 @@ serve(async (req) => {
     // Common metadata for all sessions
     const metadata: Record<string, string> = {
       project: "techno.dog",
-      operator: "Miramonte Somío SL",
+      operator: "Miramonte Somió SL",
       commercial_name: "Project La PIPA",
       support_mode: mode,
       supporter_tier: determinedTier,

@@ -467,7 +467,7 @@ const Store = () => {
                   Legal
                 </h3>
                 <p className="font-mono text-[10px] text-muted-foreground">
-                  Operated by Miramonte Somío SL
+                  Operated by Miramonte Somió SL
                 </p>
               </Link>
             </div>
