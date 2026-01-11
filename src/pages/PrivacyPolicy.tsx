@@ -89,9 +89,9 @@ const PrivacyPolicy = () => {
             <div className="bg-card border border-border p-4 rounded-none flex items-center gap-3">
               <Mail className="w-5 h-5 text-logo-green" />
               <div>
-                <p className="text-foreground font-medium text-sm">Data Protection Officer</p>
-                <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline text-sm">
-                  dpo@techno.dog
+                <p className="text-foreground font-medium text-sm">Alex Lawton — Data Protection Officer</p>
+                <a href="mailto:alex.lawton@miramonte.io" className="text-logo-green hover:underline text-sm">
+                  alex.lawton@miramonte.io
                 </a>
               </div>
             </div>
@@ -221,7 +221,7 @@ const PrivacyPolicy = () => {
             <p className="text-muted-foreground text-xs mt-4">
               SCCs = Standard Contractual Clauses approved by the European Commission for international data transfers.
               For a copy of our DPAs or sub-processor agreements, contact our DPO at{' '}
-              <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline">dpo@techno.dog</a>.
+              <a href="mailto:alex.lawton@miramonte.io" className="text-logo-green hover:underline">alex.lawton@miramonte.io</a>.
             </p>
           </section>
 
