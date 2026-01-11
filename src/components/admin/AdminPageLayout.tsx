@@ -6,6 +6,7 @@ import { ArrowLeft, RefreshCw, Loader2, Menu } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AdminSidebar from './AdminSidebar';
+import PageSEO from '@/components/PageSEO';
 
 interface AdminPageLayoutProps {
   title: string;
@@ -66,6 +67,13 @@ export const AdminPageLayout = ({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* SEO - noindex all admin pages */}
+      <PageSEO
+        title={`${title} | Admin | techno.dog`}
+        description={description}
+        path="/admin"
+        noindex={true}
+      />
       {/* Sidebar */}
       {showSidebar && (
         <>
