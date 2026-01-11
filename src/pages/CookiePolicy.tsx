@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PageLayout } from '@/components/layout/PageLayout';
-import { ArrowLeft, Cookie, Calendar } from 'lucide-react';
+import { ArrowLeft, Cookie, Calendar, Shield, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ConsentSettingsButton } from '@/components/privacy/ConsentSettingsButton';
+import { DoNotSellLink } from '@/components/privacy/DoNotSellLink';
 
 const CookiePolicy = () => {
   useEffect(() => {
@@ -221,6 +222,55 @@ const CookiePolicy = () => {
               For questions about our data processing agreements or to request copies, contact our 
               Data Protection Officer at{' '}
               <a href="mailto:alex.lawton@miramonte.io" className="text-logo-green hover:underline">alex.lawton@miramonte.io</a>.
+            </p>
+          </section>
+
+          {/* CCPA Notice */}
+          <section className="border-2 border-logo-green/30 p-6 rounded-lg bg-logo-green/5">
+            <div className="flex items-center gap-3 mb-4">
+              <Shield className="w-5 h-5 text-logo-green" />
+              <h2 className="text-lg uppercase tracking-wider text-foreground">
+                California Residents (CCPA/CPRA)
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA), 
+              California residents have additional rights regarding cookies and tracking technologies:
+            </p>
+            <ul className="text-muted-foreground space-y-2 mb-4">
+              <li>• Right to know what cookies are being used and for what purposes</li>
+              <li>• Right to opt-out of the "sale" or "sharing" of personal information via cookies</li>
+              <li>• Right to limit use of sensitive personal information</li>
+            </ul>
+            <div className="flex flex-col sm:flex-row gap-4 items-start">
+              <DoNotSellLink />
+            </div>
+            <p className="text-muted-foreground text-xs mt-4">
+              We honor Global Privacy Control (GPC) signals as a valid opt-out request.
+            </p>
+          </section>
+
+          {/* ePrivacy Notice */}
+          <section className="border-2 border-blue-500/30 p-6 rounded-lg bg-blue-500/5">
+            <div className="flex items-center gap-3 mb-4">
+              <Globe className="w-5 h-5 text-blue-400" />
+              <h2 className="text-lg uppercase tracking-wider text-foreground">
+                EU ePrivacy Directive Compliance
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              In compliance with the EU ePrivacy Directive, we:
+            </p>
+            <ul className="text-muted-foreground space-y-2">
+              <li>• Obtain your prior informed consent before placing non-essential cookies</li>
+              <li>• Only place strictly necessary cookies without consent (e.g., session cookies for login)</li>
+              <li>• Provide clear information about each cookie before you consent</li>
+              <li>• Allow you to withdraw consent as easily as you gave it</li>
+              <li>• Store consent records to demonstrate compliance</li>
+            </ul>
+            <p className="text-muted-foreground text-xs mt-4">
+              Consent is not required for cookies that are strictly necessary for providing a service 
+              you have explicitly requested (Article 5(3) of Directive 2002/58/EC).
             </p>
           </section>
 
