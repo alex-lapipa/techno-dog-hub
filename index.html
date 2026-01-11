@@ -124,55 +124,130 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- 📍 Musikaze Consent SDK Event Listener                          -->
+    <!-- 📍 Unified Consent Synchronization Layer                         -->
+    <!-- Synchronizes: Musikaze Pro SDK ↔ React CookieConsent Component   -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <script>
-      window.addEventListener('mzk:consent:change', function(e) {
-        // Update Google Consent Mode v2
-        gtag('consent', 'update', {
-          'analytics_storage': e.detail.consent.analytics ? 'granted' : 'denied',
-          'ad_storage': e.detail.consent.marketing ? 'granted' : 'denied',
-          'ad_user_data': e.detail.consent.marketing ? 'granted' : 'denied',
-          'ad_personalization': e.detail.consent.marketing ? 'granted' : 'denied'
-        });
+      (function() {
+        var MZK_KEY = 'mzk_consent';
+        var LEGACY_KEY = 'technodog_consent_preferences';
+        var lastProcessedEvent = null;
         
-        // Push consent update event to dataLayer
-        dataLayer.push({
-          'event': 'consent_update',
-          'consent_analytics': e.detail.consent.analytics,
-          'consent_marketing': e.detail.consent.marketing,
-          'consent_essential': e.detail.consent.essential || true,
-          'consent_personalization': e.detail.consent.personalization || false
-        });
-
-        // CRITICAL: If analytics consent granted, send a page view immediately
-        // This captures users who grant consent after initial page load
-        if (e.detail.consent.analytics) {
-          gtag('event', 'page_view', {
-            'page_location': window.location.href,
-            'page_path': window.location.pathname,
-            'page_title': document.title,
-            'consent_granted': true
+        // Helper: Update Google Consent Mode
+        function updateGoogleConsent(consent) {
+          gtag('consent', 'update', {
+            'analytics_storage': consent.analytics ? 'granted' : 'denied',
+            'ad_storage': consent.marketing ? 'granted' : 'denied',
+            'ad_user_data': consent.marketing ? 'granted' : 'denied',
+            'ad_personalization': consent.marketing ? 'granted' : 'denied',
+            'personalization_storage': consent.personalization ? 'granted' : 'denied'
           });
         }
-      });
-
-      // Fallback: Check for existing consent on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        try {
-          var stored = localStorage.getItem('mzk_consent');
-          if (stored) {
-            var consent = JSON.parse(stored);
-            if (consent.preferences && consent.preferences.analytics) {
-              gtag('consent', 'update', {
-                'analytics_storage': 'granted'
-              });
-            }
-          }
-        } catch (e) {
-          // Ignore parse errors
+        
+        // Helper: Push to dataLayer
+        function pushToDataLayer(consent) {
+          dataLayer.push({
+            'event': 'consent_update',
+            'consent_analytics': consent.analytics,
+            'consent_marketing': consent.marketing,
+            'consent_essential': true,
+            'consent_personalization': consent.personalization || false
+          });
         }
-      });
+        
+        // Helper: Send page view if analytics enabled
+        function sendPageViewIfAnalytics(consent) {
+          if (consent.analytics) {
+            gtag('event', 'page_view', {
+              'page_location': window.location.href,
+              'page_path': window.location.pathname,
+              'page_title': document.title,
+              'consent_granted': true
+            });
+          }
+        }
+        
+        // Listen to mzk:consent:change from ANY source (SDK or React)
+        window.addEventListener('mzk:consent:change', function(e) {
+          var consent = e.detail.consent || {};
+          var source = e.detail.source || 'unknown';
+          var eventKey = JSON.stringify(consent) + source;
+          
+          // Prevent duplicate processing
+          if (lastProcessedEvent === eventKey) return;
+          lastProcessedEvent = eventKey;
+          
+          // Update Google Consent Mode
+          updateGoogleConsent(consent);
+          
+          // Push to dataLayer
+          pushToDataLayer(consent);
+          
+          // Send page view if analytics was just granted
+          sendPageViewIfAnalytics(consent);
+          
+          // Sync to both storage systems (ensures both are in sync)
+          try {
+            var mzkData = {
+              preferences: {
+                essential: true,
+                analytics: consent.analytics || false,
+                marketing: consent.marketing || false,
+                personalization: consent.personalization || false
+              },
+              version: '1.0',
+              updatedAt: new Date().toISOString(),
+              source: source
+            };
+            localStorage.setItem(MZK_KEY, JSON.stringify(mzkData));
+            localStorage.setItem(LEGACY_KEY, JSON.stringify({
+              preferences: mzkData.preferences,
+              consentVersion: '1.0',
+              updatedAt: new Date().toISOString()
+            }));
+          } catch (err) {
+            // Storage error - ignore
+          }
+        });
+        
+        // On page load: Check for existing consent in either storage
+        document.addEventListener('DOMContentLoaded', function() {
+          try {
+            var mzkStored = localStorage.getItem(MZK_KEY);
+            var legacyStored = localStorage.getItem(LEGACY_KEY);
+            var consent = null;
+            
+            // Priority: Musikaze Pro SDK storage
+            if (mzkStored) {
+              var mzkParsed = JSON.parse(mzkStored);
+              if (mzkParsed.preferences) {
+                consent = mzkParsed.preferences;
+              }
+            }
+            // Fallback: Legacy storage
+            else if (legacyStored) {
+              var legacyParsed = JSON.parse(legacyStored);
+              if (legacyParsed.preferences) {
+                consent = legacyParsed.preferences;
+                // Sync to Musikaze Pro storage
+                localStorage.setItem(MZK_KEY, JSON.stringify({
+                  preferences: consent,
+                  version: '1.0',
+                  updatedAt: new Date().toISOString(),
+                  source: 'legacy_migration'
+                }));
+              }
+            }
+            
+            // Apply existing consent to Google
+            if (consent && (consent.analytics || consent.marketing)) {
+              updateGoogleConsent(consent);
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        });
+      })();
     </script>
   </body>
 </html>
