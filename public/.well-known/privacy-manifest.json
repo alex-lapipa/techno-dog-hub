@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-11",
+  "organization": {
+    "name": "techno.dog",
+    "legalName": "Miramonte Somió SL",
+    "country": "ES",
+    "dpo": {
+      "name": "Alex Lawton",
+      "email": "alex.lawton@miramonte.io"
+    }
+  },
+  "compliance": {
+    "gdpr": true,
+    "ccpa": true,
+    "cpra": true,
+    "ePrivacy": true,
+    "gpc": true
+  },
+  "signals": {
+    "gpcHonored": true,
+    "dntHonored": true
+  },
+  "endpoints": {
+    "privacyPolicy": "/privacy",
+    "cookiePolicy": "/cookies",
+    "termsOfService": "/terms",
+    "gdprRequest": "/privacy",
+    "ccpaRequest": "/privacy",
+    "consentApi": "/api/privacy-manifest"
+  }
+}

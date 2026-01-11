@@ -1,5 +1,6 @@
 # robots.txt for techno.dog
-# Last updated: 2025-01-01
+# Global Techno Knowledge Hub
+# Last updated: 2025-01-11
 
 User-agent: Googlebot
 Allow: /
@@ -15,8 +16,25 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# Privacy auditors and compliance crawlers
+User-agent: OneTrust-Crawler
+Allow: /
+Allow: /.well-known/
+
+User-agent: Cookiebot
+Allow: /
+Allow: /.well-known/
+
+User-agent: TrustArc
+Allow: /
+Allow: /.well-known/
+
 User-agent: *
 Allow: /
+Allow: /.well-known/
+Allow: /privacy
+Allow: /cookies
+Allow: /terms
 
 # Disallow private/admin routes
 Disallow: /auth
@@ -24,6 +42,14 @@ Disallow: /analytics
 Disallow: /admin
 Disallow: /headquarters
 Disallow: /doggy-hq
+
+# Privacy & Compliance Resources
+# These files are machine-readable for auditors and crawlers:
+# - /.well-known/privacy-manifest.json - Full privacy manifest
+# - /.well-known/gpc.json - Global Privacy Control signal support
+# - /.well-known/security.txt - Security contact information
+# - /privacy - Human-readable privacy policy
+# - /cookies - Human-readable cookie policy
 
 # Sitemap locations - Google Search Console compatible
 # Primary sitemap (edge function generates dynamic XML)

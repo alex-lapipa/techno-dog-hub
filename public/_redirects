@@ -4,3 +4,6 @@
 
 # Dynamic OG image generation
 /api/og https://bshyeweljerupobpmmes.supabase.co/functions/v1/og-image 200
+
+# Privacy manifest API endpoint for auditors
+/api/privacy-manifest https://bshyeweljerupobpmmes.supabase.co/functions/v1/privacy-manifest 200
