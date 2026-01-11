@@ -13,7 +13,7 @@ const CookiePolicy = () => {
     });
   }, []);
 
-  const lastUpdated = '2024-12-31';
+  const lastUpdated = '2025-01-11';
 
   const cookies = [
     {
@@ -166,26 +166,62 @@ const CookiePolicy = () => {
 
           <section>
             <h2 className="text-xl uppercase tracking-wider text-foreground border-b border-border pb-2">
-              Third-Party Cookies
+              Third-Party Cookies & Data Processing
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               Some cookies are placed by third-party services that appear on our pages. 
-              We use the following third-party services:
+              We have executed Data Processing Agreements (DPAs) with all third-party cookie providers 
+              to ensure GDPR-compliant handling of your data:
             </p>
-            <ul className="text-muted-foreground space-y-2">
-              <li>
-                <strong>Google Analytics:</strong>{' '}
-                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <strong>Shopify:</strong>{' '}
-                <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
-                  Privacy Policy
-                </a>
-              </li>
-            </ul>
+            <div className="border border-border mt-4">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left p-3 font-medium">Provider</th>
+                    <th className="text-left p-3 font-medium">Purpose</th>
+                    <th className="text-left p-3 font-medium">DPA Status</th>
+                    <th className="text-left p-3 font-medium">Privacy Policy</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Google Analytics</td>
+                    <td className="p-3 text-muted-foreground">Website analytics</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                    <td className="p-3">
+                      <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                  <tr className="border-b border-border">
+                    <td className="p-3 text-foreground">Shopify</td>
+                    <td className="p-3 text-muted-foreground">E-commerce</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                    <td className="p-3">
+                      <a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 text-foreground">Supabase</td>
+                    <td className="p-3 text-muted-foreground">Authentication</td>
+                    <td className="p-3 text-logo-green">✓ Signed</td>
+                    <td className="p-3">
+                      <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-logo-green hover:underline">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-muted-foreground text-xs mt-4">
+              For questions about our data processing agreements or to request copies, contact our 
+              Data Protection Officer at{' '}
+              <a href="mailto:dpo@techno.dog" className="text-logo-green hover:underline">dpo@techno.dog</a>.
+            </p>
           </section>
 
           <section>
