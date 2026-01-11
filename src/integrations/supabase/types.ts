@@ -2389,6 +2389,7 @@ export type Database = {
           press_email: string | null
           primary_platforms_json: Json | null
           region: string | null
+          slug: string | null
           sources_json: Json | null
           status: string | null
           techno_dog_fit_score: number | null
@@ -2426,6 +2427,7 @@ export type Database = {
           press_email?: string | null
           primary_platforms_json?: Json | null
           region?: string | null
+          slug?: string | null
           sources_json?: Json | null
           status?: string | null
           techno_dog_fit_score?: number | null
@@ -2463,6 +2465,7 @@ export type Database = {
           press_email?: string | null
           primary_platforms_json?: Json | null
           region?: string | null
+          slug?: string | null
           sources_json?: Json | null
           status?: string | null
           techno_dog_fit_score?: number | null
@@ -4242,6 +4245,7 @@ export type Database = {
           sampling_spec: string | null
           sequencer_arp: string | null
           short_description: string | null
+          slug: string | null
           sources: string[] | null
           strengths: string | null
           synthesis_type: string | null
@@ -4293,6 +4297,7 @@ export type Database = {
           sampling_spec?: string | null
           sequencer_arp?: string | null
           short_description?: string | null
+          slug?: string | null
           sources?: string[] | null
           strengths?: string | null
           synthesis_type?: string | null
@@ -4344,6 +4349,7 @@ export type Database = {
           sampling_spec?: string | null
           sequencer_arp?: string | null
           short_description?: string | null
+          slug?: string | null
           sources?: string[] | null
           strengths?: string | null
           synthesis_type?: string | null
@@ -8372,6 +8378,7 @@ export type Database = {
         }[]
       }
       generate_referral_code: { Args: never; Returns: string }
+      generate_slug: { Args: { name: string }; Returns: string }
       get_current_xp_multiplier: {
         Args: never
         Returns: {

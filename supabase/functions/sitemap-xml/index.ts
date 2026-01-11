@@ -64,6 +64,7 @@ serve(async (req) => {
       { url: "/community", priority: "0.7", changefreq: "weekly" },
       { url: "/developer", priority: "0.6", changefreq: "monthly" },
       { url: "/api-docs", priority: "0.6", changefreq: "monthly" },
+      { url: "/search", priority: "0.7", changefreq: "daily" },
       { url: "/about", priority: "0.5", changefreq: "monthly" },
       { url: "/support", priority: "0.5", changefreq: "monthly" },
       { url: "/training", priority: "0.5", changefreq: "monthly" },
@@ -73,8 +74,8 @@ serve(async (req) => {
       { url: "/sitemap", priority: "0.4", changefreq: "weekly" },
     ];
 
-    // Fetch all dynamic content in parallel
-    const [artistsRes, booksRes, newsRes, venuesRes, festivalsRes, labelsRes, documentariesRes] = await Promise.all([
+    // Fetch all dynamic content in parallel (including new gear and collectives)
+    const [artistsRes, booksRes, newsRes, venuesRes, festivalsRes, labelsRes, documentariesRes, gearRes, collectivesRes] = await Promise.all([
       supabase.from("canonical_artists").select("slug, updated_at").limit(5000),
       supabase.from("books").select("id, updated_at").eq("status", "published").limit(1000),
       supabase.from("td_news_articles").select("slug, updated_at").eq("status", "published").limit(1000),
@@ -82,6 +83,8 @@ serve(async (req) => {
       supabase.from("festivals").select("slug, updated_at").limit(500),
       supabase.from("labels").select("slug, updated_at").limit(2000),
       supabase.from("documentaries").select("slug, updated_at").eq("status", "published").limit(500),
+      supabase.from("gear_catalog").select("slug, updated_at").limit(1000),
+      supabase.from("collectives").select("slug, updated_at").limit(500),
     ]);
 
     // Build XML sitemap - Google Search Console compliant format
@@ -212,6 +215,38 @@ serve(async (req) => {
       }
     }
 
+    // Add gear pages
+    if (gearRes.data) {
+      console.log(`[sitemap-xml] Adding ${gearRes.data.length} gear items`);
+      for (const gear of gearRes.data) {
+        if (!gear.slug) continue;
+        const lastmod = formatDate(gear.updated_at, today);
+        xml += `  <url>
+    <loc>${SITE_URL}/gear/${escapeXml(encodeURIComponent(gear.slug))}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+`;
+      }
+    }
+
+    // Add collective pages
+    if (collectivesRes.data) {
+      console.log(`[sitemap-xml] Adding ${collectivesRes.data.length} collectives`);
+      for (const collective of collectivesRes.data) {
+        if (!collective.slug) continue;
+        const lastmod = formatDate(collective.updated_at, today);
+        xml += `  <url>
+    <loc>${SITE_URL}/crews/${escapeXml(encodeURIComponent(collective.slug))}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+`;
+      }
+    }
+
     xml += `</urlset>`;
 
     const totalUrls = staticPages.length + 
@@ -221,7 +256,9 @@ serve(async (req) => {
       (labelsRes.data?.length || 0) + 
       (booksRes.data?.length || 0) + 
       (documentariesRes.data?.length || 0) + 
-      (newsRes.data?.length || 0);
+      (newsRes.data?.length || 0) +
+      (gearRes.data?.length || 0) +
+      (collectivesRes.data?.length || 0);
 
     console.log(`[sitemap-xml] Generated sitemap with ${totalUrls} URLs`);
 

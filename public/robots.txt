@@ -1,19 +1,42 @@
 # robots.txt for techno.dog
-# Global Techno Knowledge Hub
-# Last updated: 2025-01-11
+# Global Techno Knowledge Hub - Underground Techno Culture Archive
+# Last updated: 2026-01-11
 
+# Priority crawlers with optimized crawl-delay
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
 
+User-agent: Googlebot-Image
+Allow: /
+Crawl-delay: 2
+
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 1
+Crawl-delay: 2
 
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 2
+
+# Social media crawlers (no delay needed)
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
 Allow: /
 
 # Privacy auditors and compliance crawlers
@@ -29,12 +52,24 @@ User-agent: TrustArc
 Allow: /
 Allow: /.well-known/
 
+# Default rules for all other crawlers
 User-agent: *
 Allow: /
 Allow: /.well-known/
 Allow: /privacy
 Allow: /cookies
 Allow: /terms
+Allow: /search
+Allow: /artists
+Allow: /gear
+Allow: /venues
+Allow: /festivals
+Allow: /labels
+Allow: /crews
+Allow: /books
+Allow: /documentaries
+Allow: /news
+Allow: /technopedia
 
 # Disallow private/admin routes
 Disallow: /auth
@@ -42,9 +77,12 @@ Disallow: /analytics
 Disallow: /admin
 Disallow: /headquarters
 Disallow: /doggy-hq
+Disallow: /api/
+Disallow: /*?*token=
+Disallow: /*?*key=
 
 # Privacy & Compliance Resources
-# These files are machine-readable for auditors and crawlers:
+# Machine-readable for auditors and crawlers:
 # - /.well-known/privacy-manifest.json - Full privacy manifest
 # - /.well-known/gpc.json - Global Privacy Control signal support
 # - /.well-known/security.txt - Security contact information
@@ -52,5 +90,8 @@ Disallow: /doggy-hq
 # - /cookies - Human-readable cookie policy
 
 # Sitemap locations - Google Search Console compatible
-# Primary sitemap (edge function generates dynamic XML)
+# Primary sitemap (edge function generates dynamic XML with all content)
 Sitemap: https://bshyeweljerupobpmmes.supabase.co/functions/v1/sitemap-xml
+
+# Host directive for search engines
+Host: https://techno.dog
