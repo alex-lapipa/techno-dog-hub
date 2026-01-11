@@ -6635,6 +6635,33 @@ export type Database = {
         }
         Relationships: []
       }
+      public_submission_rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          ip_hash: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_hash: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_hash?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string
@@ -8281,6 +8308,18 @@ export type Database = {
           reset_at: string
         }[]
       }
+      check_public_submission_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_ip_hash: string
+          p_limit_per_minute?: number
+        }
+        Returns: {
+          allowed: boolean
+          current_count: number
+          limit_remaining: number
+        }[]
+      }
       check_rate_limit: {
         Args: {
           p_api_key_id: string
@@ -8311,6 +8350,7 @@ export type Database = {
       }
       cleanup_old_api_usage: { Args: never; Returns: number }
       cleanup_old_ip_rate_limits: { Args: never; Returns: number }
+      cleanup_public_rate_limits: { Args: never; Returns: number }
       enqueue_media_job: {
         Args: {
           p_entity_id: string
@@ -8342,6 +8382,14 @@ export type Database = {
         }[]
       }
       get_daily_usage: { Args: { p_api_key_id: string }; Returns: number }
+      get_extension_info: {
+        Args: never
+        Returns: {
+          extension_name: string
+          schema_name: string
+          version: string
+        }[]
+      }
       get_source_map_stats: {
         Args: never
         Returns: {
