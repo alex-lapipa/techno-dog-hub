@@ -359,10 +359,10 @@ const BrandBookAdmin = () => {
             <Mail className="w-3 h-3 mr-1" /> Templates
           </TabsTrigger>
           <TabsTrigger value="guidelines" className="text-xs py-2">
-            <MessageSquare className="w-3 h-3 mr-1" /> Guidelines
+            <MessageSquare className="w-3 h-3 mr-1" /> techno.dog
           </TabsTrigger>
           <TabsTrigger value="doggies" className="text-xs py-2 text-logo-green">
-            <DogSilhouette className="w-3 h-3 mr-1" /> Doggies
+            <DogSilhouette className="w-3 h-3 mr-1" /> Techno Doggies
           </TabsTrigger>
         </TabsList>
 
