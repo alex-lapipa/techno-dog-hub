@@ -132,11 +132,18 @@ const adminSections: NavSection[] = [
     ],
   },
   {
+    id: 'brand',
+    label: 'Brand Book',
+    icon: Palette,
+    items: [
+      { label: 'Design System', path: '/admin/brand-book', icon: Palette, description: 'Colors & typography' },
+    ],
+  },
+  {
     id: 'system',
     label: 'System',
     icon: Settings,
     items: [
-      { label: 'Brand Book', path: '/admin/brand-book', icon: Palette, description: 'Design system' },
       { label: 'Doggies', path: '/admin/doggies', icon: Dog, description: 'Pack management' },
       { label: 'Doggy Orchestrator', path: '/admin/doggy-orchestrator', icon: Dog, description: 'Pack sync' },
       { label: 'Audit Log', path: '/admin/audit', icon: FileText, description: 'AI-powered audit' },
