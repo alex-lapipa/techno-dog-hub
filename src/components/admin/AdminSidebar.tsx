@@ -40,6 +40,7 @@ import {
   Inbox,
   Target,
   ClipboardList,
+  Palette,
 } from 'lucide-react';
 
 interface NavSection {
@@ -135,6 +136,7 @@ const adminSections: NavSection[] = [
     label: 'System',
     icon: Settings,
     items: [
+      { label: 'Brand Book', path: '/admin/brand-book', icon: Palette, description: 'Design system' },
       { label: 'Doggies', path: '/admin/doggies', icon: Dog, description: 'Pack management' },
       { label: 'Doggy Orchestrator', path: '/admin/doggy-orchestrator', icon: Dog, description: 'Pack sync' },
       { label: 'Audit Log', path: '/admin/audit', icon: FileText, description: 'AI-powered audit' },
