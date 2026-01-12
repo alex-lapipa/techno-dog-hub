@@ -258,7 +258,7 @@ const ButtonVariantsDisplay = () => (
 
 // Logo Usage Guidelines
 const LogoUsage = () => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <div className="border border-border p-6 space-y-4">
       <div className="flex items-center justify-center h-24 bg-background border border-muted">
         <DogSilhouette className="w-16 h-16" />
@@ -279,6 +279,16 @@ const LogoUsage = () => (
       </div>
       <p className="text-xs font-bold uppercase tracking-wider text-center">ACCENT BACKGROUND</p>
       <p className="text-xs text-muted-foreground text-center">White logo on crimson</p>
+    </div>
+    <div className="border border-border p-6 space-y-4">
+      <div className="flex items-center justify-center h-24 border border-muted" style={{ 
+        backgroundImage: 'repeating-conic-gradient(hsl(var(--muted)) 0% 25%, hsl(var(--background)) 0% 50%)',
+        backgroundSize: '16px 16px'
+      }}>
+        <DogSilhouette className="w-16 h-16" />
+      </div>
+      <p className="text-xs font-bold uppercase tracking-wider text-center">TRANSPARENT</p>
+      <p className="text-xs text-muted-foreground text-center">PNG with alpha — for overlays</p>
     </div>
   </div>
 );
