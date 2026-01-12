@@ -876,6 +876,217 @@ const BrandBookAdmin = () => {
             </div>
           </div>
 
+          {/* Language Style */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" /> LANGUAGE STYLE
+            </h3>
+            
+            {/* Voice & Tone */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">VOICE PRINCIPLES</h4>
+                <ul className="text-xs text-muted-foreground space-y-2">
+                  <li><span className="text-logo-green font-bold">Irreverent & Witty</span> — Self-aware humor, never takes itself too seriously</li>
+                  <li><span className="text-logo-green font-bold">Authentic & Underground</span> — Real rave culture, no mainstream clichés</li>
+                  <li><span className="text-logo-green font-bold">Gen Z Energy</span> — Casual slang ("no cap", "it's giving", "lowkey")</li>
+                  <li><span className="text-logo-green font-bold">Knowledgeable & Nerdy</span> — Deep gear refs, artist history, scene insider</li>
+                  <li><span className="text-logo-green font-bold">Inclusive & Warm</span> — Welcoming newcomers while respecting OGs</li>
+                </ul>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">TONE GUIDELINES</h4>
+                <ul className="text-xs text-muted-foreground space-y-2">
+                  <li><span className="text-destructive font-bold">AVOID:</span> Corporate speak, generic enthusiasm, AI-sounding phrases</li>
+                  <li><span className="text-destructive font-bold">AVOID:</span> "Amazing!", "Awesome!", overused emojis</li>
+                  <li><span className="text-logo-green font-bold">USE:</span> Specific gear references (303, 909, Minimoog)</li>
+                  <li><span className="text-logo-green font-bold">USE:</span> Scene terminology (selector, crate digging, the floor)</li>
+                  <li><span className="text-logo-green font-bold">USE:</span> Time/place anchors (4AM, warehouse, dark room)</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Slang Dictionary */}
+            <div className="border border-border p-4 mb-6">
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3">APPROVED SLANG</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">no cap</span>
+                  <p className="text-muted-foreground mt-1">for real, honestly</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">lowkey</span>
+                  <p className="text-muted-foreground mt-1">subtly, quietly</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">it's giving</span>
+                  <p className="text-muted-foreground mt-1">it has the vibe of</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">ngl</span>
+                  <p className="text-muted-foreground mt-1">not gonna lie</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">fr fr</span>
+                  <p className="text-muted-foreground mt-1">for real for real</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">bussin</span>
+                  <p className="text-muted-foreground mt-1">extremely good</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">unhinged</span>
+                  <p className="text-muted-foreground mt-1">wild, chaotic energy</p>
+                </div>
+                <div className="bg-muted/30 p-2 rounded">
+                  <span className="font-bold text-logo-green">understood the assignment</span>
+                  <p className="text-muted-foreground mt-1">nailed it perfectly</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quote Examples by Personality */}
+            <div className="mb-6">
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3">DOGGY QUOTES — BY PERSONALITY</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Techno Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <TechnoDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">Techno Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "Four to the floor. Eight hours straight. Zero small talk. This is the way."
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Pure, uncompromising, minimal words</p>
+                </div>
+
+                {/* DJ Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <DJDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">DJ Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "Reading the floor is reading souls. Also, no I won't play Sandstorm."
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Confident, slightly dismissive, insider knowledge</p>
+                </div>
+
+                {/* Grumpy Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <GrumpyDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">Grumpy Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "Oh wow, another DJ playing that track. How original. *aggressively still dancing*"
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Sarcastic but secretly loves it all</p>
+                </div>
+
+                {/* Ninja Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <NinjaDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">Ninja Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "In at 2AM, out at 2PM. No photos. No evidence. Only vibes."
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Mysterious, stealthy, low-key legend</p>
+                </div>
+
+                {/* Space Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <SpaceDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">Space Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "Ground control to major woof: I've found intelligent life. They all have good taste in synths."
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Cosmic, dreamy, transcendent</p>
+                </div>
+
+                {/* Acid Dog */}
+                <div className="border border-logo-green/30 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <AcidDog className="w-8 h-8" />
+                    <span className="text-sm font-bold uppercase">Acid Dog</span>
+                  </div>
+                  <blockquote className="text-xs italic text-muted-foreground border-l-2 border-logo-green pl-3">
+                    "One pattern. Eight hours. Infinite depth. You think it's repetitive until you're hypnotized."
+                  </blockquote>
+                  <p className="text-xs text-muted-foreground mt-2">Personality: Trippy, deep, 303-obsessed</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Ambient Message Examples */}
+            <div className="border border-border p-4 mb-6">
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3">FLOATING DOG AMBIENT MESSAGES</h4>
+              <p className="text-xs text-muted-foreground mb-3">Short, punchy Gen Z style messages for the floating dog button:</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "no cap surgeon understood the assignment"
+                </div>
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "the 303 is mother and that's on period"
+                </div>
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "it's giving warehouse at 4am realness"
+                </div>
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "lowkey obsessed with detroit techno rn"
+                </div>
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "this vinyl is bussin fr fr"
+                </div>
+                <div className="bg-background/80 border border-logo-green/30 rounded-lg px-3 py-2 text-xs font-mono">
+                  "the kick drum said slay and left"
+                </div>
+              </div>
+            </div>
+
+            {/* Copy Templates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">HASHTAG FORMAT</h4>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-logo-green font-mono">#technodoggy</span>
+                    <span className="text-muted-foreground">— main pack tag</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-logo-green font-mono">#djdoggy</span>
+                    <span className="text-muted-foreground">— individual variant</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-logo-green font-mono">#ninjadoggy</span>
+                    <span className="text-muted-foreground">— always lowercase</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 border-t border-border pt-3">
+                  Format: <code className="bg-muted px-1 rounded">#[name]doggy</code> — no spaces, all lowercase
+                </p>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">SHARE TEMPLATES</h4>
+                <div className="space-y-3 text-xs">
+                  <div className="bg-muted/30 p-2 rounded">
+                    <p className="font-bold">Short (SMS/Link):</p>
+                    <p className="text-muted-foreground mt-1">"I'm the DJ Dog — Reading the floor is reading souls. #djdoggy"</p>
+                  </div>
+                  <div className="bg-muted/30 p-2 rounded">
+                    <p className="font-bold">Full (WhatsApp):</p>
+                    <p className="text-muted-foreground mt-1">"I'm the Ninja Dog — silent warrior of the underground. 'In at 2AM, out at 2PM. No photos. No evidence.' Join the pack: techno.dog/doggies #ninjadoggy"</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Do's and Don'ts */}
           <div>
             <h3 className="text-lg font-bold uppercase tracking-wider mb-4">USAGE GUIDELINES</h3>
