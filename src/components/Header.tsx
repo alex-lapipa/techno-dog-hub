@@ -227,7 +227,7 @@ const Header = () => {
             <Link to="/developer">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-logo-green border border-logo-green/50 bg-logo-green/10 hover:bg-logo-green/20 hover:border-logo-green hover:text-logo-green px-2.5 py-1.5 h-auto">
                 <Code className="w-3 h-3 mr-1.5" />
-                Developer API
+                Dev.API
               </Button>
             </Link>
             <Link to="/support">
@@ -298,7 +298,7 @@ const Header = () => {
                     <Link to="/developer" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider text-logo-green border-logo-green/50 hover:bg-logo-green/10">
                         <Code className="w-3.5 h-3.5 mr-1.5" />
-                        Developer API
+                        Dev.API
                       </Button>
                     </Link>
                     <Link to="/support" onClick={() => setMobileMenuOpen(false)}>
