@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Palette, Type, Zap, Layout, Mail, MessageSquare, Copy, Check, Shirt, Smartphone, Globe, Share2 } from 'lucide-react';
+import { Palette, Type, Zap, Layout, Mail, MessageSquare, Copy, Check, Shirt, Smartphone, Globe, Share2, Download } from 'lucide-react';
 import { AdminPageLayout } from '@/components/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,6 +76,35 @@ const CARD_TEMPLATES = [
 const copyToClipboard = (text: string, label: string) => {
   navigator.clipboard.writeText(text);
   toast.success(`${label} copied to clipboard`);
+};
+
+// Download JSON helper
+const downloadDesignSystem = async (type: 'techno-dog' | 'doggies') => {
+  try {
+    const fileName = type === 'techno-dog' ? 'design-system-techno-dog.json' : 'design-system-doggies.json';
+    const response = await fetch(`/src/config/${fileName}`);
+    
+    // If fetch fails, use inline data
+    const jsonData = type === 'techno-dog' 
+      ? (await import('@/config/design-system-techno-dog.json')).default
+      : (await import('@/config/design-system-doggies.json')).default;
+    
+    // Add export timestamp
+    const exportData = { ...jsonData, meta: { ...jsonData.meta, exportedAt: new Date().toISOString() } };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `design-system-${type === 'techno-dog' ? 'main' : 'mascots'}-export.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Design system exported successfully');
+  } catch (error) {
+    toast.error('Failed to export design system');
+  }
 };
 
 // Color Swatch Component
@@ -558,6 +587,25 @@ const BrandBookAdmin = () => {
               </div>
             </div>
           </div>
+
+          {/* Export Design System */}
+          <div className="border border-logo-green/30 bg-logo-green/5 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-logo-green">EXPORT DESIGN SYSTEM</h4>
+                <p className="text-xs text-muted-foreground mt-1">Download the visual design system as JSON for use in other projects (brand-neutral)</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => downloadDesignSystem('techno-dog')}
+                className="border-logo-green text-logo-green hover:bg-logo-green hover:text-background"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download JSON
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         {/* Techno Doggies Tab */}
@@ -577,11 +625,20 @@ const BrandBookAdmin = () => {
                   <p className="text-sm text-muted-foreground">Official mascot design system</p>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground max-w-2xl">
+              <p className="text-xs text-muted-foreground max-w-2xl mb-4">
                 The Techno Doggies are bespoke SVG mascots representing the spirit of underground techno culture. 
                 Each doggy has a unique personality and can be used across digital and physical applications.
                 All doggies use the brand's Logo Green (#66ff66) and maintain transparent backgrounds.
               </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => downloadDesignSystem('doggies')}
+                className="border-logo-green text-logo-green hover:bg-logo-green hover:text-background"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Mascot Design System
+              </Button>
             </CardContent>
           </Card>
 

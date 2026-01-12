@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "exportedAt": null,
+    "description": "Visual design system configuration - branding-neutral export"
+  },
+  "colors": {
+    "core": {
+      "background": {
+        "hsl": "0 0% 3.9%",
+        "hex": "#0a0a0a",
+        "usage": "Primary background"
+      },
+      "foreground": {
+        "hsl": "0 0% 98%",
+        "hex": "#fafafa",
+        "usage": "Primary text"
+      },
+      "primary": {
+        "hsl": "100 100% 60%",
+        "hex": "#66ff66",
+        "usage": "Primary accent, CTAs, highlights"
+      },
+      "destructive": {
+        "hsl": "0 84% 60%",
+        "hex": "#dc2626",
+        "usage": "Errors, warnings, destructive actions"
+      },
+      "accent": {
+        "hsl": "348 83% 47%",
+        "hex": "#dc143c",
+        "usage": "Secondary accent, featured items"
+      }
+    },
+    "semantic": {
+      "muted": {
+        "hsl": "0 0% 14.9%",
+        "usage": "Subtle backgrounds"
+      },
+      "mutedForeground": {
+        "hsl": "0 0% 63.9%",
+        "usage": "Secondary text"
+      },
+      "card": {
+        "hsl": "0 0% 3.9%",
+        "usage": "Card backgrounds"
+      },
+      "border": {
+        "hsl": "0 0% 14.9%",
+        "usage": "Borders and dividers"
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "mono": "JetBrains Mono, Fira Code, monospace",
+      "sans": "system-ui, -apple-system, sans-serif"
+    },
+    "scales": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem"
+    },
+    "styles": {
+      "heading": {
+        "fontWeight": "700",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.1em"
+      },
+      "label": {
+        "fontWeight": "700",
+        "textTransform": "uppercase",
+        "letterSpacing": "0.05em",
+        "fontSize": "0.75rem"
+      },
+      "body": {
+        "fontWeight": "400",
+        "lineHeight": "1.6"
+      },
+      "mono": {
+        "fontFamily": "monospace",
+        "fontSize": "0.875rem"
+      }
+    }
+  },
+  "effects": {
+    "animations": {
+      "glitchHover": {
+        "name": "glitch-hover",
+        "description": "Chromatic aberration on hover"
+      },
+      "flicker": {
+        "name": "flicker",
+        "description": "Subtle opacity flicker"
+      },
+      "float": {
+        "name": "float-slow",
+        "description": "Gentle floating motion"
+      },
+      "borderFlicker": {
+        "name": "border-flicker",
+        "description": "Primary color border pulse"
+      },
+      "neonPulse": {
+        "name": "neon-pulse",
+        "description": "Glowing pulse effect"
+      },
+      "fadeIn": {
+        "name": "fade-in",
+        "description": "Smooth entry animation"
+      }
+    },
+    "overlays": {
+      "vhs": {
+        "description": "Nostalgic VHS scanline overlay",
+        "opacity": "0.03-0.05"
+      },
+      "grain": {
+        "description": "Film grain texture",
+        "opacity": "0.02-0.04"
+      }
+    }
+  },
+  "components": {
+    "buttons": {
+      "default": {
+        "background": "primary",
+        "foreground": "background",
+        "borderRadius": "0.375rem"
+      },
+      "outline": {
+        "background": "transparent",
+        "border": "border",
+        "foreground": "foreground"
+      },
+      "brutalist": {
+        "background": "transparent",
+        "border": "foreground",
+        "foreground": "foreground",
+        "hoverBackground": "foreground",
+        "hoverForeground": "background"
+      },
+      "terminal": {
+        "background": "transparent",
+        "border": "primary",
+        "foreground": "primary",
+        "fontFamily": "mono"
+      }
+    },
+    "cards": {
+      "default": {
+        "background": "card",
+        "border": "border",
+        "borderRadius": "0.5rem"
+      },
+      "featured": {
+        "background": "card",
+        "border": "accent",
+        "hoverBorder": "primary"
+      },
+      "vhs": {
+        "background": "card",
+        "border": "accent/30",
+        "overlay": "vhs"
+      },
+      "brutalist": {
+        "background": "transparent",
+        "border": "foreground"
+      }
+    },
+    "inputs": {
+      "default": {
+        "background": "background",
+        "border": "border",
+        "focusBorder": "primary",
+        "borderRadius": "0.375rem"
+      }
+    }
+  },
+  "layout": {
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "2xl": "3rem"
+    },
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.375rem",
+      "lg": "0.5rem",
+      "xl": "0.75rem",
+      "full": "9999px"
+    },
+    "containers": {
+      "maxWidth": "1280px",
+      "padding": "1rem"
+    }
+  },
+  "aestheticPrinciples": {
+    "primary": "Brutalist minimalism with underground/industrial influences",
+    "contrast": "High contrast, dark backgrounds with bright accents",
+    "texture": "VHS/film overlays, scanlines, subtle grain",
+    "motion": "Purposeful micro-animations, glitch effects on interaction",
+    "iconography": "Stroke-based, minimal, custom SVG preferred"
+  }
+}

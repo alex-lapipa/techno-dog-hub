@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "exportedAt": null,
+    "description": "Mascot design system configuration - branding-neutral export"
+  },
+  "mascots": {
+    "format": {
+      "type": "SVG",
+      "viewBox": "64x64",
+      "background": "transparent",
+      "style": "stroke-based"
+    },
+    "styling": {
+      "strokeColor": "primary",
+      "strokeWidth": "2-2.5px",
+      "lineCap": "round",
+      "lineJoin": "round"
+    },
+    "sizing": {
+      "minimum": "24px",
+      "recommended": "64px",
+      "maximum": "unlimited",
+      "safeArea": "10%"
+    },
+    "variants": [
+      {
+        "id": "selector",
+        "personality": "The selector, dropping beats",
+        "traits": ["confident", "skilled", "authoritative"]
+      },
+      {
+        "id": "stealth",
+        "personality": "Silent warrior of the night",
+        "traits": ["mysterious", "stealthy", "legendary"]
+      },
+      {
+        "id": "cosmic",
+        "personality": "Cosmic explorer of sound",
+        "traits": ["dreamy", "transcendent", "otherworldly"]
+      },
+      {
+        "id": "cynical",
+        "personality": "The cynical veteran",
+        "traits": ["sarcastic", "experienced", "secretly passionate"]
+      },
+      {
+        "id": "joyful",
+        "personality": "Pure positive energy",
+        "traits": ["enthusiastic", "uplifting", "contagious"]
+      },
+      {
+        "id": "digital",
+        "personality": "Glitched out & digital",
+        "traits": ["technical", "glitchy", "futuristic"]
+      },
+      {
+        "id": "kinetic",
+        "personality": "Always moving",
+        "traits": ["energetic", "rhythmic", "unstoppable"]
+      },
+      {
+        "id": "hypnotic",
+        "personality": "Deep repetitive vibes",
+        "traits": ["trippy", "deep", "mesmerizing"]
+      }
+    ]
+  },
+  "colors": {
+    "primary": {
+      "hsl": "100 100% 60%",
+      "hex": "#66ff66",
+      "usage": "Mascot stroke color"
+    },
+    "printCMYK": {
+      "c": 60,
+      "m": 0,
+      "y": 60,
+      "k": 0
+    }
+  },
+  "usage": {
+    "web": {
+      "darkBackground": {
+        "description": "Primary usage on dark backgrounds",
+        "recommended": true
+      },
+      "cards": {
+        "description": "Subtle container with primary border hint"
+      },
+      "sizes": {
+        "icon": "24-32px",
+        "card": "48-64px",
+        "hero": "128-256px"
+      }
+    },
+    "mobile": {
+      "appIcon": {
+        "placement": "centered",
+        "containerRatio": "60%"
+      },
+      "notification": {
+        "size": "32px"
+      },
+      "loading": {
+        "animated": true
+      }
+    },
+    "social": {
+      "sticker": {
+        "size": "512x512px",
+        "format": "PNG",
+        "maxFileSize": "100KB",
+        "background": "transparent"
+      },
+      "hashtagFormat": "#[variant]mascot",
+      "messageTemplate": {
+        "short": "I'm the [Variant] — [Quote]. #[variant]mascot",
+        "full": "I'm the [Variant] — [personality]. '[Quote]' Join the pack: [url] #[variant]mascot"
+      }
+    },
+    "apparel": {
+      "placements": {
+        "cap": {
+          "position": "front center",
+          "size": "40mm"
+        },
+        "tshirt": {
+          "position": "chest center",
+          "size": "100mm"
+        },
+        "hoodie": {
+          "position": "chest center",
+          "size": "120mm"
+        },
+        "bandana": {
+          "position": "center tile",
+          "size": "80mm"
+        },
+        "tote": {
+          "position": "front center",
+          "size": "150mm"
+        }
+      },
+      "printRequirements": {
+        "resolution": "300 DPI minimum",
+        "colorMode": "CMYK",
+        "background": "transparent",
+        "clearSpace": "10% of size"
+      },
+      "recommendedFabrics": ["black", "charcoal", "dark grey", "white"]
+    }
+  },
+  "language": {
+    "voicePrinciples": [
+      "Irreverent & Witty — Self-aware humor",
+      "Authentic & Underground — Real culture references",
+      "Casual Slang — Modern informal language",
+      "Knowledgeable & Nerdy — Deep subject matter expertise",
+      "Inclusive & Warm — Welcoming to newcomers"
+    ],
+    "toneGuidelines": {
+      "avoid": [
+        "Corporate speak",
+        "Generic enthusiasm",
+        "AI-sounding phrases",
+        "Overused emojis"
+      ],
+      "use": [
+        "Specific subject matter references",
+        "Scene terminology",
+        "Time/place anchors"
+      ]
+    },
+    "slangDictionary": {
+      "noCapPhrase": "for real, honestly",
+      "subtlePhrase": "subtly, quietly",
+      "vibePhrase": "it has the vibe of",
+      "honestPhrase": "not gonna lie",
+      "emphasisPhrase": "for real for real",
+      "excellentPhrase": "extremely good",
+      "chaoticPhrase": "wild, chaotic energy",
+      "successPhrase": "nailed it perfectly"
+    }
+  },
+  "guidelines": {
+    "do": [
+      "Use official SVG components only",
+      "Maintain transparent backgrounds",
+      "Scale proportionally",
+      "Use on dark backgrounds for best visibility",
+      "Include hashtag when sharing",
+      "Credit source on external uses"
+    ],
+    "dont": [
+      "Change the primary stroke color",
+      "Add backgrounds or effects",
+      "Distort or stretch the mascots",
+      "Use on busy or colorful backgrounds",
+      "Combine with generic icons",
+      "Use for commercial purposes without permission"
+    ]
+  }
+}
