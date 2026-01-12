@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, Shield, Heart, Code, ShoppingBag, Radio, BookOpen } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, SlidersHorizontal, Heart, Code, ShoppingBag, Radio, BookOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DogChat from "@/components/admin/DogChat";
@@ -244,8 +244,8 @@ const Header = () => {
             </Link>
             <Link to="/admin">
               <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
-                <Shield className="w-3.5 h-3.5 mr-1.5" />
-                Admin
+                <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
+                Control Center
               </Button>
             </Link>
             
@@ -315,8 +315,8 @@ const Header = () => {
                     </Link>
                     <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="brutalist" size="sm" className="w-full font-mono text-xs uppercase tracking-wider">
-                        <Shield className="w-3.5 h-3.5 mr-1.5" />
-                        Admin
+                        <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
+                        Control Center
                       </Button>
                     </Link>
                   </div>
