@@ -136,7 +136,8 @@ const adminSections: NavSection[] = [
     label: 'Brand Book',
     icon: Palette,
     items: [
-      { label: 'Design System', path: '/admin/brand-book', icon: Palette, description: 'Colors & typography' },
+      { label: 'techno.dog', path: '/admin/brand-book', icon: Palette, description: 'Main design system' },
+      { label: 'Techno Doggies', path: '/admin/doggies-brand-book', icon: Dog, description: 'Mascot design system' },
     ],
   },
   {
