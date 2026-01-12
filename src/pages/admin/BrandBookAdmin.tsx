@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Palette, Type, Zap, Layout, Mail, MessageSquare, Copy, Check } from 'lucide-react';
+import { Palette, Type, Zap, Layout, Mail, MessageSquare, Copy, Check, Shirt, Smartphone, Globe, Share2 } from 'lucide-react';
 import { AdminPageLayout } from '@/components/admin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import DogSilhouette from '@/components/DogSilhouette';
+import { DJDog, NinjaDog, SpaceDog, GrumpyDog, HappyDog, TechnoDog, DancingDog, AcidDog } from '@/components/DogPack';
 
 // Brand Book Configuration
 const BRAND_CONFIG = {
@@ -341,7 +342,7 @@ const BrandBookAdmin = () => {
       </Card>
 
       <Tabs defaultValue="colors" className="space-y-6">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 gap-1 h-auto p-1 bg-muted">
+        <TabsList className="grid grid-cols-4 md:grid-cols-7 gap-1 h-auto p-1 bg-muted">
           <TabsTrigger value="colors" className="text-xs py-2">
             <Palette className="w-3 h-3 mr-1" /> Colors
           </TabsTrigger>
@@ -359,6 +360,9 @@ const BrandBookAdmin = () => {
           </TabsTrigger>
           <TabsTrigger value="guidelines" className="text-xs py-2">
             <MessageSquare className="w-3 h-3 mr-1" /> Guidelines
+          </TabsTrigger>
+          <TabsTrigger value="doggies" className="text-xs py-2 text-logo-green">
+            <DogSilhouette className="w-3 h-3 mr-1" /> Doggies
           </TabsTrigger>
         </TabsList>
 
@@ -551,6 +555,352 @@ const BrandBookAdmin = () => {
               <div className="border border-border p-4">
                 <h4 className="text-sm font-bold uppercase tracking-wider mb-2">TERMINAL</h4>
                 <p className="text-xs text-muted-foreground">Monospace type, green accents, data-driven displays.</p>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Techno Doggies Tab */}
+        <TabsContent value="doggies" className="space-y-8">
+          {/* Hero Section */}
+          <Card className="border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex gap-2">
+                  <DJDog className="w-12 h-12" />
+                  <NinjaDog className="w-12 h-12" />
+                  <SpaceDog className="w-12 h-12" />
+                  <GrumpyDog className="w-12 h-12" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold uppercase tracking-wider text-logo-green">TECHNO DOGGIES</h2>
+                  <p className="text-sm text-muted-foreground">Official mascot design system</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground max-w-2xl">
+                The Techno Doggies are bespoke SVG mascots representing the spirit of underground techno culture. 
+                Each doggy has a unique personality and can be used across digital and physical applications.
+                All doggies use the brand's Logo Green (#66ff66) and maintain transparent backgrounds.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Core Variants */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">CORE VARIANTS</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: 'DJ Dog', Component: DJDog, personality: 'The selector, dropping beats' },
+                { name: 'Ninja Dog', Component: NinjaDog, personality: 'Silent warrior of the night' },
+                { name: 'Space Dog', Component: SpaceDog, personality: 'Cosmic explorer of sound' },
+                { name: 'Grumpy Dog', Component: GrumpyDog, personality: 'The cynical veteran' },
+                { name: 'Happy Dog', Component: HappyDog, personality: 'Pure rave energy' },
+                { name: 'Techno Dog', Component: TechnoDog, personality: 'Glitched out & digital' },
+                { name: 'Dancing Dog', Component: DancingDog, personality: 'Always moving' },
+                { name: 'Acid Dog', Component: AcidDog, personality: '303 vibes only' },
+              ].map((dog) => (
+                <div key={dog.name} className="border border-border p-4 hover:border-logo-green/50 transition-colors">
+                  <div className="flex items-center justify-center h-20 mb-3">
+                    <dog.Component className="w-16 h-16" />
+                  </div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-center">{dog.name}</p>
+                  <p className="text-xs text-muted-foreground text-center mt-1">{dog.personality}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Technical Specs */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">TECHNICAL SPECIFICATIONS</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-2">FORMAT</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• SVG (vector, scalable)</li>
+                  <li>• Viewbox: 64x64</li>
+                  <li>• Transparent background</li>
+                  <li>• Stroke-based design</li>
+                </ul>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-2">STYLING</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Stroke: hsl(var(--logo-green))</li>
+                  <li>• Stroke width: 2-2.5px</li>
+                  <li>• Line cap: round</li>
+                  <li>• Line join: round</li>
+                </ul>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-2">SIZING</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Minimum: 24x24px</li>
+                  <li>• Recommended: 64x64px</li>
+                  <li>• Maximum: Unlimited (vector)</li>
+                  <li>• Safe area: 10% padding</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Web Usage */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Globe className="w-4 h-4" /> WEB USAGE
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">DARK BACKGROUNDS</h4>
+                <div className="flex items-center justify-center h-24 bg-background border border-muted rounded mb-3">
+                  <DJDog className="w-16 h-16" />
+                </div>
+                <p className="text-xs text-muted-foreground">Primary usage. Logo green on dark.</p>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">CARDS & CONTAINERS</h4>
+                <div className="flex items-center justify-center h-24 bg-card border border-logo-green/20 rounded mb-3">
+                  <SpaceDog className="w-16 h-16" />
+                </div>
+                <p className="text-xs text-muted-foreground">Subtle container with green border hint.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Usage */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Smartphone className="w-4 h-4" /> MOBILE USAGE
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">APP ICON</h4>
+                <div className="flex items-center justify-center">
+                  <div className="w-16 h-16 bg-background border-2 border-logo-green rounded-xl flex items-center justify-center">
+                    <DogSilhouette className="w-10 h-10" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-3">Centered, 60% of container</p>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">NOTIFICATION</h4>
+                <div className="flex items-center gap-3 bg-muted p-3 rounded">
+                  <HappyDog className="w-8 h-8 flex-shrink-0" />
+                  <div className="text-xs">
+                    <p className="font-bold">New artist added</p>
+                    <p className="text-muted-foreground">Check the archive</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-3">32x32px in notifications</p>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">LOADING STATE</h4>
+                <div className="flex items-center justify-center h-16">
+                  <DancingDog className="w-12 h-12" animated />
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-3">Animated variant for loaders</p>
+              </div>
+            </div>
+          </div>
+
+          {/* WhatsApp & Social */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Share2 className="w-4 h-4" /> WHATSAPP & SOCIAL
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">STICKER FORMAT</h4>
+                <div className="flex items-center justify-center h-32 bg-[#075e54] rounded mb-3">
+                  <div className="bg-transparent p-2">
+                    <NinjaDog className="w-20 h-20" />
+                  </div>
+                </div>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• 512x512px PNG with transparency</li>
+                  <li>• Max file size: 100KB</li>
+                  <li>• No background color</li>
+                </ul>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">MESSAGE TEMPLATE</h4>
+                <div className="bg-[#dcf8c6] text-black p-3 rounded-lg text-xs mb-3">
+                  <p className="font-bold">I'm the Ninja Dog</p>
+                  <p className="mt-1">Silent warrior of the underground. Moving through the shadows of the dancefloor.</p>
+                  <p className="mt-2 text-[#075e54]">techno.dog/doggies #ninjadoggy</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Always include hashtag + link</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Email Templates */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Mail className="w-4 h-4" /> EMAIL TEMPLATES
+            </h3>
+            <div className="flex justify-center">
+              <div className="border border-border p-6 bg-background max-w-md w-full">
+                <div className="border-b border-border pb-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <DogSilhouette className="w-10 h-10" />
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-wider">techno.dog</p>
+                      <p className="text-xs text-muted-foreground">The Pack Updates</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <AcidDog className="w-16 h-16 flex-shrink-0" />
+                    <div>
+                      <h3 className="text-sm font-bold uppercase">NEW DOGGY ALERT</h3>
+                      <p className="text-xs text-muted-foreground mt-1">The Acid Dog has joined the pack. 303 vibes incoming.</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full border-logo-green text-logo-green">
+                    MEET THE PACK
+                  </Button>
+                </div>
+                <div className="border-t border-border mt-6 pt-4 text-center">
+                  <p className="text-xs text-muted-foreground">techno.dog — The Pack</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Apparel & Merchandise */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
+              <Shirt className="w-4 h-4" /> APPAREL & MERCHANDISE
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {/* Cap */}
+              <div className="border border-border p-4">
+                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-10 bg-background rounded-t-full border-2 border-border relative">
+                      <div className="absolute top-1 left-1/2 -translate-x-1/2">
+                        <DJDog className="w-6 h-6" />
+                      </div>
+                      <div className="absolute -bottom-1 left-0 right-0 h-2 bg-border rounded-b" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-center">CAP</p>
+                <p className="text-xs text-muted-foreground text-center mt-1">Front center, 40mm</p>
+              </div>
+              
+              {/* Hoodie */}
+              <div className="border border-border p-4">
+                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                  <div className="w-16 h-20 bg-background border-2 border-border rounded-sm relative">
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-2 border-2 border-border rounded-full" />
+                    <div className="absolute top-6 left-1/2 -translate-x-1/2">
+                      <NinjaDog className="w-8 h-8" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-center">HOODIE</p>
+                <p className="text-xs text-muted-foreground text-center mt-1">Chest center, 120mm</p>
+              </div>
+              
+              {/* T-Shirt */}
+              <div className="border border-border p-4">
+                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                  <div className="w-14 h-16 bg-background border-2 border-border relative">
+                    <div className="absolute -left-2 top-0 w-3 h-6 bg-background border-2 border-border" />
+                    <div className="absolute -right-2 top-0 w-3 h-6 bg-background border-2 border-border" />
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2">
+                      <SpaceDog className="w-8 h-8" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-center">T-SHIRT</p>
+                <p className="text-xs text-muted-foreground text-center mt-1">Chest center, 100mm</p>
+              </div>
+              
+              {/* Bandana */}
+              <div className="border border-border p-4">
+                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                  <div className="w-16 h-16 bg-background border-2 border-border rotate-45 relative">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45">
+                      <GrumpyDog className="w-8 h-8" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-center">BANDANA</p>
+                <p className="text-xs text-muted-foreground text-center mt-1">Center tile, 80mm</p>
+              </div>
+              
+              {/* Tote Bag */}
+              <div className="border border-border p-4">
+                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                  <div className="relative">
+                    <div className="absolute -top-2 left-1 w-1 h-4 bg-border rounded" />
+                    <div className="absolute -top-2 right-1 w-1 h-4 bg-border rounded" />
+                    <div className="w-14 h-16 bg-background border-2 border-border">
+                      <div className="flex items-center justify-center h-full">
+                        <TechnoDog className="w-8 h-8" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-center">TOTE BAG</p>
+                <p className="text-xs text-muted-foreground text-center mt-1">Front center, 150mm</p>
+              </div>
+            </div>
+            
+            {/* Print Guidelines */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-logo-green/30 bg-logo-green/5 p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-logo-green mb-2">PRINT REQUIREMENTS</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Export as PNG at 300 DPI minimum</li>
+                  <li>• Use CMYK color mode for print</li>
+                  <li>• Logo Green = C:60 M:0 Y:60 K:0</li>
+                  <li>• Maintain transparent background</li>
+                  <li>• Minimum clear space: 10% of logo size</li>
+                </ul>
+              </div>
+              <div className="border border-border p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-2">FABRIC COLORS</h4>
+                <div className="flex gap-2 mt-2">
+                  <div className="w-8 h-8 bg-black border border-border" title="Black" />
+                  <div className="w-8 h-8 bg-[#1a1a1a] border border-border" title="Charcoal" />
+                  <div className="w-8 h-8 bg-[#2d2d2d] border border-border" title="Dark Grey" />
+                  <div className="w-8 h-8 bg-white border border-border" title="White" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">Dark fabrics preferred for visibility</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Do's and Don'ts */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">USAGE GUIDELINES</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border border-logo-green/30 bg-logo-green/5 p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-logo-green mb-2">DO</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Use official SVG components only</li>
+                  <li>• Maintain transparent backgrounds</li>
+                  <li>• Scale proportionally</li>
+                  <li>• Use on dark backgrounds for best visibility</li>
+                  <li>• Include hashtag when sharing (#[name]doggy)</li>
+                  <li>• Credit techno.dog on external uses</li>
+                </ul>
+              </div>
+              <div className="border border-destructive/30 bg-destructive/5 p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-destructive mb-2">DON'T</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Change the logo green color</li>
+                  <li>• Add backgrounds or effects</li>
+                  <li>• Distort or stretch the doggies</li>
+                  <li>• Use on busy or colorful backgrounds</li>
+                  <li>• Combine with generic dog emojis</li>
+                  <li>• Use for commercial purposes without permission</li>
+                </ul>
               </div>
             </div>
           </div>
