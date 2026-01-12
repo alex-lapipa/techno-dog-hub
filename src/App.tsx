@@ -88,6 +88,7 @@ const GoogleOrganicStrategyAdmin = lazy(() => import("./pages/GoogleOrganicStrat
 const ChangelogAdmin = lazy(() => import("./pages/ChangelogAdmin"));
 const SEOCommandCenter = lazy(() => import("./pages/admin/SEOCommandCenter"));
 const BrandBookAdmin = lazy(() => import("./pages/admin/BrandBookAdmin"));
+const DoggiesBrandBook = lazy(() => import("./pages/admin/DoggiesBrandBook"));
 const Architecture = lazy(() => import("./pages/Architecture"));
 
 // Agent Admin Pages
@@ -286,6 +287,7 @@ const App = () => (
                     <Route path="/admin/book-knowledge" element={<AdminBookKnowledge />} />
                     <Route path="/admin/changelog" element={<ChangelogAdmin />} />
                     <Route path="/admin/brand-book" element={<BrandBookAdmin />} />
+                    <Route path="/admin/doggies-brand-book" element={<DoggiesBrandBook />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
