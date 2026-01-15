@@ -696,6 +696,12 @@ ${d.content?.slice(0, 400)}...`
     // FALLBACK TO LOVABLE AI GATEWAY (primary path)
     // =================================================================
     if (!dogResponse) {
+      // GPT-5/GPT-4o models require max_completion_tokens, others use max_tokens
+      const isOpenAIModel = routing.model.startsWith('openai/gpt-');
+      const tokenParam = isOpenAIModel 
+        ? { max_completion_tokens: routing.maxTokens }
+        : { max_tokens: routing.maxTokens };
+      
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -706,7 +712,7 @@ ${d.content?.slice(0, 400)}...`
           model: routing.model,
           messages,
           temperature: routing.temperature,
-          max_tokens: routing.maxTokens,
+          ...tokenParam,
         }),
       });
 
