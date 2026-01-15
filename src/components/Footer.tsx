@@ -12,7 +12,7 @@ const Footer = () => {
   const exploreLinks = [
     { label: 'Festivals', path: '/festivals' },
     { label: 'Artists', path: '/artists' },
-    { label: 'News', path: '/news' },
+    { label: 'Latest', path: '/info' },
     { label: 'Venues', path: '/venues' },
     { label: 'Techno Doggies', path: '/doggies' },
   ];
