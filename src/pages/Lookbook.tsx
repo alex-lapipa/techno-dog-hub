@@ -222,12 +222,48 @@ const lookbookImages = [
     handle: "low-profile",
     setting: "DJ Booth",
   },
-  {
+{
     src: "/src/assets/products/lifestyle-bundle-diverse1.jpg",
     alt: "Diverse group at festival sunset",
     product: "Collection",
     handle: "warehouse",
     setting: "Festival Crew",
+  },
+  // Techno Doggies Collection
+  {
+    src: "/src/assets/products/techno-doggy-hoodie.jpg",
+    alt: "Techno Doggy Hoodie with neon green mascot",
+    product: "Techno Doggy Hoodie",
+    handle: "techno-doggy-hoodie",
+    setting: "Doggies",
+  },
+  {
+    src: "/src/assets/products/techno-doggy-cap.jpg",
+    alt: "Techno Doggy Cap with embroidered mascot",
+    product: "Techno Doggy Cap",
+    handle: "techno-doggy-cap",
+    setting: "Doggies",
+  },
+  {
+    src: "/src/assets/products/techno-doggy-bandana.jpg",
+    alt: "Techno Doggy Bandana with mascot print",
+    product: "Techno Doggy Bandana",
+    handle: "techno-doggy-bandana",
+    setting: "Doggies",
+  },
+  {
+    src: "/src/assets/products/techno-doggy-skateboard.jpg",
+    alt: "Techno Doggy Skateboard deck",
+    product: "Techno Doggy Skateboard",
+    handle: "techno-doggy-skateboard",
+    setting: "Doggies",
+  },
+  {
+    src: "/src/assets/products/techno-doggy-tee.jpg",
+    alt: "Techno Doggy Tee with neon green mascot",
+    product: "Techno Doggy Tee",
+    handle: "techno-doggy-tee",
+    setting: "Doggies",
   },
 ];
 
@@ -265,6 +301,12 @@ import lifestyleShortsDiverse2 from "@/assets/products/lifestyle-shorts-diverse2
 import lifestyleVneckDiverse2 from "@/assets/products/lifestyle-vneck-diverse2.jpg";
 import lifestyleCapDjBooth from "@/assets/products/lifestyle-cap-dj-booth.jpg";
 import lifestyleBundleDiverse1 from "@/assets/products/lifestyle-bundle-diverse1.jpg";
+// Techno Doggies imports
+import technoDoggyHoodie from "@/assets/products/techno-doggy-hoodie.jpg";
+import technoDoggyyCap from "@/assets/products/techno-doggy-cap.jpg";
+import technoDoggyBandana from "@/assets/products/techno-doggy-bandana.jpg";
+import technoDoggySkateboard from "@/assets/products/techno-doggy-skateboard.jpg";
+import technoDoggyTee from "@/assets/products/techno-doggy-tee.jpg";
 const imageImports = [
   lifestyleWarehouse,
   lifestyleNightShift,
@@ -297,11 +339,17 @@ const imageImports = [
   lifestyleVneckDiverse2,
   lifestyleCapDjBooth,
   lifestyleBundleDiverse1,
+  technoDoggyHoodie,
+  technoDoggyyCap,
+  technoDoggyBandana,
+  technoDoggySkateboard,
+  technoDoggyTee,
 ];
 
 // Setting categories for grouping filters
 const settingCategories: Record<string, string[]> = {
   "All": [],
+  "Doggies": ["Doggies"],
   "Festival": ["Festival", "Outdoor Festival", "Festival Stage", "Main Stage", "Festival Dust", "Festival Golden Hour", "Festival Sunrise", "Festival Dawn", "Festival Glow", "Festival Crew", "Sunset Rave", "Golden Hour"],
   "Club": ["Club", "Underground Club", "Warehouse", "Warehouse Rave", "Warehouse Floor", "Warehouse Lasers", "Club Lights", "Laser Room", "Laser Night", "Laser Storm"],
   "DJ Booth": ["DJ Booth", "DJ Studio", "Backstage"],
