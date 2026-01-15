@@ -315,16 +315,140 @@ const DoggiesBrandBook = () => {
 
         {/* Apparel Tab */}
         <TabsContent value="apparel" className="space-y-8 mt-6">
+          {/* Zero Tolerance Banner */}
+          <div className="border-2 border-destructive bg-destructive/10 p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-destructive text-destructive-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+              Zero Tolerance Policy
+            </div>
+            <h3 className="text-lg font-bold uppercase tracking-wider text-destructive mb-3">
+              STRICT MERCHANDISE COMPLIANCE
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              ALL merchandise must strictly follow these guidelines. Non-compliant designs are <strong className="text-destructive">PROHIBITED</strong> and will not be approved for the Shopify store.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-destructive mb-2">MANDATORY RULES</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">×</span>
+                    <span>ONLY use the 8 core Techno Doggy variants</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">×</span>
+                    <span>ONLY use Logo Green (#66ff66) or White for strokes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">×</span>
+                    <span>ALWAYS use black fabric (dark backgrounds)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">×</span>
+                    <span>ALWAYS use official SVG exports from DogPack.tsx</span>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-destructive mb-2">PROHIBITED</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">✗</span>
+                    <span>AI-generated or modified mascot versions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">✗</span>
+                    <span>Custom colors, backgrounds, or effects</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">✗</span>
+                    <span>Distorted or restyled mascots</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-destructive">✗</span>
+                    <span>Non-core doggy variants for merchandise</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Approved Collection Lines */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">APPROVED COLLECTION LINES</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-2 border-logo-green bg-logo-green/5 p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-logo-green mb-2">GREEN LINE</h4>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 bg-black border border-border flex items-center justify-center">
+                    <DJDog className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Black fabric + Logo Green mascot</p>
+                    <p className="text-xs text-muted-foreground">Primary collection</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Example: "Green Line Hoodie – DJ Dog"
+                </p>
+              </div>
+              <div className="border-2 border-foreground/50 bg-foreground/5 p-4">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-2">WHITE LINE</h4>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 bg-black border border-border flex items-center justify-center">
+                    <svg viewBox="0 0 64 64" className="w-8 h-8" fill="none">
+                      <g stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <ellipse cx="32" cy="36" rx="16" ry="14" />
+                        <circle cx="26" cy="32" r="2.5" />
+                        <circle cx="38" cy="32" r="2.5" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Black fabric + White mascot</p>
+                    <p className="text-xs text-muted-foreground">Secondary collection</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Example: "White Line Tee – Space Dog"
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Core 8 Variants for Apparel */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">APPROVED MASCOTS FOR MERCHANDISE</h3>
+            <p className="text-xs text-muted-foreground mb-4">Only these 8 core variants may appear on official merchandise:</p>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+              {[
+                { name: 'DJ Dog', Component: DJDog },
+                { name: 'Ninja Dog', Component: NinjaDog },
+                { name: 'Space Dog', Component: SpaceDog },
+                { name: 'Grumpy Dog', Component: GrumpyDog },
+                { name: 'Happy Dog', Component: HappyDog },
+                { name: 'Techno Dog', Component: TechnoDog },
+                { name: 'Dancing Dog', Component: DancingDog },
+                { name: 'Acid Dog', Component: AcidDog },
+              ].map((dog) => (
+                <div key={dog.name} className="border border-logo-green/30 bg-logo-green/5 p-2 text-center">
+                  <dog.Component className="w-10 h-10 mx-auto mb-1" />
+                  <p className="text-[9px] uppercase tracking-wider">{dog.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Product Type Placements */}
           <div>
             <h3 className="text-lg font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Shirt className="w-4 h-4" /> APPAREL & MERCHANDISE
+              <Shirt className="w-4 h-4" /> PRODUCT PLACEMENTS
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {/* Cap */}
               <div className="border border-border p-4">
-                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                <div className="relative h-24 bg-black rounded flex items-center justify-center mb-3">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-10 bg-background rounded-t-full border-2 border-border relative">
+                    <div className="w-16 h-10 bg-[#1a1a1a] rounded-t-full border-2 border-border relative">
                       <div className="absolute top-1 left-1/2 -translate-x-1/2">
                         <DJDog className="w-6 h-6" />
                       </div>
@@ -338,8 +462,8 @@ const DoggiesBrandBook = () => {
               
               {/* Hoodie */}
               <div className="border border-border p-4">
-                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
-                  <div className="w-16 h-20 bg-background border-2 border-border rounded-sm relative">
+                <div className="relative h-24 bg-black rounded flex items-center justify-center mb-3">
+                  <div className="w-16 h-20 bg-[#1a1a1a] border-2 border-border rounded-sm relative">
                     <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-2 border-2 border-border rounded-full" />
                     <div className="absolute top-6 left-1/2 -translate-x-1/2">
                       <NinjaDog className="w-8 h-8" />
@@ -352,10 +476,10 @@ const DoggiesBrandBook = () => {
               
               {/* T-Shirt */}
               <div className="border border-border p-4">
-                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
-                  <div className="w-14 h-16 bg-background border-2 border-border relative">
-                    <div className="absolute -left-2 top-0 w-3 h-6 bg-background border-2 border-border" />
-                    <div className="absolute -right-2 top-0 w-3 h-6 bg-background border-2 border-border" />
+                <div className="relative h-24 bg-black rounded flex items-center justify-center mb-3">
+                  <div className="w-14 h-16 bg-[#1a1a1a] border-2 border-border relative">
+                    <div className="absolute -left-2 top-0 w-3 h-6 bg-[#1a1a1a] border-2 border-border" />
+                    <div className="absolute -right-2 top-0 w-3 h-6 bg-[#1a1a1a] border-2 border-border" />
                     <div className="absolute top-4 left-1/2 -translate-x-1/2">
                       <SpaceDog className="w-8 h-8" />
                     </div>
@@ -367,8 +491,8 @@ const DoggiesBrandBook = () => {
               
               {/* Bandana */}
               <div className="border border-border p-4">
-                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
-                  <div className="w-16 h-16 bg-background border-2 border-border rotate-45 relative">
+                <div className="relative h-24 bg-black rounded flex items-center justify-center mb-3">
+                  <div className="w-16 h-16 bg-[#1a1a1a] border-2 border-border rotate-45 relative">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45">
                       <GrumpyDog className="w-8 h-8" />
                     </div>
@@ -380,11 +504,11 @@ const DoggiesBrandBook = () => {
               
               {/* Tote Bag */}
               <div className="border border-border p-4">
-                <div className="relative h-24 bg-muted rounded flex items-center justify-center mb-3">
+                <div className="relative h-24 bg-black rounded flex items-center justify-center mb-3">
                   <div className="relative">
                     <div className="absolute -top-2 left-1 w-1 h-4 bg-border rounded" />
                     <div className="absolute -top-2 right-1 w-1 h-4 bg-border rounded" />
-                    <div className="w-14 h-16 bg-background border-2 border-border">
+                    <div className="w-14 h-16 bg-[#1a1a1a] border-2 border-border">
                       <div className="flex items-center justify-center h-full">
                         <TechnoDog className="w-8 h-8" />
                       </div>
@@ -410,14 +534,18 @@ const DoggiesBrandBook = () => {
               </ul>
             </div>
             <div className="border border-border p-4">
-              <h4 className="text-sm font-bold uppercase tracking-wider mb-2">FABRIC COLORS</h4>
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-2">APPROVED FABRIC COLORS</h4>
               <div className="flex gap-2 mt-2">
-                <div className="w-8 h-8 bg-black border border-border" title="Black" />
-                <div className="w-8 h-8 bg-[#1a1a1a] border border-border" title="Charcoal" />
-                <div className="w-8 h-8 bg-[#2d2d2d] border border-border" title="Dark Grey" />
-                <div className="w-8 h-8 bg-white border border-border" title="White" />
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-black border-2 border-logo-green" title="Black (Primary)" />
+                  <span className="text-[9px] mt-1 text-logo-green">PRIMARY</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-10 h-10 bg-[#1a1a1a] border border-border" title="Charcoal" />
+                  <span className="text-[9px] mt-1 text-muted-foreground">CHARCOAL</span>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Dark fabrics preferred for visibility</p>
+              <p className="text-xs text-destructive mt-3 font-bold">⚠ Black fabric ONLY — No light fabrics</p>
             </div>
           </div>
         </TabsContent>

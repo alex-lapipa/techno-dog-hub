@@ -1,8 +1,8 @@
 {
   "meta": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "exportedAt": null,
-    "description": "Mascot design system configuration - branding-neutral export"
+    "description": "Techno Doggies Official Mascot Design System — Strict Apparel & Merchandise Guidelines"
   },
   "mascots": {
     "format": {
@@ -12,7 +12,8 @@
       "style": "stroke-based"
     },
     "styling": {
-      "strokeColor": "primary",
+      "strokeColor": "#66ff66",
+      "strokeColorName": "Logo Green",
       "strokeWidth": "2-2.5px",
       "lineCap": "round",
       "lineJoin": "round"
@@ -23,60 +24,169 @@
       "maximum": "unlimited",
       "safeArea": "10%"
     },
-    "variants": [
+    "coreVariants": [
       {
-        "id": "selector",
+        "id": "dj-dog",
+        "componentName": "DJDog",
+        "displayName": "DJ Dog",
         "personality": "The selector, dropping beats",
-        "traits": ["confident", "skilled", "authoritative"]
+        "quote": "The kick is the heartbeat. Everything else is just atmosphere.",
+        "traits": ["confident", "skilled", "authoritative"],
+        "approvedForApparel": true
       },
       {
-        "id": "stealth",
+        "id": "ninja-dog",
+        "componentName": "NinjaDog",
+        "displayName": "Ninja Dog",
         "personality": "Silent warrior of the night",
-        "traits": ["mysterious", "stealthy", "legendary"]
+        "quote": "Move in silence. Let the bass speak.",
+        "traits": ["mysterious", "stealthy", "legendary"],
+        "approvedForApparel": true
       },
       {
-        "id": "cosmic",
+        "id": "space-dog",
+        "componentName": "SpaceDog",
+        "displayName": "Space Dog",
         "personality": "Cosmic explorer of sound",
-        "traits": ["dreamy", "transcendent", "otherworldly"]
+        "quote": "Beyond the stars, there's only rhythm.",
+        "traits": ["dreamy", "transcendent", "otherworldly"],
+        "approvedForApparel": true
       },
       {
-        "id": "cynical",
+        "id": "grumpy-dog",
+        "componentName": "GrumpyDog",
+        "displayName": "Grumpy Dog",
         "personality": "The cynical veteran",
-        "traits": ["sarcastic", "experienced", "secretly passionate"]
+        "quote": "Back in my day, we had REAL 303s.",
+        "traits": ["sarcastic", "experienced", "secretly passionate"],
+        "approvedForApparel": true
       },
       {
-        "id": "joyful",
+        "id": "happy-dog",
+        "componentName": "HappyDog",
+        "displayName": "Happy Dog",
         "personality": "Pure positive energy",
-        "traits": ["enthusiastic", "uplifting", "contagious"]
+        "quote": "Every beat is a blessing!",
+        "traits": ["enthusiastic", "uplifting", "contagious"],
+        "approvedForApparel": true
       },
       {
-        "id": "digital",
+        "id": "techno-dog",
+        "componentName": "TechnoDog",
+        "displayName": "Techno Dog",
         "personality": "Glitched out & digital",
-        "traits": ["technical", "glitchy", "futuristic"]
+        "quote": "01001011 01001001 01000011 01001011",
+        "traits": ["technical", "glitchy", "futuristic"],
+        "approvedForApparel": true
       },
       {
-        "id": "kinetic",
+        "id": "dancing-dog",
+        "componentName": "DancingDog",
+        "displayName": "Dancing Dog",
         "personality": "Always moving",
-        "traits": ["energetic", "rhythmic", "unstoppable"]
+        "quote": "Can't stop, won't stop. The floor is life.",
+        "traits": ["energetic", "rhythmic", "unstoppable"],
+        "approvedForApparel": true
       },
       {
-        "id": "hypnotic",
+        "id": "acid-dog",
+        "componentName": "AcidDog",
+        "displayName": "Acid Dog",
         "personality": "Deep repetitive vibes",
-        "traits": ["trippy", "deep", "mesmerizing"]
+        "quote": "The 303 knows all. Surrender to the squelch.",
+        "traits": ["trippy", "deep", "mesmerizing"],
+        "approvedForApparel": true
       }
     ]
   },
   "colors": {
     "primary": {
+      "name": "Logo Green",
       "hsl": "100 100% 60%",
       "hex": "#66ff66",
-      "usage": "Mascot stroke color"
+      "rgb": "102, 255, 102",
+      "usage": "Mascot stroke color - THE ONLY approved accent color"
+    },
+    "secondary": {
+      "name": "White",
+      "hex": "#ffffff",
+      "usage": "Alternative stroke color for light backgrounds only"
     },
     "printCMYK": {
       "c": 60,
       "m": 0,
       "y": 60,
       "k": 0
+    }
+  },
+  "merchandise": {
+    "zeroTolerancePolicy": {
+      "description": "ALL merchandise must strictly follow these guidelines. Non-compliant designs are PROHIBITED.",
+      "rules": [
+        "ONLY use the 8 core Techno Doggy variants listed in coreVariants",
+        "ONLY use Logo Green (#66ff66) or White (#ffffff) for mascot strokes",
+        "NEVER use AI-generated or modified versions of the doggies",
+        "NEVER change stroke width, style, or proportions",
+        "NEVER add backgrounds, shadows, or effects to the mascots",
+        "ALWAYS use dark fabric (black preferred) for Logo Green designs",
+        "ALWAYS maintain transparent backgrounds in print files",
+        "ALWAYS use official SVG exports from DogPack.tsx"
+      ]
+    },
+    "approvedProductTypes": [
+      {
+        "type": "Hoodie",
+        "placement": "chest center",
+        "printSize": "120mm",
+        "fabricColors": ["black"],
+        "strokeColors": ["#66ff66", "#ffffff"]
+      },
+      {
+        "type": "T-Shirt",
+        "placement": "chest center",
+        "printSize": "100mm",
+        "fabricColors": ["black"],
+        "strokeColors": ["#66ff66", "#ffffff"]
+      },
+      {
+        "type": "Cap",
+        "placement": "front center",
+        "printSize": "40mm",
+        "fabricColors": ["black"],
+        "strokeColors": ["#66ff66", "#ffffff"]
+      },
+      {
+        "type": "Tote",
+        "placement": "front center",
+        "printSize": "150mm",
+        "fabricColors": ["black", "natural cotton"],
+        "strokeColors": ["#66ff66", "#ffffff"]
+      },
+      {
+        "type": "Bandana",
+        "placement": "center tile",
+        "printSize": "80mm",
+        "fabricColors": ["black"],
+        "strokeColors": ["#66ff66"]
+      }
+    ],
+    "collectionNaming": {
+      "greenLine": {
+        "prefix": "Green Line",
+        "description": "Black fabric with Logo Green (#66ff66) stroke mascot",
+        "example": "Green Line Hoodie – DJ Dog"
+      },
+      "whiteLine": {
+        "prefix": "White Line",
+        "description": "Black fabric with White (#ffffff) stroke mascot",
+        "example": "White Line Tee – Space Dog"
+      }
+    },
+    "printRequirements": {
+      "resolution": "300 DPI minimum",
+      "colorMode": "CMYK for print",
+      "format": "PNG with transparency",
+      "clearSpace": "10% of mascot size minimum"
     }
   },
   "usage": {
@@ -113,42 +223,11 @@
         "maxFileSize": "100KB",
         "background": "transparent"
       },
-      "hashtagFormat": "#[variant]mascot",
+      "hashtagFormat": "#[variant]doggy",
       "messageTemplate": {
-        "short": "I'm the [Variant] — [Quote]. #[variant]mascot",
-        "full": "I'm the [Variant] — [personality]. '[Quote]' Join the pack: [url] #[variant]mascot"
+        "short": "I'm the [Variant] — [Quote]. #[variant]doggy",
+        "full": "I'm the [Variant] — [personality]. '[Quote]' Join the pack: techno.dog/doggies #[variant]doggy"
       }
-    },
-    "apparel": {
-      "placements": {
-        "cap": {
-          "position": "front center",
-          "size": "40mm"
-        },
-        "tshirt": {
-          "position": "chest center",
-          "size": "100mm"
-        },
-        "hoodie": {
-          "position": "chest center",
-          "size": "120mm"
-        },
-        "bandana": {
-          "position": "center tile",
-          "size": "80mm"
-        },
-        "tote": {
-          "position": "front center",
-          "size": "150mm"
-        }
-      },
-      "printRequirements": {
-        "resolution": "300 DPI minimum",
-        "colorMode": "CMYK",
-        "background": "transparent",
-        "clearSpace": "10% of size"
-      },
-      "recommendedFabrics": ["black", "charcoal", "dark grey", "white"]
     }
   },
   "language": {
@@ -167,38 +246,41 @@
         "Overused emojis"
       ],
       "use": [
-        "Specific subject matter references",
-        "Scene terminology",
-        "Time/place anchors"
+        "Specific gear references (303, 909, Minimoog)",
+        "Scene terminology (selector, crate digging, the floor)",
+        "Time/place anchors (4AM, warehouse, dark room)"
       ]
     },
-    "slangDictionary": {
-      "noCapPhrase": "for real, honestly",
-      "subtlePhrase": "subtly, quietly",
-      "vibePhrase": "it has the vibe of",
-      "honestPhrase": "not gonna lie",
-      "emphasisPhrase": "for real for real",
-      "excellentPhrase": "extremely good",
-      "chaoticPhrase": "wild, chaotic energy",
-      "successPhrase": "nailed it perfectly"
+    "approvedSlang": {
+      "no cap": "for real, honestly",
+      "lowkey": "subtly, quietly",
+      "it's giving": "it has the vibe of",
+      "ngl": "not gonna lie",
+      "fr fr": "for real for real",
+      "bussin": "extremely good",
+      "unhinged": "wild, chaotic energy",
+      "understood the assignment": "nailed it perfectly"
     }
   },
   "guidelines": {
     "do": [
-      "Use official SVG components only",
+      "Use official SVG components from DogPack.tsx ONLY",
       "Maintain transparent backgrounds",
       "Scale proportionally",
       "Use on dark backgrounds for best visibility",
       "Include hashtag when sharing",
-      "Credit source on external uses"
+      "Credit techno.dog on external uses",
+      "Follow exact placement and sizing specs for merchandise"
     ],
     "dont": [
-      "Change the primary stroke color",
+      "Change the Logo Green color",
       "Add backgrounds or effects",
       "Distort or stretch the mascots",
       "Use on busy or colorful backgrounds",
-      "Combine with generic icons",
-      "Use for commercial purposes without permission"
+      "Combine with generic icons or emojis",
+      "Use for commercial purposes without permission",
+      "Create custom or AI-generated variations",
+      "Use non-core variants for merchandise"
     ]
   }
 }
