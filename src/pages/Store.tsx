@@ -49,7 +49,7 @@ const Store = () => {
           }
         });
 
-        toast.success("You're on the list! Check your inbox for confirmation.");
+        toast.success("You're on the list!");
         setIsSubscribed(true);
       }
     } catch (error) {
@@ -81,17 +81,17 @@ const Store = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PageSEO
         title="Black Line Collection | Techno Doggy"
-        description="Premium underground streetwear. Pure black. Thin green line. Objects for people who live inside sound."
+        description="Premium underground streetwear. Pure black. Thin green line. Collector-grade pieces for those who live inside sound."
         path="/store"
       />
       <Header />
       <CartDrawer />
 
       <main className="pt-24 lg:pt-16">
-        {/* Coming Soon Notice */}
+        {/* Pre-order Banner */}
         <section className="bg-logo-green/5 border-b border-logo-green/20">
-          <div className="container mx-auto px-4 md:px-8 py-4">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="container mx-auto px-4 md:px-8 py-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div className="flex items-center gap-3">
                 <Clock className="w-3.5 h-3.5 text-logo-green shrink-0" />
                 <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
@@ -104,7 +104,7 @@ const Store = () => {
               {isSubscribed ? (
                 <div className="flex items-center gap-2 text-logo-green">
                   <CheckCircle className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px] uppercase tracking-wider">You're on the list</span>
+                  <span className="font-mono text-[10px] uppercase tracking-wider">You're in</span>
                 </div>
               ) : (
                 <form onSubmit={handleNotifySubmit} className="flex gap-2 w-full md:w-auto">
@@ -113,7 +113,7 @@ const Store = () => {
                     placeholder="your@email.com"
                     value={notifyEmail}
                     onChange={(e) => setNotifyEmail(e.target.value)}
-                    className="font-mono text-[10px] h-7 bg-transparent border-border/50 focus:border-logo-green/50 w-full md:w-48"
+                    className="font-mono text-[10px] h-7 bg-transparent border-border/50 focus:border-logo-green/50 w-full md:w-44"
                     disabled={isSubmitting}
                   />
                   <Button
@@ -123,11 +123,7 @@ const Store = () => {
                     className="font-mono text-[9px] uppercase tracking-widest h-7 border-logo-green/30 text-logo-green hover:bg-logo-green/10 shrink-0"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      "Notify"
-                    )}
+                    {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : "Notify"}
                   </Button>
                 </form>
               )}
@@ -135,66 +131,144 @@ const Store = () => {
           </div>
         </section>
 
-        {/* Hero */}
-        <section className="border-b border-border/50">
-          <div className="container mx-auto px-4 md:px-8 py-20 md:py-32">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-px bg-logo-green" />
-                <span className="font-mono text-[9px] text-logo-green uppercase tracking-[0.3em]">
-                  Black Line Collection
-                </span>
-              </div>
-              
-              <h1 className="font-mono text-2xl md:text-4xl lg:text-5xl uppercase tracking-tight leading-tight">
-                Pure black.
-                <br />
-                <span className="text-muted-foreground">Thin green line.</span>
-              </h1>
-              
-              <p className="font-mono text-xs text-muted-foreground mt-8 max-w-md leading-relaxed">
-                Premium underground streetwear. Minimal graphics. Maximum quality. 
-                Collector-grade pieces for those who live inside sound.
-              </p>
+        {/* Hero - Editorial Style */}
+        <section className="border-b border-border/30 overflow-hidden">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[70vh]">
+              {/* Left: Story */}
+              <div className="flex flex-col justify-center py-16 lg:py-24 lg:pr-16">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-px bg-logo-green" />
+                  <span className="font-mono text-[9px] text-logo-green uppercase tracking-[0.4em]">
+                    Issue 001
+                  </span>
+                </div>
+                
+                <h1 className="font-mono text-3xl md:text-4xl lg:text-5xl uppercase tracking-tight leading-[1.1] mb-8">
+                  The Black
+                  <br />
+                  Line
+                  <br />
+                  <span className="text-logo-green">Collection</span>
+                </h1>
+                
+                <div className="space-y-4 max-w-md">
+                  <p className="font-mono text-xs text-muted-foreground leading-relaxed">
+                    Berlin 4am. Tokyo basement. London warehouse. 
+                    The floor doesn't care what you're wearing—but you do.
+                  </p>
+                  <p className="font-mono text-xs text-muted-foreground leading-relaxed">
+                    Pure black. Thin green line. Insiders only.
+                  </p>
+                </div>
 
-              <div className="mt-10 flex items-center gap-6">
-                <CartButton />
-                <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                  View cart
-                </span>
+                <div className="mt-10 flex items-center gap-6">
+                  <CartButton />
+                  <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
+                    {products?.length || 0} pieces
+                  </span>
+                </div>
               </div>
+
+              {/* Right: Featured Image Collage */}
+              <div className="relative lg:border-l border-border/30 bg-muted/5">
+                {products && products.length > 0 && (
+                  <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                    {products.slice(0, 4).map((product, i) => (
+                      <Link 
+                        key={product.node.id}
+                        to={`/product/${product.node.handle}`}
+                        className="relative overflow-hidden group"
+                      >
+                        {product.node.images?.edges?.[0]?.node && (
+                          <img
+                            src={product.node.images.edges[0].node.url}
+                            alt={product.node.title}
+                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <span className="font-mono text-[9px] text-logo-green uppercase tracking-widest">
+                            {product.node.productType}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {productsLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Manifesto Strip */}
+        <section className="border-b border-border/30 bg-muted/5">
+          <div className="container mx-auto px-4 md:px-8 py-8">
+            <div className="flex items-center gap-8 overflow-x-auto scrollbar-hide">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                No logos
+              </span>
+              <span className="text-logo-green/30">·</span>
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                No hype
+              </span>
+              <span className="text-logo-green/30">·</span>
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                Just the line
+              </span>
+              <span className="text-logo-green/30">·</span>
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                Collector grade
+              </span>
+              <span className="text-logo-green/30">·</span>
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                Zero waste
+              </span>
+              <span className="text-logo-green/30">·</span>
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                Made when ordered
+              </span>
             </div>
           </div>
         </section>
 
         {/* Category Filter */}
         {productTypes.length > 0 && (
-          <section className="border-b border-border/30">
+          <section className="border-b border-border/30 sticky top-16 z-40 bg-background/95 backdrop-blur-sm">
             <div className="container mx-auto px-4 md:px-8 py-4">
-              <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-8 overflow-x-auto scrollbar-hide">
                 <button
                   onClick={() => setActiveCategory(null)}
-                  className={`font-mono text-[10px] uppercase tracking-widest whitespace-nowrap transition-colors ${
+                  className={`font-mono text-[10px] uppercase tracking-widest whitespace-nowrap transition-colors pb-1 ${
                     !activeCategory
-                      ? "text-logo-green"
+                      ? "text-logo-green border-b border-logo-green"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  All
+                  All ({products?.length || 0})
                 </button>
-                {productTypes.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setActiveCategory(type)}
-                    className={`font-mono text-[10px] uppercase tracking-widest whitespace-nowrap transition-colors ${
-                      activeCategory === type
-                        ? "text-logo-green"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+                {productTypes.map((type) => {
+                  const count = products?.filter(p => p.node.productType === type).length || 0;
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => setActiveCategory(type)}
+                      className={`font-mono text-[10px] uppercase tracking-widest whitespace-nowrap transition-colors pb-1 ${
+                        activeCategory === type
+                          ? "text-logo-green border-b border-logo-green"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {type} ({count})
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -227,43 +301,72 @@ const Store = () => {
           </div>
         </section>
 
-        {/* Collection Info */}
+        {/* Story Block */}
+        <section className="border-b border-border/30">
+          <div className="container mx-auto px-4 md:px-8 py-20">
+            <div className="max-w-2xl mx-auto text-center">
+              <span className="font-mono text-[9px] text-logo-green uppercase tracking-[0.3em] block mb-6">
+                The Story
+              </span>
+              <p className="font-mono text-sm md:text-base text-foreground leading-relaxed mb-6">
+                "We didn't want another loud streetwear brand. We wanted something for the people who actually go out—who know the difference between a warm-up set and peak time."
+              </p>
+              <p className="font-mono text-xs text-muted-foreground">
+                — Techno Doggy, somewhere dark, 2026
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Specs Grid */}
         <section className="border-b border-border/30">
           <div className="container mx-auto px-4 md:px-8 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div>
-                <h3 className="font-mono text-[10px] uppercase tracking-widest text-logo-green mb-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+              <div className="space-y-3">
+                <span className="font-mono text-[9px] text-logo-green uppercase tracking-widest block">
+                  01
+                </span>
+                <h3 className="font-mono text-xs uppercase tracking-widest">
                   Materials
                 </h3>
                 <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-                  400gsm organic cotton fleece. 220gsm premium cotton tees. 
-                  Built to last.
+                  400gsm organic cotton fleece. 220gsm premium tees. 
+                  Built heavy. Built to last.
                 </p>
               </div>
-              <div>
-                <h3 className="font-mono text-[10px] uppercase tracking-widest text-logo-green mb-3">
+              <div className="space-y-3">
+                <span className="font-mono text-[9px] text-logo-green uppercase tracking-widest block">
+                  02
+                </span>
+                <h3 className="font-mono text-xs uppercase tracking-widest">
                   Production
                 </h3>
                 <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
                   Print-on-demand. Zero inventory waste. 
-                  Made when you order.
+                  Your piece, made for you.
                 </p>
               </div>
-              <div>
-                <h3 className="font-mono text-[10px] uppercase tracking-widest text-logo-green mb-3">
+              <div className="space-y-3">
+                <span className="font-mono text-[9px] text-logo-green uppercase tracking-widest block">
+                  03
+                </span>
+                <h3 className="font-mono text-xs uppercase tracking-widest">
                   Shipping
                 </h3>
                 <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-                  Worldwide delivery. 2-3 weeks production. 
-                  Tracked shipping.
+                  Worldwide. 2-3 weeks production. 
+                  Tracked all the way.
                 </p>
               </div>
-              <div>
-                <h3 className="font-mono text-[10px] uppercase tracking-widest text-logo-green mb-3">
+              <div className="space-y-3">
+                <span className="font-mono text-[9px] text-logo-green uppercase tracking-widest block">
+                  04
+                </span>
+                <h3 className="font-mono text-xs uppercase tracking-widest">
                   Returns
                 </h3>
                 <p className="font-mono text-[10px] text-muted-foreground leading-relaxed">
-                  30-day returns on unworn items. 
+                  30 days on unworn items. 
                   Quality guaranteed.
                 </p>
               </div>
@@ -281,14 +384,14 @@ const Store = () => {
               >
                 Shipping & Returns
               </Link>
-              <span className="text-border">·</span>
+              <span className="text-border hidden md:inline">·</span>
               <Link 
                 to="/store/info" 
                 className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest hover:text-logo-green transition-colors"
               >
                 Size Guide
               </Link>
-              <span className="text-border">·</span>
+              <span className="text-border hidden md:inline">·</span>
               <Link 
                 to="/store/info" 
                 className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest hover:text-logo-green transition-colors"
@@ -296,7 +399,7 @@ const Store = () => {
                 Contact
               </Link>
             </div>
-            <p className="font-mono text-[9px] text-muted-foreground/50 text-center mt-8">
+            <p className="font-mono text-[9px] text-muted-foreground/40 text-center mt-8">
               Operated by Miramonte Somió SL
             </p>
           </div>
