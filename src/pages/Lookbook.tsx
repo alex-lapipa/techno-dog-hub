@@ -232,37 +232,37 @@ const lookbookImages = [
   // Techno Doggies Collection
   {
     src: "/src/assets/products/techno-doggy-hoodie.jpg",
-    alt: "Techno Doggy Hoodie with neon green mascot",
-    product: "Techno Doggy Hoodie",
-    handle: "techno-doggy-hoodie",
+    alt: "DJ Doggy Hoodie with neon green mascot",
+    product: "DJ Doggy Hoodie",
+    handle: "dj-doggy-hoodie",
     setting: "Doggies",
   },
   {
     src: "/src/assets/products/techno-doggy-cap.jpg",
-    alt: "Techno Doggy Cap with embroidered mascot",
-    product: "Techno Doggy Cap",
-    handle: "techno-doggy-cap",
+    alt: "DJ Doggy Cap with embroidered mascot",
+    product: "DJ Doggy Cap",
+    handle: "dj-doggy-cap",
     setting: "Doggies",
   },
   {
     src: "/src/assets/products/techno-doggy-bandana.jpg",
     alt: "Techno Doggy Bandana with mascot print",
     product: "Techno Doggy Bandana",
-    handle: "techno-doggy-bandana",
+    handle: "techno-doggy-bandana-1",
     setting: "Doggies",
   },
   {
     src: "/src/assets/products/techno-doggy-skateboard.jpg",
     alt: "Techno Doggy Skateboard deck",
     product: "Techno Doggy Skateboard",
-    handle: "techno-doggy-skateboard",
+    handle: "techno-doggy-skateboard-1",
     setting: "Doggies",
   },
   {
     src: "/src/assets/products/techno-doggy-tee.jpg",
-    alt: "Techno Doggy Tee with neon green mascot",
-    product: "Techno Doggy Tee",
-    handle: "techno-doggy-tee",
+    alt: "DJ Doggy Tee with neon green mascot",
+    product: "DJ Doggy Tee",
+    handle: "dj-doggy-tee",
     setting: "Doggies",
   },
 ];
@@ -303,7 +303,7 @@ import lifestyleCapDjBooth from "@/assets/products/lifestyle-cap-dj-booth.jpg";
 import lifestyleBundleDiverse1 from "@/assets/products/lifestyle-bundle-diverse1.jpg";
 // Techno Doggies imports
 import technoDoggyHoodie from "@/assets/products/techno-doggy-hoodie.jpg";
-import technoDoggyyCap from "@/assets/products/techno-doggy-cap.jpg";
+import technoDoggyCap from "@/assets/products/techno-doggy-cap.jpg";
 import technoDoggyBandana from "@/assets/products/techno-doggy-bandana.jpg";
 import technoDoggySkateboard from "@/assets/products/techno-doggy-skateboard.jpg";
 import technoDoggyTee from "@/assets/products/techno-doggy-tee.jpg";
@@ -340,7 +340,7 @@ const imageImports = [
   lifestyleCapDjBooth,
   lifestyleBundleDiverse1,
   technoDoggyHoodie,
-  technoDoggyyCap,
+  technoDoggyCap,
   technoDoggyBandana,
   technoDoggySkateboard,
   technoDoggyTee,
