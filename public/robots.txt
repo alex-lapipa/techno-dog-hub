@@ -1,6 +1,6 @@
 # robots.txt for techno.dog
-# Global Techno Knowledge Hub - Underground Techno Culture Archive
-# Last updated: 2026-01-11
+# Global Techno Culture Archive | Artists, Festivals, Venues
+# Last updated: 2026-01-19
 
 # Priority crawlers with optimized crawl-delay
 User-agent: Googlebot

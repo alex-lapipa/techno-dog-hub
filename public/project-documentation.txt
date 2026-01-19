@@ -125,7 +125,6 @@ FORMS & VALIDATION:
 │   │   ├── HorizontalNav.tsx      # Mobile navigation
 │   │   ├── NavLink.tsx            # Navigation links
 │   │   ├── FestivalsSection.tsx   # Festival highlights
-│   │   ├── AquasellaSection.tsx   # Festival feature
 │   │   └── LEVSection.tsx         # Festival feature
 │   │
 │   ├── contexts/
@@ -531,7 +530,7 @@ Key techno gatherings:
 - Awakenings, Dekmantel
 - Sónar, MIRA
 - Instytut, Unsound
-- LEV, Aquasella
+- LEV, Movement Detroit
 (European and global focus)
 
 GEAR DIRECTORY:
