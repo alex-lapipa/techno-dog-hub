@@ -194,6 +194,22 @@ export const festivals: Festival[] = [
     tags: ["Polish", "diverse", "industrial heritage", "Silesia"],
     description: "Festival in the post-industrial landscape of Silesia. Diverse programming.",
     coords: { lat: 50.2649, lng: 19.0238 }
+  },
+  {
+    id: "aquasella",
+    name: "Aquasella",
+    city: "Arriondas",
+    country: "Spain",
+    founded: 1997,
+    active: true,
+    type: "outdoor",
+    months: ["July", "August"],
+    tags: ["river", "nature", "Asturias", "underground", "Sella", "mountains"],
+    description: "Three decades of underground techno in the Asturian mountains. River raving on the banks of the Sella. Where nature meets bass. Mountains, rivers, techno, sidra.",
+    stages: ["Main Stage", "Bosque", "River Stage"],
+    capacity: 8000,
+    historicLineups: ["Oscar Mulero", "Exium", "Reeko", "Architectural", "Orphx", "Ancient Methods"],
+    coords: { lat: 43.3895, lng: -5.1866 }
   }
 ];
 
