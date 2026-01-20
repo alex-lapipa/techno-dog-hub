@@ -8515,7 +8515,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "owner" | "super_admin"
       claim_verification_status:
         | "unverified"
         | "partially_verified"
@@ -8672,7 +8672,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "owner", "super_admin"],
       claim_verification_status: [
         "unverified",
         "partially_verified",
