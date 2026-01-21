@@ -594,13 +594,9 @@ const BrandBookAdmin = () => {
               <div className="border border-logo-green/30 overflow-hidden">
                 <div className="relative aspect-video bg-background">
                   <img 
-                    src="/lovable-uploads/QUERODIA.jpg" 
-                    alt="Las Querodias - Official launch artwork for techno.dog"
+                    src="/images/las-querodias-official.png" 
+                    alt="Las Querodias - Official launch artwork by Alex Lawton for techno.dog"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to NFT version if QUERODIA.jpg not found
-                      e.currentTarget.src = '/lovable-uploads/LAS_QUERODIAS_NFT-01.png';
-                    }}
                   />
                 </div>
                 <div className="p-4 border-t border-logo-green/30 bg-card">
