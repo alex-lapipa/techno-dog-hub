@@ -528,6 +528,11 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
   const publishToShopify = useCallback(async (): Promise<boolean> => {
     setIsPublishing(true);
     try {
+      // Determine fulfillment service - default to 'printful' for POD products
+      const isPODProduct = ['hoodie', 't-shirt', 'cap', 'tote-bag', 'bandana', 'beanie', 'mug', 'poster']
+        .some(type => draft.productType.toLowerCase().includes(type.toLowerCase()));
+      const defaultFulfillmentService = isPODProduct ? 'printful' : 'manual';
+
       // Build comprehensive Shopify product payload (Admin API spec)
       const productPayload = {
         // Core fields
@@ -535,12 +540,12 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
         body_html: draft.aiCopy?.description || draft.description,
         vendor: draft.vendor,
         product_type: draft.productType,
-        tags: [...draft.tags, draft.brandBook, draft.mascotName].filter(Boolean).join(', '),
-        status: draft.productStatus, // NEW: Control product visibility
+        tags: [...draft.tags, draft.brandBook, draft.mascotName, isPODProduct ? 'print-on-demand' : null, isPODProduct ? 'printful' : null].filter(Boolean).join(', '),
+        status: draft.productStatus, // Control product visibility
         handle: draft.handle || undefined, // SEO-friendly URL slug
         template_suffix: draft.templateSuffix || undefined,
         
-        // Variants with full Shopify fields
+        // Variants with full Shopify fields + Printful integration
         variants: draft.variants.map(v => ({
           title: v.title,
           price: v.price,
@@ -554,8 +559,10 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
           weight_unit: v.weight_unit || 'g',
           grams: v.grams || (v.weight && v.weight_unit === 'g' ? v.weight : undefined),
           inventory_management: 'shopify',
-          inventory_policy: v.inventory_policy || 'deny',
-          fulfillment_service: v.fulfillment_service || 'manual',
+          // PRINTFUL POD: Always continue selling (no stock limits)
+          inventory_policy: isPODProduct ? 'continue' : (v.inventory_policy || 'deny'),
+          // PRINTFUL: Set fulfillment service to 'printful' when app is connected
+          fulfillment_service: v.fulfillment_service || defaultFulfillmentService,
           requires_shipping: v.requires_shipping,
           taxable: v.taxable !== false,
         })),
@@ -571,7 +578,7 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
              ...draft.images.map((img, idx) => ({ src: img.src, alt: img.alt || draft.title, position: draft.aiMockupUrls.length + idx + 1 }))]
           : undefined,
         
-        // Metafields (brand + user-defined)
+        // Metafields (brand + fulfillment + user-defined)
         metafields: [
           // Brand book metafield
           {
@@ -598,6 +605,25 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
             namespace: 'technodog',
             key: 'color_line',
             value: draft.colorLine,
+            type: 'single_line_text_field',
+          } : null,
+          // Fulfillment provider metafield (Printful integration)
+          isPODProduct ? {
+            namespace: 'fulfillment',
+            key: 'provider',
+            value: 'printful',
+            type: 'single_line_text_field',
+          } : null,
+          isPODProduct ? {
+            namespace: 'fulfillment',
+            key: 'production_model',
+            value: 'print-on-demand',
+            type: 'single_line_text_field',
+          } : null,
+          isPODProduct ? {
+            namespace: 'fulfillment',
+            key: 'shipping_estimate',
+            value: '3-5 business days',
             type: 'single_line_text_field',
           } : null,
           // User-defined metafields
