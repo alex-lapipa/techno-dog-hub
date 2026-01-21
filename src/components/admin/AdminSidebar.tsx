@@ -149,23 +149,25 @@ const adminSections: NavSection[] = [
     ],
   },
   {
-    id: 'store-operations',
-    label: 'Store & Operations',
+    id: 'shopify-store',
+    label: 'Shopify Store',
     icon: Store,
     items: [
-      // Shopify Creative Studio at top
-      { label: 'Creative Studio', path: '/admin/creative-studio', icon: ShoppingBag, description: 'Shopify-first design' },
-      // Storefront
-      { label: 'Shop', path: '/admin/store', icon: Store, description: 'Main storefront' },
-      { label: 'Lookbook', path: '/admin/lookbook', icon: ShoppingBag, description: 'Product gallery' },
-      // Operations
-      { label: 'Ops Dashboard', path: '/admin/ecommerce', icon: LayoutDashboard, description: 'KPI overview' },
-      { label: 'Orders', path: '/admin/ecommerce/orders', icon: ClipboardList, description: 'Order management' },
-      { label: 'Inventory', path: '/admin/ecommerce/inventory', icon: Database, description: 'Stock levels' },
-      { label: 'Promotions', path: '/admin/ecommerce/promotions', icon: Zap, description: 'Discount codes' },
-      { label: 'Shipping', path: '/admin/ecommerce/shipping', icon: Globe, description: 'Shipping rules' },
-      { label: 'Returns', path: '/admin/ecommerce/returns', icon: Inbox, description: 'Return requests' },
-      { label: 'Analytics', path: '/admin/ecommerce/analytics', icon: BarChart3, description: 'Sales metrics' },
+      // ─── CREATION ───
+      { label: 'Creative Studio', path: '/admin/creative-studio', icon: PenTool, description: 'POD product design' },
+      // ─── STOREFRONT ───
+      { label: 'Products', path: '/admin/store', icon: ShoppingBag, description: 'Live inventory' },
+      { label: 'Lookbook', path: '/admin/lookbook', icon: Image, description: 'Product gallery' },
+      // ─── OPERATIONS ───
+      { label: 'Dashboard', path: '/admin/ecommerce', icon: LayoutDashboard, description: 'KPIs & Printful' },
+      { label: 'Inventory', path: '/admin/ecommerce/inventory', icon: Database, description: 'Stock & POD' },
+      { label: 'Orders', path: '/admin/ecommerce/orders', icon: ClipboardList, description: 'Fulfillment' },
+      { label: 'Promotions', path: '/admin/ecommerce/promotions', icon: Zap, description: 'Discounts' },
+      // ─── FULFILLMENT ───
+      { label: 'Shipping', path: '/admin/ecommerce/shipping', icon: Globe, description: 'Printful zones' },
+      { label: 'Returns', path: '/admin/ecommerce/returns', icon: Inbox, description: 'POD policy' },
+      // ─── INSIGHTS ───
+      { label: 'Analytics', path: '/admin/ecommerce/analytics', icon: BarChart3, description: 'Sales data' },
     ],
   },
   {
