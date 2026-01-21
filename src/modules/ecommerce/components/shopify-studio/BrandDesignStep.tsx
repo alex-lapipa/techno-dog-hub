@@ -69,36 +69,42 @@ export function BrandDesignStep({
   const selectedColorLine = COLOR_LINES.find(c => c.id === draft.colorLine);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-8 p-6 max-w-4xl mx-auto">
       {/* Brand Book Selection */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-mono font-bold flex items-center gap-2">
-            <Palette className="w-5 h-5 text-primary" />
-            Brand Book
-          </h2>
+      <section className="space-y-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-1 flex items-center gap-2">
+              <Palette className="w-6 h-6 text-primary" />
+              Brand Book
+            </h2>
+            <p className="text-muted-foreground">
+              Choose your brand identity for this product
+            </p>
+          </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowZeroTolerance(!showZeroTolerance)}
-            className="text-xs"
+            className="text-xs gap-1.5"
           >
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Zero Tolerance Policy
+            <AlertTriangle className="w-3.5 h-3.5" />
+            Guidelines
           </Button>
         </div>
 
         {showZeroTolerance && (
-          <Card className="p-4 bg-destructive/10 border-destructive/30">
-            <h3 className="font-mono font-bold text-sm mb-2 text-destructive">
+          <Card className="p-4 bg-destructive/5 border-destructive/20">
+            <h3 className="font-bold text-sm mb-2 text-destructive flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
               Zero Tolerance Policy
             </h3>
-            <ul className="text-xs space-y-1 text-muted-foreground">
-              <li>• ONLY use the 8 core Techno Doggy variants</li>
-              <li>• ONLY use Logo Green or White for mascot strokes</li>
-              <li>• NEVER use AI-generated or modified versions</li>
-              <li>• ALWAYS use dark fabric (black preferred)</li>
-              <li>• ALWAYS use official SVG exports from DogPack.tsx</li>
+            <ul className="text-xs space-y-1.5 text-muted-foreground">
+              <li>• Only use the 8 core Techno Doggy variants</li>
+              <li>• Only use Logo Green or White for mascot strokes</li>
+              <li>• Never use AI-generated or modified mascot versions</li>
+              <li>• Always use dark fabric (black preferred)</li>
+              <li>• Always use official SVG exports from DogPack.tsx</li>
             </ul>
           </Card>
         )}
@@ -111,34 +117,48 @@ export function BrandDesignStep({
           <Label
             htmlFor="techno-dog"
             className={cn(
-              "flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all",
+              "relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all group",
               draft.brandBook === 'techno-dog' 
-                ? "border-primary bg-primary/10" 
-                : "border-border hover:border-primary/50"
+                ? "border-primary bg-primary/10 shadow-lg shadow-primary/10" 
+                : "border-border hover:border-primary/50 hover:bg-muted/30"
             )}
           >
             <RadioGroupItem value="techno-dog" id="techno-dog" className="sr-only" />
-            <Dog className="w-8 h-8 mb-2 text-primary" />
-            <span className="font-mono font-bold">techno.dog</span>
-            <span className="text-xs text-muted-foreground">Platform brand</span>
+            {draft.brandBook === 'techno-dog' && (
+              <div className="absolute top-3 right-3">
+                <Check className="w-5 h-5 text-primary" />
+              </div>
+            )}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+              <Dog className="w-8 h-8 text-primary" />
+            </div>
+            <span className="font-bold text-foreground">techno.dog</span>
+            <span className="text-xs text-muted-foreground mt-1">Platform brand</span>
           </Label>
 
           <Label
             htmlFor="techno-doggies"
             className={cn(
-              "flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all",
+              "relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all group",
               draft.brandBook === 'techno-doggies' 
-                ? "border-primary bg-primary/10" 
-                : "border-border hover:border-primary/50"
+                ? "border-logo-green bg-logo-green/10 shadow-lg shadow-logo-green/10" 
+                : "border-border hover:border-logo-green/50 hover:bg-muted/30"
             )}
           >
             <RadioGroupItem value="techno-doggies" id="techno-doggies" className="sr-only" />
-            <div className="flex -space-x-2 mb-2">
-              <Dog className="w-6 h-6 text-logo-green" />
-              <Dog className="w-6 h-6 text-logo-green" />
+            {draft.brandBook === 'techno-doggies' && (
+              <div className="absolute top-3 right-3">
+                <Check className="w-5 h-5 text-logo-green" />
+              </div>
+            )}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+              <div className="flex -space-x-1">
+                <Dog className="w-6 h-6 text-logo-green" />
+                <Dog className="w-6 h-6 text-logo-green" />
+              </div>
             </div>
-            <span className="font-mono font-bold">Techno Doggies</span>
-            <span className="text-xs text-muted-foreground">Mascot merchandise</span>
+            <span className="font-bold text-foreground">Techno Doggies</span>
+            <span className="text-xs text-muted-foreground mt-1">Mascot merchandise</span>
           </Label>
         </RadioGroup>
       </section>

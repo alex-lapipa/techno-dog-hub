@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { 
   Plus, Trash2, DollarSign, Palette, Ruler, 
-  Package, AlertCircle, Sparkles 
+  Package, AlertCircle, Sparkles, Check 
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -180,75 +180,92 @@ export function VariantEditor({ draft, onUpdateDraft }: VariantEditorProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h2 className="text-xl font-mono font-bold text-foreground mb-2">
-          Configure Variants
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Set up product options like size and color. Shopify will automatically create variant combinations.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-1">
+            Configure Variants
+          </h2>
+          <p className="text-muted-foreground">
+            Set up sizes, colors, and pricing. Shopify handles the variant matrix.
+          </p>
+        </div>
+        <Badge variant="outline" className="font-mono text-sm px-3 py-1">
+          {draft.variants.length} variants
+        </Badge>
       </div>
 
-      {/* Product Info Summary */}
-      <Card className="p-4 bg-muted/30">
+      {/* Product Summary Card */}
+      <Card className="p-5 bg-gradient-to-r from-muted/50 to-muted/20 border-muted">
         <div className="flex items-center gap-4">
-          <Package className="w-8 h-8 text-primary" />
-          <div className="flex-1">
-            <h3 className="font-bold">{draft.title || 'New Product'}</h3>
-            <p className="text-sm text-muted-foreground">
-              {draft.productType || 'No type set'} • {draft.vendor}
-            </p>
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Package className="w-6 h-6 text-primary" />
           </div>
-          <Badge variant="outline" className="font-mono">
-            {draft.variants.length} variants
-          </Badge>
+          <div className="flex-1">
+            <h3 className="font-bold text-lg">{draft.title || 'New Product'}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="secondary" className="text-xs">{draft.productType || 'No type'}</Badge>
+              <span className="text-xs text-muted-foreground">by {draft.vendor}</span>
+            </div>
+          </div>
         </div>
       </Card>
 
       {/* Quick Add Options */}
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addSizeOption}
-          disabled={draft.options.some(o => o.name.toLowerCase() === 'size')}
-        >
-          <Ruler className="w-4 h-4 mr-2" />
-          Add Sizes
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addColorOption}
-          disabled={draft.options.some(o => o.name.toLowerCase() === 'color')}
-        >
-          <Palette className="w-4 h-4 mr-2" />
-          Add Colors
-        </Button>
-        <div className="flex gap-2">
-          <Input
-            placeholder="Custom option..."
-            value={newOptionName}
-            onChange={(e) => setNewOptionName(e.target.value)}
-            className="w-40"
-          />
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">Quick Add Options</h3>
+        <div className="flex flex-wrap gap-3">
           <Button
-            variant="outline"
+            variant={draft.options.some(o => o.name.toLowerCase() === 'size') ? "secondary" : "outline"}
             size="sm"
-            onClick={addCustomOption}
-            disabled={!newOptionName.trim() || draft.options.length >= 3}
+            onClick={addSizeOption}
+            disabled={draft.options.some(o => o.name.toLowerCase() === 'size')}
+            className="gap-2"
           >
-            <Plus className="w-4 h-4" />
+            <Ruler className="w-4 h-4" />
+            Sizes
+            {draft.options.some(o => o.name.toLowerCase() === 'size') && (
+              <Check className="w-3 h-3 text-logo-green" />
+            )}
           </Button>
+          <Button
+            variant={draft.options.some(o => o.name.toLowerCase() === 'color') ? "secondary" : "outline"}
+            size="sm"
+            onClick={addColorOption}
+            disabled={draft.options.some(o => o.name.toLowerCase() === 'color')}
+            className="gap-2"
+          >
+            <Palette className="w-4 h-4" />
+            Colors
+            {draft.options.some(o => o.name.toLowerCase() === 'color') && (
+              <Check className="w-3 h-3 text-logo-green" />
+            )}
+          </Button>
+          <Separator orientation="vertical" className="h-8" />
+          <div className="flex gap-2">
+            <Input
+              placeholder="Custom option name..."
+              value={newOptionName}
+              onChange={(e) => setNewOptionName(e.target.value)}
+              className="w-44 h-8 text-sm"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addCustomOption}
+              disabled={!newOptionName.trim() || draft.options.length >= 3}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
       {draft.options.length >= 3 && (
-        <Alert>
-          <AlertCircle className="w-4 h-4" />
-          <AlertDescription>
+        <Alert className="bg-amber-500/10 border-amber-500/30">
+          <AlertCircle className="w-4 h-4 text-amber-600" />
+          <AlertDescription className="text-amber-700">
             Shopify supports a maximum of 3 product options.
           </AlertDescription>
         </Alert>
