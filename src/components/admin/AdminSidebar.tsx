@@ -147,8 +147,8 @@ const adminSections: NavSection[] = [
     label: 'Store',
     icon: Store,
     items: [
-      { label: 'Shop', path: '/store', icon: Store, description: 'Main storefront' },
-      { label: 'Lookbook', path: '/lookbook', icon: ShoppingBag, description: 'Product gallery' },
+      { label: 'Shop', path: '/admin/store', icon: Store, description: 'Main storefront' },
+      { label: 'Lookbook', path: '/admin/lookbook', icon: ShoppingBag, description: 'Product gallery' },
     ],
   },
   {

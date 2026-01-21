@@ -112,6 +112,8 @@ const StoreProduct = lazy(() => import("./pages/StoreProduct"));
 const StoreInfo = lazy(() => import("./pages/StoreInfo"));
 const Lookbook = lazy(() => import("./pages/Lookbook"));
 const SoundMachine = lazy(() => import("./pages/SoundMachine"));
+const AdminStore = lazy(() => import("./pages/admin/AdminStore"));
+const AdminLookbook = lazy(() => import("./pages/admin/AdminLookbook"));
 
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Books = lazy(() => import("./pages/Books"));
@@ -323,6 +325,11 @@ const App = () => (
                     <Route path="/store/product/:handle" element={<StoreProduct />} />
                     <Route path="/store/info" element={<StoreInfo />} />
                     <Route path="/store/lookbook" element={<Lookbook />} />
+                    <Route path="/lookbook" element={<Lookbook />} />
+                    
+                    {/* Admin Store */}
+                    <Route path="/admin/store" element={<AdminStore />} />
+                    <Route path="/admin/lookbook" element={<AdminLookbook />} />
                     
                     {/* Catch all */}
                     <Route path="*" element={<NotFound />} />
