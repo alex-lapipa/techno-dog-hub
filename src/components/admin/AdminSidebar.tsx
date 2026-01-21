@@ -153,8 +153,8 @@ const adminSections: NavSection[] = [
     label: 'Store & Operations',
     icon: Store,
     items: [
-      // Creative Studio at top
-      { label: 'Creative Studio', path: '/admin/creative-studio', icon: PenTool, description: 'Design tools' },
+      // Shopify Creative Studio at top
+      { label: 'Creative Studio', path: '/admin/creative-studio', icon: ShoppingBag, description: 'Shopify-first design' },
       // Storefront
       { label: 'Shop', path: '/admin/store', icon: Store, description: 'Main storefront' },
       { label: 'Lookbook', path: '/admin/lookbook', icon: ShoppingBag, description: 'Product gallery' },

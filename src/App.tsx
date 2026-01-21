@@ -125,7 +125,7 @@ const EcommerceShipping = lazy(() => import("./modules/ecommerce/pages/Ecommerce
 const EcommerceReturns = lazy(() => import("./modules/ecommerce/pages/EcommerceReturns"));
 const EcommerceAnalytics = lazy(() => import("./modules/ecommerce/pages/EcommerceAnalytics"));
 const CreativeStudio = lazy(() => import("./modules/ecommerce/pages/CreativeStudio"));
-
+const ShopifyCreativeStudio = lazy(() => import("./modules/ecommerce/pages/ShopifyCreativeStudio"));
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Books = lazy(() => import("./pages/Books"));
 const BookDetail = lazy(() => import("./pages/BookDetail"));
@@ -356,7 +356,8 @@ const App = () => (
                     <Route path="/admin/ecommerce/shipping" element={<EcommerceShipping />} />
                     <Route path="/admin/ecommerce/returns" element={<EcommerceReturns />} />
                     <Route path="/admin/ecommerce/analytics" element={<EcommerceAnalytics />} />
-                    <Route path="/admin/creative-studio" element={<CreativeStudio />} />
+                    <Route path="/admin/creative-studio" element={<ShopifyCreativeStudio />} />
+                    <Route path="/admin/creative-studio-legacy" element={<CreativeStudio />} />
                     
                     {/* Catch all */}
                     <Route path="*" element={<NotFound />} />
