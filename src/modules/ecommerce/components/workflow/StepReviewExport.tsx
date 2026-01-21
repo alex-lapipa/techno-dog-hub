@@ -141,6 +141,8 @@ export function StepReviewExport({
           brandBook: draft.brandBook,
           productType: draft.selectedProduct?.type,
           colorLine: draft.colorLine,
+          // Model routing: pass selected models for creative direction
+          selectedModels: draft.selectedModels || ['gemini'],
           // ZERO TOLERANCE: for Techno Doggies, we do NOT ask AI to "draw" any mascot.
           // We composite the official SVG onto the blank product photo client-side.
           mascot: draft.brandBook === 'techno-doggies' ? undefined : draft.selectedMascot?.displayName,
