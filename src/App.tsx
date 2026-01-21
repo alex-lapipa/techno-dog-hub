@@ -16,6 +16,7 @@ import ParticleBackground from "@/components/ParticleBackground";
 import FilmGrainOverlay from "@/components/FilmGrainOverlay";
 import FloatingDogButton from "@/components/FloatingDogButton";
 import CookieConsentBanner from "@/components/privacy/CookieConsentBanner";
+import { useCartSync } from "@/hooks/useCartSync";
 
 // Eager load - critical path
 import Index from "./pages/Index";
@@ -158,6 +159,11 @@ const PageLoader = () => (
   </div>
 );
 
+// Cart synchronization wrapper - syncs cart with Shopify after checkout
+const CartSyncProvider = ({ children }: { children: React.ReactNode }) => {
+  useCartSync();
+  return <>{children}</>;
+};
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -169,6 +175,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <AnalyticsProvider>
+                <CartSyncProvider>
                 <ParticleBackground />
                 <FilmGrainOverlay />
                 <ScrollToTop />
@@ -356,6 +363,7 @@ const App = () => (
                   </Routes>
                 </PageTransition>
                 </Suspense>
+                </CartSyncProvider>
               </AnalyticsProvider>
             </BrowserRouter>
             </TooltipProvider>

@@ -6,7 +6,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
+import { 
+  LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent, 
+  CheckCircle, XCircle, ExternalLink, RefreshCw, Package, Tag, Truck, BarChart3 
+} from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +19,8 @@ import { MODULE_CONFIG } from '../config/module-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import type { DashboardKPI } from '../types/ecommerce.types';
 
+const SHOPIFY_ADMIN_URL = 'https://admin.shopify.com/store/technodog-d3wkq';
+
 const iconMap: Record<string, React.ElementType> = {
   'euro': Euro,
   'shopping-bag': ShoppingBag,
@@ -23,34 +28,62 @@ const iconMap: Record<string, React.ElementType> = {
   'percent': Percent,
 };
 
+const QUICK_ACTIONS = [
+  { label: 'Products', icon: Package, path: '/products', description: 'Manage catalog' },
+  { label: 'Orders', icon: ShoppingBag, path: '/orders', description: 'View orders' },
+  { label: 'Discounts', icon: Tag, path: '/discounts', description: 'Promotions' },
+  { label: 'Shipping', icon: Truck, path: '/settings/shipping', description: 'Delivery' },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics', description: 'Reports' },
+];
+
 export function EcommerceDashboard() {
   const [kpis, setKpis] = useState<DashboardKPI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [connection, setConnection] = useState<ShopifyConnectionStatus | null>(null);
 
-  useEffect(() => {
-    Promise.all([
+  const fetchData = async () => {
+    const [kpiData, connectionStatus] = await Promise.all([
       fetchLiveKPIs(),
       checkShopifyConnection(),
-    ])
-      .then(([kpiData, connectionStatus]) => {
-        setKpis(kpiData);
-        setConnection(connectionStatus);
-      })
-      .finally(() => setIsLoading(false));
+    ]);
+    setKpis(kpiData);
+    setConnection(connectionStatus);
+  };
+
+  useEffect(() => {
+    fetchData().finally(() => setIsLoading(false));
   }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchData();
+    setIsRefreshing(false);
+  };
 
   return (
     <AdminPageLayout
       title="E-commerce Ops"
-      description="Operations dashboard with KPIs and metrics"
+      description="Operations dashboard with live Shopify data"
       icon={LayoutDashboard}
       iconColor="text-logo-green"
       isLoading={isLoading}
       actions={
-        MODULE_CONFIG.READ_ONLY && MODULE_CONFIG.UI.SHOW_READ_ONLY_BADGE && (
-          <ReadOnlyBadge />
-        )
+        <div className="flex items-center gap-2">
+          {MODULE_CONFIG.READ_ONLY && MODULE_CONFIG.UI.SHOW_READ_ONLY_BADGE && (
+            <ReadOnlyBadge />
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="font-mono text-xs"
+          >
+            <RefreshCw className={`w-3 h-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       }
     >
       <div className="space-y-6">
@@ -95,6 +128,27 @@ export function EcommerceDashboard() {
           })}
         </div>
 
+        {/* Quick Actions */}
+        <Card className="p-4 bg-card border-border">
+          <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-3">
+            Shopify Admin Quick Access
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+            {QUICK_ACTIONS.map((action) => (
+              <Button
+                key={action.label}
+                variant="outline"
+                size="sm"
+                className="h-auto py-3 flex-col gap-1 font-mono text-xs hover:border-logo-green/50 hover:bg-logo-green/5"
+                onClick={() => window.open(`${SHOPIFY_ADMIN_URL}${action.path}`, '_blank')}
+              >
+                <action.icon className="w-4 h-4 text-muted-foreground" />
+                <span className="uppercase tracking-wider">{action.label}</span>
+              </Button>
+            ))}
+          </div>
+        </Card>
+
         {/* Shopify Connection Status */}
         <Card className="p-6 bg-card border-border">
           <div className="flex items-start gap-4">
@@ -121,38 +175,52 @@ export function EcommerceDashboard() {
                 {connection?.storeDomain || 'No store connected'}
               </p>
               {connection?.connected && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 h-7 px-2 text-xs font-mono"
-                  onClick={() => window.open('https://admin.shopify.com', '_blank')}
-                >
-                  <ExternalLink className="w-3 h-3 mr-1" />
-                  Open Shopify Admin
-                </Button>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs font-mono"
+                    onClick={() => window.open(SHOPIFY_ADMIN_URL, '_blank')}
+                  >
+                    <ExternalLink className="w-3 h-3 mr-1" />
+                    Admin Dashboard
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-3 text-xs font-mono"
+                    onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/products`, '_blank')}
+                  >
+                    Products
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-3 text-xs font-mono"
+                    onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/orders`, '_blank')}
+                  >
+                    Orders
+                  </Button>
+                </div>
               )}
             </div>
           </div>
         </Card>
 
         {/* Info Card */}
-        <Card className="p-6 bg-card border-border">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-muted/50 rounded">
-              <LayoutDashboard className="w-5 h-5 text-muted-foreground" />
+        <Card className="p-4 bg-card border-border border-dashed">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="font-mono text-[10px]">
+                {MODULE_CONFIG.MODULE_NAME} v{MODULE_CONFIG.VERSION}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                Real-time data from Shopify Storefront API
+              </span>
             </div>
-            <div>
-              <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
-                Store Operations Module
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Real-time data from your Shopify store. KPIs above reflect live product and inventory counts.
-                Use the sidebar to navigate between Shop, Lookbook, and operational views.
-              </p>
-              <p className="mt-2 font-mono text-xs text-muted-foreground">
-                {MODULE_CONFIG.MODULE_NAME} v{MODULE_CONFIG.VERSION} • Read-Only Mode
-              </p>
-            </div>
+            <Badge variant="outline" className="font-mono text-[10px]">
+              Read-Only Mode
+            </Badge>
           </div>
         </Card>
       </div>
