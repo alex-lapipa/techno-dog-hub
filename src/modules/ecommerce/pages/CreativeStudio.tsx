@@ -69,6 +69,7 @@ export function CreativeStudio() {
             draft={workflow.draft}
             onUpdateBrief={workflow.setEditorialBrief}
             onUpdateConcept={workflow.setProductConcept}
+            onSkip={workflow.goNext}
           />
         );
       case 'review-export':
