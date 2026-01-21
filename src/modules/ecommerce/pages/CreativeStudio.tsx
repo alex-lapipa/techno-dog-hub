@@ -15,6 +15,7 @@ import {
   StepBrandSelection,
   StepVisualSelection,
   StepColorLine,
+  StepShopifyCatalog,
   StepProductType,
   StepProductCopy,
   StepEditorialBrief,
@@ -53,6 +54,44 @@ export function CreativeStudio() {
             selectedColorLine={workflow.draft.colorLine || null}
             onSelectColorLine={workflow.setColorLine}
             selectedMascot={workflow.draft.selectedMascot}
+          />
+        );
+      case 'shopify-catalog':
+        return (
+          <StepShopifyCatalog
+            selectedProduct={null}
+            selectedSize={workflow.draft.shopifyCatalog?.size || null}
+            selectedColor={workflow.draft.shopifyCatalog?.color || null}
+            onSelectProduct={(product) => {
+              if (product) {
+                workflow.updateDraft({
+                  shopifyCatalog: {
+                    productId: product.id,
+                    productName: product.name,
+                    category: product.category,
+                    size: null,
+                    color: null,
+                    basePrice: product.basePrice,
+                  }
+                });
+              } else {
+                workflow.updateDraft({ shopifyCatalog: null });
+              }
+            }}
+            onSelectSize={(size) => {
+              if (workflow.draft.shopifyCatalog) {
+                workflow.updateDraft({
+                  shopifyCatalog: { ...workflow.draft.shopifyCatalog, size }
+                });
+              }
+            }}
+            onSelectColor={(color) => {
+              if (workflow.draft.shopifyCatalog) {
+                workflow.updateDraft({
+                  shopifyCatalog: { ...workflow.draft.shopifyCatalog, color }
+                });
+              }
+            }}
           />
         );
       case 'product-type':
