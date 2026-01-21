@@ -69,42 +69,57 @@ export function BrandDesignStep({
   const selectedColorLine = COLOR_LINES.find(c => c.id === draft.colorLine);
 
   return (
-    <div className="space-y-8 p-6 max-w-4xl mx-auto">
+    <div className="space-y-10 max-w-4xl mx-auto">
       {/* Brand Book Selection */}
-      <section className="space-y-5">
+      <section className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground mb-1 flex items-center gap-2">
-              <Palette className="w-6 h-6 text-primary" />
+            <h2 className="text-xl font-mono font-bold text-foreground uppercase tracking-wide flex items-center gap-3">
+              <Palette className="w-6 h-6 text-crimson" />
               Brand Book
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-2">
               Choose your brand identity for this product
             </p>
           </div>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => setShowZeroTolerance(!showZeroTolerance)}
-            className="text-xs gap-1.5"
+            className="gap-2 font-mono text-xs uppercase border-crimson/30 text-crimson hover:bg-crimson/10"
           >
-            <AlertTriangle className="w-3.5 h-3.5" />
+            <AlertTriangle className="w-4 h-4" />
             Guidelines
           </Button>
         </div>
 
         {showZeroTolerance && (
-          <Card className="p-4 bg-destructive/5 border-destructive/20">
-            <h3 className="font-bold text-sm mb-2 text-destructive flex items-center gap-2">
+          <Card className="p-5 bg-crimson/5 border-2 border-crimson/30">
+            <h3 className="font-mono font-bold text-sm mb-3 text-crimson flex items-center gap-2 uppercase">
               <AlertTriangle className="w-4 h-4" />
               Zero Tolerance Policy
             </h3>
-            <ul className="text-xs space-y-1.5 text-muted-foreground">
-              <li>• Only use the 8 core Techno Doggy variants</li>
-              <li>• Only use Logo Green or White for mascot strokes</li>
-              <li>• Never use AI-generated or modified mascot versions</li>
-              <li>• Always use dark fabric (black preferred)</li>
-              <li>• Always use official SVG exports from DogPack.tsx</li>
+            <ul className="text-sm space-y-2 text-muted-foreground font-mono">
+              <li className="flex items-start gap-2">
+                <span className="text-crimson">—</span>
+                Only use the 8 core Techno Doggy variants
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-crimson">—</span>
+                Only use Logo Green or White for mascot strokes
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-crimson">—</span>
+                Never use AI-generated or modified mascot versions
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-crimson">—</span>
+                Always use dark fabric (black preferred)
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-crimson">—</span>
+                Always use official SVG exports from DogPack.tsx
+              </li>
             </ul>
           </Card>
         )}
@@ -112,95 +127,95 @@ export function BrandDesignStep({
         <RadioGroup
           value={draft.brandBook}
           onValueChange={(v) => onSetBrandBook(v as BrandBookType)}
-          className="grid grid-cols-2 gap-4"
+          className="grid grid-cols-2 gap-6"
         >
           <Label
             htmlFor="techno-dog"
             className={cn(
-              "relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all group",
+              "relative flex flex-col items-center p-8 rounded-2xl border-2 cursor-pointer transition-all group",
               draft.brandBook === 'techno-dog' 
-                ? "border-primary bg-primary/10 shadow-lg shadow-primary/10" 
-                : "border-border hover:border-primary/50 hover:bg-muted/30"
+                ? "border-crimson bg-crimson/10 shadow-xl shadow-crimson/10" 
+                : "border-border hover:border-crimson/50 hover:bg-muted/20"
             )}
           >
             <RadioGroupItem value="techno-dog" id="techno-dog" className="sr-only" />
             {draft.brandBook === 'techno-dog' && (
-              <div className="absolute top-3 right-3">
-                <Check className="w-5 h-5 text-primary" />
+              <div className="absolute top-4 right-4">
+                <Check className="w-6 h-6 text-crimson" />
               </div>
             )}
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-              <Dog className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-crimson/30 to-crimson/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform ring-2 ring-crimson/20">
+              <Dog className="w-10 h-10 text-crimson" />
             </div>
-            <span className="font-bold text-foreground">techno.dog</span>
-            <span className="text-xs text-muted-foreground mt-1">Platform brand</span>
+            <span className="font-mono font-bold text-foreground uppercase tracking-wide">techno.dog</span>
+            <span className="text-xs text-muted-foreground mt-1 font-mono">Platform brand</span>
           </Label>
 
           <Label
             htmlFor="techno-doggies"
             className={cn(
-              "relative flex flex-col items-center p-6 rounded-xl border-2 cursor-pointer transition-all group",
+              "relative flex flex-col items-center p-8 rounded-2xl border-2 cursor-pointer transition-all group",
               draft.brandBook === 'techno-doggies' 
-                ? "border-logo-green bg-logo-green/10 shadow-lg shadow-logo-green/10" 
-                : "border-border hover:border-logo-green/50 hover:bg-muted/30"
+                ? "border-logo-green bg-logo-green/10 shadow-xl shadow-logo-green/10" 
+                : "border-border hover:border-logo-green/50 hover:bg-muted/20"
             )}
           >
             <RadioGroupItem value="techno-doggies" id="techno-doggies" className="sr-only" />
             {draft.brandBook === 'techno-doggies' && (
-              <div className="absolute top-3 right-3">
-                <Check className="w-5 h-5 text-logo-green" />
+              <div className="absolute top-4 right-4">
+                <Check className="w-6 h-6 text-logo-green" />
               </div>
             )}
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-logo-green/30 to-logo-green/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform ring-2 ring-logo-green/20">
               <div className="flex -space-x-1">
-                <Dog className="w-6 h-6 text-logo-green" />
-                <Dog className="w-6 h-6 text-logo-green" />
+                <Dog className="w-8 h-8 text-logo-green" />
+                <Dog className="w-8 h-8 text-logo-green" />
               </div>
             </div>
-            <span className="font-bold text-foreground">Techno Doggies</span>
-            <span className="text-xs text-muted-foreground mt-1">Mascot merchandise</span>
+            <span className="font-mono font-bold text-foreground uppercase tracking-wide">Techno Doggies</span>
+            <span className="text-xs text-muted-foreground mt-1 font-mono">Mascot merchandise</span>
           </Label>
         </RadioGroup>
       </section>
 
       {/* Mascot Selection (only for Techno Doggies) */}
       {draft.brandBook === 'techno-doggies' && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-mono font-bold flex items-center gap-2">
+        <section className="space-y-5">
+          <h2 className="text-lg font-mono font-bold uppercase tracking-wide flex items-center gap-3">
             <Dog className="w-5 h-5 text-logo-green" />
             Select Mascot
             {selectedMascot && (
-              <Badge variant="outline" className="ml-2 font-normal">
+              <Badge variant="outline" className="ml-2 font-mono text-xs border-logo-green/40 text-logo-green">
                 {selectedMascot.name}
               </Badge>
             )}
           </h2>
 
-          <ScrollArea className="h-[240px]">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pr-4">
+          <ScrollArea className="h-[280px]">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pr-4">
               {CORE_MASCOTS.map((mascot) => (
                 <Card
                   key={mascot.id}
                   onClick={() => onSetMascot(mascot.id, mascot.name)}
                   className={cn(
-                    "p-3 cursor-pointer transition-all hover:scale-105",
+                    "p-4 cursor-pointer transition-all hover:scale-105 relative border-2",
                     draft.mascotId === mascot.id
-                      ? "border-logo-green bg-logo-green/10"
-                      : "hover:border-primary/50"
+                      ? "border-logo-green bg-logo-green/10 shadow-lg shadow-logo-green/10"
+                      : "border-border hover:border-logo-green/50 hover:bg-muted/20"
                   )}
                 >
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center">
-                      <Dog className="w-8 h-8 text-logo-green" />
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="w-14 h-14 rounded-full bg-background flex items-center justify-center ring-2 ring-logo-green/30">
+                      <Dog className="w-9 h-9 text-logo-green" />
                     </div>
                     <div>
-                      <p className="font-mono font-bold text-sm">{mascot.name}</p>
-                      <p className="text-[10px] text-muted-foreground line-clamp-1">
+                      <p className="font-mono font-bold text-sm uppercase">{mascot.name}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1 mt-1">
                         {mascot.personality}
                       </p>
                     </div>
                     {draft.mascotId === mascot.id && (
-                      <Check className="w-4 h-4 text-logo-green absolute top-2 right-2" />
+                      <Check className="w-5 h-5 text-logo-green absolute top-3 right-3" />
                     )}
                   </div>
                 </Card>
@@ -211,46 +226,52 @@ export function BrandDesignStep({
       )}
 
       {/* Color Line Selection */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-mono font-bold flex items-center gap-2">
-          <Palette className="w-5 h-5" />
+      <section className="space-y-5">
+        <h2 className="text-lg font-mono font-bold uppercase tracking-wide flex items-center gap-3">
+          <Palette className="w-5 h-5 text-crimson" />
           Color Line
           {selectedColorLine && (
             <Badge 
               variant="outline" 
-              className="ml-2"
-              style={{ borderColor: selectedColorLine.hex }}
+              className="ml-2 font-mono text-xs"
+              style={{ borderColor: selectedColorLine.hex, color: selectedColorLine.hex }}
             >
               {selectedColorLine.name}
             </Badge>
           )}
         </h2>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {COLOR_LINES.map((line) => (
             <Card
               key={line.id}
               onClick={() => onSetColorLine(line.id as 'green-line' | 'white-line')}
               className={cn(
-                "p-4 cursor-pointer transition-all",
+                "p-5 cursor-pointer transition-all border-2",
                 draft.colorLine === line.id
-                  ? "border-2"
-                  : "border hover:border-primary/50"
+                  ? "shadow-lg"
+                  : "border-border hover:border-primary/50 hover:bg-muted/20"
               )}
               style={{ 
-                borderColor: draft.colorLine === line.id ? line.hex : undefined 
+                borderColor: draft.colorLine === line.id ? line.hex : undefined,
+                boxShadow: draft.colorLine === line.id ? `0 10px 30px -10px ${line.hex}40` : undefined
               }}
             >
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "w-16 h-16 rounded flex items-center justify-center",
-                  line.bgClass
-                )}>
-                  <Dog className={cn("w-10 h-10", line.strokeClass)} />
+              <div className="flex items-center gap-5">
+                <div 
+                  className={cn(
+                    "w-20 h-20 rounded-xl flex items-center justify-center",
+                    line.bgClass
+                  )} 
+                  style={{ 
+                    boxShadow: `inset 0 0 0 2px ${line.hex}40`
+                  }}
+                >
+                  <Dog className={cn("w-12 h-12", line.strokeClass)} />
                 </div>
                 <div>
-                  <p className="font-mono font-bold">{line.name}</p>
-                  <p className="text-xs text-muted-foreground">{line.description}</p>
+                  <p className="font-mono font-bold uppercase tracking-wide">{line.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{line.description}</p>
                 </div>
               </div>
             </Card>
@@ -259,26 +280,28 @@ export function BrandDesignStep({
       </section>
 
       {/* Preview */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-mono font-bold">Product Preview</h2>
-        <Card className="p-6 bg-black">
+      <section className="space-y-5">
+        <h2 className="text-lg font-mono font-bold uppercase tracking-wide">Product Preview</h2>
+        <Card className="p-8 bg-background border-2 border-border">
           <div className="flex items-center justify-center">
             <div className="relative">
-              <div className="w-32 h-40 bg-muted/20 rounded-lg flex items-center justify-center">
+              <div className="w-40 h-48 bg-muted/10 rounded-xl flex items-center justify-center ring-2 ring-border">
                 {selectedMascot && selectedColorLine ? (
                   <Dog 
-                    className="w-16 h-16" 
+                    className="w-20 h-20" 
                     style={{ color: selectedColorLine.hex }}
                   />
                 ) : (
-                  <span className="text-xs text-muted-foreground text-center px-2">
+                  <span className="text-xs text-muted-foreground text-center px-4 font-mono">
                     Select mascot & color line
                   </span>
                 )}
               </div>
               {selectedMascot && (
-                <p className="text-center mt-2 font-mono text-sm text-muted-foreground">
-                  {selectedColorLine?.name} – {selectedMascot.name}
+                <p className="text-center mt-4 font-mono text-sm text-muted-foreground">
+                  <span style={{ color: selectedColorLine?.hex }}>{selectedColorLine?.name}</span>
+                  <span className="text-muted-foreground/50"> — </span>
+                  <span className="text-foreground">{selectedMascot.name}</span>
                 </p>
               )}
             </div>
