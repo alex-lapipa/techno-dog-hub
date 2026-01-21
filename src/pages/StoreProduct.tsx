@@ -8,7 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { CartDrawer, CartButton } from "@/components/store/CartDrawer";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { fetchProductByHandle, formatPrice, ShopifyVariant } from "@/lib/shopify";
-import { useCartStore, CartItem } from "@/stores/cartStore";
+import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -143,16 +143,15 @@ const StoreProduct = () => {
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return;
 
-    const cartItem: CartItem = {
+    // addItem accepts Omit<CartItem, 'lineId'> - lineId is added by the store
+    addItem({
       product,
       variantId: selectedVariant.id,
       variantTitle: selectedVariant.title,
       price: selectedVariant.price,
       quantity: 1,
       selectedOptions: selectedVariant.selectedOptions,
-    };
-
-    addItem(cartItem);
+    });
     toast.success("Added to cart", {
       description: product.title,
       position: "top-center",

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ShopifyProductNode, formatPrice } from "@/lib/shopify";
-import { useCartStore, CartItem } from "@/stores/cartStore";
+import { useCartStore } from "@/stores/cartStore";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -25,16 +25,15 @@ export const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
     
     if (!firstVariant) return;
 
-    const cartItem: CartItem = {
+    // addItem accepts Omit<CartItem, 'lineId'> - lineId is added by the store
+    addItem({
       product,
       variantId: firstVariant.id,
       variantTitle: firstVariant.title,
       price: firstVariant.price,
       quantity: 1,
       selectedOptions: firstVariant.selectedOptions,
-    };
-
-    addItem(cartItem);
+    });
     toast.success("Added to cart", {
       description: product.title,
       position: "top-center",
