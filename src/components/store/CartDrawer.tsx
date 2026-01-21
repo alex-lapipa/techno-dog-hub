@@ -14,12 +14,14 @@ import { formatPrice } from "@/lib/shopify";
 export const CartDrawer = () => {
   const { 
     items, 
-    isLoading, 
+    isLoading,
+    isSyncing,
     isOpen,
     setOpen,
     updateQuantity, 
     removeItem, 
-    createCheckout,
+    getCheckoutUrl,
+    syncCart,
     getTotalItems,
     getTotalPrice,
   } = useCartStore();
@@ -28,8 +30,14 @@ export const CartDrawer = () => {
   const totalPrice = getTotalPrice();
   const currencyCode = items[0]?.price.currencyCode || 'EUR';
 
-  const handleCheckout = async () => {
-    const checkoutUrl = await createCheckout();
+  // Sync cart when drawer opens
+  const handleOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (open) syncCart();
+  };
+
+  const handleCheckout = () => {
+    const checkoutUrl = getCheckoutUrl();
     if (checkoutUrl) {
       window.open(checkoutUrl, '_blank');
       setOpen(false);
@@ -37,7 +45,7 @@ export const CartDrawer = () => {
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setOpen}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-background border-border">
         <SheetHeader className="flex-shrink-0 border-b border-border pb-4">
           <SheetTitle className="font-mono text-lg uppercase tracking-wider">
@@ -137,7 +145,7 @@ export const CartDrawer = () => {
                   onClick={handleCheckout}
                   className="w-full font-mono text-xs uppercase tracking-widest" 
                   size="lg"
-                  disabled={items.length === 0 || isLoading}
+                  disabled={items.length === 0 || isLoading || isSyncing}
                 >
                   {isLoading ? (
                     <>
