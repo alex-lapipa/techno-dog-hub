@@ -17,7 +17,7 @@ export const MODULE_CONFIG = {
    * Module Metadata
    */
   MODULE_NAME: 'techno.dog-ops',
-  VERSION: '1.0.0',
+  VERSION: '1.1.0',
   
   /**
    * Feature Flags
@@ -26,6 +26,16 @@ export const MODULE_CONFIG = {
     ECOMMERCE_OPS: true,
     CREATIVE_STUDIO: true,
     ANALYTICS: true,
+    PRINTFUL_POD: true,
+  },
+  
+  /**
+   * Printful POD Configuration
+   */
+  PRINTFUL: {
+    ENABLED: true,
+    DEFAULT_MARGIN_PERCENT: 60,
+    FULFILLMENT_SERVICE: 'printful',
   },
 
   /**
