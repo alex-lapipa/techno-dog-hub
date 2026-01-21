@@ -14,6 +14,7 @@ export { StepProductType } from './StepProductType';
 export { StepProductCopy } from './StepProductCopy';
 export { StepEditorialBrief } from './StepEditorialBrief';
 export { StepReviewExport } from './StepReviewExport';
+export { ShopifyProductSync } from './ShopifyProductSync';
 // Legacy exports (kept for compatibility)
 export { StepDesignPreview } from './StepDesignPreview';
 export { StepSaveDraft } from './StepSaveDraft';
