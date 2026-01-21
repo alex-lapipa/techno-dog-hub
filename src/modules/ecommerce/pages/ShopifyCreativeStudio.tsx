@@ -89,6 +89,7 @@ export function ShopifyCreativeStudio() {
             draft={studio.draft}
             isPublishing={studio.isPublishing}
             onPublish={studio.publishToShopify}
+            onUpdateDraft={studio.updateDraft}
           />
         );
       default:
