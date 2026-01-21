@@ -1,11 +1,34 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Camera, Filter, Loader2, ShoppingBag } from "lucide-react";
+import { Camera, Filter, Loader2, ShoppingBag, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminPageLayout } from "@/components/admin/AdminPageLayout";
 import FilmFrame from "@/components/FilmFrame";
 import { fetchProducts } from "@/lib/shopify";
+import { Button } from "@/components/ui/button";
+import { openShopifyAdmin } from "@/modules/ecommerce/config/shopify-config";
+import {
+  DJDog,
+  NinjaDog,
+  SpaceDog,
+  GrumpyDog,
+  HappyDog,
+  TechnoDog,
+  DancingDog,
+  AcidDog,
+} from "@/components/DogPack";
 
+// Brand book core mascots for admin showcase
+const CORE_MASCOTS = [
+  { id: 'dj-dog', name: 'DJ Dog', Component: DJDog },
+  { id: 'ninja-dog', name: 'Ninja Dog', Component: NinjaDog },
+  { id: 'space-dog', name: 'Space Dog', Component: SpaceDog },
+  { id: 'grumpy-dog', name: 'Grumpy Dog', Component: GrumpyDog },
+  { id: 'happy-dog', name: 'Happy Dog', Component: HappyDog },
+  { id: 'techno-dog', name: 'Techno Dog', Component: TechnoDog },
+  { id: 'dancing-dog', name: 'Dancing Dog', Component: DancingDog },
+  { id: 'acid-dog', name: 'Acid Dog', Component: AcidDog },
+];
 const AdminLookbook = () => {
   const [activeFilter, setActiveFilter] = useState<string>("All");
 
@@ -126,14 +149,59 @@ const AdminLookbook = () => {
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
           </div>
         ) : filteredImages.length === 0 ? (
-          <div className="text-center py-16 bg-card border border-border rounded-lg">
-            <Camera className="w-10 h-10 text-muted-foreground mx-auto mb-6 opacity-20" />
-            <h2 className="font-mono text-sm uppercase tracking-widest mb-3">
-              Coming soon
-            </h2>
-            <p className="font-mono text-[10px] text-muted-foreground max-w-xs mx-auto">
-              Product photography in production.
-            </p>
+          <div className="space-y-6">
+            {/* Brand Book Preview */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-mono text-sm uppercase tracking-widest mb-1">
+                    Black Line Collection
+                  </h3>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    8 core mascots approved for merchandise. Add products in Shopify to populate.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => openShopifyAdmin('products')}
+                  variant="outline"
+                  size="sm"
+                  className="font-mono text-xs"
+                >
+                  <ExternalLink className="w-3 h-3 mr-2" />
+                  Add Products
+                </Button>
+              </div>
+              
+              {/* Mascot Grid */}
+              <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                {CORE_MASCOTS.map((mascot) => (
+                  <div 
+                    key={mascot.id}
+                    className="border border-border bg-background p-3 text-center hover:border-logo-green/50 transition-colors"
+                  >
+                    <mascot.Component className="w-8 h-8 mx-auto mb-1 text-logo-green" />
+                    <p className="font-mono text-[8px] text-muted-foreground uppercase tracking-wider truncate">
+                      {mascot.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Guidelines Card */}
+            <div className="bg-logo-green/5 border border-logo-green/30 rounded-lg p-4">
+              <div className="flex items-start gap-4">
+                <Camera className="w-5 h-5 text-logo-green flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-mono text-xs uppercase tracking-widest mb-1">
+                    Zero Tolerance Policy
+                  </h4>
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    Black fabric only • Logo Green (#66ff66) or White strokes • No fills or gradients • Official SVG exports only
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
