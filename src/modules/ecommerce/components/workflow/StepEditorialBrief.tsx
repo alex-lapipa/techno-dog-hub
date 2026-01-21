@@ -1,0 +1,221 @@
+/**
+ * Step 4: Editorial Brief
+ * 
+ * AI-powered product description and creative rationale generation.
+ * Uses RAG + brand book context for on-brand copy.
+ */
+
+import { useState } from 'react';
+import { Sparkles, Loader2, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
+import { type ProductDraft } from '../../hooks/useCreativeWorkflow';
+
+interface StepEditorialBriefProps {
+  draft: ProductDraft;
+  onUpdateBrief: (brief: ProductDraft['editorialBrief']) => void;
+  onUpdateConcept: (concept: string) => void;
+}
+
+export function StepEditorialBrief({
+  draft,
+  onUpdateBrief,
+  onUpdateConcept,
+}: StepEditorialBriefProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [concept, setConcept] = useState(draft.productConcept || '');
+
+  const handleConceptChange = (value: string) => {
+    setConcept(value);
+    onUpdateConcept(value);
+  };
+
+  const generateEditorial = async () => {
+    if (!concept.trim()) {
+      setError('Please enter a product concept first');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('creative-studio-editorial', {
+        body: {
+          concept,
+          brandBook: draft.brandBook,
+          mascot: draft.selectedMascot?.displayName,
+          mascotPersonality: draft.selectedMascot?.personality,
+          productType: draft.selectedProduct?.type,
+          placement: draft.selectedProduct?.placement,
+        },
+      });
+
+      if (fnError) {
+        throw new Error(fnError.message);
+      }
+
+      if (data?.editorial) {
+        onUpdateBrief(data.editorial);
+      } else {
+        throw new Error('No editorial content received');
+      }
+    } catch (err) {
+      console.error('Editorial generation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to generate editorial');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const hasEditorial = !!draft.editorialBrief?.productName;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-mono font-bold text-foreground mb-2">
+          Editorial Brief
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Describe your product concept and let AI generate the editorial copy using 
+          your brand guidelines and RAG context.
+        </p>
+      </div>
+
+      {/* Product Concept Input */}
+      <Card className="p-5">
+        <Label htmlFor="concept" className="text-sm font-mono uppercase tracking-wide">
+          Product Concept
+        </Label>
+        <Textarea
+          id="concept"
+          placeholder="Describe your product idea... (e.g., 'Berlin winter hoodie for late-night ravers, minimal design with subtle acid house reference')"
+          value={concept}
+          onChange={(e) => handleConceptChange(e.target.value)}
+          className="mt-2 min-h-[100px] font-mono text-sm"
+        />
+        
+        {/* Context summary */}
+        <div className="mt-4 p-3 bg-muted/30 rounded text-xs space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Brand:</span>
+            <span className="font-mono text-foreground">{draft.brandBook}</span>
+          </div>
+          {draft.selectedMascot && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Mascot:</span>
+              <span className="font-mono text-foreground">{draft.selectedMascot.displayName}</span>
+            </div>
+          )}
+          {draft.selectedProduct && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Product:</span>
+              <span className="font-mono text-foreground">{draft.selectedProduct.type}</span>
+            </div>
+          )}
+        </div>
+
+        <Button
+          onClick={generateEditorial}
+          disabled={isGenerating || !concept.trim()}
+          className="mt-4 w-full"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Generating Editorial...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Generate Editorial Brief
+            </>
+          )}
+        </Button>
+      </Card>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="w-4 h-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Generated Editorial Display */}
+      {hasEditorial && draft.editorialBrief && (
+        <Card className="p-5 border-primary/30 bg-primary/5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Check className="w-5 h-5 text-primary" />
+              <span className="font-mono text-sm uppercase text-primary">Generated Editorial</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={generateEditorial}
+              disabled={isGenerating}
+            >
+              <RefreshCw className={`w-4 h-4 mr-1 ${isGenerating ? 'animate-spin' : ''}`} />
+              Regenerate
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground">Product Name</Label>
+              <Input
+                value={draft.editorialBrief.productName}
+                onChange={(e) => onUpdateBrief({ ...draft.editorialBrief!, productName: e.target.value })}
+                className="mt-1 font-mono"
+              />
+            </div>
+
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground">Tagline</Label>
+              <Input
+                value={draft.editorialBrief.tagline}
+                onChange={(e) => onUpdateBrief({ ...draft.editorialBrief!, tagline: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground">Description</Label>
+              <Textarea
+                value={draft.editorialBrief.description}
+                onChange={(e) => onUpdateBrief({ ...draft.editorialBrief!, description: e.target.value })}
+                className="mt-1 min-h-[80px]"
+              />
+            </div>
+
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground">Creative Rationale</Label>
+              <Textarea
+                value={draft.editorialBrief.creativeRationale}
+                onChange={(e) => onUpdateBrief({ ...draft.editorialBrief!, creativeRationale: e.target.value })}
+                className="mt-1 min-h-[80px] text-sm italic"
+              />
+            </div>
+
+            <div>
+              <Label className="text-[10px] uppercase text-muted-foreground">Target Audience</Label>
+              <Input
+                value={draft.editorialBrief.targetAudience}
+                onChange={(e) => onUpdateBrief({ ...draft.editorialBrief!, targetAudience: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+export default StepEditorialBrief;
