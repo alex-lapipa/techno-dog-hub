@@ -587,6 +587,47 @@ const BrandBookAdmin = () => {
             </div>
           </div>
 
+          {/* Key Visual Assets */}
+          <div>
+            <h3 className="text-lg font-bold uppercase tracking-wider mb-4">KEY VISUAL ASSETS</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="border border-logo-green/30 overflow-hidden">
+                <div className="relative aspect-video bg-background">
+                  <img 
+                    src="/lovable-uploads/QUERODIA.jpg" 
+                    alt="Las Querodias - Official launch artwork for techno.dog"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to NFT version if QUERODIA.jpg not found
+                      e.currentTarget.src = '/lovable-uploads/LAS_QUERODIAS_NFT-01.png';
+                    }}
+                  />
+                </div>
+                <div className="p-4 border-t border-logo-green/30 bg-card">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-logo-green">QUERODIAS</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Official launch artwork featured in Alex Lawton's founding letter. This visual represents the underground spirit and cultural ethos of techno.dog.
+                  </p>
+                  <div className="flex items-center gap-4 mt-3">
+                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Usage: Homepage, Press, About</span>
+                    <span className="text-[10px] uppercase tracking-wider text-logo-green">PROTECTED ASSET</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border border-border p-4 flex flex-col justify-center">
+                <h4 className="text-sm font-bold uppercase tracking-wider mb-3">ASSET GUIDELINES</h4>
+                <ul className="text-xs text-muted-foreground space-y-2">
+                  <li>• Use only in brand-appropriate contexts</li>
+                  <li>• Do not crop or alter the composition</li>
+                  <li>• Always maintain original aspect ratio</li>
+                  <li>• Credit as "techno.dog official artwork"</li>
+                  <li>• High-resolution versions available on request</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Export Design System */}
           <div className="border border-logo-green/30 bg-logo-green/5 p-4">
             <div className="flex items-center justify-between">
