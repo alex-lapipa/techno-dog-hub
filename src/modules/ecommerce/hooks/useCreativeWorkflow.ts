@@ -14,6 +14,7 @@ export type WorkflowStep =
   | 'visual-selection'
   | 'color-line'
   | 'product-type'
+  | 'product-copy'
   | 'editorial-brief'
   | 'review-export';
 
@@ -58,20 +59,36 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required: true,
   },
   {
-    id: 'editorial-brief',
+    id: 'product-copy',
     number: 5,
+    title: 'Product Copy',
+    description: 'Add text or tagline (optional)',
+    required: false,
+  },
+  {
+    id: 'editorial-brief',
+    number: 6,
     title: 'Editorial Brief',
     description: 'AI-generated product story',
     required: true,
   },
   {
     id: 'review-export',
-    number: 6,
+    number: 7,
     title: 'Review & Export',
     description: 'Preview, compliance check, and save',
     required: true,
   },
 ];
+
+// Text placement options for product copy
+export type TextPlacement = 'front' | 'back' | 'left-side' | 'right-side' | 'sleeve' | 'hood' | 'collar';
+
+export interface ProductCopyConfig {
+  text: string;
+  placement: TextPlacement;
+  fontSize?: 'small' | 'medium' | 'large';
+}
 
 // Product draft structure
 export interface ProductDraft {
@@ -81,6 +98,7 @@ export interface ProductDraft {
   selectedMascot?: ApprovedMascot | null;
   colorLine?: ColorLineType | null;
   selectedProduct?: ApprovedProduct | null;
+  productCopy?: ProductCopyConfig[];
   productConcept?: string;
   editorialBrief?: {
     productName: string;
@@ -124,6 +142,7 @@ export interface UseCreativeWorkflowReturn {
   selectMascot: (mascot: ApprovedMascot | null) => void;
   setColorLine: (colorLine: ColorLineType | null) => void;
   selectProductType: (product: ApprovedProduct | null) => void;
+  setProductCopy: (copy: ProductCopyConfig[]) => void;
   setProductConcept: (concept: string) => void;
   setEditorialBrief: (brief: ProductDraft['editorialBrief']) => void;
   setGeneratedImage: (url: string) => void;
@@ -175,6 +194,9 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
         return !!draft.colorLine;
       case 'product-type':
         return !!draft.selectedProduct;
+      case 'product-copy':
+        // Optional step - always considered complete
+        return true;
       case 'editorial-brief':
         return !!draft.editorialBrief?.productName;
       case 'review-export':
@@ -257,6 +279,10 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     updateDraft({ selectedProduct: product });
   }, [updateDraft]);
 
+  const setProductCopy = useCallback((copy: ProductCopyConfig[]) => {
+    updateDraft({ productCopy: copy });
+  }, [updateDraft]);
+
   const setProductConcept = useCallback((concept: string) => {
     updateDraft({ productConcept: concept });
   }, [updateDraft]);
@@ -315,6 +341,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     selectMascot,
     setColorLine,
     selectProductType,
+    setProductCopy,
     setProductConcept,
     setEditorialBrief,
     setGeneratedImage,
