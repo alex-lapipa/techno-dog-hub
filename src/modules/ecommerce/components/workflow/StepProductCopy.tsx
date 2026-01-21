@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Trash2, SkipForward, Type, MapPin } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -138,7 +138,7 @@ export function StepProductCopy({
             onClick={onSkip}
             className="flex-shrink-0 border-dashed"
           >
-            <SkipForward className="w-4 h-4 mr-2" />
+            <ChevronRight className="w-4 h-4 mr-2" />
             Skip
           </Button>
         )}
@@ -162,8 +162,7 @@ export function StepProductCopy({
               <div className="flex-1 space-y-4">
                 {/* Text input */}
                 <div>
-                  <Label className="text-xs uppercase text-muted-foreground flex items-center gap-1">
-                    <Type className="w-3 h-3" />
+                  <Label className="text-xs uppercase text-muted-foreground">
                     Text / Tagline
                   </Label>
                   <Input
@@ -181,8 +180,7 @@ export function StepProductCopy({
                 <div className="grid grid-cols-2 gap-4">
                   {/* Placement */}
                   <div>
-                    <Label className="text-xs uppercase text-muted-foreground flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
+                    <Label className="text-xs uppercase text-muted-foreground">
                       Placement
                     </Label>
                     <Select
@@ -233,7 +231,7 @@ export function StepProductCopy({
                 onClick={() => removeEntry(index)}
                 className="text-muted-foreground hover:text-destructive"
               >
-                <Trash2 className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </Button>
             </div>
           </Card>
@@ -245,7 +243,6 @@ export function StepProductCopy({
           onClick={addEntry}
           className="w-full border-dashed"
         >
-          <Plus className="w-4 h-4 mr-2" />
           Add Text Element
         </Button>
       </div>
