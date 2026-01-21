@@ -16,6 +16,7 @@ import {
   StepVisualSelection,
   StepColorLine,
   StepProductType,
+  StepProductCopy,
   StepEditorialBrief,
   StepReviewExport,
 } from '../components/workflow';
@@ -61,6 +62,15 @@ export function CreativeStudio() {
             products={workflow.guidelines.products}
             selectedProduct={workflow.draft.selectedProduct || null}
             onSelectProduct={workflow.selectProductType}
+          />
+        );
+      case 'product-copy':
+        return (
+          <StepProductCopy
+            productType={workflow.draft.selectedProduct?.type}
+            currentCopy={workflow.draft.productCopy || []}
+            onUpdateCopy={workflow.setProductCopy}
+            onSkip={workflow.goNext}
           />
         );
       case 'editorial-brief':
