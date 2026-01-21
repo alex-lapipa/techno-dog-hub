@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import DogSilhouette from '@/components/DogSilhouette';
 import { DJDog, NinjaDog, SpaceDog, GrumpyDog, HappyDog, TechnoDog, DancingDog, AcidDog } from '@/components/DogPack';
+import { BrandBookProtectionBadge } from '@/components/admin/BrandBookProtectionBadge';
 
 // Brand Book Configuration
 const BRAND_CONFIG = {
@@ -355,6 +356,7 @@ const BrandBookAdmin = () => {
       icon={Palette}
       iconColor="text-logo-green"
       showSidebar={true}
+      actions={<BrandBookProtectionBadge configType="techno_dog" />}
     >
       {/* Brand Identity Header */}
       <Card className="border-logo-green/30 mb-6">

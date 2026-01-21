@@ -1731,6 +1731,78 @@ export type Database = {
           },
         ]
       }
+      brand_book_audit_log: {
+        Row: {
+          action: string
+          config_type: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          config_type: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          config_type?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      brand_book_configs: {
+        Row: {
+          config_data: Json
+          config_type: string
+          created_at: string
+          id: string
+          is_locked: boolean
+          locked_by: string
+          locked_reason: string | null
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          config_data?: Json
+          config_type: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean
+          locked_by?: string
+          locked_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          config_data?: Json
+          config_type?: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean
+          locked_by?: string
+          locked_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
       brand_contacts: {
         Row: {
           brand_id: string | null
@@ -8418,9 +8490,14 @@ export type Database = {
             Returns: boolean
           }
         | { Args: { check_role: string }; Returns: boolean }
+      is_brand_book_owner: { Args: never; Returns: boolean }
       is_verified_community_member:
         | { Args: never; Returns: boolean }
         | { Args: { p_user_id: string }; Returns: boolean }
+      log_brand_book_access: {
+        Args: { p_action: string; p_config_type: string; p_details?: Json }
+        Returns: undefined
+      }
       log_changelog_entry: {
         Args: {
           p_author?: string

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import DogSilhouette from '@/components/DogSilhouette';
 import { DJDog, NinjaDog, SpaceDog, GrumpyDog, HappyDog, TechnoDog, DancingDog, AcidDog } from '@/components/DogPack';
+import { BrandBookProtectionBadge } from '@/components/admin/BrandBookProtectionBadge';
 
 // Download JSON helper
 const downloadDesignSystem = async () => {
@@ -39,6 +40,7 @@ const DoggiesBrandBook = () => {
       icon={Palette}
       iconColor="text-logo-green"
       showSidebar={true}
+      actions={<BrandBookProtectionBadge configType="techno_doggies" />}
     >
       {/* Hero Section */}
       <Card className="border-logo-green/50 bg-gradient-to-br from-logo-green/5 to-background mb-6">
