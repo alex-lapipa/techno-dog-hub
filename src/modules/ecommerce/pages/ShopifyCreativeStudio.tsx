@@ -1,26 +1,54 @@
 /**
- * Shopify Creative Studio v2 - Main Page
+ * Shopify Creative Studio v2 - Main Page (Vertical Flow)
  * 
- * Shopify-first creative workflow for product design and publishing.
- * Enhanced UX with cleaner layout and better visual hierarchy.
+ * Redesigned with a vertical scrolling layout for better UX.
+ * Features: horizontal progress bar, full-width step content,
+ * generous whitespace, and sticky bottom navigation.
  */
 
 import { useEffect } from 'react';
-import { ArrowLeft, ArrowRight, RotateCcw, ShoppingBag, Save, Sparkles } from 'lucide-react';
+import { Sparkles, Package, Palette, Wand2, Rocket } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 import { useShopifyStudio } from '../hooks/useShopifyStudio';
 import { 
-  StudioSidebar, 
+  VerticalProgressIndicator,
+  StepContainer,
+  BottomNavigation,
   ProductSelector, 
   VariantEditor,
   BrandDesignStep,
   AIEnhancementStep,
   PublishStep,
 } from '../components/shopify-studio';
+
+// Step metadata for the container
+const STEP_META = {
+  'product-select': {
+    title: 'Choose Your Product',
+    description: 'Start from your existing Shopify inventory or create something entirely new from our product catalog.',
+    icon: Package,
+  },
+  'variant-config': {
+    title: 'Configure Variants',
+    description: 'Set up sizes, colors, and pricing. Shopify handles the variant matrix automatically.',
+    icon: Sparkles,
+  },
+  'brand-design': {
+    title: 'Apply Brand Identity',
+    description: 'Choose your brand book and apply mascots, colors, and design elements that define your product.',
+    icon: Palette,
+  },
+  'ai-enhance': {
+    title: 'AI Enhancement',
+    description: 'Generate authentic underground techno copy and product mockups using our Technopedia knowledge base.',
+    icon: Wand2,
+  },
+  'publish': {
+    title: 'Review & Publish',
+    description: 'Final review of all product details. Configure SEO, metafields, and publish directly to your Shopify store.',
+    icon: Rocket,
+  },
+};
 
 export function ShopifyCreativeStudio() {
   const studio = useShopifyStudio();
@@ -30,7 +58,10 @@ export function ShopifyCreativeStudio() {
     studio.refreshProducts();
   }, []);
 
-  // Render current step content
+  // Get current step metadata
+  const currentMeta = STEP_META[studio.currentStep];
+
+  // Render current step content (without duplicate headers - StepContainer provides them)
   const renderStepContent = () => {
     switch (studio.currentStep) {
       case 'product-select':
@@ -105,78 +136,45 @@ export function ShopifyCreativeStudio() {
       description="Design and publish products with Shopify-first workflow"
       icon={Sparkles}
       iconColor="text-primary"
-      actions={
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-[10px] bg-muted/50">
-            Step {studio.stepNumber} of {studio.totalSteps}
-          </Badge>
-          <Separator orientation="vertical" className="h-5" />
-          <Button variant="ghost" size="sm" onClick={studio.saveDraft} className="gap-1.5">
-            <Save className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Save</span>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={studio.resetStudio} className="gap-1.5 text-muted-foreground hover:text-destructive">
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Reset</span>
-          </Button>
-        </div>
-      }
     >
-      <div className="flex h-[calc(100vh-180px)] min-h-[600px] -mx-6 -mb-6 border-t border-border bg-background/50">
-        {/* Sidebar */}
-        <StudioSidebar
+      {/* Main Container - Full height with scroll */}
+      <div className="flex flex-col -mx-6 -mb-6 min-h-[calc(100vh-120px)] bg-gradient-to-b from-background to-muted/20">
+        {/* Horizontal Progress Indicator (Sticky) */}
+        <VerticalProgressIndicator
           currentStep={studio.currentStep}
           completedSteps={studio.completedSteps}
-          onStepClick={studio.goToStep}
           isStepComplete={studio.isStepComplete}
-          productTitle={studio.draft.title}
+          onStepClick={studio.goToStep}
         />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Step Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-6">
-              {renderStepContent()}
-            </div>
-          </div>
-
-          {/* Footer Navigation */}
-          <div className="flex-shrink-0 border-t border-border bg-card/80 backdrop-blur-sm">
-            <div className="flex items-center justify-between px-6 py-4">
-              <Button 
-                variant="outline" 
-                onClick={studio.goBack} 
-                disabled={!studio.canGoBack}
-                className="gap-2 min-w-[120px]"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-              
-              <div className="flex items-center gap-3">
-                <div className="hidden md:flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Current:</span>
-                  <Badge variant="secondary" className="font-medium">
-                    {studio.currentStepConfig.title}
-                  </Badge>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={studio.goNext} 
-                disabled={!studio.canGoNext}
-                className={cn(
-                  "gap-2 min-w-[120px]",
-                  studio.currentStep === 'publish' && "bg-logo-green hover:bg-logo-green/90 text-black"
-                )}
-              >
-                {studio.currentStep === 'publish' ? 'Publish' : 'Next'}
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto pb-24">
+          <StepContainer
+            stepNumber={studio.stepNumber}
+            totalSteps={studio.totalSteps}
+            title={currentMeta.title}
+            description={currentMeta.description}
+            icon={currentMeta.icon}
+            isComplete={studio.isStepComplete(studio.currentStep)}
+          >
+            {renderStepContent()}
+          </StepContainer>
         </div>
+
+        {/* Fixed Bottom Navigation */}
+        <BottomNavigation
+          currentStepConfig={studio.currentStepConfig}
+          stepNumber={studio.stepNumber}
+          totalSteps={studio.totalSteps}
+          canGoBack={studio.canGoBack}
+          canGoNext={studio.canGoNext}
+          isPublishStep={studio.currentStep === 'publish'}
+          isPublishing={studio.isPublishing}
+          onBack={studio.goBack}
+          onNext={studio.currentStep === 'publish' ? studio.publishToShopify : studio.goNext}
+          onSave={studio.saveDraft}
+          onReset={studio.resetStudio}
+        />
       </div>
     </AdminPageLayout>
   );
