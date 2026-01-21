@@ -3,12 +3,16 @@
  * 
  * Configure product variants with Shopify-aligned structure.
  * Sizes, colors, pricing all follow Shopify Admin API schema.
+ * 
+ * PRINTFUL INTEGRATION: Products are configured with Printful-aligned
+ * colors, sizes, and fulfillment settings for seamless POD orders.
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   Plus, Trash2, DollarSign, Palette, Ruler, 
-  Package, AlertCircle, Sparkles, Check 
+  Package, AlertCircle, Sparkles, Check, Truck,
+  Factory, Clock, Info
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,8 +29,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { type ShopifyVariant, type ShopifyOption, type StudioDraft } from '../../hooks/useShopifyStudio';
+import { 
+  getPrintfulConfig, 
+  isPrintfulSupported, 
+  calculateRetailPrice,
+  getProductionEstimate,
+  PRINTFUL_COLORS,
+  type PrintfulVariantInfo 
+} from '../../config/printful-integration';
 
 // Standard POD size options
 const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
@@ -62,6 +80,29 @@ export function VariantEditor({ draft, onUpdateDraft }: VariantEditorProps) {
   
   const hasVariants = draft.variants.length > 0;
   const hasOptions = draft.options.length > 0;
+
+  // Get Printful configuration for this product type
+  const printfulConfig = useMemo(() => {
+    if (!draft.productType) return null;
+    return getPrintfulConfig(draft.productType);
+  }, [draft.productType]);
+
+  const isPODProduct = useMemo(() => {
+    return draft.productType ? isPrintfulSupported(draft.productType) : false;
+  }, [draft.productType]);
+
+  // Calculate pricing info
+  const pricingInfo = useMemo(() => {
+    if (!printfulConfig) return null;
+    const basePrice = parseFloat(draft.variants[0]?.price || '0');
+    if (basePrice <= 0) return null;
+    return {
+      baseCost: printfulConfig.baseCost,
+      retailPrice: basePrice,
+      profit: basePrice - printfulConfig.baseCost,
+      margin: ((basePrice - printfulConfig.baseCost) / basePrice * 100).toFixed(1),
+    };
+  }, [printfulConfig, draft.variants]);
 
   // Add a standard Size option
   const addSizeOption = () => {
@@ -219,6 +260,67 @@ export function VariantEditor({ draft, onUpdateDraft }: VariantEditorProps) {
         </Badge>
       </div>
 
+      {/* Printful POD Info Banner */}
+      {isPODProduct && printfulConfig && (
+        <Card className="p-4 bg-gradient-to-r from-logo-green/5 to-primary/5 border-logo-green/30">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-logo-green/10 flex items-center justify-center flex-shrink-0">
+              <Factory className="w-5 h-5 text-logo-green" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-mono font-bold text-sm">Printful Print-on-Demand</h4>
+                <Badge variant="outline" className="text-[10px] border-logo-green/50 text-logo-green">
+                  Connected
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>Base: ${printfulConfig.baseCost.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{printfulConfig.productionDays} day production</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Truck className="w-3.5 h-3.5" />
+                  <span>{printfulConfig.shippingEstimate}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Package className="w-3.5 h-3.5" />
+                  <span>{printfulConfig.printAreas.length} print area{printfulConfig.printAreas.length > 1 ? 's' : ''}</span>
+                </div>
+              </div>
+              {pricingInfo && pricingInfo.profit > 0 && (
+                <div className="mt-2 pt-2 border-t border-logo-green/20">
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="text-muted-foreground">Profit:</span>
+                    <span className="font-mono font-bold text-logo-green">${pricingInfo.profit.toFixed(2)}</span>
+                    <Badge variant="secondary" className="text-[10px]">{pricingInfo.margin}% margin</Badge>
+                  </div>
+                </div>
+              )}
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Info className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left" className="max-w-xs">
+                  <p className="text-xs">
+                    This product is fulfilled by Printful. Orders are automatically sent to Printful 
+                    for production and shipping. No inventory management needed.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </Card>
+      )}
+
       {/* Product Summary Card */}
       <Card className="p-5 bg-gradient-to-r from-muted/50 to-muted/20 border-muted">
         <div className="flex items-center gap-4">
@@ -229,6 +331,9 @@ export function VariantEditor({ draft, onUpdateDraft }: VariantEditorProps) {
             <h3 className="font-bold text-lg">{draft.title || 'New Product'}</h3>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="secondary" className="text-xs">{draft.productType || 'No type'}</Badge>
+              {isPODProduct && (
+                <Badge variant="outline" className="text-[10px] border-logo-green/30">POD</Badge>
+              )}
               <span className="text-xs text-muted-foreground">by {draft.vendor}</span>
             </div>
           </div>

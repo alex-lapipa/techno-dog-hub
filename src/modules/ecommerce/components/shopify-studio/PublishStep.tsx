@@ -2,10 +2,11 @@
  * Publish Step - Review and publish to Shopify
  * 
  * SHOPIFY-FIRST: Direct integration with Shopify Admin API.
+ * PRINTFUL INTEGRATION: Displays POD fulfillment info and routing.
  * Includes SEO, Metafields, and Collections per best practices.
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   ShoppingBag, 
   Check, 
@@ -19,7 +20,10 @@ import {
   Rocket,
   Eye,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Factory,
+  Truck,
+  Clock
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +41,11 @@ import { SHOPIFY_STORE_PERMANENT_DOMAIN } from '@/lib/shopify';
 import { SEOPanel } from './SEOPanel';
 import { MetafieldEditor, type Metafield } from './MetafieldEditor';
 import { CollectionSelector } from './CollectionSelector';
+import { 
+  getPrintfulConfig, 
+  isPrintfulSupported,
+  getProductionEstimate 
+} from '../../config/printful-integration';
 
 interface PublishStepProps {
   draft: StudioDraft;
@@ -60,6 +69,16 @@ export function PublishStep({
 }: PublishStepProps) {
   const [hasPublished, setHasPublished] = useState(draft.status === 'published');
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Check if product is POD/Printful
+  const isPODProduct = useMemo(() => {
+    return draft.productType ? isPrintfulSupported(draft.productType) : false;
+  }, [draft.productType]);
+
+  const printfulConfig = useMemo(() => {
+    if (!draft.productType) return null;
+    return getPrintfulConfig(draft.productType);
+  }, [draft.productType]);
 
   // Run validation checks (Shopify best practices)
   const validationItems: ValidationItem[] = [
@@ -132,6 +151,12 @@ export function PublishStep({
       label: 'Collections',
       status: draft.collectionIds.length > 0 ? 'pass' : 'warn',
       message: draft.collectionIds.length > 0 ? `${draft.collectionIds.length} selected` : 'None selected',
+    },
+    {
+      id: 'fulfillment',
+      label: 'Fulfillment',
+      status: isPODProduct ? 'pass' : 'warn',
+      message: isPODProduct ? 'Printful POD' : 'Manual',
     },
   ];
 
