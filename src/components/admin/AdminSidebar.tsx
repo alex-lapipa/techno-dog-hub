@@ -41,6 +41,8 @@ import {
   Target,
   ClipboardList,
   Palette,
+  Store,
+  ShoppingBag,
 } from 'lucide-react';
 
 interface NavSection {
@@ -138,6 +140,15 @@ const adminSections: NavSection[] = [
     items: [
       { label: 'techno.dog', path: '/admin/brand-book', icon: Palette, description: 'Main design system' },
       { label: 'Techno Doggies', path: '/admin/doggies-brand-book', icon: Dog, description: 'Mascot design system' },
+    ],
+  },
+  {
+    id: 'store',
+    label: 'Store',
+    icon: Store,
+    items: [
+      { label: 'Shop', path: '/store', icon: Store, description: 'Main storefront' },
+      { label: 'Lookbook', path: '/lookbook', icon: ShoppingBag, description: 'Product gallery' },
     ],
   },
   {
