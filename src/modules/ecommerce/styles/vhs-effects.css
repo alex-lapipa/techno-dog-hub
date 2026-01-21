@@ -1,0 +1,224 @@
+/**
+ * VHS Underground Effects - Phase 4
+ * 
+ * CSS animations and effects for the Creative Studio.
+ * Brings the '90s London underground / VHS aesthetic to life.
+ * 
+ * Usage:
+ * - Import and apply classes to components
+ * - Use with Tailwind for composition
+ */
+
+/* ===== VHS SCANLINES OVERLAY ===== */
+.vhs-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.vhs-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+  animation: scanlines-shift 8s linear infinite;
+}
+
+@keyframes scanlines-shift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100px;
+  }
+}
+
+/* ===== GLITCH TEXT EFFECT ===== */
+.glitch-text {
+  position: relative;
+  animation: glitch-text 3s infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+}
+
+.glitch-text::before {
+  animation: glitch-before 2s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  transform: translateX(-2px);
+  color: hsl(var(--primary));
+}
+
+.glitch-text::after {
+  animation: glitch-after 2s infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  transform: translateX(2px);
+  color: hsl(var(--destructive));
+}
+
+@keyframes glitch-before {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes glitch-after {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(3px); }
+  40% { transform: translateX(-3px); }
+  60% { transform: translateX(1px); }
+  80% { transform: translateX(-2px); }
+}
+
+@keyframes glitch-text {
+  0%, 100% { opacity: 1; }
+  2% { opacity: 0.8; }
+  4% { opacity: 1; }
+  6% { opacity: 0.9; }
+  8% { opacity: 1; }
+}
+
+/* ===== VHS TRACKING DISTORTION ===== */
+.vhs-tracking {
+  animation: vhs-tracking 0.3s ease-in-out;
+}
+
+@keyframes vhs-tracking {
+  0% { transform: translateX(0) skewX(0deg); filter: none; }
+  25% { transform: translateX(-2px) skewX(-0.5deg); filter: blur(0.5px); }
+  50% { transform: translateX(2px) skewX(0.5deg); filter: none; }
+  75% { transform: translateX(-1px) skewX(-0.25deg); filter: blur(0.25px); }
+  100% { transform: translateX(0) skewX(0deg); filter: none; }
+}
+
+/* ===== NEON GLOW PULSE ===== */
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+.neon-pulse-green {
+  animation: neon-pulse-green 2s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary)),
+                0 0 10px hsl(var(--primary)),
+                0 0 15px hsl(var(--primary) / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 10px hsl(var(--primary)),
+                0 0 20px hsl(var(--primary)),
+                0 0 30px hsl(var(--primary) / 0.5);
+  }
+}
+
+@keyframes neon-pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 5px #00FF00,
+                0 0 10px #00FF00,
+                0 0 15px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 10px #00FF00,
+                0 0 20px #00FF00,
+                0 0 30px rgba(0, 255, 0, 0.5);
+  }
+}
+
+/* ===== CRT FLICKER ===== */
+.crt-flicker {
+  animation: crt-flicker 0.15s infinite;
+}
+
+@keyframes crt-flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.98; }
+}
+
+/* ===== STEP TRANSITION ===== */
+.step-enter {
+  animation: step-enter 0.4s ease-out forwards;
+}
+
+@keyframes step-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(4px);
+  }
+  50% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* ===== UNDERGROUND BADGE ===== */
+.badge-underground {
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(var(--muted)) 50%,
+    hsl(var(--background)) 100%
+  );
+  background-size: 200% 200%;
+  animation: badge-shimmer 3s ease infinite;
+}
+
+@keyframes badge-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== LOADING BAR ===== */
+.loading-underground {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    hsl(var(--primary)) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: loading-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ===== NOISE OVERLAY ===== */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}

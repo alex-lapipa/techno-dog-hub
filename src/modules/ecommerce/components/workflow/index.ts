@@ -5,6 +5,7 @@
  */
 
 export { WorkflowSidebar } from './WorkflowSidebar';
+export { KnowledgeBasePanel, type KnowledgeContext, SCENE_PRESETS } from './KnowledgeBasePanel';
 export { StepBrandSelection } from './StepBrandSelection';
 export { StepVisualSelection } from './StepVisualSelection';
 export { StepColorLine } from './StepColorLine';

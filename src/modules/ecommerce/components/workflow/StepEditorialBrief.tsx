@@ -1,8 +1,14 @@
 /**
- * Step 4: Editorial Brief
+ * Step 5: Editorial Brief
  * 
+ * Phase 2 & 3: Enhanced with Technopedia integration and scene/mood context.
  * AI-powered product description and creative rationale generation.
  * Uses RAG + brand book context for on-brand copy.
+ * 
+ * BRAND COMPLIANCE:
+ * - Brand book data is READ-ONLY
+ * - Only approved mascots from 94-variant pack
+ * - Never modifies brand assets
  */
 
 import { useState } from 'react';
@@ -15,12 +21,22 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { type ProductDraft } from '../../hooks/useCreativeWorkflow';
+import { KnowledgeBasePanel, type KnowledgeContext } from './KnowledgeBasePanel';
 
 interface StepEditorialBriefProps {
   draft: ProductDraft;
   onUpdateBrief: (brief: ProductDraft['editorialBrief']) => void;
   onUpdateConcept: (concept: string) => void;
 }
+
+// Initial empty knowledge context
+const EMPTY_CONTEXT: KnowledgeContext = {
+  artists: [],
+  gear: [],
+  venues: [],
+  labels: [],
+  customKeywords: [],
+};
 
 export function StepEditorialBrief({
   draft,
@@ -30,6 +46,7 @@ export function StepEditorialBrief({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [concept, setConcept] = useState(draft.productConcept || '');
+  const [knowledgeContext, setKnowledgeContext] = useState<KnowledgeContext>(EMPTY_CONTEXT);
 
   const handleConceptChange = (value: string) => {
     setConcept(value);
@@ -54,6 +71,13 @@ export function StepEditorialBrief({
           mascotPersonality: draft.selectedMascot?.personality,
           productType: draft.selectedProduct?.type,
           placement: draft.selectedProduct?.placement,
+          colorLine: draft.colorLine,
+          // Phase 2: Send knowledge context to AI
+          knowledgeContext: {
+            selectedScene: knowledgeContext.selectedScene,
+            artists: knowledgeContext.artists,
+            gear: knowledgeContext.gear,
+          },
         },
       });
 
@@ -84,61 +108,87 @@ export function StepEditorialBrief({
         </h2>
         <p className="text-sm text-muted-foreground">
           Describe your product concept and let AI generate the editorial copy using 
-          your brand guidelines and RAG context.
+          your brand guidelines, Technopedia context, and scene inspiration.
         </p>
       </div>
 
-      {/* Product Concept Input */}
-      <Card className="p-5">
-        <Label htmlFor="concept" className="text-sm font-mono uppercase tracking-wide">
-          Product Concept
-        </Label>
-        <Textarea
-          id="concept"
-          placeholder="Describe your product idea... (e.g., 'Berlin winter hoodie for late-night ravers, minimal design with subtle acid house reference')"
-          value={concept}
-          onChange={(e) => handleConceptChange(e.target.value)}
-          className="mt-2 min-h-[100px] font-mono text-sm"
-        />
-        
-        {/* Context summary */}
-        <div className="mt-4 p-3 bg-muted/30 rounded text-xs space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Brand:</span>
-            <span className="font-mono text-foreground">{draft.brandBook}</span>
+      {/* Two-column layout for larger screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left: Product Concept Input */}
+        <Card className="p-5">
+          <Label htmlFor="concept" className="text-sm font-mono uppercase tracking-wide">
+            Product Concept
+          </Label>
+          <Textarea
+            id="concept"
+            placeholder="Describe your product idea... (e.g., 'Berlin winter hoodie for late-night ravers, minimal design with subtle acid house reference')"
+            value={concept}
+            onChange={(e) => handleConceptChange(e.target.value)}
+            className="mt-2 min-h-[120px] font-mono text-sm"
+          />
+          
+          {/* Context summary */}
+          <div className="mt-4 p-3 bg-muted/30 rounded text-xs space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Brand:</span>
+              <span className="font-mono text-foreground">{draft.brandBook}</span>
+            </div>
+            {draft.colorLine && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Color:</span>
+                <span className="font-mono text-foreground">
+                  {draft.colorLine === 'green-line' ? 'Green Line' : 'White Line'}
+                </span>
+              </div>
+            )}
+            {draft.selectedMascot && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Mascot:</span>
+                <span className="font-mono text-foreground">{draft.selectedMascot.displayName}</span>
+              </div>
+            )}
+            {draft.selectedProduct && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Product:</span>
+                <span className="font-mono text-foreground">{draft.selectedProduct.type}</span>
+              </div>
+            )}
+            {knowledgeContext.selectedScene && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Scene:</span>
+                <span className="font-mono text-primary">
+                  {knowledgeContext.selectedScene.replace('-', ' ')}
+                </span>
+              </div>
+            )}
           </div>
-          {draft.selectedMascot && (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">Mascot:</span>
-              <span className="font-mono text-foreground">{draft.selectedMascot.displayName}</span>
-            </div>
-          )}
-          {draft.selectedProduct && (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">Product:</span>
-              <span className="font-mono text-foreground">{draft.selectedProduct.type}</span>
-            </div>
-          )}
-        </div>
 
-        <Button
-          onClick={generateEditorial}
-          disabled={isGenerating || !concept.trim()}
-          className="mt-4 w-full"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Generating Editorial...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 mr-2" />
-              Generate Editorial Brief
-            </>
-          )}
-        </Button>
-      </Card>
+          <Button
+            onClick={generateEditorial}
+            disabled={isGenerating || !concept.trim()}
+            className="mt-4 w-full"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating Editorial...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate Editorial Brief
+              </>
+            )}
+          </Button>
+        </Card>
+
+        {/* Right: Knowledge Base Panel (Phase 2) */}
+        <KnowledgeBasePanel
+          onContextChange={setKnowledgeContext}
+          context={knowledgeContext}
+          brandBook={draft.brandBook}
+        />
+      </div>
 
       {error && (
         <Alert variant="destructive">
