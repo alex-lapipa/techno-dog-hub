@@ -12,10 +12,13 @@ import { useBrandBookGuidelines, type BrandBookType, type ApprovedMascot, type A
 export type WorkflowStep = 
   | 'brand-selection'
   | 'visual-selection'
+  | 'color-line'
   | 'product-type'
   | 'editorial-brief'
-  | 'design-preview'
-  | 'save-draft';
+  | 'review-export';
+
+// Color line types (from brand book - NEVER MODIFY)
+export type ColorLineType = 'green-line' | 'white-line';
 
 export interface WorkflowStepConfig {
   id: WorkflowStep;
@@ -41,31 +44,31 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required: false,
   },
   {
-    id: 'product-type',
+    id: 'color-line',
     number: 3,
-    title: 'Product Type',
-    description: 'Choose the merchandise type',
+    title: 'Color Line',
+    description: 'Green Line or White Line stroke',
+    required: true,
+  },
+  {
+    id: 'product-type',
+    number: 4,
+    title: 'Product & Placement',
+    description: 'Merchandise type and print zone',
     required: true,
   },
   {
     id: 'editorial-brief',
-    number: 4,
+    number: 5,
     title: 'Editorial Brief',
     description: 'AI-generated product story',
     required: true,
   },
   {
-    id: 'design-preview',
-    number: 5,
-    title: 'Design Preview',
-    description: 'Review and refine your design',
-    required: true,
-  },
-  {
-    id: 'save-draft',
+    id: 'review-export',
     number: 6,
-    title: 'Save Draft',
-    description: 'Save to drafts collection',
+    title: 'Review & Export',
+    description: 'Preview, compliance check, and save',
     required: true,
   },
 ];
@@ -75,6 +78,7 @@ export interface ProductDraft {
   id?: string;
   brandBook: BrandBookType;
   selectedMascot?: ApprovedMascot | null;
+  colorLine?: ColorLineType | null;
   selectedProduct?: ApprovedProduct | null;
   productConcept?: string;
   editorialBrief?: {
@@ -116,6 +120,7 @@ export interface UseCreativeWorkflowReturn {
   updateDraft: (updates: Partial<ProductDraft>) => void;
   selectBrand: (brand: BrandBookType) => void;
   selectMascot: (mascot: ApprovedMascot | null) => void;
+  setColorLine: (colorLine: ColorLineType | null) => void;
   selectProductType: (product: ApprovedProduct | null) => void;
   setProductConcept: (concept: string) => void;
   setEditorialBrief: (brief: ProductDraft['editorialBrief']) => void;
@@ -161,13 +166,15 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
       case 'visual-selection':
         // Optional step - always considered complete
         return true;
+      case 'color-line':
+        // For techno-dog brand, skip this step
+        if (draft.brandBook === 'techno-dog') return true;
+        return !!draft.colorLine;
       case 'product-type':
         return !!draft.selectedProduct;
       case 'editorial-brief':
         return !!draft.editorialBrief?.productName;
-      case 'design-preview':
-        return !!draft.generatedImageUrl || !!draft.editorialBrief;
-      case 'save-draft':
+      case 'review-export':
         return draft.status === 'draft';
       default:
         return false;
@@ -235,6 +242,10 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     updateDraft({ selectedMascot: mascot });
   }, [updateDraft]);
 
+  const setColorLine = useCallback((colorLine: ColorLineType | null) => {
+    updateDraft({ colorLine });
+  }, [updateDraft]);
+
   const selectProductType = useCallback((product: ApprovedProduct | null) => {
     updateDraft({ selectedProduct: product });
   }, [updateDraft]);
@@ -293,6 +304,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     updateDraft,
     selectBrand,
     selectMascot,
+    setColorLine,
     selectProductType,
     setProductConcept,
     setEditorialBrief,
