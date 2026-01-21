@@ -19,6 +19,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { type ShopifyProductEdge } from '@/lib/shopify';
 import { openShopifyAdmin } from '../../config/shopify-config';
+import { ProductTypeCatalog } from './ProductTypeCatalog';
+import { getProductById, type ProductTypeConfig } from '../../config/shopify-product-catalog';
 
 interface ProductSelectorProps {
   products: ShopifyProductEdge[];
@@ -129,7 +131,7 @@ export function ProductSelector({
           <div className="flex-1">
             <h3 className="font-bold text-foreground">Create New Product</h3>
             <p className="text-sm text-muted-foreground">
-              Start fresh with a new product using POD templates
+              Start fresh with 30+ product types including apparel, accessories, bags, drinkware, home décor, tech & more
             </p>
           </div>
           {selectedProductId === null && (

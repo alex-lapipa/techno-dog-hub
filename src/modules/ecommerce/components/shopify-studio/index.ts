@@ -1,5 +1,7 @@
 // Shopify Studio Components
 export { StudioSidebar } from './StudioSidebar';
+export { ProductTypeCatalog } from './ProductTypeCatalog';
+export { AdvancedVariantBuilder } from './AdvancedVariantBuilder';
 export { ProductSelector } from './ProductSelector';
 export { VariantEditor } from './VariantEditor';
 export { BrandDesignStep } from './BrandDesignStep';
