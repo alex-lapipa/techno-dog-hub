@@ -9,6 +9,7 @@ import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MODULE_CONFIG } from '../config/module-config';
+import { openShopifyAdmin } from '../config/shopify-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 
 export function EcommerceOrders() {
@@ -37,7 +38,7 @@ export function EcommerceOrders() {
             Click below to view and manage orders in your Shopify dashboard.
           </p>
           <Button
-            onClick={() => window.open('https://admin.shopify.com/store/technodog-d3wkq/orders', '_blank')}
+            onClick={() => openShopifyAdmin('orders')}
             className="font-mono"
           >
             <ExternalLink className="w-4 h-4 mr-2" />

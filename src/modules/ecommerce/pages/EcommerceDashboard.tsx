@@ -16,10 +16,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { fetchLiveKPIs, checkShopifyConnection, type ShopifyConnectionStatus } from '../services/shopify-data.service';
 import { MODULE_CONFIG } from '../config/module-config';
+import { SHOPIFY_ADMIN_URL, getShopifyAdminUrl, openShopifyAdmin } from '../config/shopify-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import type { DashboardKPI } from '../types/ecommerce.types';
-
-const SHOPIFY_ADMIN_URL = 'https://admin.shopify.com/store/technodog-d3wkq';
 
 const iconMap: Record<string, React.ElementType> = {
   'euro': Euro,

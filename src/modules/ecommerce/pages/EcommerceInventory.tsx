@@ -11,11 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { fetchShopifyInventory, type ShopifyInventoryItem } from '../services/shopify-data.service';
 import { MODULE_CONFIG } from '../config/module-config';
+import { getShopifyAdminUrl, openShopifyAdmin } from '../config/shopify-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { EcommerceDataTable } from '../components/EcommerceDataTable';
 import type { TableColumn } from '../types/ecommerce.types';
-
-const SHOPIFY_ADMIN_URL = 'https://admin.shopify.com/store/technodog-d3wkq';
 
 export function EcommerceInventory() {
   const [inventory, setInventory] = useState<ShopifyInventoryItem[]>([]);
@@ -119,7 +118,7 @@ export function EcommerceInventory() {
             variant="outline"
             size="sm"
             className="font-mono text-xs"
-            onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/products/inventory`, '_blank')}
+            onClick={() => openShopifyAdmin('inventory')}
           >
             <ExternalLink className="w-3 h-3 mr-1" />
             Manage in Shopify

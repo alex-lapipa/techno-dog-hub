@@ -3,11 +3,13 @@
  * 
  * Connects to live Shopify data via Storefront API.
  * This is READ-ONLY and does not modify any Shopify configuration.
+ * 
+ * Enhanced with error handling and toast notifications.
  */
 
 import { fetchProducts, fetchCollections } from '@/lib/shopify';
+import { toast } from 'sonner';
 import type { DashboardKPI } from '../types/ecommerce.types';
-import { MODULE_CONFIG } from '../config/module-config';
 
 // ============================================
 // SHOPIFY PRODUCT STATS
@@ -55,7 +57,20 @@ export async function fetchShopifyStats(): Promise<ShopifyStats> {
       productTypes: Array.from(productTypesSet),
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Shopify Data Service] Error fetching stats:', error);
+    
+    // Show user-friendly toast for common errors
+    if (errorMessage.includes('402') || errorMessage.includes('Payment required')) {
+      toast.error('Shopify API Access Unavailable', {
+        description: 'Your Shopify store requires an active billing plan to access API data.',
+      });
+    } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+      toast.error('Network Error', {
+        description: 'Unable to connect to Shopify. Please check your connection.',
+      });
+    }
+    
     return {
       totalProducts: 0,
       totalVariants: 0,
@@ -137,7 +152,16 @@ export async function fetchShopifyInventory(): Promise<ShopifyInventoryItem[]> {
 
     return inventory;
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Shopify Data Service] Error fetching inventory:', error);
+    
+    // Show user-friendly toast for common errors
+    if (errorMessage.includes('402') || errorMessage.includes('Payment required')) {
+      toast.error('Shopify API Access Unavailable', {
+        description: 'Your Shopify store requires an active billing plan to access inventory data.',
+      });
+    }
+    
     return [];
   }
 }

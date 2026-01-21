@@ -11,9 +11,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MODULE_CONFIG } from '../config/module-config';
+import { SHOPIFY_ADMIN_URL, openShopifyAdmin, getShopifyAdminUrl } from '../config/shopify-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
-
-const SHOPIFY_ADMIN_URL = 'https://admin.shopify.com/store/technodog-d3wkq';
 
 const ANALYTICS_LINKS = [
   {
