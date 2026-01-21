@@ -189,6 +189,28 @@ const FloatingDogButton = () => {
       <Dialog open={dogChatOpen} onOpenChange={setDogChatOpen}>
         <DialogContent className="max-w-2xl h-[85vh] max-h-[700px] p-0 overflow-hidden bg-background border-logo-green/30 shadow-[0_0_40px_hsl(100_100%_60%/0.15)]">
           <DialogTitle className="sr-only">Techno Dog</DialogTitle>
+          {/* Close button */}
+          <button
+            onClick={() => setDogChatOpen(false)}
+            className="absolute top-3 right-3 z-50 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm border border-logo-green/40 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-logo-green hover:bg-background transition-all duration-200 group"
+            aria-label="Close Techno Dog chat"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              className="group-hover:rotate-90 transition-transform duration-200"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
           <DogChat />
         </DialogContent>
       </Dialog>
