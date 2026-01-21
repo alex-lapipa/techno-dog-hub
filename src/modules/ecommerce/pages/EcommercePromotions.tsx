@@ -12,9 +12,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MODULE_CONFIG } from '../config/module-config';
+import { openShopifyAdmin } from '../config/shopify-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
-
-const SHOPIFY_ADMIN_URL = 'https://admin.shopify.com/store/technodog-d3wkq';
 
 export function EcommercePromotions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +54,7 @@ export function EcommercePromotions() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card 
             className="p-4 bg-card border-border hover:border-logo-green/50 transition-colors cursor-pointer group"
-            onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/discounts/new`, '_blank')}
+            onClick={() => openShopifyAdmin('discountsNew')}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-logo-green/10 rounded group-hover:bg-logo-green/20 transition-colors">
@@ -74,7 +73,7 @@ export function EcommercePromotions() {
 
           <Card 
             className="p-4 bg-card border-border hover:border-logo-green/50 transition-colors cursor-pointer group"
-            onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/discounts`, '_blank')}
+            onClick={() => openShopifyAdmin('discounts')}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-muted/50 rounded group-hover:bg-muted transition-colors">
@@ -93,7 +92,7 @@ export function EcommercePromotions() {
 
           <Card 
             className="p-4 bg-card border-border hover:border-logo-green/50 transition-colors cursor-pointer group"
-            onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/discounts?type=automatic`, '_blank')}
+            onClick={() => openShopifyAdmin('discountsAutomatic')}
           >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-muted/50 rounded group-hover:bg-muted transition-colors">
@@ -143,7 +142,7 @@ export function EcommercePromotions() {
                 variant="outline"
                 size="sm"
                 className="mt-4 font-mono text-xs"
-                onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/discounts`, '_blank')}
+                onClick={() => openShopifyAdmin('discounts')}
               >
                 <ExternalLink className="w-3 h-3 mr-2" />
                 Open Shopify Discounts

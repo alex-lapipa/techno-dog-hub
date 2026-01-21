@@ -13,7 +13,7 @@ const corsHeaders = {
 };
 
 const SHOPIFY_STORE_DOMAIN = 'technodog-d3wkq.myshopify.com';
-const SHOPIFY_API_VERSION = '2025-01';
+const SHOPIFY_API_VERSION = '2025-07'; // Aligned with Storefront API version
 
 interface ShopifyProductInput {
   title: string;

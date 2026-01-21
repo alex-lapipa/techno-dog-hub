@@ -3,6 +3,27 @@
  * 
  * Browse the complete Shopify print-on-demand product catalog
  * with real products, sizes, colors, and quality options.
+ * 
+ * IMPORTANT: This catalog represents POD (Print-on-Demand) TEMPLATES
+ * aligned with Printful/Printify/Gooten fulfillment standards.
+ * 
+ * These templates define:
+ * - Available print areas and dimensions
+ * - Size charts and measurements
+ * - Color options from fulfillment providers
+ * - Base pricing from POD providers
+ * 
+ * DISTINCTION FROM LIVE SHOPIFY PRODUCTS:
+ * - Live Shopify products are the ACTUAL products in your store
+ *   (e.g., "DJ Dog Hoodie", "Berghain Dog T-Shirt")
+ * - This catalog provides the BLANK PRODUCT TEMPLATES that can be
+ *   customized with your designs and published to Shopify
+ * 
+ * The Creative Studio workflow:
+ * 1. Select a POD template from this catalog
+ * 2. Design your product with mascot/artwork
+ * 3. Generate AI preview
+ * 4. Publish to Shopify as a new product
  */
 
 import { useState, useMemo } from 'react';
