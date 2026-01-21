@@ -2909,6 +2909,39 @@ export type Database = {
         }
         Relationships: []
       }
+      creative_studio_archive: {
+        Row: {
+          archived_at: string | null
+          archived_by: string | null
+          brand_book: string | null
+          id: string
+          notes: string | null
+          original_id: string | null
+          workflow_state: Json | null
+          workflow_version: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
+          brand_book?: string | null
+          id?: string
+          notes?: string | null
+          original_id?: string | null
+          workflow_state?: Json | null
+          workflow_version?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          archived_by?: string | null
+          brand_book?: string | null
+          id?: string
+          notes?: string | null
+          original_id?: string | null
+          workflow_state?: Json | null
+          workflow_version?: string | null
+        }
+        Relationships: []
+      }
       crm_contacts: {
         Row: {
           city: string | null
@@ -7146,6 +7179,81 @@ export type Database = {
           module_name?: string
           quiz_results?: Json | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      shopify_studio_drafts: {
+        Row: {
+          ai_generated_copy: Json | null
+          ai_mockup_urls: string[] | null
+          brand_book: string | null
+          color_line: string | null
+          created_at: string | null
+          current_step: number | null
+          description: string | null
+          id: string
+          mascot_id: string | null
+          options: Json | null
+          product_type: string | null
+          published_at: string | null
+          rag_context: Json | null
+          shopify_product_handle: string | null
+          shopify_product_id: string | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          variants: Json | null
+          vendor: string | null
+        }
+        Insert: {
+          ai_generated_copy?: Json | null
+          ai_mockup_urls?: string[] | null
+          brand_book?: string | null
+          color_line?: string | null
+          created_at?: string | null
+          current_step?: number | null
+          description?: string | null
+          id?: string
+          mascot_id?: string | null
+          options?: Json | null
+          product_type?: string | null
+          published_at?: string | null
+          rag_context?: Json | null
+          shopify_product_handle?: string | null
+          shopify_product_id?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          variants?: Json | null
+          vendor?: string | null
+        }
+        Update: {
+          ai_generated_copy?: Json | null
+          ai_mockup_urls?: string[] | null
+          brand_book?: string | null
+          color_line?: string | null
+          created_at?: string | null
+          current_step?: number | null
+          description?: string | null
+          id?: string
+          mascot_id?: string | null
+          options?: Json | null
+          product_type?: string | null
+          published_at?: string | null
+          rag_context?: Json | null
+          shopify_product_handle?: string | null
+          shopify_product_id?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          variants?: Json | null
+          vendor?: string | null
         }
         Relationships: []
       }
