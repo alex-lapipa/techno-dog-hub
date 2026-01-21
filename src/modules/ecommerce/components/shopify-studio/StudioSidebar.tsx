@@ -1,12 +1,14 @@
 /**
  * Shopify Creative Studio v2 - Sidebar Navigation
  * 
- * Visual progress indicator with step navigation.
+ * Enhanced visual progress indicator with step navigation.
+ * Cleaner UX with better visual hierarchy and animations.
  */
 
-import { Check, Circle, CircleDot, ShoppingBag } from 'lucide-react';
+import { Check, ChevronRight, ShoppingBag, Sparkles, Package, Palette, Wand2, Rocket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { STUDIO_STEPS, type StudioStep } from '../../hooks/useShopifyStudio';
 
 interface StudioSidebarProps {
@@ -16,6 +18,15 @@ interface StudioSidebarProps {
   isStepComplete: (step: StudioStep) => boolean;
   productTitle?: string;
 }
+
+// Step-specific icons for better visual identity
+const STEP_ICONS: Record<StudioStep, React.ReactNode> = {
+  'product-select': <Package className="w-4 h-4" />,
+  'variant-config': <Sparkles className="w-4 h-4" />,
+  'brand-design': <Palette className="w-4 h-4" />,
+  'ai-enhance': <Wand2 className="w-4 h-4" />,
+  'publish': <Rocket className="w-4 h-4" />,
+};
 
 export function StudioSidebar({
   currentStep,
@@ -29,97 +40,135 @@ export function StudioSidebar({
   const progressPercent = (completedSteps.length / STUDIO_STEPS.length) * 100;
 
   return (
-    <div className="w-64 border-r border-border bg-card/30 flex flex-col">
+    <div className="w-72 border-r border-border bg-gradient-to-b from-card/80 to-card/40 backdrop-blur-sm flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <ShoppingBag className="w-4 h-4 text-primary" />
+      <div className="p-5 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center ring-1 ring-primary/20">
+            <ShoppingBag className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-mono text-xs font-bold text-primary">SHOPIFY STUDIO</h3>
-            <p className="text-[10px] text-muted-foreground">v2 • Shopify-First</p>
+            <h3 className="font-mono text-sm font-bold text-foreground tracking-tight">
+              CREATIVE STUDIO
+            </h3>
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Shopify-First Workflow
+            </p>
           </div>
         </div>
         
-        {productTitle && (
-          <div className="mt-3 p-2 bg-muted/50 rounded text-xs font-mono truncate">
-            {productTitle}
+        {/* Product Title Badge */}
+        {productTitle && productTitle !== 'New Product' && (
+          <div className="mt-4 px-3 py-2 bg-primary/5 border border-primary/10 rounded-lg">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">
+              Editing
+            </p>
+            <p className="text-sm font-medium text-foreground truncate">
+              {productTitle}
+            </p>
           </div>
         )}
       </div>
 
-      {/* Steps */}
-      <div className="flex-1 p-4 space-y-1">
-        {STUDIO_STEPS.map((step, index) => {
-          const isCurrent = step.id === currentStep;
-          const isComplete = isStepComplete(step.id);
-          const isPast = index < currentIndex;
-          const isClickable = isPast || isComplete || index === currentIndex;
-
-          return (
-            <button
-              key={step.id}
-              onClick={() => isClickable && onStepClick(step.id)}
-              disabled={!isClickable}
-              className={cn(
-                "w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all",
-                "hover:bg-muted/50",
-                isCurrent && "bg-primary/10 border border-primary/30",
-                !isClickable && "opacity-40 cursor-not-allowed hover:bg-transparent"
-              )}
-            >
-              {/* Step indicator */}
-              <div className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5",
-                isComplete && "bg-logo-green text-black",
-                isCurrent && !isComplete && "bg-primary text-primary-foreground",
-                !isComplete && !isCurrent && "bg-muted text-muted-foreground"
-              )}>
-                {isComplete ? (
-                  <Check className="w-3.5 h-3.5" />
-                ) : isCurrent ? (
-                  <CircleDot className="w-3.5 h-3.5" />
-                ) : (
-                  <span className="text-xs font-mono">{step.number}</span>
-                )}
-              </div>
-
-              {/* Step content */}
-              <div className="flex-1 min-w-0">
-                <p className={cn(
-                  "text-sm font-medium",
-                  isCurrent && "text-primary",
-                  isComplete && "text-logo-green"
-                )}>
-                  {step.title}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {step.description}
-                </p>
-              </div>
-            </button>
-          );
-        })}
+      {/* Progress Indicator */}
+      <div className="px-5 py-4 border-b border-border/30">
+        <div className="flex items-center justify-between text-xs mb-2">
+          <span className="text-muted-foreground font-medium">Progress</span>
+          <span className="font-mono font-bold text-primary">{Math.round(progressPercent)}%</span>
+        </div>
+        <Progress value={progressPercent} className="h-2" />
       </div>
 
-      {/* Progress bar */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-          <span>Progress</span>
-          <span className="font-mono">{Math.round(progressPercent)}%</span>
+      {/* Steps */}
+      <nav className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-1">
+          {STUDIO_STEPS.map((step, index) => {
+            const isCurrent = step.id === currentStep;
+            const isComplete = isStepComplete(step.id);
+            const isPast = index < currentIndex;
+            const isClickable = isPast || isComplete || index === currentIndex;
+            const isNext = index === currentIndex + 1;
+
+            return (
+              <button
+                key={step.id}
+                onClick={() => isClickable && onStepClick(step.id)}
+                disabled={!isClickable}
+                className={cn(
+                  "w-full group relative flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200",
+                  isCurrent && "bg-primary/10 shadow-sm shadow-primary/5",
+                  !isCurrent && isClickable && "hover:bg-muted/60",
+                  !isClickable && "opacity-40 cursor-not-allowed"
+                )}
+              >
+                {/* Connector Line */}
+                {index < STUDIO_STEPS.length - 1 && (
+                  <div className={cn(
+                    "absolute left-6 top-12 w-0.5 h-4 rounded-full transition-colors",
+                    isComplete ? "bg-logo-green" : "bg-border"
+                  )} />
+                )}
+
+                {/* Step Indicator */}
+                <div className={cn(
+                  "relative w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200",
+                  isComplete && "bg-logo-green text-black shadow-sm shadow-logo-green/30",
+                  isCurrent && !isComplete && "bg-primary text-primary-foreground shadow-sm shadow-primary/30",
+                  !isComplete && !isCurrent && "bg-muted/80 text-muted-foreground",
+                  isNext && !isComplete && "ring-1 ring-primary/30"
+                )}>
+                  {isComplete ? (
+                    <Check className="w-4 h-4" strokeWidth={3} />
+                  ) : (
+                    STEP_ICONS[step.id]
+                  )}
+                </div>
+
+                {/* Step Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className={cn(
+                      "text-sm font-medium transition-colors",
+                      isCurrent && "text-primary",
+                      isComplete && "text-logo-green"
+                    )}>
+                      {step.title}
+                    </p>
+                    {isCurrent && (
+                      <ChevronRight className="w-3 h-3 text-primary animate-pulse" />
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Step Number Badge */}
+                <span className={cn(
+                  "text-[10px] font-mono opacity-50",
+                  isCurrent && "opacity-100 text-primary"
+                )}>
+                  {step.number}/{STUDIO_STEPS.length}
+                </span>
+              </button>
+            );
+          })}
         </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-primary to-logo-green transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        
-        {allComplete && (
-          <Badge variant="outline" className="w-full justify-center mt-3 text-logo-green border-logo-green">
-            Ready to Publish
-          </Badge>
+      </nav>
+
+      {/* Footer Status */}
+      <div className="p-4 border-t border-border/50">
+        {allComplete ? (
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-logo-green/10 border border-logo-green/30 rounded-lg">
+            <Check className="w-4 h-4 text-logo-green" />
+            <span className="text-sm font-medium text-logo-green">Ready to Publish</span>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-[11px] text-muted-foreground">
+              Complete all steps to publish
+            </p>
+          </div>
         )}
       </div>
     </div>

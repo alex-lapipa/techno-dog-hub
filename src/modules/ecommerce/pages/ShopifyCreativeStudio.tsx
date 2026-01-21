@@ -2,14 +2,16 @@
  * Shopify Creative Studio v2 - Main Page
  * 
  * Shopify-first creative workflow for product design and publishing.
- * All 5 steps fully implemented with brand book and RAG integration.
+ * Enhanced UX with cleaner layout and better visual hierarchy.
  */
 
 import { useEffect } from 'react';
-import { ArrowLeft, ArrowRight, RotateCcw, ShoppingBag, Save } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCcw, ShoppingBag, Save, Sparkles } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { useShopifyStudio } from '../hooks/useShopifyStudio';
 import { 
   StudioSidebar, 
@@ -99,27 +101,29 @@ export function ShopifyCreativeStudio() {
 
   return (
     <AdminPageLayout
-      title="Shopify Creative Studio"
-      description="Shopify-first product design workflow"
-      icon={ShoppingBag}
+      title="Creative Studio"
+      description="Design and publish products with Shopify-first workflow"
+      icon={Sparkles}
       iconColor="text-primary"
       actions={
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-[10px]">
-            Step {studio.stepNumber}/{studio.totalSteps}
+          <Badge variant="outline" className="font-mono text-[10px] bg-muted/50">
+            Step {studio.stepNumber} of {studio.totalSteps}
           </Badge>
-          <Button variant="ghost" size="sm" onClick={studio.saveDraft}>
-            <Save className="w-4 h-4 mr-1" />
-            Save
+          <Separator orientation="vertical" className="h-5" />
+          <Button variant="ghost" size="sm" onClick={studio.saveDraft} className="gap-1.5">
+            <Save className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Save</span>
           </Button>
-          <Button variant="ghost" size="sm" onClick={studio.resetStudio}>
-            <RotateCcw className="w-4 h-4 mr-1" />
-            Reset
+          <Button variant="ghost" size="sm" onClick={studio.resetStudio} className="gap-1.5 text-muted-foreground hover:text-destructive">
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Reset</span>
           </Button>
         </div>
       }
     >
-      <div className="flex h-[calc(100vh-200px)] min-h-[600px] -mx-6 -mb-6 border-t border-border">
+      <div className="flex h-[calc(100vh-180px)] min-h-[600px] -mx-6 -mb-6 border-t border-border bg-background/50">
+        {/* Sidebar */}
         <StudioSidebar
           currentStep={studio.currentStep}
           completedSteps={studio.completedSteps}
@@ -128,23 +132,47 @@ export function ShopifyCreativeStudio() {
           productTitle={studio.draft.title}
         />
 
+        {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Step Content */}
           <div className="flex-1 overflow-y-auto">
-            {renderStepContent()}
+            <div className="p-6">
+              {renderStepContent()}
+            </div>
           </div>
 
-          <div className="flex-shrink-0 border-t border-border bg-card/50 p-4">
-            <div className="flex items-center justify-between">
-              <Button variant="outline" onClick={studio.goBack} disabled={!studio.canGoBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
+          {/* Footer Navigation */}
+          <div className="flex-shrink-0 border-t border-border bg-card/80 backdrop-blur-sm">
+            <div className="flex items-center justify-between px-6 py-4">
+              <Button 
+                variant="outline" 
+                onClick={studio.goBack} 
+                disabled={!studio.canGoBack}
+                className="gap-2 min-w-[120px]"
+              >
+                <ArrowLeft className="w-4 h-4" />
                 Back
               </Button>
-              <div className="text-xs text-muted-foreground font-mono">
-                {studio.currentStepConfig.title}
+              
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">Current:</span>
+                  <Badge variant="secondary" className="font-medium">
+                    {studio.currentStepConfig.title}
+                  </Badge>
+                </div>
               </div>
-              <Button onClick={studio.goNext} disabled={!studio.canGoNext}>
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
+              
+              <Button 
+                onClick={studio.goNext} 
+                disabled={!studio.canGoNext}
+                className={cn(
+                  "gap-2 min-w-[120px]",
+                  studio.currentStep === 'publish' && "bg-logo-green hover:bg-logo-green/90 text-black"
+                )}
+              >
+                {studio.currentStep === 'publish' ? 'Publish' : 'Next'}
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
           </div>
