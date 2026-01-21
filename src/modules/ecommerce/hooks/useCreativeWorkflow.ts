@@ -13,6 +13,7 @@ export type WorkflowStep =
   | 'brand-selection'
   | 'visual-selection'
   | 'color-line'
+  | 'shopify-catalog'
   | 'product-type'
   | 'product-copy'
   | 'editorial-brief'
@@ -52,29 +53,36 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required: true,
   },
   {
-    id: 'product-type',
+    id: 'shopify-catalog',
     number: 4,
+    title: 'Shopify Catalog',
+    description: 'Browse full product catalog',
+    required: true,
+  },
+  {
+    id: 'product-type',
+    number: 5,
     title: 'Product & Placement',
-    description: 'Merchandise type and print zone',
+    description: 'Print zone configuration',
     required: true,
   },
   {
     id: 'product-copy',
-    number: 5,
+    number: 6,
     title: 'Product Copy',
     description: 'Add text or tagline (optional)',
     required: false,
   },
   {
     id: 'editorial-brief',
-    number: 6,
+    number: 7,
     title: 'Editorial Brief',
     description: 'AI-generated product story',
     required: true,
   },
   {
     id: 'review-export',
-    number: 7,
+    number: 8,
     title: 'Review & Export',
     description: 'Preview, compliance check, and save',
     required: true,
@@ -90,6 +98,16 @@ export interface ProductCopyConfig {
   fontSize?: 'small' | 'medium' | 'large';
 }
 
+// Shopify catalog selection
+export interface ShopifyCatalogSelection {
+  productId: string;
+  productName: string;
+  category: string;
+  size: string | null;
+  color: string | null;
+  basePrice: number;
+}
+
 // Product draft structure
 export interface ProductDraft {
   id?: string;
@@ -97,6 +115,7 @@ export interface ProductDraft {
   selectedModels?: string[]; // AI models for creative process
   selectedMascot?: ApprovedMascot | null;
   colorLine?: ColorLineType | null;
+  shopifyCatalog?: ShopifyCatalogSelection | null; // NEW: Shopify catalog selection
   selectedProduct?: ApprovedProduct | null;
   productCopy?: ProductCopyConfig[];
   productConcept?: string;
@@ -192,6 +211,8 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
         // For techno-dog brand, skip this step
         if (draft.brandBook === 'techno-dog') return true;
         return !!draft.colorLine;
+      case 'shopify-catalog':
+        return !!draft.shopifyCatalog?.productId;
       case 'product-type':
         return !!draft.selectedProduct;
       case 'product-copy':
