@@ -49,13 +49,53 @@ const TECHNO_DOG_PRODUCTS: ApprovedProduct[] = [
   },
 ];
 
-// Icons for product types
-const PRODUCT_ICONS: Record<string, string> = {
-  'Hoodie': '🧥',
-  'T-Shirt': '👕',
-  'Cap': '🧢',
-  'Tote Bag': '👜',
-  'Bandana': '🎀',
+// SVG icon components for product types (no emojis per design rules)
+import { Shirt, ShoppingBag } from 'lucide-react';
+
+// Product type icon mapping - using SVG paths for brand compliance
+const ProductIcon = ({ type, className }: { type: string; className?: string }) => {
+  switch (type) {
+    case 'Hoodie':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+          <path d="M6 4L4 8v12h16V8l-2-4M6 4h12M6 4l2 4h8l2-4" />
+          <path d="M8 8v12M16 8v12" />
+          <path d="M4 12h4M16 12h4" />
+        </svg>
+      );
+    case 'T-Shirt':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+          <path d="M6 4L3 7l3 2v11h12V9l3-2-3-3" />
+          <path d="M6 4h12" />
+          <path d="M9 4v3h6V4" />
+        </svg>
+      );
+    case 'Cap':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+          <path d="M4 14c0-4 4-8 8-8s8 4 8 8" />
+          <path d="M3 14h18v2c0 2-4 4-9 4s-9-2-9-4v-2z" />
+          <path d="M19 13l3 1" />
+        </svg>
+      );
+    case 'Tote Bag':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+          <path d="M5 8h14l-1 12H6L5 8z" />
+          <path d="M8 8V6a4 4 0 018 0v2" />
+        </svg>
+      );
+    case 'Bandana':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+          <path d="M12 3L3 12l9 9 9-9-9-9z" />
+          <path d="M12 7v10M7 12h10" />
+        </svg>
+      );
+    default:
+      return <ShoppingBag className={className} />;
+  }
 };
 
 export function StepProductType({
@@ -82,7 +122,6 @@ export function StepProductType({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {availableProducts.map((product, index) => {
           const isSelected = selectedProduct?.type === product.type;
-          const icon = PRODUCT_ICONS[product.type] || '📦';
           
           return (
             <Card
@@ -101,13 +140,13 @@ export function StepProductType({
               )}
               
               <div className="flex items-start gap-4">
-                {/* Icon */}
-                <div className={cn(
-                  "w-14 h-14 rounded-lg flex items-center justify-center text-2xl",
-                  isSelected ? "bg-primary/20" : "bg-muted"
-                )}>
-                  {icon}
-                </div>
+              {/* Icon - using custom SVG instead of emoji */}
+              <div className={cn(
+                "w-14 h-14 rounded-lg flex items-center justify-center",
+                isSelected ? "bg-primary/20" : "bg-muted"
+              )}>
+                <ProductIcon type={product.type} className="w-7 h-7" />
+              </div>
                 
                 {/* Content */}
                 <div className="flex-1 min-w-0">

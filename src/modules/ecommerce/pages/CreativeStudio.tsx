@@ -14,10 +14,10 @@ import {
   WorkflowSidebar,
   StepBrandSelection,
   StepVisualSelection,
+  StepColorLine,
   StepProductType,
   StepEditorialBrief,
-  StepDesignPreview,
-  StepSaveDraft,
+  StepReviewExport,
 } from '../components/workflow';
 
 export function CreativeStudio() {
@@ -43,6 +43,15 @@ export function CreativeStudio() {
             onSkip={workflow.goNext}
           />
         );
+      case 'color-line':
+        return (
+          <StepColorLine
+            brandBook={workflow.brandBook}
+            selectedColorLine={workflow.draft.colorLine || null}
+            onSelectColorLine={workflow.setColorLine}
+            selectedMascot={workflow.draft.selectedMascot}
+          />
+        );
       case 'product-type':
         return (
           <StepProductType
@@ -60,17 +69,11 @@ export function CreativeStudio() {
             onUpdateConcept={workflow.setProductConcept}
           />
         );
-      case 'design-preview':
+      case 'review-export':
         return (
-          <StepDesignPreview
+          <StepReviewExport
             draft={workflow.draft}
             onSetImage={workflow.setGeneratedImage}
-          />
-        );
-      case 'save-draft':
-        return (
-          <StepSaveDraft
-            draft={workflow.draft}
             onSaveDraft={workflow.saveDraft}
             isOwner={workflow.isOwner}
           />
