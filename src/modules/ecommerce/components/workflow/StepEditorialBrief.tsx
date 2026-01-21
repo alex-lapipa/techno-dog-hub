@@ -74,6 +74,8 @@ export function StepEditorialBrief({
           productType: draft.selectedProduct?.type,
           placement: draft.selectedProduct?.placement,
           colorLine: draft.colorLine,
+          // Model routing: pass selected models for creative direction
+          selectedModels: draft.selectedModels || ['gemini'],
           // Phase 2: Send knowledge context to AI
           knowledgeContext: {
             selectedScene: knowledgeContext.selectedScene,

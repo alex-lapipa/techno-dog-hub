@@ -1,8 +1,13 @@
 /**
  * Creative Studio Editorial Generator
  * 
- * Phase 2 & 3: Enhanced with Technopedia RAG context and scene/mood integration.
+ * Phase 5: Multi-model routing + Technopedia RAG context
  * Generates brand-compliant product copy using the Lovable AI Gateway.
+ * 
+ * MODEL ROUTING:
+ * - Accepts selectedModels from frontend
+ * - Routes to appropriate model based on selection
+ * - Mixer mode blends creative styles
  * 
  * BRAND COMPLIANCE:
  * - Uses brand book guidelines (read-only)
@@ -11,6 +16,11 @@
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { 
+  getTextModelConfig, 
+  getMixerPromptPrefix, 
+  getModelsSummary 
+} from "../_shared/creative-model-router.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,8 +49,8 @@ serve(async (req) => {
       productType, 
       placement,
       colorLine,
-      // Phase 2: Knowledge base context
       knowledgeContext,
+      selectedModels = ['gemini'], // Default to gemini
     } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -48,6 +58,12 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
     }
+
+    // Get model configuration with routing
+    const modelConfig = getTextModelConfig(selectedModels);
+    const mixerPrefix = getMixerPromptPrefix(selectedModels);
+    
+    console.log(`[Creative Studio Editorial] Models: ${getModelsSummary(selectedModels)}, Using: ${modelConfig.model}, Mixer: ${modelConfig.mixer}`);
 
     // Build brand-specific guidelines (READ-ONLY from brand book)
     const brandGuidelines = brandBook === 'techno-dog' 
@@ -64,7 +80,7 @@ serve(async (req) => {
 - Editorial tone: Streetwear drops, limited edition culture
 - Target: Scene insiders, techno heads, rave culture`;
 
-    // Build Technopedia context (Phase 2)
+    // Build Technopedia context
     let technopediaContext = '';
     if (knowledgeContext) {
       const parts: string[] = [];
@@ -95,7 +111,7 @@ serve(async (req) => {
       }
     }
 
-    const systemPrompt = `You are a creative director for ${brandBook === 'techno-dog' ? 'techno.dog' : 'Techno Doggies'}, a premium underground techno merchandise brand.
+    const systemPrompt = `${mixerPrefix}You are a creative director for ${brandBook === 'techno-dog' ? 'techno.dog' : 'Techno Doggies'}, a premium underground techno merchandise brand.
 
 BRAND BOOK GUIDELINES (STRICT - NEVER DEVIATE):
 ${brandGuidelines}
@@ -129,12 +145,12 @@ Return a JSON object with:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: modelConfig.model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.8,
+        temperature: modelConfig.temperature,
       }),
     });
 
@@ -149,6 +165,8 @@ Return a JSON object with:
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      const errorText = await response.text();
+      console.error('AI Gateway error:', response.status, errorText);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -165,7 +183,11 @@ Return a JSON object with:
       targetAudience: "Underground techno enthusiasts",
     };
 
-    return new Response(JSON.stringify({ editorial }), {
+    return new Response(JSON.stringify({ 
+      editorial,
+      modelUsed: modelConfig.model,
+      mixerEnabled: modelConfig.mixer,
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
