@@ -26,12 +26,22 @@ export interface ShopifyVariant {
   id?: string;
   title: string;
   price: string;
+  compare_at_price?: string; // Shopify best practice: show sale pricing
   sku: string;
   option1: string | null;
   option2: string | null;
   option3: string | null;
   inventory_quantity?: number;
+  weight?: number;
+  weight_unit?: 'g' | 'kg' | 'lb' | 'oz';
   requires_shipping: boolean;
+}
+
+export interface ShopifyMetafield {
+  namespace: string;
+  key: string;
+  value: string;
+  type: string;
 }
 
 export interface ShopifyOption {
@@ -77,6 +87,17 @@ export interface StudioDraft {
     tagline?: string;
   } | null;
   aiMockupUrls: string[];
+  
+  // SEO (Shopify best practice)
+  seoTitle: string;
+  seoDescription: string;
+  handle: string;
+  
+  // Metafields (Shopify custom data)
+  metafields: ShopifyMetafield[];
+  
+  // Collections
+  collectionIds: string[];
   
   // RAG Context
   ragContext: {
@@ -149,6 +170,11 @@ const INITIAL_DRAFT: StudioDraft = {
   colorLine: null,
   aiCopy: null,
   aiMockupUrls: [],
+  seoTitle: '',
+  seoDescription: '',
+  handle: '',
+  metafields: [],
+  collectionIds: [],
   ragContext: null,
   currentStep: 'product-select',
   status: 'draft',
@@ -454,6 +480,11 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
         colorLine: data.color_line as 'green-line' | 'white-line' | null,
         aiCopy: data.ai_generated_copy as StudioDraft['aiCopy'],
         aiMockupUrls: data.ai_mockup_urls || [],
+        seoTitle: '',
+        seoDescription: '',
+        handle: data.shopify_product_handle || '',
+        metafields: [],
+        collectionIds: [],
         ragContext: data.rag_context as StudioDraft['ragContext'],
         currentStep,
         status: data.status as StudioDraft['status'],
