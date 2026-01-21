@@ -10,6 +10,7 @@ export { ModelSelector, AI_MODELS, type AIModelOption, type SelectedModels } fro
 export { StepBrandSelection } from './StepBrandSelection';
 export { StepVisualSelection } from './StepVisualSelection';
 export { StepColorLine } from './StepColorLine';
+export { StepShopifyCatalog } from './StepShopifyCatalog';
 export { StepProductType } from './StepProductType';
 export { StepProductCopy } from './StepProductCopy';
 export { StepEditorialBrief } from './StepEditorialBrief';
