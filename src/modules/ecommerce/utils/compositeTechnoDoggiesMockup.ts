@@ -9,7 +9,7 @@
 
 import { OFFICIAL_MASCOT_SVG_DATA, getMascotSVGData } from '../data/officialMascotSVGData';
 import type { ApprovedMascot } from '../hooks/useBrandBookGuidelines';
-import type { ColorLineType } from '../hooks/useCreativeWorkflow';
+import type { ColorLineType, ProductCopyConfig } from '../hooks/useCreativeWorkflow';
 
 type PlacementHint = {
   xPct: number; // 0..1
@@ -64,6 +64,44 @@ function getPlacementHint(productType?: string, placement?: string): PlacementHi
   return { xPct: 0.5, yPct: 0.5, sizePct: 0.22 };
 }
 
+function getTextPlacementHint(productType?: string, textPlacement?: string): PlacementHint {
+  const pt = (productType || '').toLowerCase();
+  const pl = (textPlacement || '').toLowerCase();
+
+  // These are pragmatic 2D overlays on a single product photo.
+  // They are intentionally conservative to stay "small-to-medium".
+  if (pt.includes('cap')) {
+    if (pl.includes('front')) return { xPct: 0.5, yPct: 0.66, sizePct: 0.035 };
+    if (pl.includes('left')) return { xPct: 0.27, yPct: 0.56, sizePct: 0.03 };
+    if (pl.includes('right')) return { xPct: 0.73, yPct: 0.56, sizePct: 0.03 };
+    if (pl.includes('back')) return { xPct: 0.5, yPct: 0.58, sizePct: 0.03 };
+    return { xPct: 0.5, yPct: 0.66, sizePct: 0.035 };
+  }
+
+  if (pt.includes('hoodie')) {
+    if (pl.includes('front')) return { xPct: 0.5, yPct: 0.64, sizePct: 0.04 };
+    if (pl.includes('back')) return { xPct: 0.5, yPct: 0.72, sizePct: 0.045 };
+    if (pl.includes('sleeve')) return { xPct: 0.78, yPct: 0.60, sizePct: 0.03 };
+    if (pl.includes('hood')) return { xPct: 0.5, yPct: 0.30, sizePct: 0.03 };
+    return { xPct: 0.5, yPct: 0.64, sizePct: 0.04 };
+  }
+
+  if (pt.includes('tee') || pt.includes('t-shirt') || pt.includes('shirt')) {
+    if (pl.includes('front')) return { xPct: 0.5, yPct: 0.62, sizePct: 0.04 };
+    if (pl.includes('back')) return { xPct: 0.5, yPct: 0.72, sizePct: 0.045 };
+    if (pl.includes('sleeve')) return { xPct: 0.80, yPct: 0.56, sizePct: 0.03 };
+    if (pl.includes('collar')) return { xPct: 0.5, yPct: 0.30, sizePct: 0.03 };
+    return { xPct: 0.5, yPct: 0.62, sizePct: 0.04 };
+  }
+
+  if (pt.includes('tote')) {
+    if (pl.includes('back')) return { xPct: 0.5, yPct: 0.78, sizePct: 0.045 };
+    return { xPct: 0.5, yPct: 0.72, sizePct: 0.045 };
+  }
+
+  return { xPct: 0.5, yPct: 0.7, sizePct: 0.04 };
+}
+
 function buildMascotSvgDataUrl({
   mascot,
   colorLine,
@@ -90,10 +128,34 @@ function buildMascotSvgDataUrl({
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    // Prevent canvas tainting if the image URL is served with CORS headers.
+    // (Data URLs are fine either way.)
+    img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error('Failed to load image'));
     img.src = src;
   });
+}
+
+function sanitizeCopyText(input: string): string {
+  return (input || '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function resolveCopyFontSizePx({
+  canvasW,
+  canvasH,
+  sizeLabel,
+}: {
+  canvasW: number;
+  canvasH: number;
+  sizeLabel?: ProductCopyConfig['fontSize'];
+}): number {
+  const base = Math.min(canvasW, canvasH);
+  const pct = sizeLabel === 'large' ? 0.055 : sizeLabel === 'medium' ? 0.042 : 0.032;
+  return Math.max(12, Math.round(base * pct));
 }
 
 /**
@@ -105,12 +167,14 @@ export async function compositeTechnoDoggiesMockup({
   colorLine,
   productType,
   placement,
+  productCopy,
 }: {
   baseImageUrl: string;
   mascot: ApprovedMascot;
   colorLine: ColorLineType;
   productType?: string;
   placement?: string;
+  productCopy?: ProductCopyConfig[];
 }): Promise<string> {
   const base = await loadImage(baseImageUrl);
   const hint = getPlacementHint(productType, placement);
@@ -134,6 +198,40 @@ export async function compositeTechnoDoggiesMockup({
   const y = Math.round(canvas.height * hint.yPct - size / 2);
 
   ctx.drawImage(overlay, x, y, size, size);
+
+   // Optional: product copy overlay (stroke-only)
+  const copyEntries = (productCopy || []).filter((c) => sanitizeCopyText(c.text).length > 0);
+  if (copyEntries.length > 0) {
+    const stroke = colorLine === 'white-line' ? '#FFFFFF' : '#00FF00';
+
+    ctx.save();
+    ctx.fillStyle = 'transparent';
+    ctx.strokeStyle = stroke;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+
+    for (const entry of copyEntries) {
+      const txt = sanitizeCopyText(entry.text);
+      const tHint = getTextPlacementHint(productType, entry.placement);
+      const fontPx = resolveCopyFontSizePx({
+        canvasW: canvas.width,
+        canvasH: canvas.height,
+        sizeLabel: entry.fontSize,
+      });
+
+      ctx.font = `${fontPx}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace`;
+      ctx.lineWidth = Math.max(1.5, Math.round(fontPx / 12));
+
+      const tx = Math.round(canvas.width * tHint.xPct);
+      const ty = Math.round(canvas.height * tHint.yPct);
+
+      // Stroke-only for brand compliance
+      ctx.strokeText(txt, tx, ty);
+    }
+
+    ctx.restore();
+  }
 
   return canvas.toDataURL('image/png');
 }

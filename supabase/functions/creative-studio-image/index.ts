@@ -112,40 +112,36 @@ The Face magazine editorial quality, 90s London underground style.
 Product type: ${productType || 'apparel'}, placement: ${placement || 'center'}.
 Professional product photography, ultra high resolution, magazine quality editorial shot.
 16:9 aspect ratio, studio lighting with dramatic shadows.`;
-    } else {
-      // Techno Doggies brand - STRICT geometry enforcement
-      const mascotGeometry = getMascotGeometry(mascot || 'default');
-      const strokeColor = colorLine === 'green-line' 
-        ? 'laser green (#00FF00) ONLY' 
-        : 'pure white (#FFFFFF) ONLY';
-      
-      enhancedPrompt = `ZERO TOLERANCE - BRAND COMPLIANCE REQUIRED:
+    } else if (brandBook === 'techno-doggies') {
+      // Techno Doggies brand - ZERO TOLERANCE
+      // CRITICAL RULE: The AI must NEVER draw mascots or text on the product.
+      // We ONLY generate a blank product mockup photo; the client composites the official SVG pack.
+      const strokeColor = colorLine === 'green-line'
+        ? 'laser green (#00FF00) stroke ONLY'
+        : 'pure white (#FFFFFF) stroke ONLY';
+
+      enhancedPrompt = `ZERO TOLERANCE - BLANK PRODUCT MOCKUP ONLY:
 
 Product: ${productType || 'apparel'} mockup on BLACK fabric
-Placement: ${placement || 'center chest'}
+Placement reference: ${placement || 'front'}
 
-MASCOT DESIGN - ${mascot || 'Techno Doggy'}:
-${mascotGeometry.description}
-The mascot is a SIMPLE STROKE-ONLY dog silhouette. NOT a realistic dog. NOT a cartoon dog. 
-Just clean geometric stroke lines forming an abstract dog face/head shape.
+CRITICAL (must follow):
+1. NO printed graphics on the product
+2. NO logo
+3. NO mascot / dog icon
+4. NO text / numbers / lettering
+5. NO patches / embroidery / decals
+6. Keep the garment completely blank
 
-STRICT GEOMETRY (SVG paths - do not deviate):
-${mascotGeometry.paths}
+NOTE: Official mascot + text will be composited separately in ${strokeColor}.
 
-CRITICAL DESIGN RULES:
-1. Stroke color: ${strokeColor} - NO other colors
-2. Fill: NONE - stroke-only, no fills, no solid areas
-3. Stroke width: 2-2.5px equivalent
-4. Background: BLACK fabric only
-5. NO gradients, NO shadows, NO glow effects ON the mascot itself
-6. The design is MINIMALIST - just clean stroke lines
-7. Style: Premium streetwear, The Face magazine editorial, London underground aesthetic
+Style: Premium streetwear product photography, The Face magazine editorial, 90s London underground mood.
+Lighting: professional studio, dark and moody.
 
-${prompt || ''}.
-
-Product photography: Professional studio shot, dark moody lighting, magazine quality.
-The mascot print should be subtle, refined, not oversized or cartoonish.
-Ultra high resolution, 16:9 aspect ratio.`;
+${prompt || ''}`;
+    } else {
+      // Fallback (shouldn't happen in this project)
+      enhancedPrompt = `${prompt || ''}. Professional product photography, ultra high resolution.`;
     }
 
     // Add scene context if provided
