@@ -12,7 +12,7 @@
  */
 
 import { useState } from 'react';
-import { Sparkles, Loader2, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { Sparkles, Loader2, RefreshCw, Check, AlertCircle, SkipForward } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,6 +27,7 @@ interface StepEditorialBriefProps {
   draft: ProductDraft;
   onUpdateBrief: (brief: ProductDraft['editorialBrief']) => void;
   onUpdateConcept: (concept: string) => void;
+  onSkip?: () => void;
 }
 
 // Initial empty knowledge context
@@ -42,6 +43,7 @@ export function StepEditorialBrief({
   draft,
   onUpdateBrief,
   onUpdateConcept,
+  onSkip,
 }: StepEditorialBriefProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,14 +104,28 @@ export function StepEditorialBrief({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-mono font-bold text-foreground mb-2">
-          Editorial Brief
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Describe your product concept and let AI generate the editorial copy using 
-          your brand guidelines, Technopedia context, and scene inspiration.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-mono font-bold text-foreground mb-2">
+            Editorial Brief
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Describe your product concept and let AI generate the editorial copy using 
+            your brand guidelines, Technopedia context, and scene inspiration.
+          </p>
+        </div>
+        
+        {/* Skip button for simple products */}
+        {onSkip && (
+          <Button
+            variant="outline"
+            onClick={onSkip}
+            className="flex-shrink-0 border-dashed"
+          >
+            <SkipForward className="w-4 h-4 mr-2" />
+            Skip to Preview
+          </Button>
+        )}
       </div>
 
       {/* Two-column layout for larger screens */}
