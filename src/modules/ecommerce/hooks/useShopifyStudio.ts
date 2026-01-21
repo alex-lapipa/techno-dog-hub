@@ -28,25 +28,31 @@ export interface ShopifyVariant {
   price: string;
   compare_at_price?: string; // Shopify best practice: show sale pricing
   sku: string;
+  barcode?: string; // UPC, EAN, or ISBN
   option1: string | null;
   option2: string | null;
   option3: string | null;
   inventory_quantity?: number;
+  inventory_policy?: 'deny' | 'continue'; // Shopify: deny = stop selling when OOS
+  fulfillment_service?: string;
   weight?: number;
   weight_unit?: 'g' | 'kg' | 'lb' | 'oz';
   requires_shipping: boolean;
+  taxable?: boolean;
+  grams?: number;
 }
 
 export interface ShopifyMetafield {
   namespace: string;
   key: string;
   value: string;
-  type: string;
+  type: 'single_line_text_field' | 'multi_line_text_field' | 'number_integer' | 'number_decimal' | 'boolean' | 'json' | 'date' | 'url' | 'color';
 }
 
 export interface ShopifyOption {
   name: string;
   values: string[];
+  position?: number; // Shopify: option order
 }
 
 export interface ShopifyImage {
@@ -54,6 +60,9 @@ export interface ShopifyImage {
   alt?: string;
   position?: number;
 }
+
+// Shopify product status
+export type ShopifyProductStatus = 'active' | 'draft' | 'archived';
 
 export interface StudioDraft {
   id?: string;
@@ -66,6 +75,10 @@ export interface StudioDraft {
   productType: string;
   vendor: string;
   tags: string[];
+  
+  // Shopify Product Settings
+  productStatus: ShopifyProductStatus; // NEW: Control visibility in store
+  templateSuffix?: string; // Shopify: custom theme template
   
   // Variants & Options (Shopify structure)
   variants: ShopifyVariant[];
@@ -88,7 +101,7 @@ export interface StudioDraft {
   } | null;
   aiMockupUrls: string[];
   
-  // SEO (Shopify best practice)
+  // SEO (Shopify best practice - Admin API fields)
   seoTitle: string;
   seoDescription: string;
   handle: string;
@@ -109,8 +122,10 @@ export interface StudioDraft {
   // Workflow
   currentStep: StudioStep;
   status: 'draft' | 'ready' | 'published' | 'archived';
+  isEditingExisting: boolean; // NEW: Track if editing vs creating
   createdAt?: string;
   updatedAt?: string;
+  publishedAt?: string; // NEW: Track when published
 }
 
 export interface StudioStepConfig {
@@ -161,6 +176,7 @@ const INITIAL_DRAFT: StudioDraft = {
   productType: '',
   vendor: 'techno.dog',
   tags: [],
+  productStatus: 'draft', // NEW: Default to draft for safety
   variants: [],
   options: [],
   images: [],
@@ -178,6 +194,7 @@ const INITIAL_DRAFT: StudioDraft = {
   ragContext: null,
   currentStep: 'product-select',
   status: 'draft',
+  isEditingExisting: false, // NEW
 };
 
 // ============================================================================
@@ -320,6 +337,7 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
         variants: [],
         options: [],
         images: [],
+        isEditingExisting: false, // Creating new product
       }));
       return;
     }
@@ -359,6 +377,8 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
       variants,
       options,
       images,
+      isEditingExisting: true, // Mark as editing existing Shopify product
+      handle: node.handle,
     }));
   }, []);
 
@@ -471,6 +491,7 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
         productType: data.product_type || '',
         vendor: data.vendor || 'techno.dog',
         tags: data.tags || [],
+        productStatus: 'draft',
         variants: (data.variants as unknown as ShopifyVariant[]) || [],
         options: (data.options as unknown as ShopifyOption[]) || [],
         images: [],
@@ -488,6 +509,7 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
         ragContext: data.rag_context as StudioDraft['ragContext'],
         currentStep,
         status: data.status as StudioDraft['status'],
+        isEditingExisting: !!data.shopify_product_id,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
       });
@@ -506,45 +528,100 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
   const publishToShopify = useCallback(async (): Promise<boolean> => {
     setIsPublishing(true);
     try {
-      // Build Shopify product payload
+      // Build comprehensive Shopify product payload (Admin API spec)
       const productPayload = {
+        // Core fields
         title: draft.aiCopy?.title || draft.title,
         body_html: draft.aiCopy?.description || draft.description,
         vendor: draft.vendor,
         product_type: draft.productType,
-        tags: [...draft.tags, draft.brandBook, draft.mascotName].filter(Boolean),
+        tags: [...draft.tags, draft.brandBook, draft.mascotName].filter(Boolean).join(', '),
+        status: draft.productStatus, // NEW: Control product visibility
+        handle: draft.handle || undefined, // SEO-friendly URL slug
+        template_suffix: draft.templateSuffix || undefined,
+        
+        // Variants with full Shopify fields
         variants: draft.variants.map(v => ({
           title: v.title,
           price: v.price,
+          compare_at_price: v.compare_at_price || undefined,
           sku: v.sku,
+          barcode: v.barcode || undefined,
           option1: v.option1,
           option2: v.option2,
           option3: v.option3,
+          weight: v.weight || undefined,
+          weight_unit: v.weight_unit || 'g',
+          grams: v.grams || (v.weight && v.weight_unit === 'g' ? v.weight : undefined),
           inventory_management: 'shopify',
+          inventory_policy: v.inventory_policy || 'deny',
+          fulfillment_service: v.fulfillment_service || 'manual',
           requires_shipping: v.requires_shipping,
+          taxable: v.taxable !== false,
         })),
-        options: draft.options.length > 0 ? draft.options : undefined,
-        images: draft.aiMockupUrls.length > 0 
-          ? draft.aiMockupUrls.map((src, idx) => ({ src, position: idx + 1 }))
+        
+        // Options
+        options: draft.options.length > 0 
+          ? draft.options.map((o, idx) => ({ ...o, position: idx + 1 }))
           : undefined,
+        
+        // Images from mockups + existing
+        images: [...draft.aiMockupUrls, ...draft.images.map(i => i.src)].length > 0
+          ? [...draft.aiMockupUrls.map((src, idx) => ({ src, alt: draft.title, position: idx + 1 })),
+             ...draft.images.map((img, idx) => ({ src: img.src, alt: img.alt || draft.title, position: draft.aiMockupUrls.length + idx + 1 }))]
+          : undefined,
+        
+        // Metafields (brand + user-defined)
         metafields: [
+          // Brand book metafield
           {
             namespace: 'technodog',
             key: 'brand_book',
             value: draft.brandBook,
             type: 'single_line_text_field',
           },
+          // Mascot metafield
           draft.mascotId ? {
             namespace: 'technodog',
             key: 'mascot_id',
             value: draft.mascotId,
             type: 'single_line_text_field',
           } : null,
+          draft.mascotName ? {
+            namespace: 'technodog',
+            key: 'mascot_name',
+            value: draft.mascotName,
+            type: 'single_line_text_field',
+          } : null,
+          // Color line metafield
+          draft.colorLine ? {
+            namespace: 'technodog',
+            key: 'color_line',
+            value: draft.colorLine,
+            type: 'single_line_text_field',
+          } : null,
+          // User-defined metafields
+          ...draft.metafields,
         ].filter(Boolean),
+        
+        // SEO fields
+        seo: {
+          title: draft.seoTitle || draft.aiCopy?.seoTitle || undefined,
+          description: draft.seoDescription || draft.aiCopy?.seoDescription || undefined,
+        },
       };
 
+      // Determine if creating or updating
+      const action = draft.isEditingExisting && draft.shopifyProductId ? 'update' : 'create';
+
       const { data, error } = await supabase.functions.invoke('shopify-create-product', {
-        body: { product: productPayload, draftId: draft.id },
+        body: { 
+          product: productPayload, 
+          draftId: draft.id,
+          action, // NEW: 'create' or 'update'
+          productId: draft.shopifyProductId, // For updates
+          collectionIds: draft.collectionIds, // NEW: Collection assignment
+        },
       });
 
       if (error) throw error;
@@ -555,9 +632,12 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
           status: 'published',
           shopifyProductId: data.product.id,
           shopifyProductHandle: data.product.handle,
+          publishedAt: new Date().toISOString(),
         }));
-        toast.success('Published to Shopify!', {
-          description: `Product ID: ${data.product.id}`,
+        
+        const actionVerb = action === 'update' ? 'Updated' : 'Published';
+        toast.success(`${actionVerb} to Shopify!`, {
+          description: `Product: ${data.product.title} - View in Shopify Admin`,
         });
         return true;
       } else {
@@ -565,7 +645,9 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
       }
     } catch (error) {
       console.error('[ShopifyStudio] Publish failed:', error);
-      toast.error('Failed to publish to Shopify');
+      toast.error('Failed to publish to Shopify', {
+        description: error instanceof Error ? error.message : 'Check console for details',
+      });
       return false;
     } finally {
       setIsPublishing(false);

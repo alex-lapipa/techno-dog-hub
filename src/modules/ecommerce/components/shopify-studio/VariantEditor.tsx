@@ -40,6 +40,16 @@ const STANDARD_COLORS = [
   { code: 'forest', name: 'Forest Green', hex: '#228b22' },
   { code: 'burgundy', name: 'Burgundy', hex: '#800020' },
   { code: 'heather-grey', name: 'Heather Grey', hex: '#9a9a9a' },
+  { code: 'logo-green', name: 'Logo Green', hex: '#00ff00' }, // Brand color
+  { code: 'crimson', name: 'Crimson Red', hex: '#dc143c' }, // Brand color
+];
+
+// Weight unit options
+const WEIGHT_UNITS = [
+  { value: 'g', label: 'Grams (g)' },
+  { value: 'kg', label: 'Kilograms (kg)' },
+  { value: 'lb', label: 'Pounds (lb)' },
+  { value: 'oz', label: 'Ounces (oz)' },
 ];
 
 interface VariantEditorProps {
@@ -173,9 +183,22 @@ export function VariantEditor({ draft, onUpdateDraft }: VariantEditorProps) {
     onUpdateDraft({ variants: newVariants });
   };
 
+  // Update variant compare at price (sale pricing)
+  const updateVariantCompareAtPrice = (index: number, compare_at_price: string) => {
+    const newVariants = [...draft.variants];
+    newVariants[index] = { ...newVariants[index], compare_at_price: compare_at_price || undefined };
+    onUpdateDraft({ variants: newVariants });
+  };
+
   // Bulk update all prices
   const bulkUpdatePrices = (price: string) => {
     const newVariants = draft.variants.map(v => ({ ...v, price }));
+    onUpdateDraft({ variants: newVariants });
+  };
+
+  // Bulk update compare at prices
+  const bulkUpdateCompareAtPrices = (compare_at_price: string) => {
+    const newVariants = draft.variants.map(v => ({ ...v, compare_at_price: compare_at_price || undefined }));
     onUpdateDraft({ variants: newVariants });
   };
 
