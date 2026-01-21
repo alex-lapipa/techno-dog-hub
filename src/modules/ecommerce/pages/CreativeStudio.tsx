@@ -16,7 +16,6 @@ import {
   StepVisualSelection,
   StepColorLine,
   StepShopifyCatalog,
-  StepProductType,
   StepProductCopy,
   StepEditorialBrief,
   StepReviewExport,
@@ -94,15 +93,8 @@ export function CreativeStudio() {
             }}
           />
         );
-      case 'product-type':
-        return (
-          <StepProductType
-            brandBook={workflow.brandBook}
-            products={workflow.guidelines.products}
-            selectedProduct={workflow.draft.selectedProduct || null}
-            onSelectProduct={workflow.selectProductType}
-          />
-        );
+      // NOTE: 'product-type' step removed - Shopify Catalog is now the single source of truth
+      // The product selection, size, color, and print area are all handled in StepShopifyCatalog
       case 'product-copy':
         return (
           <StepProductCopy

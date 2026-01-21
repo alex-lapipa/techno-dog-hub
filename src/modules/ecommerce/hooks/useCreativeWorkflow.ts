@@ -9,12 +9,12 @@ import { useState, useCallback, useMemo } from 'react';
 import { useBrandBookGuidelines, type BrandBookType, type ApprovedMascot, type ApprovedProduct } from './useBrandBookGuidelines';
 
 // Workflow step definitions
+// NOTE: 'product-type' removed - Shopify Catalog is now the single source of truth
 export type WorkflowStep = 
   | 'brand-selection'
   | 'visual-selection'
   | 'color-line'
   | 'shopify-catalog'
-  | 'product-type'
   | 'product-copy'
   | 'editorial-brief'
   | 'review-export';
@@ -55,34 +55,27 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
   {
     id: 'shopify-catalog',
     number: 4,
-    title: 'Shopify Catalog',
-    description: 'Browse full product catalog',
-    required: true,
-  },
-  {
-    id: 'product-type',
-    number: 5,
     title: 'Product & Placement',
-    description: 'Print zone configuration',
+    description: 'Select product, size, color & print zone',
     required: true,
   },
   {
     id: 'product-copy',
-    number: 6,
+    number: 5,
     title: 'Product Copy',
     description: 'Add text or tagline (optional)',
     required: false,
   },
   {
     id: 'editorial-brief',
-    number: 7,
+    number: 6,
     title: 'Editorial Brief',
     description: 'AI-generated product story',
     required: true,
   },
   {
     id: 'review-export',
-    number: 8,
+    number: 7,
     title: 'Review & Export',
     description: 'Preview, compliance check, and save',
     required: true,
@@ -200,6 +193,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
   const totalSteps = WORKFLOW_STEPS.length;
 
   // Check if a step is complete
+  // NOTE: 'product-type' removed - Shopify Catalog handles product + placement selection
   const isStepComplete = useCallback((step: WorkflowStep): boolean => {
     switch (step) {
       case 'brand-selection':
@@ -212,9 +206,8 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
         if (draft.brandBook === 'techno-dog') return true;
         return !!draft.colorLine;
       case 'shopify-catalog':
-        return !!draft.shopifyCatalog?.productId;
-      case 'product-type':
-        return !!draft.selectedProduct;
+        // Shopify catalog is now the single source - must have product, size, and color
+        return !!(draft.shopifyCatalog?.productId && draft.shopifyCatalog?.size && draft.shopifyCatalog?.color);
       case 'product-copy':
         // Optional step - always considered complete
         return true;
