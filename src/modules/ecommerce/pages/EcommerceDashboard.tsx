@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent, 
   CheckCircle, XCircle, ExternalLink, RefreshCw, Package, Tag, Truck, BarChart3,
-  Printer, FolderOpen
+  Printer, FolderOpen, Plus
 } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
@@ -32,6 +32,7 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 const QUICK_ACTIONS = [
+  { label: 'New Product', icon: Plus, path: '/products/new', description: 'Quick create', primary: true },
   { label: 'Products', icon: Package, path: '/products', description: 'Manage catalog' },
   { label: 'Orders', icon: ShoppingBag, path: '/orders', description: 'View orders' },
   { label: 'Discounts', icon: Tag, path: '/discounts', description: 'Promotions' },
