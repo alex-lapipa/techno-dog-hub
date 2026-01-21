@@ -27,6 +27,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { type ProductDraft, type ColorLineType } from '../../hooks/useCreativeWorkflow';
+import { compositeTechnoDoggiesMockup } from '../../utils/compositeTechnoDoggiesMockup';
 import { toast } from 'sonner';
 
 interface ComplianceItem {
@@ -140,7 +141,9 @@ export function StepReviewExport({
           brandBook: draft.brandBook,
           productType: draft.selectedProduct?.type,
           colorLine: draft.colorLine,
-          mascot: draft.selectedMascot?.displayName,
+          // ZERO TOLERANCE: for Techno Doggies, we do NOT ask AI to "draw" any mascot.
+          // We composite the official SVG onto the blank product photo client-side.
+          mascot: draft.brandBook === 'techno-doggies' ? undefined : draft.selectedMascot?.displayName,
           placement: draft.selectedProduct?.placement,
           modificationPrompt: modPrompt,
         },
@@ -148,7 +151,25 @@ export function StepReviewExport({
 
       if (fnError) throw new Error(fnError.message);
       if (data?.imageUrl) {
-        onSetImage(data.imageUrl);
+        // ZERO TOLERANCE: For Techno Doggies, never trust AI-drawn mascots.
+        // We generate a BLANK product photo and composite the OFFICIAL SVG mascot client-side.
+        let finalImageUrl: string = data.imageUrl;
+        if (draft.brandBook === 'techno-doggies' && draft.selectedMascot) {
+          try {
+            finalImageUrl = await compositeTechnoDoggiesMockup({
+              baseImageUrl: data.imageUrl,
+              mascot: draft.selectedMascot,
+              colorLine: (draft.colorLine ?? 'green-line') as ColorLineType,
+              productType: draft.selectedProduct?.type,
+              placement: draft.selectedProduct?.placement,
+            });
+          } catch (e) {
+            // If compositing fails, fall back to base image, but keep the workflow alive.
+            console.warn('Techno Doggies compositing failed:', e);
+          }
+        }
+
+        onSetImage(finalImageUrl);
         
         // Add to modification history if this was a modification
         if (modPrompt) {
@@ -202,18 +223,15 @@ export function StepReviewExport({
     if (draft.brandBook === 'techno-dog') {
       parts.push('brutalist VHS aesthetic, dark background, minimal design, geometric hexagon logo only, NO dog imagery');
     } else {
-      // Techno Doggies - Zero Hallucination enforcement
+      // Techno Doggies - ZERO TOLERANCE
+      // We generate a blank product photo and overlay the official mascot ourselves.
       const strokeColor = draft.colorLine === 'green-line' 
         ? 'laser green (#00FF00) stroke ONLY' 
         : 'pure white (#FFFFFF) stroke ONLY';
       
-      parts.push(`black fabric, STROKE-ONLY graphic in ${strokeColor}`);
-      parts.push('minimalist line art, NOT a realistic dog, NOT a cartoon');
-      
-      if (draft.selectedMascot) {
-        // The edge function will embed the actual SVG geometry
-        parts.push(`official ${draft.selectedMascot.displayName} mascot from 94-variant pack`);
-      }
+      parts.push('black fabric product photography');
+      parts.push('BLANK product: NO printed graphics, NO logo, NO mascot on the garment');
+      parts.push(`(official mascot overlay will be applied separately in ${strokeColor})`);
     }
     
     // Editorial context
