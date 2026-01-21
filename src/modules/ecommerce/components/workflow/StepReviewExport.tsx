@@ -162,6 +162,7 @@ export function StepReviewExport({
               colorLine: (draft.colorLine ?? 'green-line') as ColorLineType,
               productType: draft.selectedProduct?.type,
               placement: draft.selectedProduct?.placement,
+              productCopy: draft.productCopy,
             });
           } catch (e) {
             // If compositing fails, fall back to base image, but keep the workflow alive.
