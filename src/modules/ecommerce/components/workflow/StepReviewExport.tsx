@@ -2,7 +2,7 @@
  * Step 6: Review & Export (Merged Design Preview + Save Draft)
  * 
  * Final step combining:
- * - AI-generated product mockup
+ * - AI-generated product mockup with modification prompts
  * - Compliance checklist verification
  * - Save to drafts / export options
  * 
@@ -16,13 +16,15 @@ import { useState } from 'react';
 import { 
   ImagePlus, Loader2, RefreshCw, Check, AlertCircle, 
   Download, Save, CheckCircle2, XCircle, AlertTriangle,
-  ExternalLink
+  ExternalLink, MessageSquare, Send, History
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { type ProductDraft, type ColorLineType } from '../../hooks/useCreativeWorkflow';
 import { toast } from 'sonner';
@@ -32,6 +34,13 @@ interface ComplianceItem {
   label: string;
   status: 'pass' | 'fail' | 'warning' | 'na';
   message: string;
+}
+
+interface ModificationEntry {
+  id: string;
+  prompt: string;
+  timestamp: Date;
+  imageUrl?: string;
 }
 
 interface StepReviewExportProps {
@@ -50,6 +59,9 @@ export function StepReviewExport({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modificationPrompt, setModificationPrompt] = useState('');
+  const [modificationHistory, setModificationHistory] = useState<ModificationEntry[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Generate compliance checklist based on draft
   const complianceChecklist: ComplianceItem[] = [
@@ -111,31 +123,44 @@ export function StepReviewExport({
   const failCount = complianceChecklist.filter(c => c.status === 'fail').length;
   const allPassed = failCount === 0;
 
-  const generateImage = async () => {
+  const generateImage = async (modPrompt?: string) => {
     setIsGenerating(true);
     setError(null);
 
     try {
-      const prompt = buildImagePrompt(draft);
+      const basePrompt = buildImagePrompt(draft);
+      const finalPrompt = modPrompt 
+        ? `${basePrompt}. User modification request: ${modPrompt}`
+        : basePrompt;
       
       // Phase 3: Enhanced with scene/mood context
       const { data, error: fnError } = await supabase.functions.invoke('creative-studio-image', {
         body: {
-          prompt,
+          prompt: finalPrompt,
           brandBook: draft.brandBook,
           productType: draft.selectedProduct?.type,
           colorLine: draft.colorLine,
           mascot: draft.selectedMascot?.displayName,
           placement: draft.selectedProduct?.placement,
-          // Scene context would come from editorial step knowledge context
-          // For now we use the product concept as scene hint
-          scenePreset: undefined, // Can be enhanced to store in draft
+          modificationPrompt: modPrompt,
         },
       });
 
       if (fnError) throw new Error(fnError.message);
       if (data?.imageUrl) {
         onSetImage(data.imageUrl);
+        
+        // Add to modification history if this was a modification
+        if (modPrompt) {
+          setModificationHistory(prev => [...prev, {
+            id: Date.now().toString(),
+            prompt: modPrompt,
+            timestamp: new Date(),
+            imageUrl: data.imageUrl,
+          }]);
+          setModificationPrompt('');
+          toast.success('Design modified successfully');
+        }
       } else {
         throw new Error('No image received');
       }
@@ -145,6 +170,18 @@ export function StepReviewExport({
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleModificationSubmit = () => {
+    if (!modificationPrompt.trim()) {
+      toast.error('Please enter a modification prompt');
+      return;
+    }
+    if (modificationPrompt.length > 500) {
+      toast.error('Modification prompt must be under 500 characters');
+      return;
+    }
+    generateImage(modificationPrompt.trim());
   };
 
   const buildImagePrompt = (draft: ProductDraft): string => {
@@ -283,11 +320,20 @@ export function StepReviewExport({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={generateImage}
+                  onClick={() => generateImage()}
                   disabled={isGenerating}
                 >
                   <RefreshCw className={`w-4 h-4 mr-1 ${isGenerating ? 'animate-spin' : ''}`} />
                   Regenerate
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHistory(!showHistory)}
+                  disabled={modificationHistory.length === 0}
+                >
+                  <History className="w-4 h-4 mr-1" />
+                  History ({modificationHistory.length})
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
                   <a href={draft.generatedImageUrl} download target="_blank" rel="noopener noreferrer">
@@ -337,6 +383,79 @@ export function StepReviewExport({
                 <Badge variant="outline">{draft.selectedProduct.type}</Badge>
               )}
             </div>
+            
+            {/* Modification History Panel */}
+            {showHistory && modificationHistory.length > 0 && (
+              <Card className="p-4 border-dashed">
+                <div className="flex items-center gap-2 mb-3">
+                  <History className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-mono text-xs uppercase text-muted-foreground">
+                    Modification History
+                  </span>
+                </div>
+                <ScrollArea className="h-32">
+                  <div className="space-y-2">
+                    {modificationHistory.map((entry, idx) => (
+                      <div 
+                        key={entry.id}
+                        className="p-2 bg-muted/30 rounded text-xs"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Badge variant="outline" className="text-[9px] shrink-0">
+                            #{idx + 1}
+                          </Badge>
+                          <p className="text-muted-foreground line-clamp-2">{entry.prompt}</p>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground/60 mt-1">
+                          {entry.timestamp.toLocaleTimeString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </Card>
+            )}
+            
+            {/* Modification Prompt Input */}
+            <Card className="p-4 border-primary/20 bg-primary/5">
+              <div className="flex items-center gap-2 mb-3">
+                <MessageSquare className="w-4 h-4 text-primary" />
+                <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                  Request Modifications
+                </span>
+              </div>
+              <div className="space-y-3">
+                <Textarea
+                  placeholder="Describe changes to the design... (e.g., 'Make the logo larger', 'Add more contrast', 'Position mascot on the left')"
+                  value={modificationPrompt}
+                  onChange={(e) => setModificationPrompt(e.target.value.slice(0, 500))}
+                  className="min-h-[80px] text-sm resize-none"
+                  disabled={isGenerating}
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">
+                    {modificationPrompt.length}/500 characters
+                  </span>
+                  <Button
+                    size="sm"
+                    onClick={handleModificationSubmit}
+                    disabled={isGenerating || !modificationPrompt.trim()}
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                        Applying...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3 h-3 mr-1" />
+                        Apply Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Card>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -349,7 +468,7 @@ export function StepReviewExport({
               selections and editorial brief.
             </p>
             <Button
-              onClick={generateImage}
+              onClick={() => generateImage()}
               disabled={isGenerating || !allPassed}
               size="lg"
             >
