@@ -115,6 +115,16 @@ const SoundMachine = lazy(() => import("./pages/SoundMachine"));
 const AdminStore = lazy(() => import("./pages/admin/AdminStore"));
 const AdminLookbook = lazy(() => import("./pages/admin/AdminLookbook"));
 
+// E-commerce Operations Module
+const EcommerceDashboard = lazy(() => import("./modules/ecommerce/pages/EcommerceDashboard"));
+const EcommerceOrders = lazy(() => import("./modules/ecommerce/pages/EcommerceOrders"));
+const EcommerceInventory = lazy(() => import("./modules/ecommerce/pages/EcommerceInventory"));
+const EcommercePromotions = lazy(() => import("./modules/ecommerce/pages/EcommercePromotions"));
+const EcommerceShipping = lazy(() => import("./modules/ecommerce/pages/EcommerceShipping"));
+const EcommerceReturns = lazy(() => import("./modules/ecommerce/pages/EcommerceReturns"));
+const EcommerceAnalytics = lazy(() => import("./modules/ecommerce/pages/EcommerceAnalytics"));
+const CreativeStudio = lazy(() => import("./modules/ecommerce/pages/CreativeStudio"));
+
 const Technopedia = lazy(() => import("./pages/Technopedia"));
 const Books = lazy(() => import("./pages/Books"));
 const BookDetail = lazy(() => import("./pages/BookDetail"));
@@ -330,6 +340,16 @@ const App = () => (
                     {/* Admin Store */}
                     <Route path="/admin/store" element={<AdminStore />} />
                     <Route path="/admin/lookbook" element={<AdminLookbook />} />
+                    
+                    {/* E-commerce Operations Module */}
+                    <Route path="/admin/ecommerce" element={<EcommerceDashboard />} />
+                    <Route path="/admin/ecommerce/orders" element={<EcommerceOrders />} />
+                    <Route path="/admin/ecommerce/inventory" element={<EcommerceInventory />} />
+                    <Route path="/admin/ecommerce/promotions" element={<EcommercePromotions />} />
+                    <Route path="/admin/ecommerce/shipping" element={<EcommerceShipping />} />
+                    <Route path="/admin/ecommerce/returns" element={<EcommerceReturns />} />
+                    <Route path="/admin/ecommerce/analytics" element={<EcommerceAnalytics />} />
+                    <Route path="/admin/creative-studio" element={<CreativeStudio />} />
                     
                     {/* Catch all */}
                     <Route path="*" element={<NotFound />} />
