@@ -3,6 +3,10 @@
  * 
  * Select mascot or icon from the active brand book.
  * Optional step - user can skip to next step.
+ * 
+ * DESIGN SYSTEM COMPLIANCE:
+ * - NO emoji icons (🐕 forbidden)
+ * - Use DogSilhouette component only
  */
 
 import { useState } from 'react';
@@ -14,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { type BrandBookType, type ApprovedMascot } from '../../hooks/useBrandBookGuidelines';
+import DogSilhouette from '@/components/DogSilhouette';
 
 interface StepVisualSelectionProps {
   brandBook: BrandBookType;
@@ -155,9 +160,9 @@ export function StepVisualSelection({
                   </div>
                 )}
                 
-                {/* Placeholder for mascot icon */}
-                <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center">
-                  <span className="text-2xl">🐕</span>
+                {/* Official Techno Doggy silhouette - NO emojis allowed */}
+                <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center p-2">
+                  <DogSilhouette className="w-full h-full text-primary" />
                 </div>
                 
                 <h4 className="font-mono text-xs font-medium truncate">
