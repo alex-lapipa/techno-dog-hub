@@ -77,6 +77,7 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
 export interface ProductDraft {
   id?: string;
   brandBook: BrandBookType;
+  selectedModels?: string[]; // AI models for creative process
   selectedMascot?: ApprovedMascot | null;
   colorLine?: ColorLineType | null;
   selectedProduct?: ApprovedProduct | null;
@@ -119,6 +120,7 @@ export interface UseCreativeWorkflowReturn {
   // Draft updates
   updateDraft: (updates: Partial<ProductDraft>) => void;
   selectBrand: (brand: BrandBookType) => void;
+  selectModels: (models: string[]) => void;
   selectMascot: (mascot: ApprovedMascot | null) => void;
   setColorLine: (colorLine: ColorLineType | null) => void;
   selectProductType: (product: ApprovedProduct | null) => void;
@@ -147,6 +149,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
   const [currentStep, setCurrentStep] = useState<WorkflowStep>('brand-selection');
   const [draft, setDraft] = useState<ProductDraft>({
     brandBook: activeBrandBook,
+    selectedModels: ['gemini'], // Default to Gemini
     status: 'in_progress',
   });
 
@@ -238,6 +241,10 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     });
   }, [switchBrandBook, updateDraft]);
 
+  const selectModels = useCallback((models: string[]) => {
+    updateDraft({ selectedModels: models });
+  }, [updateDraft]);
+
   const selectMascot = useCallback((mascot: ApprovedMascot | null) => {
     updateDraft({ selectedMascot: mascot });
   }, [updateDraft]);
@@ -267,6 +274,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     setCurrentStep('brand-selection');
     setDraft({
       brandBook: activeBrandBook,
+      selectedModels: ['gemini'],
       status: 'in_progress',
     });
   }, [activeBrandBook]);
@@ -303,6 +311,7 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     // Draft updates
     updateDraft,
     selectBrand,
+    selectModels,
     selectMascot,
     setColorLine,
     selectProductType,

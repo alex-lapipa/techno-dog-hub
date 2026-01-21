@@ -31,6 +31,8 @@ export function CreativeStudio() {
           <StepBrandSelection
             selectedBrand={workflow.brandBook}
             onSelectBrand={workflow.selectBrand}
+            selectedModels={workflow.draft.selectedModels || ['gemini']}
+            onSelectModels={workflow.selectModels}
           />
         );
       case 'visual-selection':

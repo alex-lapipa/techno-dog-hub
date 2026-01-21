@@ -1,17 +1,21 @@
 /**
- * Step 1: Brand Selection
+ * Step 1: Brand Selection + AI Model Selection
  * 
- * User selects between techno.dog and techno-doggies brand identities.
+ * User selects between techno.dog and techno-doggies brand identities,
+ * and chooses which AI model(s) will power the creative process.
  */
 
 import { Hexagon, Dog } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { type BrandBookType } from '../../hooks/useBrandBookGuidelines';
+import { ModelSelector, type SelectedModels } from './ModelSelector';
 
 interface StepBrandSelectionProps {
   selectedBrand: BrandBookType;
   onSelectBrand: (brand: BrandBookType) => void;
+  selectedModels: SelectedModels;
+  onSelectModels: (models: SelectedModels) => void;
 }
 
 const BRAND_OPTIONS = [
@@ -38,6 +42,8 @@ const BRAND_OPTIONS = [
 export function StepBrandSelection({
   selectedBrand,
   onSelectBrand,
+  selectedModels,
+  onSelectModels,
 }: StepBrandSelectionProps) {
   return (
     <div className="space-y-6">
@@ -120,6 +126,12 @@ export function StepBrandSelection({
         })}
       </div>
       
+      {/* AI Model Selector */}
+      <ModelSelector
+        selectedModels={selectedModels}
+        onModelsChange={onSelectModels}
+      />
+
       {/* Guidelines reminder */}
       <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
         <p className="text-xs text-muted-foreground">
