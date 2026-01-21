@@ -1,42 +1,30 @@
 /**
  * techno.dog E-commerce Module - Inventory List
  * 
- * View inventory levels in read-only mode.
+ * View inventory levels from LIVE Shopify data.
  */
 
 import { useEffect, useState } from 'react';
-import { Package, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { Package, CheckCircle, XCircle } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Badge } from '@/components/ui/badge';
-import { fetchInventory } from '../services/mock-data.service';
-import { formatDate, MODULE_CONFIG } from '../config/module-config';
+import { fetchShopifyInventory, type ShopifyInventoryItem } from '../services/shopify-data.service';
+import { MODULE_CONFIG } from '../config/module-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { EcommerceDataTable } from '../components/EcommerceDataTable';
-import type { InventoryItem, TableColumn, StockStatus } from '../types/ecommerce.types';
-
-function getStockStatus(item: InventoryItem): StockStatus {
-  if (item.availableQuantity === 0) return 'out_of_stock';
-  if (item.availableQuantity <= item.lowStockThreshold) return 'low_stock';
-  return 'in_stock';
-}
-
-const statusConfig: Record<StockStatus, { label: string; className: string; icon: React.ElementType }> = {
-  in_stock: { label: 'In Stock', className: 'bg-logo-green/10 text-logo-green', icon: CheckCircle },
-  low_stock: { label: 'Low Stock', className: 'bg-destructive/10 text-destructive', icon: AlertTriangle },
-  out_of_stock: { label: 'Out of Stock', className: 'bg-muted text-muted-foreground', icon: XCircle },
-};
+import type { TableColumn } from '../types/ecommerce.types';
 
 export function EcommerceInventory() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [inventory, setInventory] = useState<ShopifyInventoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchInventory()
+    fetchShopifyInventory()
       .then(setInventory)
       .finally(() => setIsLoading(false));
   }, []);
 
-  const columns: TableColumn<InventoryItem>[] = [
+  const columns: TableColumn<ShopifyInventoryItem>[] = [
     {
       key: 'productName',
       label: 'Product',
@@ -55,47 +43,34 @@ export function EcommerceInventory() {
       ),
     },
     {
-      key: 'quantity',
-      label: 'Qty',
+      key: 'price',
+      label: 'Price',
       render: (item) => (
-        <span className="font-mono text-foreground">{item.quantity}</span>
-      ),
-    },
-    {
-      key: 'availableQuantity',
-      label: 'Available',
-      render: (item) => (
-        <span className="font-mono text-foreground">{item.availableQuantity}</span>
+        <span className="font-mono text-foreground">
+          {new Intl.NumberFormat('en-GB', { style: 'currency', currency: item.currencyCode }).format(parseFloat(item.price))}
+        </span>
       ),
     },
     {
       key: 'status',
       label: 'Status',
-      render: (item) => {
-        const status = getStockStatus(item);
-        const config = statusConfig[status];
-        return (
-          <Badge 
-            variant="secondary" 
-            className={`font-mono text-[10px] uppercase ${config.className}`}
-          >
-            {config.label}
-          </Badge>
-        );
-      },
-    },
-    {
-      key: 'locationName',
-      label: 'Location',
       render: (item) => (
-        <span className="text-muted-foreground">{item.locationName}</span>
-      ),
-    },
-    {
-      key: 'lastUpdated',
-      label: 'Updated',
-      render: (item) => (
-        <span className="text-muted-foreground text-xs">{formatDate(item.lastUpdated)}</span>
+        <Badge 
+          variant="secondary" 
+          className={`font-mono text-[10px] uppercase ${item.availableForSale ? 'bg-logo-green/10 text-logo-green' : 'bg-muted text-muted-foreground'}`}
+        >
+          {item.availableForSale ? (
+            <>
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Available
+            </>
+          ) : (
+            <>
+              <XCircle className="w-3 h-3 mr-1" />
+              Unavailable
+            </>
+          )}
+        </Badge>
       ),
     },
   ];
@@ -103,7 +78,7 @@ export function EcommerceInventory() {
   return (
     <AdminPageLayout
       title="Inventory"
-      description="Stock levels and availability tracking"
+      description="Live stock availability from Shopify"
       icon={Package}
       iconColor="text-logo-green"
       isLoading={isLoading}
@@ -118,7 +93,7 @@ export function EcommerceInventory() {
         data={inventory}
         keyField="id"
         isLoading={isLoading}
-        emptyMessage="No inventory items found"
+        emptyMessage="No products in Shopify store"
       />
     </AdminPageLayout>
   );
