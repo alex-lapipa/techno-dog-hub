@@ -36,44 +36,51 @@ export function StepContainer({
   return (
     <div className={cn("min-h-[calc(100vh-220px)]", className)}>
       {/* Step Header */}
-      <div className="max-w-5xl mx-auto px-6 pt-10 pb-8">
-        <div className="flex items-start gap-6">
+      <div className="max-w-5xl mx-auto px-6 pt-12 pb-10">
+        <div className="flex items-start gap-8">
           {/* Icon */}
           <div className={cn(
-            "w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0",
-            "bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/10",
-            isComplete && "from-logo-green/20 to-logo-green/5 ring-logo-green/20"
+            "w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0",
+            "bg-gradient-to-br ring-2 ring-offset-2 ring-offset-background transition-all",
+            isComplete 
+              ? "from-logo-green/30 to-logo-green/10 ring-logo-green/40" 
+              : "from-crimson/20 to-crimson/5 ring-crimson/30"
           )}>
-            <Icon className={cn("w-8 h-8", isComplete ? "text-logo-green" : iconColor)} />
+            <Icon className={cn("w-10 h-10", isComplete ? "text-logo-green" : "text-crimson")} />
           </div>
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-3">
               <Badge 
                 variant="outline" 
-                className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5"
+                className="font-mono text-xs uppercase tracking-wider px-3 py-1 border-crimson/30 text-crimson"
               >
                 Step {stepNumber} of {totalSteps}
               </Badge>
               {isComplete && (
-                <Badge className="bg-logo-green/20 text-logo-green border-logo-green/30 text-[10px]">
+                <Badge className="bg-logo-green/20 text-logo-green border border-logo-green/30 text-xs font-mono uppercase">
                   Complete
                 </Badge>
               )}
             </div>
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">
+            <h1 className="text-4xl font-bold text-foreground tracking-tight font-mono uppercase">
               {title}
             </h1>
-            <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
+            <p className="text-muted-foreground mt-3 text-lg max-w-2xl leading-relaxed">
               {description}
             </p>
           </div>
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="max-w-5xl mx-auto px-6">
+        <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
+
       {/* Step Content */}
-      <div className="max-w-5xl mx-auto px-6 pb-12">
+      <div className="max-w-5xl mx-auto px-6 py-10">
         {children}
       </div>
     </div>

@@ -74,99 +74,92 @@ export function ProductSelector({
   }, {} as Record<string, ShopifyProductEdge[]>);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-1">
-            Choose Your Product
-          </h2>
-          <p className="text-muted-foreground">
-            Start from your Shopify inventory or create something new
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="gap-2"
-          >
-            <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
-            Sync
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => openShopifyAdmin('products')}
-            className="gap-2"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Shopify
-          </Button>
-        </div>
-      </div>
-
+    <div className="space-y-10">
       {/* Create New Card - Featured */}
       <Card
         onClick={onCreateNew}
         className={cn(
-          "p-6 cursor-pointer transition-all border-2 border-dashed group",
-          "hover:border-primary hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/5",
-          selectedProductId === null && "border-primary bg-primary/10 shadow-lg shadow-primary/10"
+          "p-8 cursor-pointer transition-all border-2 border-dashed group",
+          "hover:border-logo-green hover:bg-logo-green/5 hover:shadow-xl hover:shadow-logo-green/10",
+          selectedProductId === null && "border-logo-green bg-logo-green/10 shadow-xl shadow-logo-green/10"
         )}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-6">
           <div className={cn(
-            "w-20 h-20 rounded-2xl flex items-center justify-center transition-all",
-            "bg-gradient-to-br from-primary/20 to-primary/5",
-            "group-hover:scale-105 group-hover:shadow-lg",
-            selectedProductId === null && "from-primary/30 to-primary/10"
+            "w-24 h-24 rounded-2xl flex items-center justify-center transition-all",
+            "bg-gradient-to-br from-logo-green/30 to-logo-green/10 ring-2 ring-logo-green/20",
+            "group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-logo-green/20",
+            selectedProductId === null && "from-logo-green/40 to-logo-green/20 ring-logo-green/40"
           )}>
-            <Plus className="w-10 h-10 text-primary" />
+            <Plus className="w-12 h-12 text-logo-green" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-foreground mb-1">Create New Product</h3>
+            <h3 className="text-xl font-mono font-bold text-foreground uppercase tracking-wide mb-2">Create New Product</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Access 30+ product types: apparel, accessories, bags, drinkware, home décor, tech gadgets & more
             </p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              <Badge variant="secondary" className="text-[10px]">👕 T-Shirts</Badge>
-              <Badge variant="secondary" className="text-[10px]">🧢 Caps</Badge>
-              <Badge variant="secondary" className="text-[10px]">☕ Mugs</Badge>
-              <Badge variant="secondary" className="text-[10px]">📱 Cases</Badge>
-              <Badge variant="secondary" className="text-[10px]">+26 more</Badge>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Badge variant="outline" className="text-xs font-mono border-logo-green/30 text-logo-green">T-Shirts</Badge>
+              <Badge variant="outline" className="text-xs font-mono border-logo-green/30 text-logo-green">Caps</Badge>
+              <Badge variant="outline" className="text-xs font-mono border-logo-green/30 text-logo-green">Mugs</Badge>
+              <Badge variant="outline" className="text-xs font-mono border-logo-green/30 text-logo-green">Cases</Badge>
+              <Badge variant="outline" className="text-xs font-mono border-muted-foreground/30 text-muted-foreground">+26 more</Badge>
             </div>
           </div>
           {selectedProductId === null && (
-            <Badge className="bg-primary text-primary-foreground">Selected</Badge>
+            <Badge className="bg-logo-green text-background font-mono uppercase">Selected</Badge>
           )}
         </div>
       </Card>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search your Shopify products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-11 h-11 text-sm bg-muted/30"
-        />
+      {/* Inventory Section */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-mono font-bold uppercase tracking-wide text-foreground">
+              Shopify Inventory
+            </h3>
+            <Badge variant="outline" className="font-mono text-xs border-crimson/30 text-crimson">
+              {products.length} products
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="gap-2 font-mono text-xs uppercase border-border hover:border-logo-green hover:text-logo-green"
+            >
+              <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
+              Sync
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openShopifyAdmin('products')}
+              className="gap-2 font-mono text-xs uppercase border-border hover:border-crimson hover:text-crimson"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Shopify
+            </Button>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Input
+            placeholder="Search your Shopify products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 h-12 text-sm bg-muted/20 border-2 border-border focus:border-logo-green font-mono"
+          />
+        </div>
       </div>
 
       {/* Existing Products */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-foreground">
-            Your Shopify Inventory
-          </h3>
-          <Badge variant="outline" className="font-mono text-xs">
-            {products.length} products
-          </Badge>
-        </div>
-
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map(i => (
@@ -174,27 +167,27 @@ export function ProductSelector({
             ))}
           </div>
         ) : products.length === 0 ? (
-          <Card className="p-10 text-center bg-muted/20">
-            <ShoppingBag className="w-14 h-14 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="text-lg font-bold mb-2">No Products Yet</h3>
-            <p className="text-sm text-muted-foreground mb-5 max-w-sm mx-auto">
+          <Card className="p-12 text-center bg-muted/10 border-2 border-dashed border-border">
+            <ShoppingBag className="w-16 h-16 mx-auto text-muted-foreground/40 mb-5" />
+            <h3 className="text-xl font-mono font-bold uppercase mb-3">No Products Yet</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
               Your Shopify store is empty. Create your first product to get started!
             </p>
-            <Button onClick={onCreateNew} size="lg" className="gap-2">
+            <Button onClick={onCreateNew} size="lg" className="gap-2 bg-logo-green hover:bg-logo-green/90 text-background font-mono uppercase">
               <Plus className="w-4 h-4" />
               Create Your First Product
             </Button>
           </Card>
         ) : (
-          <ScrollArea className="h-[350px]">
-            <div className="space-y-5 pr-4">
+          <ScrollArea className="h-[380px]">
+            <div className="space-y-6 pr-4">
               {Object.entries(groupedProducts).map(([type, typeProducts]) => (
                 <div key={type}>
-                  <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-border pb-2">
                     <span>{type}</span>
                     <span className="text-muted-foreground/50">({typeProducts.length})</span>
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {typeProducts.map((product) => {
                       const isSelected = selectedProductId === product.node.id;
                       const image = product.node.images.edges[0]?.node;
@@ -206,14 +199,14 @@ export function ProductSelector({
                           key={product.node.id}
                           onClick={() => onSelectProduct(product)}
                           className={cn(
-                            "p-4 cursor-pointer transition-all group",
-                            "hover:border-primary/50 hover:bg-primary/5 hover:shadow-md",
-                            isSelected && "border-primary bg-primary/10 ring-2 ring-primary/20 shadow-lg"
+                            "p-4 cursor-pointer transition-all group border-2",
+                            "hover:border-crimson/50 hover:bg-crimson/5 hover:shadow-lg",
+                            isSelected && "border-crimson bg-crimson/10 ring-2 ring-crimson/20 shadow-lg shadow-crimson/10"
                           )}
                         >
                           <div className="flex gap-4">
                             {/* Image */}
-                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 ring-1 ring-border group-hover:ring-primary/30 transition-all">
+                            <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 ring-2 ring-border group-hover:ring-crimson/30 transition-all">
                               {image ? (
                                 <img
                                   src={image.url}
@@ -230,17 +223,17 @@ export function ProductSelector({
                             {/* Content */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
-                                <h4 className="font-medium text-sm truncate">
+                                <h4 className="font-mono font-bold text-sm truncate uppercase">
                                   {product.node.title}
                                 </h4>
                                 {isSelected && (
-                                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                                  <Check className="w-5 h-5 text-crimson flex-shrink-0" />
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground mt-1">
+                              <p className="text-xs text-muted-foreground mt-1 font-mono">
                                 {variantCount} variant{variantCount !== 1 ? 's' : ''}
                               </p>
-                              <p className="text-base font-bold text-primary mt-2 font-mono">
+                              <p className="text-lg font-bold text-logo-green mt-2 font-mono">
                                 ${parseFloat(price.amount).toFixed(2)}
                               </p>
                             </div>

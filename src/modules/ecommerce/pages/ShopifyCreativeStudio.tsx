@@ -135,10 +135,10 @@ export function ShopifyCreativeStudio() {
       title="Creative Studio"
       description="Design and publish products with Shopify-first workflow"
       icon={Sparkles}
-      iconColor="text-primary"
+      iconColor="text-logo-green"
     >
       {/* Main Container - Full height with scroll */}
-      <div className="flex flex-col -mx-6 -mb-6 min-h-[calc(100vh-120px)] bg-gradient-to-b from-background to-muted/20">
+      <div className="flex flex-col -mx-6 -mb-6 min-h-[calc(100vh-120px)] bg-gradient-to-b from-background via-background to-muted/10">
         {/* Horizontal Progress Indicator (Sticky) */}
         <VerticalProgressIndicator
           currentStep={studio.currentStep}

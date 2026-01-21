@@ -34,8 +34,8 @@ export function VerticalProgressIndicator({
   const currentIndex = STUDIO_STEPS.findIndex(s => s.id === currentStep);
 
   return (
-    <div className="w-full bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-40">
-      <div className="max-w-5xl mx-auto px-6 py-4">
+    <div className="w-full bg-background/95 backdrop-blur-lg border-b-2 border-logo-green/20 sticky top-0 z-40 shadow-lg shadow-logo-green/5">
+      <div className="max-w-5xl mx-auto px-6 py-5">
         {/* Progress Steps */}
         <div className="flex items-center justify-between">
           {STUDIO_STEPS.map((step, index) => {
@@ -58,30 +58,33 @@ export function VerticalProgressIndicator({
                   )}
                 >
                   <div className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300",
+                    "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300",
                     "ring-2 ring-offset-2 ring-offset-background",
-                    isComplete && "bg-logo-green text-black ring-logo-green",
-                    isCurrent && !isComplete && "bg-primary text-primary-foreground ring-primary scale-110 shadow-lg shadow-primary/25",
-                    !isComplete && !isCurrent && "bg-muted text-muted-foreground ring-muted-foreground/20"
+                    isComplete && "bg-logo-green text-background ring-logo-green shadow-lg shadow-logo-green/30",
+                    isCurrent && !isComplete && "bg-crimson text-white ring-crimson scale-110 shadow-xl shadow-crimson/30",
+                    !isComplete && !isCurrent && "bg-muted text-muted-foreground ring-border"
                   )}>
                     {isComplete ? (
-                      <Check className="w-5 h-5" strokeWidth={3} />
+                      <Check className="w-6 h-6" strokeWidth={3} />
                     ) : (
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-6 h-6" />
                     )}
                   </div>
                   
                   {/* Step Label */}
-                  <div className="text-center min-w-[80px]">
+                  <div className="text-center min-w-[90px]">
                     <p className={cn(
-                      "text-xs font-medium transition-colors",
-                      isCurrent && "text-primary",
+                      "text-xs font-mono font-bold uppercase tracking-wide transition-colors",
+                      isCurrent && "text-crimson",
                       isComplete && "text-logo-green",
                       !isCurrent && !isComplete && "text-muted-foreground"
                     )}>
                       {step.title}
                     </p>
-                    <p className="text-[10px] text-muted-foreground/70 mt-0.5 hidden sm:block">
+                    <p className={cn(
+                      "text-[10px] font-mono mt-0.5 hidden sm:block",
+                      isCurrent ? "text-crimson/70" : "text-muted-foreground/50"
+                    )}>
                       Step {step.number}
                     </p>
                   </div>
@@ -89,11 +92,11 @@ export function VerticalProgressIndicator({
 
                 {/* Connector Line */}
                 {!isLast && (
-                  <div className="flex-1 mx-4 h-0.5 relative hidden sm:block">
-                    <div className="absolute inset-0 bg-border rounded-full" />
+                  <div className="flex-1 mx-4 h-1 relative hidden sm:block rounded-full overflow-hidden">
+                    <div className="absolute inset-0 bg-border" />
                     <div 
                       className={cn(
-                        "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
+                        "absolute inset-y-0 left-0 transition-all duration-500",
                         isComplete ? "bg-logo-green" : "bg-transparent"
                       )}
                       style={{ width: isComplete ? '100%' : '0%' }}

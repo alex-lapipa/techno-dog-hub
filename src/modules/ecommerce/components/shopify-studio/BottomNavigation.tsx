@@ -40,25 +40,28 @@ export function BottomNavigation({
   onReset,
 }: BottomNavigationProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border shadow-2xl">
-      <div className="max-w-5xl mx-auto px-6 py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t-2 border-logo-green/20 shadow-2xl shadow-logo-green/10">
+      <div className="max-w-5xl mx-auto px-6 py-5">
         <div className="flex items-center justify-between gap-4">
           {/* Left: Back Button */}
           <Button 
             variant="outline" 
             onClick={onBack} 
             disabled={!canGoBack}
-            className="gap-2 min-w-[130px] h-11"
+            className="gap-2 min-w-[140px] h-12 font-mono uppercase text-sm border-border hover:border-crimson hover:text-crimson transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
 
           {/* Center: Step Info & Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             {/* Current Step Badge */}
             <div className="hidden md:flex items-center gap-3">
-              <Badge variant="secondary" className="font-medium px-3 py-1 text-sm">
+              <Badge 
+                variant="secondary" 
+                className="font-mono font-bold px-4 py-1.5 text-sm bg-muted text-foreground"
+              >
                 {currentStepConfig.title}
               </Badge>
               <span className="text-xs text-muted-foreground font-mono">
@@ -66,15 +69,15 @@ export function BottomNavigation({
               </span>
             </div>
 
-            <Separator orientation="vertical" className="h-6 hidden md:block" />
+            <Separator orientation="vertical" className="h-8 hidden md:block bg-border" />
 
             {/* Save & Reset */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={onSave} 
-                className="gap-1.5 text-muted-foreground hover:text-foreground"
+                className="gap-2 text-muted-foreground hover:text-logo-green hover:bg-logo-green/10 font-mono uppercase text-xs"
               >
                 <Save className="w-4 h-4" />
                 <span className="hidden sm:inline">Save</span>
@@ -83,7 +86,7 @@ export function BottomNavigation({
                 variant="ghost" 
                 size="sm" 
                 onClick={onReset} 
-                className="gap-1.5 text-muted-foreground hover:text-destructive"
+                className="gap-2 text-muted-foreground hover:text-crimson hover:bg-crimson/10 font-mono uppercase text-xs"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span className="hidden sm:inline">Reset</span>
@@ -96,8 +99,10 @@ export function BottomNavigation({
             onClick={onNext} 
             disabled={!canGoNext && !isPublishStep}
             className={cn(
-              "gap-2 min-w-[160px] h-11 font-semibold",
-              isPublishStep && "bg-logo-green hover:bg-logo-green/90 text-black shadow-lg shadow-logo-green/25"
+              "gap-2 min-w-[180px] h-12 font-mono uppercase text-sm font-bold transition-all",
+              isPublishStep 
+                ? "bg-logo-green hover:bg-logo-green/90 text-background shadow-lg shadow-logo-green/30 hover:shadow-xl hover:shadow-logo-green/40" 
+                : "bg-crimson hover:bg-crimson/90 text-white shadow-lg shadow-crimson/20"
             )}
           >
             {isPublishing ? (
