@@ -143,20 +143,15 @@ const adminSections: NavSection[] = [
     ],
   },
   {
-    id: 'store',
-    label: 'Store',
+    id: 'store-operations',
+    label: 'Store & Operations',
     icon: Store,
     items: [
+      // Storefront
       { label: 'Shop', path: '/admin/store', icon: Store, description: 'Main storefront' },
       { label: 'Lookbook', path: '/admin/lookbook', icon: ShoppingBag, description: 'Product gallery' },
-    ],
-  },
-  {
-    id: 'store-ops',
-    label: 'Store Ops',
-    icon: ShoppingBag,
-    items: [
-      { label: 'Dashboard', path: '/admin/ecommerce', icon: LayoutDashboard, description: 'KPI overview' },
+      // Operations
+      { label: 'Ops Dashboard', path: '/admin/ecommerce', icon: LayoutDashboard, description: 'KPI overview' },
       { label: 'Orders', path: '/admin/ecommerce/orders', icon: ClipboardList, description: 'Order management' },
       { label: 'Inventory', path: '/admin/ecommerce/inventory', icon: Database, description: 'Stock levels' },
       { label: 'Promotions', path: '/admin/ecommerce/promotions', icon: Zap, description: 'Discount codes' },
