@@ -2,13 +2,16 @@
  * techno.dog E-commerce Module - Dashboard
  * 
  * KPI overview for e-commerce operations.
+ * Connected to LIVE Shopify data via Storefront API.
  */
 
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
-import { fetchDashboardKPIs } from '../services/mock-data.service';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { fetchLiveKPIs, checkShopifyConnection, type ShopifyConnectionStatus } from '../services/shopify-data.service';
 import { MODULE_CONFIG } from '../config/module-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import type { DashboardKPI } from '../types/ecommerce.types';
@@ -23,10 +26,17 @@ const iconMap: Record<string, React.ElementType> = {
 export function EcommerceDashboard() {
   const [kpis, setKpis] = useState<DashboardKPI[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [connection, setConnection] = useState<ShopifyConnectionStatus | null>(null);
 
   useEffect(() => {
-    fetchDashboardKPIs()
-      .then(setKpis)
+    Promise.all([
+      fetchLiveKPIs(),
+      checkShopifyConnection(),
+    ])
+      .then(([kpiData, connectionStatus]) => {
+        setKpis(kpiData);
+        setConnection(connectionStatus);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -85,6 +95,46 @@ export function EcommerceDashboard() {
           })}
         </div>
 
+        {/* Shopify Connection Status */}
+        <Card className="p-6 bg-card border-border">
+          <div className="flex items-start gap-4">
+            <div className={`p-3 rounded ${connection?.connected ? 'bg-logo-green/10' : 'bg-destructive/10'}`}>
+              {connection?.connected ? (
+                <CheckCircle className="w-5 h-5 text-logo-green" />
+              ) : (
+                <XCircle className="w-5 h-5 text-destructive" />
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
+                  Shopify Connection
+                </h3>
+                <Badge 
+                  variant="secondary" 
+                  className={`font-mono text-[10px] ${connection?.connected ? 'bg-logo-green/10 text-logo-green' : 'bg-destructive/10 text-destructive'}`}
+                >
+                  {connection?.connected ? 'CONNECTED' : 'DISCONNECTED'}
+                </Badge>
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground font-mono">
+                {connection?.storeDomain || 'No store connected'}
+              </p>
+              {connection?.connected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 h-7 px-2 text-xs font-mono"
+                  onClick={() => window.open('https://admin.shopify.com', '_blank')}
+                >
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  Open Shopify Admin
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+
         {/* Info Card */}
         <Card className="p-6 bg-card border-border">
           <div className="flex items-start gap-4">
@@ -93,14 +143,14 @@ export function EcommerceDashboard() {
             </div>
             <div>
               <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
-                E-commerce Operations Module
+                Store Operations Module
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                This module provides read-only access to e-commerce operations data. 
-                Use the sidebar to navigate between Orders, Inventory, Promotions, Shipping, Returns, and Analytics.
+                Real-time data from your Shopify store. KPIs above reflect live product and inventory counts.
+                Use the sidebar to navigate between Shop, Lookbook, and operational views.
               </p>
               <p className="mt-2 font-mono text-xs text-muted-foreground">
-                {MODULE_CONFIG.MODULE_NAME} v{MODULE_CONFIG.VERSION}
+                {MODULE_CONFIG.MODULE_NAME} v{MODULE_CONFIG.VERSION} • Read-Only Mode
               </p>
             </div>
           </div>

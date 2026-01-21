@@ -1,120 +1,49 @@
 /**
- * techno.dog E-commerce Module - Shipping Rules
+ * techno.dog E-commerce Module - Shipping
  * 
- * View shipping zones and rates.
+ * Shipping is managed in Shopify Admin.
  */
 
-import { useEffect, useState } from 'react';
-import { Truck, CheckCircle, XCircle } from 'lucide-react';
+import { Truck, ExternalLink } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
-import { Badge } from '@/components/ui/badge';
-import { fetchShippingRules } from '../services/mock-data.service';
-import { formatCurrency, MODULE_CONFIG } from '../config/module-config';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MODULE_CONFIG } from '../config/module-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
-import { EcommerceDataTable } from '../components/EcommerceDataTable';
-import type { ShippingRule, TableColumn } from '../types/ecommerce.types';
 
 export function EcommerceShipping() {
-  const [rules, setRules] = useState<ShippingRule[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchShippingRules()
-      .then(setRules)
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  const columns: TableColumn<ShippingRule>[] = [
-    {
-      key: 'name',
-      label: 'Name',
-      render: (rule) => (
-        <span className="font-medium text-foreground">{rule.name}</span>
-      ),
-    },
-    {
-      key: 'zone',
-      label: 'Zone',
-      render: (rule) => (
-        <div>
-          <div className="text-foreground">{rule.zone.name}</div>
-          <div className="text-[10px] text-muted-foreground">
-            {rule.zone.countries.join(', ')}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'rateType',
-      label: 'Type',
-      render: (rule) => (
-        <span className="font-mono text-xs text-muted-foreground uppercase">
-          {rule.rateType.replace('_', ' ')}
-        </span>
-      ),
-    },
-    {
-      key: 'rate',
-      label: 'Rate',
-      render: (rule) => (
-        <span className="font-mono text-foreground">{formatCurrency(rule.rate)}</span>
-      ),
-    },
-    {
-      key: 'freeAbove',
-      label: 'Free Above',
-      render: (rule) => (
-        <span className="font-mono text-muted-foreground">
-          {rule.freeAbove ? formatCurrency(rule.freeAbove) : '-'}
-        </span>
-      ),
-    },
-    {
-      key: 'estimatedDays',
-      label: 'Delivery',
-      render: (rule) => (
-        <span className="text-muted-foreground text-xs">{rule.estimatedDays}</span>
-      ),
-    },
-    {
-      key: 'isActive',
-      label: 'Active',
-      render: (rule) => (
-        rule.isActive ? (
-          <Badge variant="secondary" className="bg-logo-green/10 text-logo-green font-mono text-[10px]">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Active
-          </Badge>
-        ) : (
-          <Badge variant="secondary" className="bg-muted text-muted-foreground font-mono text-[10px]">
-            <XCircle className="w-3 h-3 mr-1" />
-            Inactive
-          </Badge>
-        )
-      ),
-    },
-  ];
-
   return (
     <AdminPageLayout
       title="Shipping"
-      description="Shipping zones and delivery rates"
+      description="Shipping zones via Shopify Admin"
       icon={Truck}
       iconColor="text-logo-green"
-      isLoading={isLoading}
       actions={
         MODULE_CONFIG.READ_ONLY && MODULE_CONFIG.UI.SHOW_READ_ONLY_BADGE && (
           <ReadOnlyBadge />
         )
       }
     >
-      <EcommerceDataTable
-        columns={columns}
-        data={rules}
-        keyField="id"
-        isLoading={isLoading}
-        emptyMessage="No shipping rules found"
-      />
+      <Card className="p-8 bg-card border-border">
+        <div className="text-center max-w-md mx-auto">
+          <div className="p-4 bg-muted/50 rounded-full w-fit mx-auto mb-4">
+            <Truck className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <h3 className="font-mono text-lg font-medium text-foreground uppercase tracking-wide mb-2">
+            Shipping in Shopify Admin
+          </h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            Configure shipping zones, rates, and delivery options directly in your Shopify dashboard.
+          </p>
+          <Button
+            onClick={() => window.open('https://admin.shopify.com/store/technodog-d3wkq/settings/shipping', '_blank')}
+            className="font-mono"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Open Shopify Shipping
+          </Button>
+        </div>
+      </Card>
     </AdminPageLayout>
   );
 }
