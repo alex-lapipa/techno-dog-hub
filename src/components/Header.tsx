@@ -60,9 +60,6 @@ const Header = () => {
     },
   ];
 
-  // Check if any store item is active
-  const isStoreActive = STORE_ITEMS.some(item => isActive(item.path));
-
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
   const isSubItemActive = (path: string) => {
     if (path.includes('?')) {
@@ -74,6 +71,9 @@ const Header = () => {
 
   // Check if any scene item is active
   const isScenesActive = SCENES_ITEMS.some(item => isActive(item.path));
+  
+  // Check if any store item is active
+  const isStoreActive = STORE_ITEMS.some(item => isActive(item.path));
   
   // Get current scene index for navigation arrows
   const getCurrentSceneIndex = useCallback(() => {
