@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import HexagonLogo from "./HexagonLogo";
 import { useState, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, SlidersHorizontal, Heart, Code, ShoppingBag, Radio, BookOpen, Store } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Menu, SlidersHorizontal, Heart, Code, ShoppingBag, Radio, BookOpen } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import DogChat from "@/components/admin/DogChat";
@@ -17,11 +17,7 @@ const SCENES_ITEMS = [
   { label: 'Proper Marketing', path: '/scenes/proper-marketing' },
 ];
 
-// Store group: Store pages and related content
-const STORE_ITEMS = [
-  { label: 'Shop', path: '/store' },
-  { label: 'Lookbook', path: '/lookbook' },
-];
+// Store items - hidden from public nav, accessible via admin
 
 const Header = () => {
   const location = useLocation();
@@ -52,12 +48,7 @@ const Header = () => {
     },
     { label: 'Books', path: '/books' },
     { label: 'Documentaries', path: '/documentaries' },
-    { 
-      label: 'Store', 
-      path: '/store',
-      isStore: true,
-      sub: STORE_ITEMS
-    },
+    // Store hidden from public navigation - accessible via /admin/store
   ];
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -71,9 +62,6 @@ const Header = () => {
 
   // Check if any scene item is active
   const isScenesActive = SCENES_ITEMS.some(item => isActive(item.path));
-  
-  // Check if any store item is active
-  const isStoreActive = STORE_ITEMS.some(item => isActive(item.path));
   
   // Get current scene index for navigation arrows
   const getCurrentSceneIndex = useCallback(() => {
@@ -163,16 +151,15 @@ const Header = () => {
                   onMouseEnter={() => setActiveDropdown(item.path)}
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  {item.isScenes || item.isStore ? (
+                  {item.isScenes ? (
                     // Dropdown trigger (not a link itself)
                     <button
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest transition-all duration-300 hover:animate-glitch hover:text-logo-green ${
-                        (item.isScenes && isScenesActive) || (item.isStore && isStoreActive)
+                        isScenesActive
                           ? 'text-logo-green drop-shadow-[0_0_8px_hsl(var(--logo-green)/0.6)]' 
                           : 'text-muted-foreground hover:text-logo-green'
                       }`}
                     >
-                      {item.isStore && <Store className="w-3 h-3 mr-1" />}
                       {item.label}
                       <ChevronDown className="w-2.5 h-2.5 opacity-60" />
                     </button>
@@ -187,7 +174,7 @@ const Header = () => {
                       }`}
                     >
                       {item.label}
-                      {item.sub && !item.isScenes && !item.isStore && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
+                      {item.sub && !item.isScenes && <ChevronDown className="w-2.5 h-2.5 opacity-60" />}
                     </Link>
                   )}
                   
