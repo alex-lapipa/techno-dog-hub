@@ -2,6 +2,7 @@
  * Shopify Creative Studio v2 - Main Page
  * 
  * Shopify-first creative workflow for product design and publishing.
+ * All 5 steps fully implemented with brand book and RAG integration.
  */
 
 import { useEffect } from 'react';
@@ -10,9 +11,14 @@ import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useShopifyStudio } from '../hooks/useShopifyStudio';
-import { StudioSidebar } from '../components/shopify-studio/StudioSidebar';
-import { ProductSelector } from '../components/shopify-studio/ProductSelector';
-import { VariantEditor } from '../components/shopify-studio/VariantEditor';
+import { 
+  StudioSidebar, 
+  ProductSelector, 
+  VariantEditor,
+  BrandDesignStep,
+  AIEnhancementStep,
+  PublishStep,
+} from '../components/shopify-studio';
 
 export function ShopifyCreativeStudio() {
   const studio = useShopifyStudio();
@@ -60,29 +66,30 @@ export function ShopifyCreativeStudio() {
         );
       case 'brand-design':
         return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-mono font-bold">Brand Design</h2>
-            <p className="text-muted-foreground">Apply Techno Dog/Doggies mascots and color lines.</p>
-            <Badge>Coming in next iteration</Badge>
-          </div>
+          <BrandDesignStep
+            draft={studio.draft}
+            onUpdateDraft={studio.updateDraft}
+            onSetBrandBook={studio.setBrandBook}
+            onSetMascot={studio.setMascot}
+            onSetColorLine={studio.setColorLine}
+          />
         );
       case 'ai-enhance':
         return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-mono font-bold">AI Enhancement</h2>
-            <p className="text-muted-foreground">Generate product copy and mockups with Technopedia RAG.</p>
-            <Badge>Coming in next iteration</Badge>
-          </div>
+          <AIEnhancementStep
+            draft={studio.draft}
+            onUpdateDraft={studio.updateDraft}
+            onSetAICopy={studio.setAICopy}
+            onAddMockupUrl={studio.addMockupUrl}
+          />
         );
       case 'publish':
         return (
-          <div className="space-y-4">
-            <h2 className="text-xl font-mono font-bold">Publish to Shopify</h2>
-            <p className="text-muted-foreground">Review and publish your product.</p>
-            <Button onClick={studio.publishToShopify} disabled={studio.isPublishing}>
-              {studio.isPublishing ? 'Publishing...' : 'Publish Now'}
-            </Button>
-          </div>
+          <PublishStep
+            draft={studio.draft}
+            isPublishing={studio.isPublishing}
+            onPublish={studio.publishToShopify}
+          />
         );
       default:
         return null;
@@ -121,7 +128,7 @@ export function ShopifyCreativeStudio() {
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto">
             {renderStepContent()}
           </div>
 
