@@ -160,9 +160,13 @@ export function StepVisualSelection({
                   </div>
                 )}
                 
-                {/* Official Techno Doggy silhouette - NO emojis allowed */}
+                {/* Official Techno Doggy component - NO emojis allowed */}
                 <div className="aspect-square bg-muted rounded-lg mb-2 flex items-center justify-center p-2">
-                  <DogSilhouette className="w-full h-full text-primary" />
+                  {mascot.Component ? (
+                    <mascot.Component className="w-full h-full" />
+                  ) : (
+                    <DogSilhouette className="w-full h-full text-primary" />
+                  )}
                 </div>
                 
                 <h4 className="font-mono text-xs font-medium truncate">

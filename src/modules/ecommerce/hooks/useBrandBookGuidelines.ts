@@ -4,12 +4,15 @@
  * Provides brand guidelines for product creation in Creative Studio.
  * Enforces strict compliance with brand books.
  * Only Alex Lawton can create designs outside guidelines.
+ * 
+ * INCLUDES ALL 94 TECHNO DOGGY VARIANTS from DogPack.tsx
  */
 
 import { useState, useMemo, useCallback } from 'react';
 import { useBrandBookProtection } from '@/hooks/useBrandBookProtection';
 import technoDogDesign from '@/config/design-system-techno-dog.json';
 import doggiesDesign from '@/config/design-system-doggies.json';
+import { dogVariants } from '@/components/DogPack';
 
 export type BrandBookType = 'techno-dog' | 'techno-doggies';
 
@@ -35,6 +38,7 @@ export interface ApprovedMascot {
   quote: string;
   traits: string[];
   approvedForApparel: boolean;
+  Component?: React.ComponentType<{ className?: string }>;
 }
 
 export interface ApprovedProduct {
@@ -121,16 +125,19 @@ export function useBrandBookGuidelines() {
   }, []);
 
   // Extract guidelines from Techno Doggies brand book
+  // Include ALL 94 variants from DogPack.tsx
   const doggiesGuidelines = useMemo<BrandBookGuidelines>(() => {
-    const mascots: ApprovedMascot[] = doggiesDesign?.mascots?.coreVariants?.map((variant: any) => ({
-      id: variant.id,
-      displayName: variant.displayName,
-      componentName: variant.componentName,
+    // Map ALL 94 doggy variants from DogPack.tsx
+    const mascots: ApprovedMascot[] = dogVariants.map((variant, index) => ({
+      id: variant.name.toLowerCase().replace(/\s+/g, '-'),
+      displayName: variant.name,
+      componentName: variant.Component.name || variant.name,
       personality: variant.personality,
-      quote: variant.quote,
-      traits: variant.traits || [],
-      approvedForApparel: variant.approvedForApparel ?? true,
-    })) || [];
+      quote: variant.status, // Using status as quote equivalent
+      traits: [variant.status],
+      approvedForApparel: true, // All 94 are approved per brand book
+      Component: variant.Component,
+    }));
 
     const products: ApprovedProduct[] = doggiesDesign?.merchandise?.approvedProductTypes?.map((product: any) => ({
       type: product.type,
