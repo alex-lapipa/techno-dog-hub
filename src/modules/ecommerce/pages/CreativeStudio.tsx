@@ -1,70 +1,88 @@
 /**
  * techno.dog E-commerce Module - Creative Studio
  * 
- * Design tools with READ-ONLY access to brand books.
- * Brand books are only modifiable by Alex Lawton.
+ * Design tools integrated with brand books.
+ * Only Alex Lawton can create designs outside brand guidelines.
  */
 
-import { useState, useEffect } from 'react';
-import { Palette, Lock, Eye, BookOpen, Dog, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Palette, Lock, Shield, AlertTriangle, Plus, ExternalLink, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MODULE_CONFIG } from '../config/module-config';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
-
-// Import design system configs (READ-ONLY)
-import technoDogDesign from '@/config/design-system-techno-dog.json';
-import doggiesDesign from '@/config/design-system-doggies.json';
-
-interface DesignToken {
-  name: string;
-  value: string;
-  type: 'color' | 'font' | 'effect';
-}
+import { BrandBookToggle } from '../components/BrandBookToggle';
+import { GuidelinesPanel } from '../components/GuidelinesPanel';
+import { useBrandBookGuidelines, type BrandBookType } from '../hooks/useBrandBookGuidelines';
 
 export function CreativeStudio() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [technoDogTokens, setTechnoDogTokens] = useState<DesignToken[]>([]);
-  const [doggiesTokens, setDoggiesTokens] = useState<DesignToken[]>([]);
+  const [activeTab, setActiveTab] = useState('guidelines');
+  const {
+    activeBrandBook,
+    isLoading,
+    isOwner,
+    canCreateCustomDesigns,
+    activeGuidelines,
+    switchBrandBook,
+    validateProduct,
+  } = useBrandBookGuidelines();
 
-  useEffect(() => {
-    // Extract color tokens from techno.dog design system (READ-ONLY)
-    if (technoDogDesign?.colors?.core) {
-      const tokens: DesignToken[] = Object.entries(technoDogDesign.colors.core).map(([name, data]: [string, any]) => ({
-        name,
-        value: data?.hex || data?.hsl || String(data),
-        type: 'color' as const,
-      }));
-      setTechnoDogTokens(tokens);
-    }
+  // Demo product validation
+  const [demoValidation, setDemoValidation] = useState<{
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+  } | null>(null);
 
-    // Extract mascot data from doggies design system (READ-ONLY)
-    if (doggiesDesign?.mascots?.coreVariants) {
-      const tokens: DesignToken[] = doggiesDesign.mascots.coreVariants.map((variant: any) => ({
-        name: variant.displayName || variant.id,
-        value: variant.personality || 'Techno mascot',
-        type: 'effect' as const,
-      }));
-      setDoggiesTokens(tokens);
-    }
-  }, []);
+  const handleBrandBookChange = async (brandBook: BrandBookType) => {
+    await switchBrandBook(brandBook);
+    setDemoValidation(null);
+  };
+
+  const handleTestValidation = () => {
+    // Test validation with a sample product
+    const result = validateProduct({
+      mascotId: 'dj-dog',
+      productType: 'Hoodie',
+      fabricColor: 'black',
+      strokeColor: '#66ff66',
+      customDesign: false,
+    });
+    setDemoValidation(result);
+  };
+
+  const handleTestCustomDesign = () => {
+    // Test custom design validation
+    const result = validateProduct({
+      customDesign: true,
+    });
+    setDemoValidation(result);
+  };
 
   return (
     <AdminPageLayout
       title="Creative Studio"
-      description="Design tools with read-only access to brand books"
+      description="Create products using brand book guidelines"
       icon={Palette}
       iconColor="text-crimson"
       actions={
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="bg-destructive/10 text-destructive font-mono text-[10px] uppercase">
-            <Lock className="w-3 h-3 mr-1" />
-            Brand Books Protected
-          </Badge>
+          {isOwner ? (
+            <Badge className="bg-logo-green/10 text-logo-green border-logo-green/20 font-mono text-[10px] uppercase">
+              <Shield className="w-3 h-3 mr-1" />
+              Owner Access
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="bg-destructive/10 text-destructive font-mono text-[10px] uppercase">
+              <Lock className="w-3 h-3 mr-1" />
+              Guidelines Enforced
+            </Badge>
+          )}
           {MODULE_CONFIG.READ_ONLY && MODULE_CONFIG.UI.SHOW_READ_ONLY_BADGE && (
             <ReadOnlyBadge />
           )}
@@ -72,183 +90,276 @@ export function CreativeStudio() {
       }
     >
       <div className="space-y-6">
-        {/* Security Notice */}
-        <Card className="p-4 bg-destructive/5 border-destructive/20">
-          <div className="flex items-start gap-3">
-            <Lock className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+        {/* Brand Book Toggle */}
+        <Card className="p-4 bg-card border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h4 className="font-mono text-xs uppercase tracking-wide text-destructive font-medium">
-                Brand Book Protection
-              </h4>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Brand books are <strong>read-only</strong> and serve as inspiration sources only. 
-                Only <strong>Alex Lawton</strong> can modify brand guidelines.
+              <h3 className="font-mono text-sm uppercase tracking-wide text-foreground font-medium">
+                Active Brand Book
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                All product designs must follow the selected brand book guidelines
               </p>
             </div>
+            <BrandBookToggle
+              value={activeBrandBook}
+              onChange={handleBrandBookChange}
+              disabled={isLoading}
+            />
           </div>
         </Card>
 
+        {/* Owner Notice or Enforcement Notice */}
+        {isOwner ? (
+          <Alert className="border-logo-green/30 bg-logo-green/5">
+            <Shield className="w-4 h-4 text-logo-green" />
+            <AlertDescription className="text-sm">
+              <strong>Owner Access Enabled:</strong> You can create custom designs outside brand guidelines. 
+              All other users must strictly follow the {activeGuidelines.name} brand book.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert className="border-destructive/30 bg-destructive/5">
+            <Lock className="w-4 h-4 text-destructive" />
+            <AlertDescription className="text-sm">
+              <strong>Brand Guidelines Enforced:</strong> All product designs must follow the {activeGuidelines.name} brand book. 
+              Only <strong>Alex Lawton</strong> can create custom designs outside these guidelines.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-muted/50">
-            <TabsTrigger value="overview" className="font-mono text-xs uppercase">Overview</TabsTrigger>
-            <TabsTrigger value="techno-dog" className="font-mono text-xs uppercase">techno.dog</TabsTrigger>
-            <TabsTrigger value="doggies" className="font-mono text-xs uppercase">Techno Doggies</TabsTrigger>
+            <TabsTrigger value="guidelines" className="font-mono text-xs uppercase">Guidelines</TabsTrigger>
+            <TabsTrigger value="create" className="font-mono text-xs uppercase">Create Product</TabsTrigger>
+            <TabsTrigger value="validate" className="font-mono text-xs uppercase">Validate</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* techno.dog Brand Book Reference */}
-              <Card className="p-6 bg-card border-border">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-crimson/10 rounded">
-                      <BookOpen className="w-5 h-5 text-crimson" />
-                    </div>
-                    <div>
-                      <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
-                        techno.dog
-                      </h3>
-                      <p className="text-xs text-muted-foreground mt-1">Main design system</p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="font-mono text-[10px]">
-                    <Eye className="w-3 h-3 mr-1" />
-                    View Only
-                  </Badge>
-                </div>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  VHS/Brutalist aesthetic with industrial influences. 
-                  {technoDogTokens.length > 0 && ` ${technoDogTokens.length} design tokens loaded.`}
-                </p>
-                <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link to="/admin/brand-book">
-                    <ExternalLink className="w-3 h-3 mr-2" />
-                    View Brand Book
-                  </Link>
-                </Button>
-              </Card>
+          <TabsContent value="guidelines" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Active Guidelines Panel */}
+              <GuidelinesPanel 
+                guidelines={activeGuidelines} 
+                isOwner={isOwner}
+              />
 
-              {/* Techno Doggies Brand Book Reference */}
-              <Card className="p-6 bg-card border-border">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-logo-green/10 rounded">
-                      <Dog className="w-5 h-5 text-logo-green" />
+              {/* Quick Links & Status */}
+              <div className="space-y-6">
+                {/* Brand Book Links */}
+                <Card className="p-6 bg-card border-border">
+                  <h3 className="font-mono text-sm uppercase tracking-wide text-foreground font-medium mb-4">
+                    Full Brand Books
+                  </h3>
+                  <div className="space-y-3">
+                    <Button 
+                      asChild 
+                      variant={activeBrandBook === 'techno-dog' ? 'default' : 'outline'} 
+                      className="w-full justify-start"
+                    >
+                      <Link to="/admin/brand-book">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        techno.dog Brand Book
+                        {activeBrandBook === 'techno-dog' && (
+                          <Badge className="ml-auto text-[8px]">Active</Badge>
+                        )}
+                      </Link>
+                    </Button>
+                    <Button 
+                      asChild 
+                      variant={activeBrandBook === 'techno-doggies' ? 'default' : 'outline'} 
+                      className="w-full justify-start"
+                    >
+                      <Link to="/admin/doggies-brand-book">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Techno Doggies Brand Book
+                        {activeBrandBook === 'techno-doggies' && (
+                          <Badge className="ml-auto text-[8px]">Active</Badge>
+                        )}
+                      </Link>
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Compliance Status */}
+                <Card className="p-6 bg-card border-border">
+                  <h3 className="font-mono text-sm uppercase tracking-wide text-foreground font-medium mb-4">
+                    Compliance Status
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
+                      <span className="text-sm text-muted-foreground">Brand Book Connected</span>
+                      <Badge className="bg-logo-green/10 text-logo-green border-logo-green/20">
+                        <Check className="w-3 h-3 mr-1" />
+                        Yes
+                      </Badge>
                     </div>
-                    <div>
-                      <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
-                        Techno Doggies
-                      </h3>
-                      <p className="text-xs text-muted-foreground mt-1">Mascot design system</p>
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
+                      <span className="text-sm text-muted-foreground">Guidelines Enforced</span>
+                      <Badge className="bg-logo-green/10 text-logo-green border-logo-green/20">
+                        <Check className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
+                      <span className="text-sm text-muted-foreground">Custom Designs</span>
+                      {canCreateCustomDesigns ? (
+                        <Badge className="bg-logo-green/10 text-logo-green border-logo-green/20">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Allowed
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-destructive/10 text-destructive border-destructive/20">
+                          <Lock className="w-3 h-3 mr-1" />
+                          Blocked
+                        </Badge>
+                      )}
                     </div>
                   </div>
-                  <Badge variant="outline" className="font-mono text-[10px]">
-                    <Eye className="w-3 h-3 mr-1" />
-                    View Only
-                  </Badge>
-                </div>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  94-variant Techno Talkies pack with stroke-only graphics.
-                  {doggiesTokens.length > 0 && ` ${doggiesTokens.length} mascot variants loaded.`}
-                </p>
-                <Button asChild variant="outline" size="sm" className="mt-4">
-                  <Link to="/admin/doggies-brand-book">
-                    <ExternalLink className="w-3 h-3 mr-2" />
-                    View Brand Book
-                  </Link>
-                </Button>
-              </Card>
+                </Card>
+              </div>
             </div>
+          </TabsContent>
 
-            {/* Module Ready Card */}
-            <Card className="p-8 bg-card border-border border-dashed mt-6">
+          <TabsContent value="create" className="mt-6">
+            <Card className="p-8 bg-card border-border">
               <div className="flex flex-col items-center justify-center text-center max-w-md mx-auto">
                 <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
-                  <Palette className="w-8 h-8 text-muted-foreground" />
+                  <Plus className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
-                  Creative Studio
+                  Product Creation
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  This module is prepared for design and content creation features.
-                  Use the brand books above as read-only inspiration sources.
+                  Create new products using the <strong>{activeGuidelines.name}</strong> brand book guidelines.
+                  {!canCreateCustomDesigns && (
+                    <> All designs will be validated against approved colors, mascots, and product specifications.</>
+                  )}
                 </p>
-                <span className="mt-4 inline-flex items-center px-3 py-1 text-[10px] font-mono uppercase tracking-wider bg-logo-green/10 text-logo-green rounded">
-                  Ready for Development
-                </span>
-              </div>
-            </Card>
-          </TabsContent>
+                
+                {activeBrandBook === 'techno-doggies' && activeGuidelines.mascots.length > 0 && (
+                  <div className="mt-4 p-3 bg-muted/30 rounded border border-border/50 w-full">
+                    <p className="text-xs text-muted-foreground">
+                      <strong>{activeGuidelines.mascots.length}</strong> approved mascots available • 
+                      <strong> {activeGuidelines.products.length}</strong> approved product types • 
+                      <strong> {activeGuidelines.colors.length}</strong> approved colors
+                    </p>
+                  </div>
+                )}
 
-          <TabsContent value="techno-dog" className="mt-6">
-            <Card className="p-6 bg-card border-border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
-                  techno.dog Design Tokens
-                </h3>
-                <Badge variant="outline" className="font-mono text-[10px]">
-                  <Lock className="w-3 h-3 mr-1" />
-                  Read-Only
-                </Badge>
-              </div>
-              {technoDogTokens.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {technoDogTokens.slice(0, 8).map((token) => (
-                    <div key={token.name} className="p-3 bg-muted/30 rounded border border-border/50">
-                      <div 
-                        className="w-full h-8 rounded mb-2 border border-border/30"
-                        style={{ backgroundColor: token.value }}
-                      />
-                      <p className="font-mono text-[10px] text-foreground truncate">{token.name}</p>
-                      <p className="font-mono text-[9px] text-muted-foreground truncate">{token.value}</p>
-                    </div>
-                  ))}
+                <div className="mt-6 flex gap-3">
+                  <Button asChild variant="outline">
+                    <Link to="/admin/ecommerce/products">
+                      View Products
+                    </Link>
+                  </Button>
+                  <Button 
+                    className="bg-logo-green text-background hover:bg-logo-green/90"
+                    onClick={() => setActiveTab('validate')}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Start Design
+                  </Button>
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Loading design tokens...</p>
-              )}
-              <Button asChild variant="ghost" size="sm" className="mt-4">
-                <Link to="/admin/brand-book">
-                  View Full Brand Book
-                  <ExternalLink className="w-3 h-3 ml-2" />
-                </Link>
-              </Button>
+              </div>
             </Card>
           </TabsContent>
 
-          <TabsContent value="doggies" className="mt-6">
-            <Card className="p-6 bg-card border-border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
-                  Techno Doggies Mascots
+          <TabsContent value="validate" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Validation Test Panel */}
+              <Card className="p-6 bg-card border-border">
+                <h3 className="font-mono text-sm uppercase tracking-wide text-foreground font-medium mb-4">
+                  Design Validation
                 </h3>
-                <Badge variant="outline" className="font-mono text-[10px]">
-                  <Lock className="w-3 h-3 mr-1" />
-                  Read-Only
-                </Badge>
-              </div>
-              {doggiesTokens.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {doggiesTokens.map((token) => (
-                    <div key={token.name} className="p-3 bg-muted/30 rounded border border-border/50">
-                      <div className="w-8 h-8 rounded-full bg-logo-green/10 flex items-center justify-center mb-2">
-                        <Dog className="w-4 h-4 text-logo-green" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  Test product designs against the {activeGuidelines.name} brand book guidelines.
+                </p>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleTestValidation} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <Check className="w-4 h-4 mr-2 text-logo-green" />
+                    Test Compliant Design (DJ Dog Hoodie)
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleTestCustomDesign} 
+                    variant="outline" 
+                    className="w-full justify-start"
+                  >
+                    <AlertTriangle className="w-4 h-4 mr-2 text-amber-500" />
+                    Test Custom Design (Owner Only)
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Validation Results */}
+              <Card className="p-6 bg-card border-border">
+                <h3 className="font-mono text-sm uppercase tracking-wide text-foreground font-medium mb-4">
+                  Validation Results
+                </h3>
+                
+                {demoValidation ? (
+                  <div className="space-y-4">
+                    <div className={`p-4 rounded border ${
+                      demoValidation.isValid 
+                        ? 'bg-primary/5 border-primary/30' 
+                        : 'bg-destructive/5 border-destructive/30'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {demoValidation.isValid ? (
+                          <>
+                            <Check className="w-5 h-5 text-primary" />
+                            <span className="font-mono text-sm text-primary uppercase">Design Approved</span>
+                          </>
+                        ) : (
+                          <>
+                            <X className="w-5 h-5 text-destructive" />
+                            <span className="font-mono text-sm text-destructive uppercase">Design Rejected</span>
+                          </>
+                        )}
                       </div>
-                      <p className="font-mono text-[10px] text-foreground truncate">{token.name}</p>
-                      <p className="font-mono text-[9px] text-muted-foreground truncate">{token.value}</p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Loading mascot data...</p>
-              )}
-              <Button asChild variant="ghost" size="sm" className="mt-4">
-                <Link to="/admin/doggies-brand-book">
-                  View Full Brand Book
-                  <ExternalLink className="w-3 h-3 ml-2" />
-                </Link>
-              </Button>
-            </Card>
+
+                    {demoValidation.errors.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-mono text-xs uppercase text-destructive">Errors</h4>
+                        {demoValidation.errors.map((error, i) => (
+                          <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground p-2 bg-destructive/5 rounded">
+                            <X className="w-3 h-3 text-destructive flex-shrink-0 mt-0.5" />
+                            <span>{error}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {demoValidation.warnings.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-mono text-xs uppercase text-amber-500">Warnings</h4>
+                        {demoValidation.warnings.map((warning, i) => (
+                          <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground p-2 bg-amber-500/5 rounded">
+                            <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+                            <span>{warning}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                      <Check className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Run a validation test to see results
+                    </p>
+                  </div>
+                )}
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
