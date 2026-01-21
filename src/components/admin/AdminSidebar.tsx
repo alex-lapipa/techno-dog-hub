@@ -153,6 +153,8 @@ const adminSections: NavSection[] = [
     label: 'Store & Operations',
     icon: Store,
     items: [
+      // Creative Studio at top
+      { label: 'Creative Studio', path: '/admin/creative-studio', icon: PenTool, description: 'Design tools' },
       // Storefront
       { label: 'Shop', path: '/admin/store', icon: Store, description: 'Main storefront' },
       { label: 'Lookbook', path: '/admin/lookbook', icon: ShoppingBag, description: 'Product gallery' },
@@ -164,7 +166,6 @@ const adminSections: NavSection[] = [
       { label: 'Shipping', path: '/admin/ecommerce/shipping', icon: Globe, description: 'Shipping rules' },
       { label: 'Returns', path: '/admin/ecommerce/returns', icon: Inbox, description: 'Return requests' },
       { label: 'Analytics', path: '/admin/ecommerce/analytics', icon: BarChart3, description: 'Sales metrics' },
-      { label: 'Creative Studio', path: '/admin/creative-studio', icon: PenTool, description: 'Design tools' },
     ],
   },
   {
