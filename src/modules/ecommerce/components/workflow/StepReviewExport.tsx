@@ -184,33 +184,48 @@ export function StepReviewExport({
     generateImage(modificationPrompt.trim());
   };
 
+  /**
+   * Build image prompt with Zero Hallucination enforcement
+   * The actual SVG geometry is embedded in the edge function
+   */
   const buildImagePrompt = (draft: ProductDraft): string => {
     const parts: string[] = [];
     
+    // Product type context
     if (draft.selectedProduct) {
-      parts.push(`A ${draft.selectedProduct.type.toLowerCase()} mockup`);
+      parts.push(`Premium ${draft.selectedProduct.type.toLowerCase()} product mockup`);
     } else {
-      parts.push('A product mockup');
+      parts.push('Premium streetwear product mockup');
     }
     
+    // Brand-specific context
     if (draft.brandBook === 'techno-dog') {
-      parts.push('in brutalist VHS aesthetic, dark background, minimal design, geometric hexagon logo');
+      parts.push('brutalist VHS aesthetic, dark background, minimal design, geometric hexagon logo only, NO dog imagery');
     } else {
-      const strokeColor = draft.colorLine === 'green-line' ? 'neon laser green (#00FF00)' : 'pure white';
-      parts.push(`in streetwear editorial style, black fabric, stroke-only graphic in ${strokeColor}`);
+      // Techno Doggies - Zero Hallucination enforcement
+      const strokeColor = draft.colorLine === 'green-line' 
+        ? 'laser green (#00FF00) stroke ONLY' 
+        : 'pure white (#FFFFFF) stroke ONLY';
+      
+      parts.push(`black fabric, STROKE-ONLY graphic in ${strokeColor}`);
+      parts.push('minimalist line art, NOT a realistic dog, NOT a cartoon');
+      
+      if (draft.selectedMascot) {
+        // The edge function will embed the actual SVG geometry
+        parts.push(`official ${draft.selectedMascot.displayName} mascot from 94-variant pack`);
+      }
     }
     
-    if (draft.selectedMascot) {
-      parts.push(`featuring ${draft.selectedMascot.displayName} silhouette mascot`);
-    }
-    
+    // Editorial context
     if (draft.editorialBrief?.productName) {
-      parts.push(`for "${draft.editorialBrief.productName}"`);
+      parts.push(`product name: "${draft.editorialBrief.productName}"`);
     }
     
-    parts.push('Ultra high resolution, professional product photography, dark moody lighting');
+    // Quality enforcement
+    parts.push('The Face magazine editorial style, premium streetwear photography');
+    parts.push('Ultra high resolution, professional studio lighting, dark moody atmosphere');
     
-    return parts.join(', ');
+    return parts.join('. ');
   };
 
   const handleSave = async () => {
