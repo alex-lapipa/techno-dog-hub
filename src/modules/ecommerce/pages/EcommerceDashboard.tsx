@@ -8,7 +8,8 @@
 import { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, TrendingUp, TrendingDown, ShoppingBag, Euro, Percent, 
-  CheckCircle, XCircle, ExternalLink, RefreshCw, Package, Tag, Truck, BarChart3 
+  CheckCircle, XCircle, ExternalLink, RefreshCw, Package, Tag, Truck, BarChart3,
+  Printer, FolderOpen
 } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Card } from '@/components/ui/card';
@@ -25,6 +26,9 @@ const iconMap: Record<string, React.ElementType> = {
   'shopping-bag': ShoppingBag,
   'trending-up': TrendingUp,
   'percent': Percent,
+  'printer': Printer,
+  'check-circle': CheckCircle,
+  'folder': FolderOpen,
 };
 
 const QUICK_ACTIONS = [
@@ -33,6 +37,7 @@ const QUICK_ACTIONS = [
   { label: 'Discounts', icon: Tag, path: '/discounts', description: 'Promotions' },
   { label: 'Shipping', icon: Truck, path: '/settings/shipping', description: 'Delivery' },
   { label: 'Analytics', icon: BarChart3, path: '/analytics', description: 'Reports' },
+  { label: 'Printful', icon: Printer, path: '/apps/printful', description: 'POD Fulfillment' },
 ];
 
 export function EcommerceDashboard() {
@@ -90,7 +95,9 @@ export function EcommerceDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((kpi) => {
             const IconComponent = kpi.icon ? iconMap[kpi.icon] || TrendingUp : TrendingUp;
-            const isPositive = (kpi.change ?? 0) >= 0;
+            const changeValue = typeof kpi.change === 'number' ? kpi.change : 0;
+            const isPositive = changeValue >= 0;
+            const isStringChange = typeof kpi.change === 'string';
             
             return (
               <Card key={kpi.label} className="p-4 bg-card border-border">
@@ -109,14 +116,22 @@ export function EcommerceDashboard() {
                 </div>
                 {kpi.change !== undefined && (
                   <div className="mt-3 flex items-center gap-1.5">
-                    {isPositive ? (
-                      <TrendingUp className="w-3 h-3 text-logo-green" />
+                    {isStringChange ? (
+                      <span className="font-mono text-xs text-logo-green">
+                        {kpi.change}
+                      </span>
                     ) : (
-                      <TrendingDown className="w-3 h-3 text-destructive" />
+                      <>
+                        {isPositive ? (
+                          <TrendingUp className="w-3 h-3 text-logo-green" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 text-destructive" />
+                        )}
+                        <span className={`font-mono text-xs ${isPositive ? 'text-logo-green' : 'text-destructive'}`}>
+                          {isPositive ? '+' : ''}{kpi.change}%
+                        </span>
+                      </>
                     )}
-                    <span className={`font-mono text-xs ${isPositive ? 'text-logo-green' : 'text-destructive'}`}>
-                      {isPositive ? '+' : ''}{kpi.change}%
-                    </span>
                     <span className="font-mono text-[10px] text-muted-foreground">
                       {kpi.changeLabel}
                     </span>
@@ -206,7 +221,51 @@ export function EcommerceDashboard() {
           </div>
         </Card>
 
-        {/* Info Card */}
+        {/* Printful POD Integration Card */}
+        {MODULE_CONFIG.FEATURES.PRINTFUL_POD && (
+          <Card className="p-4 bg-card border-border">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-logo-green/10 rounded">
+                <Printer className="w-5 h-5 text-logo-green" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-mono text-sm font-medium text-foreground uppercase tracking-wide">
+                    Printful POD
+                  </h3>
+                  <Badge variant="secondary" className="font-mono text-[10px] bg-logo-green/10 text-logo-green">
+                    INTEGRATED
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground font-mono">
+                  Print-on-demand fulfillment via Shopify integration
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge variant="outline" className="font-mono text-[10px]">
+                    Auto-Fulfillment
+                  </Badge>
+                  <Badge variant="outline" className="font-mono text-[10px]">
+                    2-5 Day Production
+                  </Badge>
+                  <Badge variant="outline" className="font-mono text-[10px]">
+                    Global Shipping
+                  </Badge>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-3 text-xs font-mono"
+                    onClick={() => window.open(`${SHOPIFY_ADMIN_URL}/apps/printful`, '_blank')}
+                  >
+                    <ExternalLink className="w-3 h-3 mr-1" />
+                    Printful Dashboard
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
         <Card className="p-4 bg-card border-border border-dashed">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

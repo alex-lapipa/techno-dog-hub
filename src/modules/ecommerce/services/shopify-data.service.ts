@@ -4,12 +4,13 @@
  * Connects to live Shopify data via Storefront API.
  * This is READ-ONLY and does not modify any Shopify configuration.
  * 
- * Enhanced with error handling and toast notifications.
+ * Enhanced with Printful POD integration detection and metrics.
  */
 
 import { fetchProducts, fetchCollections } from '@/lib/shopify';
 import { toast } from 'sonner';
 import type { DashboardKPI } from '../types/ecommerce.types';
+import { isPrintfulSupported, getPrintfulConfig } from '../config/printful-integration';
 
 // ============================================
 // SHOPIFY PRODUCT STATS
@@ -22,6 +23,10 @@ export interface ShopifyStats {
   outOfStockVariants: number;
   totalCollections: number;
   productTypes: string[];
+  // Printful POD metrics
+  podProducts: number;
+  standardProducts: number;
+  avgProductionDays: number;
 }
 
 export async function fetchShopifyStats(): Promise<ShopifyStats> {
@@ -33,12 +38,23 @@ export async function fetchShopifyStats(): Promise<ShopifyStats> {
 
     let totalVariants = 0;
     let availableVariants = 0;
+    let podProducts = 0;
+    let totalProductionDays = 0;
     const productTypesSet = new Set<string>();
 
     products.forEach((edge) => {
       const product = edge.node;
       if (product.productType) {
         productTypesSet.add(product.productType);
+        
+        // Check if this product type is POD-supported
+        if (isPrintfulSupported(product.productType)) {
+          podProducts++;
+          const config = getPrintfulConfig(product.productType);
+          if (config) {
+            totalProductionDays += config.productionDays;
+          }
+        }
       }
       product.variants.edges.forEach((variantEdge) => {
         totalVariants++;
@@ -48,6 +64,9 @@ export async function fetchShopifyStats(): Promise<ShopifyStats> {
       });
     });
 
+    const standardProducts = products.length - podProducts;
+    const avgProductionDays = podProducts > 0 ? Math.round(totalProductionDays / podProducts) : 0;
+
     return {
       totalProducts: products.length,
       totalVariants,
@@ -55,6 +74,9 @@ export async function fetchShopifyStats(): Promise<ShopifyStats> {
       outOfStockVariants: totalVariants - availableVariants,
       totalCollections: collections.length,
       productTypes: Array.from(productTypesSet),
+      podProducts,
+      standardProducts,
+      avgProductionDays,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -78,6 +100,9 @@ export async function fetchShopifyStats(): Promise<ShopifyStats> {
       outOfStockVariants: 0,
       totalCollections: 0,
       productTypes: [],
+      podProducts: 0,
+      standardProducts: 0,
+      avgProductionDays: 0,
     };
   }
 }
@@ -96,19 +121,20 @@ export async function fetchLiveKPIs(): Promise<DashboardKPI[]> {
       icon: 'shopping-bag',
     },
     {
-      label: 'Variants',
-      value: stats.totalVariants.toString(),
-      icon: 'trending-up',
+      label: 'POD Items',
+      value: stats.podProducts.toString(),
+      icon: 'printer',
+      change: stats.podProducts > 0 ? '+Printful' : undefined,
     },
     {
       label: 'In Stock',
       value: stats.availableVariants.toString(),
-      icon: 'euro',
+      icon: 'check-circle',
     },
     {
       label: 'Collections',
       value: stats.totalCollections.toString(),
-      icon: 'percent',
+      icon: 'folder',
     },
   ];
 }
@@ -121,11 +147,17 @@ export interface ShopifyInventoryItem {
   id: string;
   productId: string;
   productName: string;
+  productType: string;
   variantName: string;
   sku: string;
   availableForSale: boolean;
   price: string;
   currencyCode: string;
+  // Printful POD fields
+  isPOD: boolean;
+  fulfillmentService: 'printful' | 'manual' | 'standard';
+  productionDays: number | null;
+  baseCost: number | null;
 }
 
 export async function fetchShopifyInventory(): Promise<ShopifyInventoryItem[]> {
@@ -135,17 +167,26 @@ export async function fetchShopifyInventory(): Promise<ShopifyInventoryItem[]> {
 
     products.forEach((edge) => {
       const product = edge.node;
+      const productType = product.productType || '';
+      const isPOD = isPrintfulSupported(productType);
+      const printfulConfig = isPOD ? getPrintfulConfig(productType) : null;
+      
       product.variants.edges.forEach((variantEdge) => {
         const variant = variantEdge.node;
         inventory.push({
           id: variant.id,
           productId: product.id,
           productName: product.title,
+          productType,
           variantName: variant.title === 'Default Title' ? '-' : variant.title,
           sku: variant.id.split('/').pop() || '-',
           availableForSale: variant.availableForSale,
           price: variant.price.amount,
           currencyCode: variant.price.currencyCode,
+          isPOD,
+          fulfillmentService: isPOD ? 'printful' : 'standard',
+          productionDays: printfulConfig?.productionDays ?? null,
+          baseCost: printfulConfig?.baseCost ?? null,
         });
       });
     });

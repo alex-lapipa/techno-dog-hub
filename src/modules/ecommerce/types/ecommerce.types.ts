@@ -193,7 +193,7 @@ export interface ReturnRequest {
 export interface DashboardKPI {
   label: string;
   value: string | number;
-  change?: number;
+  change?: number | string;
   changeLabel?: string;
   icon?: string;
 }
