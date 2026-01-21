@@ -48,8 +48,10 @@ const FloatingDogButton = () => {
   const typewriterRef = useRef<NodeJS.Timeout | null>(null);
   const location = useLocation();
 
-  // Hide on widget page - keep widget clean and self-contained
+  // Hide on widget page and admin routes - keep widget/admin clean
   const isWidgetPage = location.pathname === '/doggy-widget';
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const shouldHide = isWidgetPage || isAdminRoute;
 
   // Stop pulsing after first interaction
   useEffect(() => {
@@ -139,10 +141,10 @@ const FloatingDogButton = () => {
         clearTimeout(typewriterRef.current);
       }
     };
-  }, [dogChatOpen, isWidgetPage, pickRandomMessage]);
+  }, [dogChatOpen, shouldHide, pickRandomMessage]);
 
-  // Don't render on widget page
-  if (isWidgetPage) {
+  // Don't render on widget page or admin routes
+  if (shouldHide) {
     return null;
   }
 
