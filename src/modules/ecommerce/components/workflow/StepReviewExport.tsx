@@ -86,12 +86,12 @@ export function StepReviewExport({
           : 'No color line selected',
     },
     {
-      id: 'product-type',
-      label: 'Approved Product Type',
-      status: draft.selectedProduct ? 'pass' : 'fail',
-      message: draft.selectedProduct 
-        ? `${draft.selectedProduct.type} - ${draft.selectedProduct.placement}`
-        : 'No product type selected',
+      id: 'shopify-product',
+      label: 'Shopify Product Selected',
+      status: draft.shopifyCatalog?.productId ? 'pass' : 'fail',
+      message: draft.shopifyCatalog?.productId 
+        ? `${draft.shopifyCatalog.productName} (${draft.shopifyCatalog.size}, ${draft.shopifyCatalog.color})`
+        : 'No product selected from Shopify catalog',
     },
     {
       id: 'mascot-approved',
