@@ -5,6 +5,7 @@
  * Integrates brand books for validation and RAG for editorial generation.
  */
 
+import { useMemo } from 'react';
 import { ArrowLeft, ArrowRight, RotateCcw, Palette } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { Button } from '@/components/ui/button';
@@ -19,10 +20,17 @@ import {
   StepProductCopy,
   StepEditorialBrief,
   StepReviewExport,
+  SHOPIFY_CATALOG,
 } from '../components/workflow';
 
 export function CreativeStudio() {
   const workflow = useCreativeWorkflow();
+
+  // Find the selected product from catalog based on draft state
+  const selectedCatalogProduct = useMemo(() => {
+    if (!workflow.draft.shopifyCatalog?.productId) return null;
+    return SHOPIFY_CATALOG.find(p => p.id === workflow.draft.shopifyCatalog?.productId) || null;
+  }, [workflow.draft.shopifyCatalog?.productId]);
 
   // Render the current step content
   const renderStepContent = () => {
@@ -58,18 +66,21 @@ export function CreativeStudio() {
       case 'shopify-catalog':
         return (
           <StepShopifyCatalog
-            selectedProduct={null}
+            selectedProduct={selectedCatalogProduct}
             selectedSize={workflow.draft.shopifyCatalog?.size || null}
             selectedColor={workflow.draft.shopifyCatalog?.color || null}
             onSelectProduct={(product) => {
               if (product) {
+                // Auto-select first available size and color
+                const firstSize = product.sizes[0]?.code || null;
+                const firstColor = product.colors.find(c => c.inStock)?.code || null;
                 workflow.updateDraft({
                   shopifyCatalog: {
                     productId: product.id,
                     productName: product.name,
                     category: product.category,
-                    size: null,
-                    color: null,
+                    size: firstSize,
+                    color: firstColor,
                     basePrice: product.basePrice,
                   }
                 });
@@ -93,12 +104,10 @@ export function CreativeStudio() {
             }}
           />
         );
-      // NOTE: 'product-type' step removed - Shopify Catalog is now the single source of truth
-      // The product selection, size, color, and print area are all handled in StepShopifyCatalog
       case 'product-copy':
         return (
           <StepProductCopy
-            productType={workflow.draft.selectedProduct?.type}
+            productType={workflow.draft.shopifyCatalog?.productName}
             currentCopy={workflow.draft.productCopy || []}
             onUpdateCopy={workflow.setProductCopy}
             onSkip={workflow.goNext}
