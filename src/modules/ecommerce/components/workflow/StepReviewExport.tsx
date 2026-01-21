@@ -28,6 +28,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { type ProductDraft, type ColorLineType } from '../../hooks/useCreativeWorkflow';
 import { compositeTechnoDoggiesMockup } from '../../utils/compositeTechnoDoggiesMockup';
+import { ShopifyProductSync } from './ShopifyProductSync';
 import { toast } from 'sonner';
 
 interface ComplianceItem {
@@ -533,6 +534,14 @@ export function StepReviewExport({
 
       <Separator />
 
+      {/* Shopify Integration */}
+      <ShopifyProductSync 
+        draft={draft}
+        onProductCreated={(productId) => {
+          console.log('Shopify product created:', productId);
+        }}
+      />
+
       {/* Export Actions */}
       <Card className="p-5 border-primary/30 bg-primary/5">
         <h3 className="font-mono text-sm uppercase tracking-wide text-muted-foreground mb-4">
@@ -556,11 +565,6 @@ export function StepReviewExport({
                 Save to Drafts
               </>
             )}
-          </Button>
-          
-          <Button variant="outline" disabled className="flex-1 min-w-[150px]">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Send to Shop (Coming Soon)
           </Button>
         </div>
         
