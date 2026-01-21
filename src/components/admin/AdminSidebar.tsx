@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import {
   Settings,
   BarChart3,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Newspaper,
   Image,
@@ -44,6 +45,11 @@ import {
   Store,
   ShoppingBag,
 } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 interface NavSection {
   id: string;
@@ -195,6 +201,16 @@ export const AdminSidebar = ({ isCollapsed = false, onToggle }: AdminSidebarProp
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<string[]>(['control']);
 
+  // Auto-expand section containing active path
+  useEffect(() => {
+    const activeSection = adminSections.find(section => 
+      section.items.some(item => location.pathname.startsWith(item.path) && item.path !== '/admin')
+    );
+    if (activeSection && !expandedSections.includes(activeSection.id)) {
+      setExpandedSections(prev => [...prev, activeSection.id]);
+    }
+  }, [location.pathname]);
+
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev =>
       prev.includes(sectionId)
@@ -210,15 +226,19 @@ export const AdminSidebar = ({ isCollapsed = false, onToggle }: AdminSidebarProp
     return location.pathname.startsWith(path);
   };
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <aside className={cn(
-      "fixed left-0 top-0 h-screen bg-zinc-900 border-r border-crimson/20 z-40 transition-all duration-300",
+      "fixed left-0 top-0 h-screen bg-background border-r border-destructive/20 z-40 transition-all duration-300 ease-in-out",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-crimson/20">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-destructive/20">
         {!isCollapsed && (
-          <div className="font-mono text-sm uppercase tracking-wider text-crimson">
+          <div className="font-mono text-sm uppercase tracking-wider text-destructive">
             Control Room
           </div>
         )}
@@ -226,9 +246,9 @@ export const AdminSidebar = ({ isCollapsed = false, onToggle }: AdminSidebarProp
           variant="ghost"
           size="sm"
           onClick={onToggle}
-          className="text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors duration-200"
         >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </Button>
       </div>
 
@@ -241,58 +261,67 @@ export const AdminSidebar = ({ isCollapsed = false, onToggle }: AdminSidebarProp
             const hasActiveItem = section.items.some(item => isActive(item.path));
 
             return (
-              <div key={section.id}>
-                <button
-                  onClick={() => toggleSection(section.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded text-left transition-colors",
-                    "hover:bg-zinc-800",
-                    hasActiveItem && "bg-crimson/10 text-crimson"
-                  )}
-                >
-                  <SectionIcon className={cn(
-                    "w-4 h-4 flex-shrink-0",
-                    hasActiveItem ? "text-crimson" : "text-muted-foreground"
-                  )} />
+              <Collapsible 
+                key={section.id} 
+                open={isExpanded && !isCollapsed}
+                onOpenChange={() => toggleSection(section.id)}
+              >
+                <CollapsibleTrigger asChild>
+                  <button
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2 rounded text-left",
+                      "transition-all duration-200 ease-in-out",
+                      "hover:bg-muted/50",
+                      hasActiveItem && "bg-destructive/10 text-destructive"
+                    )}
+                  >
+                    <SectionIcon className={cn(
+                      "w-4 h-4 flex-shrink-0 transition-colors duration-200",
+                      hasActiveItem ? "text-destructive" : "text-muted-foreground"
+                    )} />
+                    {!isCollapsed && (
+                      <>
+                        <span className="font-mono text-xs uppercase tracking-wider flex-1">
+                          {section.label}
+                        </span>
+                        <ChevronDown className={cn(
+                          "w-3 h-3 transition-transform duration-200 ease-in-out",
+                          isExpanded ? "rotate-0" : "-rotate-90"
+                        )} />
+                      </>
+                    )}
+                  </button>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                   {!isCollapsed && (
-                    <>
-                      <span className="font-mono text-xs uppercase tracking-wider flex-1">
-                        {section.label}
-                      </span>
-                      <ChevronRight className={cn(
-                        "w-3 h-3 transition-transform",
-                        isExpanded && "rotate-90"
-                      )} />
-                    </>
+                    <div className="ml-4 mt-1 space-y-0.5 border-l border-border/50 pl-3">
+                      {section.items.map((item) => {
+                        const ItemIcon = item.icon || FileText;
+                        const active = isActive(item.path);
+
+                        return (
+                          <button
+                            key={item.path}
+                            onClick={() => handleNavigation(item.path)}
+                            className={cn(
+                              "w-full flex items-center gap-2 px-2 py-1.5 rounded text-left",
+                              "transition-all duration-150 ease-in-out",
+                              "hover:bg-muted/50",
+                              active && "bg-destructive/20 text-destructive"
+                            )}
+                          >
+                            <ItemIcon className="w-3 h-3 flex-shrink-0" />
+                            <span className="font-mono text-[11px] truncate">
+                              {item.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                </button>
-
-                {!isCollapsed && isExpanded && (
-                  <div className="ml-4 mt-1 space-y-0.5 border-l border-border/50 pl-3">
-                    {section.items.map((item) => {
-                      const ItemIcon = item.icon || FileText;
-                      const active = isActive(item.path);
-
-                      return (
-                        <button
-                          key={item.path}
-                          onClick={() => navigate(item.path)}
-                          className={cn(
-                            "w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-colors",
-                            "hover:bg-zinc-800",
-                            active && "bg-crimson/20 text-crimson"
-                          )}
-                        >
-                          <ItemIcon className="w-3 h-3 flex-shrink-0" />
-                          <span className="font-mono text-[11px] truncate">
-                            {item.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                </CollapsibleContent>
+              </Collapsible>
             );
           })}
         </nav>
