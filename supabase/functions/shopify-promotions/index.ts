@@ -1,16 +1,16 @@
 /**
  * techno.dog - Shopify Promotions Edge Function
  * 
- * Handles Price Rules and Discount Codes CRUD operations.
+ * Uses unified ShopifyClient for Price Rules and Discount Codes CRUD.
  */
+
+import { createShopifyClient } from '../_shared/shopify-client.ts';
+import { createLogger } from '../_shared/logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-const SHOPIFY_STORE_DOMAIN = 'technodog-d3wkq.myshopify.com';
-const SHOPIFY_API_VERSION = '2025-07';
 
 interface PromotionInput {
   title: string;
@@ -26,54 +26,35 @@ interface PromotionInput {
 }
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
+  const logger = createLogger('shopify-promotions', requestId);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const accessToken = Deno.env.get('SHOPIFY_ACCESS_TOKEN');
-    if (!accessToken) {
-      throw new Error('SHOPIFY_ACCESS_TOKEN not configured');
-    }
+    // Initialize Shopify client (uses native Lovable integration)
+    const shopify = createShopifyClient({ requestId });
 
     const { action, promotion, priceRuleId } = await req.json();
-    const baseUrl = `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}`;
+    logger.info('Processing request', { action, priceRuleId });
 
     // ─── LIST ───
     if (action === 'list') {
-      // Fetch all price rules
-      const priceRulesRes = await fetch(`${baseUrl}/price_rules.json?limit=50`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': accessToken,
-        },
-      });
+      const priceRulesResult = await shopify.listPriceRules(50);
 
-      if (!priceRulesRes.ok) {
-        const errorData = await priceRulesRes.json();
-        throw new Error(`Shopify API error: ${JSON.stringify(errorData)}`);
+      if (!priceRulesResult.success) {
+        throw new Error(`Shopify API error: ${priceRulesResult.error}`);
       }
 
-      const { price_rules } = await priceRulesRes.json();
+      const priceRules = priceRulesResult.data?.price_rules || [];
 
       // Fetch discount codes for each price rule
       const promotionsWithCodes = await Promise.all(
-        (price_rules || []).map(async (rule: any) => {
-          const codesRes = await fetch(
-            `${baseUrl}/price_rules/${rule.id}/discount_codes.json`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Shopify-Access-Token': accessToken,
-              },
-            }
-          );
-
-          let discountCodes = [];
-          if (codesRes.ok) {
-            const codesData = await codesRes.json();
-            discountCodes = codesData.discount_codes || [];
-          }
+        priceRules.map(async (rule: any) => {
+          const codesResult = await shopify.listDiscountCodes(rule.id);
+          const discountCodes = codesResult.success ? (codesResult.data?.discount_codes || []) : [];
 
           return {
             id: String(rule.id),
@@ -103,6 +84,8 @@ Deno.serve(async (req) => {
         })
       );
 
+      logger.info('Listed promotions', { count: promotionsWithCodes.length });
+
       return new Response(
         JSON.stringify({ promotions: promotionsWithCodes }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -112,68 +95,42 @@ Deno.serve(async (req) => {
     // ─── CREATE ───
     if (action === 'create' && promotion) {
       const input = promotion as PromotionInput;
+      logger.info('Creating promotion', { title: input.title, code: input.code });
       
       // Create price rule
-      const priceRulePayload = {
-        price_rule: {
-          title: input.title,
-          target_type: input.targetType || 'line_item',
-          target_selection: 'all',
-          allocation_method: 'across',
-          value_type: input.valueType,
-          value: input.valueType === 'percentage' ? `-${input.value}` : `-${input.value}`,
-          customer_selection: 'all',
-          starts_at: input.startsAt || new Date().toISOString(),
-          ends_at: input.endsAt || null,
-          usage_limit: input.usageLimit || null,
-          once_per_customer: input.oncePerCustomer || false,
-          prerequisite_subtotal_range: input.minimumOrderAmount 
-            ? { greater_than_or_equal_to: String(input.minimumOrderAmount) }
-            : null,
-        },
-      };
-
-      const priceRuleRes = await fetch(`${baseUrl}/price_rules.json`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': accessToken,
-        },
-        body: JSON.stringify(priceRulePayload),
+      const priceRuleResult = await shopify.createPriceRule({
+        title: input.title,
+        target_type: input.targetType || 'line_item',
+        target_selection: 'all',
+        allocation_method: 'across',
+        value_type: input.valueType,
+        value: `-${input.value}`,
+        customer_selection: 'all',
+        starts_at: input.startsAt || new Date().toISOString(),
+        ends_at: input.endsAt || null,
+        usage_limit: input.usageLimit || null,
+        once_per_customer: input.oncePerCustomer || false,
+        prerequisite_subtotal_range: input.minimumOrderAmount 
+          ? { greater_than_or_equal_to: String(input.minimumOrderAmount) }
+          : null,
       });
 
-      if (!priceRuleRes.ok) {
-        const errorData = await priceRuleRes.json();
-        throw new Error(`Failed to create price rule: ${JSON.stringify(errorData)}`);
+      if (!priceRuleResult.success) {
+        throw new Error(`Failed to create price rule: ${priceRuleResult.error}`);
       }
 
-      const { price_rule } = await priceRuleRes.json();
+      const priceRule = priceRuleResult.data?.price_rule;
 
       // Create discount code
-      const discountCodeRes = await fetch(
-        `${baseUrl}/price_rules/${price_rule.id}/discount_codes.json`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Access-Token': accessToken,
-          },
-          body: JSON.stringify({
-            discount_code: { code: input.code },
-          }),
-        }
-      );
+      const discountCodeResult = await shopify.createDiscountCode(priceRule.id, input.code);
+      const discountCodeId = discountCodeResult.success ? discountCodeResult.data?.discount_code?.id : null;
 
-      let discountCodeId = null;
-      if (discountCodeRes.ok) {
-        const { discount_code } = await discountCodeRes.json();
-        discountCodeId = discount_code.id;
-      }
+      logger.info('Promotion created', { priceRuleId: priceRule.id, discountCodeId });
 
       return new Response(
         JSON.stringify({
           success: true,
-          priceRuleId: price_rule.id,
+          priceRuleId: priceRule.id,
           discountCodeId,
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -182,17 +139,15 @@ Deno.serve(async (req) => {
 
     // ─── DELETE ───
     if (action === 'delete' && priceRuleId) {
-      const deleteRes = await fetch(`${baseUrl}/price_rules/${priceRuleId}.json`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': accessToken,
-        },
-      });
+      logger.info('Deleting promotion', { priceRuleId });
+      
+      const deleteResult = await shopify.deletePriceRule(priceRuleId);
 
-      if (!deleteRes.ok && deleteRes.status !== 404) {
-        throw new Error('Failed to delete price rule');
+      if (!deleteResult.success && deleteResult.statusCode !== 404) {
+        throw new Error(`Failed to delete price rule: ${deleteResult.error}`);
       }
+
+      logger.info('Promotion deleted', { priceRuleId });
 
       return new Response(
         JSON.stringify({ success: true }),
@@ -206,7 +161,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('[shopify-promotions] Error:', error);
+    logger.error('Request failed', { error: String(error) });
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: message }),
