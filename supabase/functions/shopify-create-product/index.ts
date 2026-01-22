@@ -1,62 +1,18 @@
 /**
  * techno.dog - Shopify Product Create/Update Edge Function
  * 
- * Full Shopify Admin API integration for Creative Studio.
+ * Uses unified ShopifyClient for all Admin API operations.
  * Supports product creation, updates, and collection assignment.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createShopifyClient, type ShopifyProductInput } from '../_shared/shopify-client.ts';
+import { createLogger } from '../_shared/logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-const SHOPIFY_STORE_DOMAIN = 'technodog-d3wkq.myshopify.com';
-const SHOPIFY_API_VERSION = '2025-07';
-const ADMIN_URL_BASE = 'https://admin.shopify.com/store/technodog-d3wkq';
-
-interface ShopifyVariantInput {
-  title?: string;
-  option1?: string | null;
-  option2?: string | null;
-  option3?: string | null;
-  price: string;
-  compare_at_price?: string;
-  sku?: string;
-  barcode?: string;
-  weight?: number;
-  weight_unit?: string;
-  grams?: number;
-  inventory_management?: string;
-  inventory_policy?: string;
-  fulfillment_service?: string;
-  requires_shipping?: boolean;
-  taxable?: boolean;
-}
-
-interface ShopifyMetafieldInput {
-  namespace: string;
-  key: string;
-  value: string;
-  type: string;
-}
-
-interface ShopifyProductInput {
-  title: string;
-  body_html?: string;
-  vendor?: string;
-  product_type?: string;
-  tags?: string | string[];
-  status?: 'active' | 'draft' | 'archived';
-  handle?: string;
-  template_suffix?: string;
-  variants?: ShopifyVariantInput[];
-  options?: Array<{ name: string; values: string[]; position?: number }>;
-  images?: Array<{ src: string; alt?: string; position?: number }>;
-  metafields?: ShopifyMetafieldInput[];
-  seo?: { title?: string; description?: string };
-}
 
 interface RequestBody {
   product: ShopifyProductInput;
@@ -67,16 +23,17 @@ interface RequestBody {
 }
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
+  const logger = createLogger('shopify-create-product', requestId);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const accessToken = Deno.env.get('SHOPIFY_ACCESS_TOKEN');
-    if (!accessToken) {
-      throw new Error('SHOPIFY_ACCESS_TOKEN not configured');
-    }
+    // Initialize Shopify client (uses native Lovable integration)
+    const shopify = createShopifyClient({ requestId });
 
     const { product, draftId, action = 'create', productId, collectionIds }: RequestBody = await req.json();
 
@@ -88,81 +45,38 @@ Deno.serve(async (req) => {
     }
 
     const isUpdate = action === 'update' && productId;
-    console.log(`[shopify-product] ${isUpdate ? 'Updating' : 'Creating'} product:`, product.title);
+    logger.info(`${isUpdate ? 'Updating' : 'Creating'} product`, { title: product.title, productId });
 
-    // Build Shopify Admin API URL
-    const shopifyUrl = isUpdate
-      ? `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/products/${productId.split('/').pop()}.json`
-      : `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/products.json`;
+    // Execute product create/update
+    const result = isUpdate
+      ? await shopify.updateProduct(productId, product)
+      : await shopify.createProduct(product);
 
-    // Clean up product payload for Shopify
-    const cleanProduct = {
-      ...product,
-      // Ensure tags is a comma-separated string
-      tags: Array.isArray(product.tags) ? product.tags.join(', ') : product.tags,
-      // Clean up empty fields
-      body_html: product.body_html || '',
-      vendor: product.vendor || 'techno.dog',
-      product_type: product.product_type || '',
-    };
-
-    // Make request to Shopify Admin API
-    const shopifyResponse = await fetch(shopifyUrl, {
-      method: isUpdate ? 'PUT' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': accessToken,
-      },
-      body: JSON.stringify({ product: cleanProduct }),
-    });
-
-    const responseData = await shopifyResponse.json();
-
-    if (!shopifyResponse.ok) {
-      console.error('[shopify-product] Shopify API error:', responseData);
+    if (!result.success) {
+      logger.error('Shopify API error', { error: result.error, statusCode: result.statusCode });
       return new Response(
         JSON.stringify({ 
           error: 'Shopify API error', 
-          details: responseData.errors || responseData 
+          details: result.error 
         }),
-        { status: shopifyResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: result.statusCode || 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const createdProduct = responseData.product;
-    console.log(`[shopify-product] Product ${isUpdate ? 'updated' : 'created'} successfully:`, createdProduct.id);
+    const createdProduct = result.data?.product;
+    logger.info(`Product ${isUpdate ? 'updated' : 'created'} successfully`, { 
+      id: createdProduct.id, 
+      handle: createdProduct.handle 
+    });
 
     // Handle collection assignment if provided
     if (collectionIds && collectionIds.length > 0) {
-      console.log('[shopify-product] Assigning to collections:', collectionIds);
+      logger.info('Assigning to collections', { count: collectionIds.length });
       
       for (const collectionId of collectionIds) {
-        try {
-          // Extract numeric ID from GraphQL ID if needed
-          const numericCollectionId = collectionId.includes('gid://') 
-            ? collectionId.split('/').pop() || ''
-            : collectionId;
-          
-          if (!numericCollectionId) continue;
-          
-          const collectUrl = `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/collects.json`;
-          
-          await fetch(collectUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Shopify-Access-Token': accessToken,
-            },
-            body: JSON.stringify({
-              collect: {
-                product_id: createdProduct.id,
-                collection_id: parseInt(numericCollectionId, 10),
-              },
-            }),
-          });
-        } catch (collectError) {
-          console.warn('[shopify-product] Collection assignment failed:', collectError);
-          // Continue - don't fail the whole operation for collection assignment
+        const collectResult = await shopify.assignProductToCollection(createdProduct.id, collectionId);
+        if (!collectResult.success) {
+          logger.warn('Collection assignment failed', { collectionId, error: collectResult.error });
         }
       }
     }
@@ -181,6 +95,7 @@ Deno.serve(async (req) => {
           admin_user_id: '00000000-0000-0000-0000-000000000000',
           details: {
             draftId,
+            requestId,
             productTitle: createdProduct.title,
             productId: createdProduct.id,
             handle: createdProduct.handle,
@@ -202,7 +117,7 @@ Deno.serve(async (req) => {
           .eq('id', draftId);
 
       } catch (auditError) {
-        console.warn('[shopify-product] Audit/draft update failed:', auditError);
+        logger.warn('Audit/draft update failed', { error: String(auditError) });
       }
     }
 
@@ -217,15 +132,15 @@ Deno.serve(async (req) => {
           status: createdProduct.status,
           variants_count: createdProduct.variants?.length || 0,
           images_count: createdProduct.images?.length || 0,
-          admin_url: `${ADMIN_URL_BASE}/products/${createdProduct.id}`,
-          storefront_url: `https://${SHOPIFY_STORE_DOMAIN}/products/${createdProduct.handle}`,
+          admin_url: shopify.getAdminUrl(`/products/${createdProduct.id}`),
+          storefront_url: shopify.getStorefrontUrl(createdProduct.handle),
         },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('[shopify-product] Error:', error);
+    logger.error('Request failed', { error: String(error) });
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: errorMessage }),
