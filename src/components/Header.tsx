@@ -244,10 +244,10 @@ const Header = () => {
                 Learn
               </Button>
             </Link>
-            <Link to="/admin">
-              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-logo-green">
-                <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
-                Control Center
+            <Link to="/store">
+              <Button variant="ghost" size="sm" className="hidden sm:flex hover:animate-glitch font-mono text-[10px] uppercase tracking-widest text-foreground border border-foreground bg-foreground/5 hover:bg-foreground/15 hover:border-foreground px-2.5 py-1.5 h-auto">
+                <ShoppingBag className="w-3 h-3 mr-1.5" />
+                Shop
               </Button>
             </Link>
             
@@ -315,10 +315,10 @@ const Header = () => {
                         Audio Lab
                       </Button>
                     </Link>
-                    <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="brutalist" size="sm" className="w-full font-mono text-xs uppercase tracking-wider">
-                        <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
-                        Control Center
+                    <Link to="/store" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full font-mono text-xs uppercase tracking-wider border-foreground/50 hover:bg-foreground/10">
+                        <ShoppingBag className="w-3.5 h-3.5 mr-1.5" />
+                        Shop
                       </Button>
                     </Link>
                   </div>
