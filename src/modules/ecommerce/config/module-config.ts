@@ -27,6 +27,7 @@ export const MODULE_CONFIG = {
     CREATIVE_STUDIO: true,
     ANALYTICS: true,
     PRINTFUL_POD: true,
+    PACKLINK_PRO: true,
   },
   
   /**
@@ -36,6 +37,15 @@ export const MODULE_CONFIG = {
     ENABLED: true,
     DEFAULT_MARGIN_PERCENT: 60,
     FULFILLMENT_SERVICE: 'printful',
+  },
+
+  /**
+   * Packlink PRO Shipping Configuration
+   */
+  PACKLINK: {
+    ENABLED: true,
+    SHOPIFY_APP_PATH: '/apps/packlink-pro',
+    FULFILLMENT_TYPE: 'shipping-automation',
   },
 
   /**

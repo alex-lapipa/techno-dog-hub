@@ -2,13 +2,12 @@
  * techno.dog - Shopify Product Create/Update Edge Function
  * 
  * Uses unified ShopifyClient for all Admin API operations.
- * Supports product creation, updates, collection assignment, and Printful POD routing.
+ * Supports product creation, updates, collection assignment, and hybrid fulfillment routing.
  * 
- * PRINTFUL INTEGRATION:
- * When publishing POD products, this function automatically:
- * 1. Sets fulfillment_service to 'printful' for automatic order routing
- * 2. Sets inventory_policy to 'continue' (POD = always available)
- * 3. Injects Printful metafields for tracking
+ * HYBRID FULFILLMENT MODEL:
+ * 1. PRINTFUL (POD): Hoodies, tees, caps - auto-routed for print-on-demand
+ * 2. PACKLINK PRO: Vinyl, equipment, accessories - shipping automation for inventory items
+ * 3. MANUAL: Default for unclassified products
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -20,7 +19,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// POD product type detection
+// ============================================
+// FULFILLMENT SERVICE DETECTION
+// ============================================
+
+// POD product types → Printful
 const POD_PRODUCT_TYPES = [
   'hoodie', 't-shirt', 'tee', 'shirt', 'cap', 'hat', 'beanie',
   'tote-bag', 'tote bag', 'bandana', 'mug', 'poster', 'canvas',
@@ -28,71 +31,127 @@ const POD_PRODUCT_TYPES = [
   'backpack', 'pillow', 'phone-case', 'phone case', 'mousepad'
 ];
 
-function isPrintfulProduct(productType: string): boolean {
-  const normalized = productType.toLowerCase().trim();
-  return POD_PRODUCT_TYPES.some(type => normalized.includes(type));
+// Inventory product types → Packlink PRO
+const PACKLINK_PRODUCT_TYPES = [
+  'vinyl', 'record', 'lp', 'ep', 'album',
+  'equipment', 'hardware', 'synth', 'drum-machine',
+  'accessory', 'cable', 'stand', 'case',
+  'pre-made', 'physical', 'inventory'
+];
+
+type FulfillmentProvider = 'printful' | 'packlink-pro' | 'manual';
+
+interface FulfillmentConfig {
+  provider: FulfillmentProvider;
+  service: string; // Shopify fulfillment_service value
+  inventoryPolicy: 'continue' | 'deny';
+  inventoryManagement: 'shopify' | 'printful';
+  tags: string[];
 }
 
-// Apply Printful defaults to variants
-function applyPrintfulDefaults(variants: ShopifyVariantInput[], productType: string): ShopifyVariantInput[] {
-  const isPOD = isPrintfulProduct(productType);
+function determineFulfillment(productType: string): FulfillmentConfig {
+  const normalized = productType.toLowerCase().trim();
   
-  if (!isPOD) return variants;
+  // Check for Printful POD
+  if (POD_PRODUCT_TYPES.some(type => normalized.includes(type))) {
+    return {
+      provider: 'printful',
+      service: 'printful',
+      inventoryPolicy: 'continue', // POD = always available
+      inventoryManagement: 'shopify',
+      tags: ['print-on-demand', 'printful', 'pod-fulfillment'],
+    };
+  }
   
+  // Check for Packlink PRO inventory
+  if (PACKLINK_PRODUCT_TYPES.some(type => normalized.includes(type))) {
+    return {
+      provider: 'packlink-pro',
+      service: 'manual', // Packlink handles shipping, not fulfillment API
+      inventoryPolicy: 'deny', // Inventory items have stock limits
+      inventoryManagement: 'shopify',
+      tags: ['packlink-pro', 'inventory-shipping', 'warehouse-fulfillment'],
+    };
+  }
+  
+  // Default to manual
+  return {
+    provider: 'manual',
+    service: 'manual',
+    inventoryPolicy: 'deny',
+    inventoryManagement: 'shopify',
+    tags: ['manual-fulfillment'],
+  };
+}
+
+// ============================================
+// VARIANT PROCESSING
+// ============================================
+
+function applyFulfillmentDefaults(
+  variants: ShopifyVariantInput[], 
+  config: FulfillmentConfig
+): ShopifyVariantInput[] {
   return variants.map(variant => ({
     ...variant,
-    // CRITICAL: Route orders to Printful for fulfillment
-    fulfillment_service: 'printful',
-    // POD model: Always continue selling (no stock limits)
-    inventory_policy: 'continue',
-    // Shopify manages display, Printful handles production
-    inventory_management: 'shopify',
-    // Physical goods require shipping
+    fulfillment_service: config.service,
+    inventory_policy: config.inventoryPolicy,
+    inventory_management: config.inventoryManagement,
     requires_shipping: true,
-    // POD products are taxable
     taxable: true,
   }));
 }
 
-// Inject Printful metafields for product tracking
-function injectPrintfulMetafields(
+// ============================================
+// METAFIELD INJECTION
+// ============================================
+
+function injectFulfillmentMetafields(
   existingMetafields: Array<{ namespace: string; key: string; value: string; type: string }> = [],
-  productType: string
+  config: FulfillmentConfig
 ): Array<{ namespace: string; key: string; value: string; type: string }> {
-  const isPOD = isPrintfulProduct(productType);
-  
-  if (!isPOD) return existingMetafields;
-  
-  const printfulMetafields = [
+  const fulfillmentMetafields = [
     {
       namespace: 'fulfillment',
       key: 'provider',
-      value: 'printful',
-      type: 'single_line_text_field',
-    },
-    {
-      namespace: 'fulfillment',
-      key: 'production_model',
-      value: 'print-on-demand',
+      value: config.provider,
       type: 'single_line_text_field',
     },
     {
       namespace: 'fulfillment',
       key: 'auto_route',
-      value: 'true',
+      value: config.provider !== 'manual' ? 'true' : 'false',
       type: 'boolean',
     },
     {
-      namespace: 'printful',
-      key: 'integration_status',
-      value: 'connected',
+      namespace: 'fulfillment',
+      key: 'service_type',
+      value: config.provider === 'printful' ? 'print-on-demand' : 
+             config.provider === 'packlink-pro' ? 'shipping-automation' : 'manual',
       type: 'single_line_text_field',
     },
   ];
   
+  // Add provider-specific metafields
+  if (config.provider === 'printful') {
+    fulfillmentMetafields.push({
+      namespace: 'printful',
+      key: 'integration_status',
+      value: 'connected',
+      type: 'single_line_text_field',
+    });
+  } else if (config.provider === 'packlink-pro') {
+    fulfillmentMetafields.push({
+      namespace: 'packlink',
+      key: 'shipping_enabled',
+      value: 'true',
+      type: 'boolean',
+    });
+  }
+  
   // Merge without duplicates
   const metafieldKeys = new Set(existingMetafields.map(m => `${m.namespace}:${m.key}`));
-  const newMetafields = printfulMetafields.filter(m => !metafieldKeys.has(`${m.namespace}:${m.key}`));
+  const newMetafields = fulfillmentMetafields.filter(m => !metafieldKeys.has(`${m.namespace}:${m.key}`));
   
   return [...existingMetafields, ...newMetafields];
 }
@@ -128,39 +187,40 @@ Deno.serve(async (req) => {
     }
 
     const productType = product.product_type || '';
-    const isPOD = isPrintfulProduct(productType);
+    const fulfillmentConfig = determineFulfillment(productType);
     const isUpdate = action === 'update' && productId;
     
     logger.info(`${isUpdate ? 'Updating' : 'Creating'} product`, { 
       title: product.title, 
       productId,
       productType,
-      isPOD,
+      fulfillmentProvider: fulfillmentConfig.provider,
       variantCount: product.variants?.length || 0,
     });
 
-    // Apply Printful defaults to variants if POD product
+    // Apply fulfillment defaults to variants
     const processedVariants = product.variants 
-      ? applyPrintfulDefaults(product.variants, productType)
+      ? applyFulfillmentDefaults(product.variants, fulfillmentConfig)
       : undefined;
     
-    // Inject Printful metafields if POD product
-    const processedMetafields = injectPrintfulMetafields(
+    // Inject fulfillment metafields
+    const processedMetafields = injectFulfillmentMetafields(
       product.metafields || [],
-      productType
+      fulfillmentConfig
     );
+
+    // Merge fulfillment tags with existing tags
+    const existingTags = Array.isArray(product.tags) 
+      ? product.tags 
+      : (product.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+    const allTags = [...new Set([...existingTags, ...fulfillmentConfig.tags])];
 
     // Build final product payload
     const finalProduct: ShopifyProductInput = {
       ...product,
       variants: processedVariants,
       metafields: processedMetafields.length > 0 ? processedMetafields : undefined,
-      // Add POD tags for Printful sync
-      tags: isPOD 
-        ? (Array.isArray(product.tags) 
-            ? [...product.tags, 'print-on-demand', 'printful'].join(', ')
-            : `${product.tags || ''}, print-on-demand, printful`.replace(/^, /, ''))
-        : product.tags,
+      tags: allTags.join(', '),
     };
 
     // Execute product create/update
@@ -183,8 +243,8 @@ Deno.serve(async (req) => {
     logger.info(`Product ${isUpdate ? 'updated' : 'created'} successfully`, { 
       id: createdProduct.id, 
       handle: createdProduct.handle,
-      isPOD,
-      fulfillmentService: isPOD ? 'printful' : 'manual',
+      fulfillmentProvider: fulfillmentConfig.provider,
+      fulfillmentService: fulfillmentConfig.service,
     });
 
     // Handle collection assignment if provided
@@ -220,8 +280,10 @@ Deno.serve(async (req) => {
             status: createdProduct.status,
             variantsCount: createdProduct.variants?.length || 0,
             collectionsAssigned: collectionIds?.length || 0,
-            isPOD,
-            fulfillmentService: isPOD ? 'printful' : 'manual',
+            fulfillmentProvider: fulfillmentConfig.provider,
+            fulfillmentService: fulfillmentConfig.service,
+            isPOD: fulfillmentConfig.provider === 'printful',
+            isPacklink: fulfillmentConfig.provider === 'packlink-pro',
           },
         });
 
@@ -256,9 +318,11 @@ Deno.serve(async (req) => {
           storefront_url: shopify.getStorefrontUrl(createdProduct.handle),
         },
         fulfillment: {
-          provider: isPOD ? 'printful' : 'manual',
-          isPOD,
-          autoRoute: isPOD,
+          provider: fulfillmentConfig.provider,
+          service: fulfillmentConfig.service,
+          isPOD: fulfillmentConfig.provider === 'printful',
+          isPacklink: fulfillmentConfig.provider === 'packlink-pro',
+          autoRoute: fulfillmentConfig.provider !== 'manual',
         },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
