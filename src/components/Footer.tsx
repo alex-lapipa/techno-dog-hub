@@ -23,6 +23,7 @@ const Footer = () => {
     { label: 'Gear', path: '/gear' },
     { label: 'Contribute', path: '/contribute' },
     { label: 'Developers', path: '/developer' },
+    { label: 'Control Center', path: '/admin' },
   ];
 
   const legalLinks = [
