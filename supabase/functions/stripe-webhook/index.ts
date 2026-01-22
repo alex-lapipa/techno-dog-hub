@@ -60,19 +60,28 @@ serve(async (req) => {
 
     let event: Stripe.Event;
 
-    if (webhookSecret && signature) {
+    // SECURITY: Always verify webhook signature in production
+    if (!webhookSecret) {
+      const warningMsg = "SECURITY WARNING: STRIPE_WEBHOOK_SECRET not configured - webhook signature verification disabled";
+      console.warn(`[stripe-webhook] ${warningMsg}`);
+      await logHealthAlert("stripe-webhook", "security_misconfiguration", "warn", warningMsg);
+      // Allow processing but log the security gap
+      event = JSON.parse(body);
+    } else if (!signature) {
+      const errorMsg = "Missing stripe-signature header - request rejected for security";
+      logStep("ERROR: " + errorMsg);
+      await logHealthAlert("stripe-webhook", "missing_signature", "error", errorMsg);
+      return new Response(JSON.stringify({ error: "Missing signature" }), { status: 400, headers: corsHeaders });
+    } else {
       try {
         event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        logStep("Webhook signature verified");
+        logStep("Webhook signature verified successfully");
       } catch (err: unknown) {
         const error = err as Error;
         logStep("ERROR: Signature verification failed", { message: error.message });
-        await logHealthAlert("stripe-webhook", "signature_verification_failed", "warn", `Webhook signature verification failed: ${error.message}`);
+        await logHealthAlert("stripe-webhook", "signature_verification_failed", "error", `Webhook signature verification failed: ${error.message}`);
         return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400, headers: corsHeaders });
       }
-    } else {
-      event = JSON.parse(body);
-      logStep("WARNING: No webhook secret configured - signature not verified");
     }
 
     logStep(`Processing event: ${event.type}`);
