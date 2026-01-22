@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCreativeWorkflow } from '../hooks/useCreativeWorkflow';
 import {
   WorkflowSidebar,
-  StepBrandSelection,
+  StepCreateProduct,
   StepVisualSelection,
   StepColorLine,
   StepShopifyCatalog,
@@ -37,11 +37,14 @@ export function CreativeStudio() {
     switch (workflow.currentStep) {
       case 'brand-selection':
         return (
-          <StepBrandSelection
+          <StepCreateProduct
             selectedBrand={workflow.brandBook}
             onSelectBrand={workflow.selectBrand}
-            selectedModels={workflow.draft.selectedModels || ['gemini']}
-            onSelectModels={workflow.selectModels}
+            selectedVisuals={workflow.draft.selectedVisuals || []}
+            onSelectVisual={workflow.selectVisual}
+            uploadedAssets={workflow.draft.uploadedAssets || []}
+            onUploadAsset={workflow.addUploadedAsset}
+            onRemoveAsset={workflow.removeUploadedAsset}
           />
         );
       case 'visual-selection':
