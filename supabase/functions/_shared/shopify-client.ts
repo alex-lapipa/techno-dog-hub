@@ -249,6 +249,21 @@ export class ShopifyClient {
     return this.request<{ products: any[] }>(`/products.json?limit=${limit}`);
   }
 
+  // ─── VARIANTS ───
+
+  async updateVariant(variantId: string | number, variant: Partial<ShopifyVariantInput>): Promise<ShopifyApiResponse<{ variant: any }>> {
+    const numericId = typeof variantId === 'string' ? variantId.split('/').pop() : variantId;
+    return this.request<{ variant: any }>(`/variants/${numericId}.json`, {
+      method: 'PUT',
+      body: { variant },
+    });
+  }
+
+  async getVariant(variantId: string | number): Promise<ShopifyApiResponse<{ variant: any }>> {
+    const numericId = typeof variantId === 'string' ? variantId.split('/').pop() : variantId;
+    return this.request<{ variant: any }>(`/variants/${numericId}.json`);
+  }
+
   private cleanProductPayload(product: ShopifyProductInput): Record<string, unknown> {
     return {
       ...product,

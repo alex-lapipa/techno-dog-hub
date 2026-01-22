@@ -157,10 +157,20 @@ function injectFulfillmentMetafields(
 }
 
 interface RequestBody {
-  product: ShopifyProductInput;
+  product?: ShopifyProductInput;
+  // Also accept product fields at root level for backward compatibility
+  title?: string;
+  body?: string;
+  vendor?: string;
+  product_type?: string;
+  status?: 'active' | 'draft' | 'archived';
+  tags?: string | string[];
+  variants?: ShopifyVariantInput[];
+  metafields?: Array<{ namespace: string; key: string; value: string; type: string }>;
+  // Control fields
   draftId?: string;
   action?: 'create' | 'update';
-  productId?: string;
+  productId?: string | number;
   collectionIds?: string[];
 }
 
@@ -177,9 +187,26 @@ Deno.serve(async (req) => {
     // Initialize Shopify client (uses native Lovable integration)
     const shopify = createShopifyClient({ requestId });
 
-    const { product, draftId, action = 'create', productId, collectionIds }: RequestBody = await req.json();
+    const body: RequestBody = await req.json();
+    
+    // Support both {product: {...}} and root-level fields
+    const product: ShopifyProductInput = body.product ?? {
+      title: body.title ?? '',
+      body_html: body.body,
+      vendor: body.vendor,
+      product_type: body.product_type,
+      status: body.status,
+      tags: body.tags,
+      variants: body.variants,
+      metafields: body.metafields,
+    };
+    
+    const draftId = body.draftId;
+    const action = body.action || 'create';
+    const productId = body.productId;
+    const collectionIds = body.collectionIds;
 
-    if (!product || !product.title) {
+    if (!product.title) {
       return new Response(
         JSON.stringify({ error: 'Product title is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
