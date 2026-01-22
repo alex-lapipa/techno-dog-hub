@@ -101,11 +101,22 @@ export interface ShopifyCatalogSelection {
   basePrice: number;
 }
 
+// Uploaded asset from Step 1
+export interface UploadedAsset {
+  id: string;
+  name: string;
+  url: string;
+  type: 'upload' | 'url';
+  size?: number;
+}
+
 // Product draft structure
 export interface ProductDraft {
   id?: string;
   brandBook: BrandBookType;
   selectedModels?: string[]; // AI models for creative process
+  selectedVisuals?: string[]; // Visual IDs from brand book
+  uploadedAssets?: UploadedAsset[]; // User uploaded/pasted images
   selectedMascot?: ApprovedMascot | null;
   colorLine?: ColorLineType | null;
   shopifyCatalog?: ShopifyCatalogSelection | null; // NEW: Shopify catalog selection
@@ -151,6 +162,9 @@ export interface UseCreativeWorkflowReturn {
   updateDraft: (updates: Partial<ProductDraft>) => void;
   selectBrand: (brand: BrandBookType) => void;
   selectModels: (models: string[]) => void;
+  selectVisual: (visualId: string) => void;
+  addUploadedAsset: (asset: UploadedAsset) => void;
+  removeUploadedAsset: (assetId: string) => void;
   selectMascot: (mascot: ApprovedMascot | null) => void;
   setColorLine: (colorLine: ColorLineType | null) => void;
   selectProductType: (product: ApprovedProduct | null) => void;
@@ -281,6 +295,27 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     updateDraft({ selectedModels: models });
   }, [updateDraft]);
 
+  const selectVisual = useCallback((visualId: string) => {
+    const currentVisuals = draft.selectedVisuals || [];
+    const isSelected = currentVisuals.includes(visualId);
+    
+    if (isSelected) {
+      updateDraft({ selectedVisuals: currentVisuals.filter(id => id !== visualId) });
+    } else {
+      updateDraft({ selectedVisuals: [...currentVisuals, visualId] });
+    }
+  }, [draft.selectedVisuals, updateDraft]);
+
+  const addUploadedAsset = useCallback((asset: UploadedAsset) => {
+    const currentAssets = draft.uploadedAssets || [];
+    updateDraft({ uploadedAssets: [...currentAssets, asset] });
+  }, [draft.uploadedAssets, updateDraft]);
+
+  const removeUploadedAsset = useCallback((assetId: string) => {
+    const currentAssets = draft.uploadedAssets || [];
+    updateDraft({ uploadedAssets: currentAssets.filter(a => a.id !== assetId) });
+  }, [draft.uploadedAssets, updateDraft]);
+
   const selectMascot = useCallback((mascot: ApprovedMascot | null) => {
     updateDraft({ selectedMascot: mascot });
   }, [updateDraft]);
@@ -352,6 +387,9 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
     updateDraft,
     selectBrand,
     selectModels,
+    selectVisual,
+    addUploadedAsset,
+    removeUploadedAsset,
     selectMascot,
     setColorLine,
     selectProductType,

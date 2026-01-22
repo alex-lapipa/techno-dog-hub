@@ -7,6 +7,7 @@
 export { WorkflowSidebar } from './WorkflowSidebar';
 export { KnowledgeBasePanel, type KnowledgeContext, SCENE_PRESETS } from './KnowledgeBasePanel';
 export { ModelSelector, AI_MODELS, type AIModelOption, type SelectedModels } from './ModelSelector';
+export { StepCreateProduct } from './StepCreateProduct';
 export { StepBrandSelection } from './StepBrandSelection';
 export { StepVisualSelection } from './StepVisualSelection';
 export { StepColorLine } from './StepColorLine';
