@@ -8,6 +8,7 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
+import labelHeroDefault from "@/assets/labels/label-hero-default.jpg";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -159,15 +160,15 @@ const LabelsPage = () => {
                 to={`/labels/${label.id}`}
                 className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
               >
-                {/* Label Image Placeholder */}
+                {/* Label Image with VHS Film Effect */}
                 <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Disc className="w-12 h-12 text-muted-foreground/20" />
-                  </div>
-                  {/* Frame overlay */}
-                  <div className="absolute bottom-2 right-2 font-mono text-[10px] text-muted-foreground/50">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
+                  <GlitchImage 
+                    src={labelHeroDefault} 
+                    alt={label.name}
+                    className="w-full h-full"
+                    frameNumber={String(index + 1).padStart(2, '0')}
+                    size="thumbnail"
+                  />
                 </div>
                 
                 <div className="p-3 sm:p-4">

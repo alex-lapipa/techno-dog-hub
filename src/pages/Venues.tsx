@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { cn } from "@/lib/utils";
 import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
+import venueHeroDefault from "@/assets/venues/venue-hero-default.jpg";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 type StatusFilter = "all" | "open" | "closed";
@@ -270,9 +271,13 @@ const VenuesPage = () => {
                         size="thumbnail"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <MapPin className="w-12 h-12 text-muted-foreground/20" />
-                      </div>
+                      <GlitchImage 
+                        src={venueHeroDefault} 
+                        alt={venue.name}
+                        className="w-full h-full"
+                        frameNumber={String(index + 1).padStart(2, '0')}
+                        size="thumbnail"
+                      />
                     )}
                     
                     {/* Status Badge */}
