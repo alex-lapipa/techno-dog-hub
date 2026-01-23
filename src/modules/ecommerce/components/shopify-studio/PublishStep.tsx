@@ -7,6 +7,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   ShoppingBag, 
   Check, 
@@ -172,10 +173,11 @@ export function PublishStep({
     }
   };
 
-  // Get product preview URL
+  // Get product preview URL - use local storefront route, not external Shopify domain
   const getProductUrl = () => {
-    if (draft.shopifyProductHandle || draft.handle) {
-      return `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/products/${draft.shopifyProductHandle || draft.handle}`;
+    const handle = draft.shopifyProductHandle || draft.handle;
+    if (handle) {
+      return `/store/product/${handle}`;
     }
     return null;
   };
@@ -367,15 +369,13 @@ export function PublishStep({
       {/* Action Buttons */}
       <div className="flex items-center justify-between">
         {hasPublished && getProductUrl() && (
-          <Button
-            variant="outline"
-            onClick={() => window.open(getProductUrl()!, '_blank')}
-            className="gap-2"
+          <Link
+            to={getProductUrl()!}
+            className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
           >
             <Eye className="w-4 h-4" />
             View on Store
-            <ExternalLink className="w-3 h-3" />
-          </Button>
+          </Link>
         )}
         
         {!hasPublished && <div />}
