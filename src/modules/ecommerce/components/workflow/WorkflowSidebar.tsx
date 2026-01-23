@@ -2,9 +2,10 @@
  * Creative Studio Workflow Sidebar
  * 
  * Displays numbered steps with descriptions and progress indicators.
+ * GREEN = complete, RED = incomplete/pending
  */
 
-import { Check, Circle, CircleDot } from 'lucide-react';
+import { Check, Circle, CircleDot, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { WORKFLOW_STEPS, type WorkflowStep } from '../../hooks/useCreativeWorkflow';
 
@@ -23,7 +24,7 @@ export function WorkflowSidebar({
 }: WorkflowSidebarProps) {
   return (
     <div className="w-64 flex-shrink-0 border-r border-border bg-card/50 p-4 relative">
-      {/* Subtle VHS noise overlay - Phase 4 */}
+      {/* Subtle VHS noise overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02]"
         style={{
@@ -34,6 +35,9 @@ export function WorkflowSidebar({
         <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Workflow Steps
         </h3>
+        <p className="text-[10px] text-muted-foreground/60 mt-1">
+          <span className="text-logo-green">●</span> Done <span className="text-destructive ml-2">●</span> Pending
+        </p>
       </div>
       
       <nav className="space-y-1">
@@ -43,6 +47,8 @@ export function WorkflowSidebar({
           const isPast = completedSteps.includes(step.id);
           const currentIndex = WORKFLOW_STEPS.findIndex(s => s.id === currentStep);
           const canNavigate = index <= currentIndex || isPast;
+          // Required steps that are not complete show red, optional steps show neutral
+          const showIncomplete = step.required && !isComplete && !isCurrent;
           
           return (
             <button
@@ -53,21 +59,25 @@ export function WorkflowSidebar({
                 "w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all",
                 "hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed",
                 isCurrent && "bg-primary/10 border border-primary/30",
-                !isCurrent && !isComplete && "opacity-60"
+                isComplete && !isCurrent && "bg-logo-green/5 border border-logo-green/20",
+                showIncomplete && "border border-destructive/20"
               )}
             >
-              {/* Step indicator */}
+              {/* Step indicator - GREEN for done, RED for pending required */}
               <div className={cn(
                 "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono",
                 "border-2 transition-colors",
                 isCurrent && "border-primary bg-primary text-primary-foreground",
-                isComplete && !isCurrent && "border-logo-green bg-logo-green/10 text-logo-green",
-                !isCurrent && !isComplete && "border-muted-foreground/30 text-muted-foreground"
+                isComplete && !isCurrent && "border-logo-green bg-logo-green text-black",
+                showIncomplete && "border-destructive/60 bg-destructive/10 text-destructive",
+                !isCurrent && !isComplete && !showIncomplete && "border-muted-foreground/30 text-muted-foreground"
               )}>
                 {isComplete && !isCurrent ? (
                   <Check className="w-4 h-4" />
                 ) : isCurrent ? (
                   <CircleDot className="w-4 h-4" />
+                ) : showIncomplete ? (
+                  <Circle className="w-4 h-4" />
                 ) : (
                   step.number
                 )}
@@ -78,50 +88,74 @@ export function WorkflowSidebar({
                 <p className={cn(
                   "font-mono text-sm font-medium truncate",
                   isCurrent && "text-foreground",
-                  !isCurrent && "text-muted-foreground"
+                  isComplete && !isCurrent && "text-logo-green",
+                  showIncomplete && "text-destructive",
+                  !isCurrent && !isComplete && !showIncomplete && "text-muted-foreground"
                 )}>
                   {step.title}
                 </p>
                 <p className="text-[10px] text-muted-foreground/70 mt-0.5 line-clamp-2">
                   {step.description}
                 </p>
-                {!step.required && (
-                  <span className="inline-block mt-1 px-1.5 py-0.5 bg-muted/50 text-[9px] font-mono uppercase rounded text-muted-foreground">
-                    Optional
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5 mt-1">
+                  {!step.required && (
+                    <span className="inline-block px-1.5 py-0.5 bg-muted/50 text-[9px] font-mono uppercase rounded text-muted-foreground">
+                      Optional
+                    </span>
+                  )}
+                  {isComplete && !isCurrent && (
+                    <span className="inline-block px-1.5 py-0.5 bg-logo-green/20 text-[9px] font-mono uppercase rounded text-logo-green">
+                      Done
+                    </span>
+                  )}
+                  {showIncomplete && (
+                    <span className="inline-block px-1.5 py-0.5 bg-destructive/10 text-[9px] font-mono uppercase rounded text-destructive">
+                      Required
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
           );
         })}
       </nav>
       
-      {/* Progress indicator with neon glow - Phase 4 */}
+      {/* Progress indicator with green/red status */}
       <div className="mt-6 pt-4 border-t border-border relative">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span className="font-mono uppercase">Progress</span>
-          <span className="font-mono">
+          <span className={cn(
+            "font-mono font-bold",
+            completedSteps.length === WORKFLOW_STEPS.length ? "text-logo-green" : "text-foreground"
+          )}>
             {completedSteps.length}/{WORKFLOW_STEPS.length}
           </span>
         </div>
-        <div className="h-1.5 bg-muted rounded-full overflow-hidden relative">
-          <div 
-            className="h-full bg-primary transition-all duration-300"
-            style={{ 
-              width: `${(completedSteps.length / WORKFLOW_STEPS.length) * 100}%`,
-              boxShadow: completedSteps.length > 0 
-                ? '0 0 8px hsl(var(--primary)), 0 0 16px hsl(var(--primary) / 0.5)' 
-                : 'none',
-            }}
-          />
+        <div className="h-2 bg-muted rounded-full overflow-hidden relative flex">
+          {WORKFLOW_STEPS.map((step, i) => {
+            const isComplete = completedSteps.includes(step.id);
+            return (
+              <div
+                key={step.id}
+                className={cn(
+                  "flex-1 h-full transition-colors border-r border-background last:border-r-0",
+                  isComplete ? "bg-logo-green" : "bg-destructive/30"
+                )}
+                style={isComplete ? { 
+                  boxShadow: '0 0 6px hsl(142, 76%, 36%)' 
+                } : undefined}
+              />
+            );
+          })}
         </div>
-        {/* Underground badge - Phase 4 */}
+        {/* Completion badge */}
         {completedSteps.length === WORKFLOW_STEPS.length && (
           <div className="mt-3 text-center">
             <span 
-              className="inline-block px-2 py-1 text-[9px] font-mono uppercase rounded bg-gradient-to-r from-muted via-primary/20 to-muted text-primary animate-pulse"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase rounded-full bg-logo-green text-black font-bold"
             >
-              Design Complete
+              <Check className="w-3 h-3" />
+              All Steps Complete
             </span>
           </div>
         )}

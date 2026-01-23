@@ -146,9 +146,37 @@ export function CreativeStudio() {
       icon={Palette}
       iconColor="text-crimson"
       actions={
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-[10px]">
-            Step {workflow.stepNumber}/{workflow.totalSteps}
+        <div className="flex items-center gap-3">
+          {/* Step progress pills */}
+          <div className="hidden sm:flex items-center gap-1">
+            {Array.from({ length: workflow.totalSteps }, (_, i) => {
+              const stepId = ['brand-selection', 'shopify-catalog', 'product-copy', 'story-generator', 'image-generator', 'review-export'][i] as import('../hooks/useCreativeWorkflow').WorkflowStep;
+              const isComplete = workflow.isStepComplete(stepId);
+              const isCurrent = i + 1 === workflow.stepNumber;
+              return (
+                <div
+                  key={i}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    isCurrent 
+                      ? 'bg-primary ring-2 ring-primary/30' 
+                      : isComplete 
+                        ? 'bg-logo-green' 
+                        : 'bg-destructive/40'
+                  }`}
+                  title={`Step ${i + 1}: ${isComplete ? 'Complete' : 'Pending'}`}
+                />
+              );
+            })}
+          </div>
+          <Badge 
+            variant="outline" 
+            className={`font-mono text-[10px] ${
+              workflow.completedSteps.length === workflow.totalSteps 
+                ? 'border-logo-green text-logo-green' 
+                : ''
+            }`}
+          >
+            {workflow.completedSteps.length}/{workflow.totalSteps} Done
           </Badge>
           <Button variant="ghost" size="sm" onClick={workflow.resetWorkflow}>
             <RotateCcw className="w-4 h-4 mr-1" />
