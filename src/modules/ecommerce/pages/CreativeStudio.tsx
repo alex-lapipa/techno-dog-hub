@@ -3,6 +3,14 @@
  * 
  * AI-enabled step-by-step product design workflow.
  * Integrates brand books for validation and RAG for editorial generation.
+ * 
+ * WORKFLOW:
+ * 1. Brand & Visuals - Select brand identity, mascots, color line
+ * 2. Product Config - Shopify-first product/size/color selection
+ * 3. Product Copy - Optional text placement
+ * 4. Story Generator - AI-powered product story from prompt
+ * 5. Image Generator - AI-powered product mockup
+ * 6. Review & Export - Final review and Shopify export
  */
 
 import { useMemo } from 'react';
@@ -14,14 +22,13 @@ import { useCreativeWorkflow } from '../hooks/useCreativeWorkflow';
 import {
   WorkflowSidebar,
   StepCreateProduct,
-  StepVisualSelection,
-  StepColorLine,
   StepShopifyCatalog,
   StepProductCopy,
-  StepEditorialBrief,
   StepReviewExport,
   SHOPIFY_CATALOG,
 } from '../components/workflow';
+import StepStoryGenerator from '../components/workflow/StepStoryGenerator';
+import StepImageGenerator from '../components/workflow/StepImageGenerator';
 
 export function CreativeStudio() {
   const workflow = useCreativeWorkflow();
@@ -45,25 +52,12 @@ export function CreativeStudio() {
             uploadedAssets={workflow.draft.uploadedAssets || []}
             onUploadAsset={workflow.addUploadedAsset}
             onRemoveAsset={workflow.removeUploadedAsset}
-          />
-        );
-      case 'visual-selection':
-        return (
-          <StepVisualSelection
-            brandBook={workflow.brandBook}
-            mascots={workflow.guidelines.mascots}
-            selectedMascot={workflow.draft.selectedMascot || null}
-            onSelectMascot={workflow.selectMascot}
-            onSkip={workflow.goNext}
-          />
-        );
-      case 'color-line':
-        return (
-          <StepColorLine
-            brandBook={workflow.brandBook}
+            // Color line selection now part of step 1 for Techno Doggies
             selectedColorLine={workflow.draft.colorLine || null}
             onSelectColorLine={workflow.setColorLine}
-            selectedMascot={workflow.draft.selectedMascot}
+            // Mascot selection also part of step 1
+            selectedMascot={workflow.draft.selectedMascot || null}
+            onSelectMascot={workflow.selectMascot}
           />
         );
       case 'shopify-catalog':
@@ -116,13 +110,19 @@ export function CreativeStudio() {
             onSkip={workflow.goNext}
           />
         );
-      case 'editorial-brief':
+      case 'story-generator':
         return (
-          <StepEditorialBrief
+          <StepStoryGenerator
             draft={workflow.draft}
             onUpdateBrief={workflow.setEditorialBrief}
             onUpdateConcept={workflow.setProductConcept}
-            onSkip={workflow.goNext}
+          />
+        );
+      case 'image-generator':
+        return (
+          <StepImageGenerator
+            draft={workflow.draft}
+            onSetImage={workflow.setGeneratedImage}
           />
         );
       case 'review-export':

@@ -9,15 +9,17 @@ import { useState, useCallback, useMemo } from 'react';
 import { useBrandBookGuidelines, type BrandBookType, type ApprovedMascot, type ApprovedProduct } from './useBrandBookGuidelines';
 
 // Workflow step definitions
-// NOTE: 'product-type' removed - Shopify Catalog is now the single source of truth
+// Restructured: Brand + Visual → Product Config → Story → Image → Review
 export type WorkflowStep = 
-  | 'brand-selection'
-  | 'visual-selection'
-  | 'color-line'
-  | 'shopify-catalog'
-  | 'product-copy'
-  | 'editorial-brief'
-  | 'review-export';
+  | 'brand-selection'      // Step 1: Brand identity + visual assets selection
+  | 'shopify-catalog'      // Step 2: Product type, size, color selection (Shopify-first)
+  | 'product-copy'         // Step 3: Optional text/tagline placement
+  | 'story-generator'      // Step 4: AI-powered product story with prompt
+  | 'image-generator'      // Step 5: AI-powered product image generation
+  | 'review-export';       // Step 6: Final review and export
+
+// Legacy steps kept for backward compatibility
+export type LegacyWorkflowStep = 'visual-selection' | 'color-line' | 'editorial-brief';
 
 // Color line types (from brand book - NEVER MODIFY)
 export type ColorLineType = 'green-line' | 'white-line';
@@ -34,50 +36,43 @@ export const WORKFLOW_STEPS: WorkflowStepConfig[] = [
   {
     id: 'brand-selection',
     number: 1,
-    title: 'Brand Selection',
-    description: 'Choose your brand identity',
-    required: true,
-  },
-  {
-    id: 'visual-selection',
-    number: 2,
-    title: 'Visual Assets',
-    description: 'Select mascot or icon (optional)',
-    required: false,
-  },
-  {
-    id: 'color-line',
-    number: 3,
-    title: 'Color Line',
-    description: 'Green Line or White Line stroke',
+    title: 'Brand & Visuals',
+    description: 'Choose brand identity and select visual assets',
     required: true,
   },
   {
     id: 'shopify-catalog',
-    number: 4,
-    title: 'Product & Placement',
-    description: 'Select product, size, color & print zone',
+    number: 2,
+    title: 'Product Config',
+    description: 'Select product type, size, and color',
     required: true,
   },
   {
     id: 'product-copy',
-    number: 5,
+    number: 3,
     title: 'Product Copy',
     description: 'Add text or tagline (optional)',
     required: false,
   },
   {
-    id: 'editorial-brief',
-    number: 6,
-    title: 'Editorial Brief',
-    description: 'AI-generated product story',
+    id: 'story-generator',
+    number: 4,
+    title: 'Story Generator',
+    description: 'AI-generated product story from your prompt',
     required: true,
   },
   {
+    id: 'image-generator',
+    number: 5,
+    title: 'Image Generator',
+    description: 'AI-generated product mockup',
+    required: false,
+  },
+  {
     id: 'review-export',
-    number: 7,
+    number: 6,
     title: 'Review & Export',
-    description: 'Preview, compliance check, and save',
+    description: 'Preview, compliance check, and save to Shopify',
     required: true,
   },
 ];
@@ -207,26 +202,24 @@ export function useCreativeWorkflow(): UseCreativeWorkflowReturn {
   const totalSteps = WORKFLOW_STEPS.length;
 
   // Check if a step is complete
-  // NOTE: 'product-type' removed - Shopify Catalog handles product + placement selection
   const isStepComplete = useCallback((step: WorkflowStep): boolean => {
     switch (step) {
       case 'brand-selection':
-        return !!draft.brandBook;
-      case 'visual-selection':
-        // Optional step - always considered complete
+        // Brand must be selected, visuals/mascot optional but color line required for techno-doggies
+        if (!draft.brandBook) return false;
+        if (draft.brandBook === 'techno-doggies' && !draft.colorLine) return false;
         return true;
-      case 'color-line':
-        // For techno-dog brand, skip this step
-        if (draft.brandBook === 'techno-dog') return true;
-        return !!draft.colorLine;
       case 'shopify-catalog':
-        // Shopify catalog is now the single source - must have product, size, and color
+        // Shopify catalog is the single source - must have product, size, and color
         return !!(draft.shopifyCatalog?.productId && draft.shopifyCatalog?.size && draft.shopifyCatalog?.color);
       case 'product-copy':
         // Optional step - always considered complete
         return true;
-      case 'editorial-brief':
+      case 'story-generator':
         return !!draft.editorialBrief?.productName;
+      case 'image-generator':
+        // Optional step - always considered complete
+        return true;
       case 'review-export':
         return draft.status === 'draft';
       default:

@@ -132,6 +132,12 @@ interface StepCreateProductProps {
   uploadedAssets: UploadedAsset[];
   onUploadAsset: (asset: UploadedAsset) => void;
   onRemoveAsset: (assetId: string) => void;
+  // Color line selection (for Techno Doggies)
+  selectedColorLine?: 'green-line' | 'white-line' | null;
+  onSelectColorLine?: (colorLine: 'green-line' | 'white-line' | null) => void;
+  // Mascot selection (for Techno Doggies)
+  selectedMascot?: { displayName: string; personality: string } | null;
+  onSelectMascot?: (mascot: { displayName: string; personality: string } | null) => void;
 }
 
 // ============================================================================
@@ -146,6 +152,10 @@ export function StepCreateProduct({
   uploadedAssets,
   onUploadAsset,
   onRemoveAsset,
+  selectedColorLine,
+  onSelectColorLine,
+  selectedMascot,
+  onSelectMascot,
 }: StepCreateProductProps) {
   const [activeTab, setActiveTab] = useState<'brand-visuals' | 'upload'>('brand-visuals');
   const [urlInput, setUrlInput] = useState('');
@@ -350,6 +360,53 @@ export function StepCreateProduct({
         </div>
       </section>
 
+      {/* Color Line Selection (Techno Doggies only) */}
+      {selectedBrand === 'techno-doggies' && onSelectColorLine && (
+        <section className="space-y-4">
+          <Label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            Color Line
+          </Label>
+          <div className="grid grid-cols-2 gap-4">
+            <Card
+              onClick={() => onSelectColorLine('green-line')}
+              className={cn(
+                "p-4 cursor-pointer transition-all",
+                "hover:border-logo-green/50",
+                selectedColorLine === 'green-line' && "border-logo-green bg-logo-green/10 ring-2 ring-logo-green/30"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-logo-green flex items-center justify-center">
+                  {selectedColorLine === 'green-line' && <Check className="w-4 h-4 text-black" />}
+                </div>
+                <div>
+                  <p className="font-mono font-bold text-sm uppercase">Green Line</p>
+                  <p className="text-xs text-muted-foreground">Laser green stroke (#00FF00)</p>
+                </div>
+              </div>
+            </Card>
+            <Card
+              onClick={() => onSelectColorLine('white-line')}
+              className={cn(
+                "p-4 cursor-pointer transition-all",
+                "hover:border-foreground/50",
+                selectedColorLine === 'white-line' && "border-foreground bg-foreground/10 ring-2 ring-foreground/30"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white border border-border flex items-center justify-center">
+                  {selectedColorLine === 'white-line' && <Check className="w-4 h-4 text-black" />}
+                </div>
+                <div>
+                  <p className="font-mono font-bold text-sm uppercase">White Line</p>
+                  <p className="text-xs text-muted-foreground">Pure white stroke (#FFFFFF)</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </section>
+      )}
+
       {/* Visual Assets Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
@@ -423,7 +480,14 @@ export function StepCreateProduct({
                         return (
                           <Card
                             key={mascotId}
-                            onClick={() => onSelectVisual(mascotId)}
+                            onClick={() => {
+                              onSelectVisual(mascotId);
+                              // Also update mascot selection for workflow
+                              if (onSelectMascot) {
+                                const isCurrentlySelected = selectedVisuals.includes(mascotId);
+                                onSelectMascot(isCurrentlySelected ? null : { displayName: mascot.name, personality: mascot.personality });
+                              }
+                            }}
                             className={cn(
                               "relative p-2 cursor-pointer transition-all border-2 hover:scale-[1.02]",
                               isSelected 
