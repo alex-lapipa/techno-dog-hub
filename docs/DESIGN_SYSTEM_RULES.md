@@ -1,5 +1,58 @@
 # Design System Rules — techno.dog
 
+## MANDATORY IMAGE COMPLIANCE (ZERO TOLERANCE)
+
+### HARDCODED RULE — IMMUTABLE
+**ALL product images MUST come from ONE of these sources:**
+
+1. **User-Uploaded Images** (`user-uploads://`)
+   - Explicitly provided by the user in chat
+   - Verified brand artwork (e.g., Las Querodias)
+
+2. **Official Brand Book Assets**
+   - `/public/images/` — Approved brand imagery
+   - `/src/assets/doggies/` — Official Techno Doggies pack
+   - `/src/assets/brand/` — techno.dog brand elements
+
+3. **Official Mascot SVG Pack** (94 variants)
+   - Stroke-based SVG only
+   - No fills, no gradients, no modifications
+   - Green (#00FF00) or White stroke only
+
+4. **Shopify CDN** (`cdn.shopify.com`)
+   - Existing verified product images
+
+### FORBIDDEN SOURCES (ALWAYS REJECT)
+- AI-generated mascots or brand elements
+- Stock photos (Unsplash, Pexels, Shutterstock, Getty)
+- Placeholder images
+- Base64-encoded AI outputs
+- Any unverified external URLs
+
+### ENFORCEMENT
+- Edge function `brand-image-validator` validates ALL images before use
+- Products CANNOT be created with non-compliant images
+- Violations logged to audit trail
+
+---
+
+## SHOPIFY-FIRST FORMAT REQUIREMENTS
+
+### Image Specifications
+- **Formats**: JPG, JPEG, PNG, GIF, WebP
+- **Max Size**: 20MB
+- **Product Images**: 2048×2048px (1:1)
+- **Lifestyle Images**: 1920×1080px (16:9)
+- **Thumbnails**: 400×400px
+
+### Workflow
+1. Validate image source via `brand-image-validator`
+2. Convert to Shopify-supported format
+3. Upload to Shopify product
+4. Verify in storefront
+
+---
+
 ## STRICT ICON & EMOJI POLICY
 
 ### Prohibited
@@ -77,9 +130,10 @@ toast({ title: "Success", description: "Operation completed." });
 
 ### Enforcement
 - Code review checklist includes emoji/icon audit
+- Edge function `brand-image-validator` enforces image compliance
 - Automated linting rules (future implementation)
 - Design system documentation in `/docs/DESIGN_SYSTEM_RULES.md`
 
 ---
 
-*Last Updated: 2025-12-30*
+*Last Updated: 2025-01-23*
