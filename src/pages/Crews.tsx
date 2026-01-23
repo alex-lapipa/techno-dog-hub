@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
+import crewHeroDefault from "@/assets/crews/crew-hero-default.jpg";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -166,15 +168,15 @@ const CrewsPage = () => {
                 to={`/crews/${crew.id}`}
                 className="group border border-border hover:bg-card transition-all duration-200 overflow-hidden"
               >
-                {/* Crew Image Placeholder */}
+                {/* Crew Image with VHS Film Effect */}
                 <div className="aspect-[4/3] relative overflow-hidden bg-card/30">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Users className="w-12 h-12 text-muted-foreground/20" />
-                  </div>
-                  {/* Frame overlay */}
-                  <div className="absolute bottom-2 right-2 font-mono text-[10px] text-muted-foreground/50">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
+                  <GlitchImage 
+                    src={crewHeroDefault} 
+                    alt={crew.name}
+                    className="w-full h-full"
+                    frameNumber={String(index + 1).padStart(2, '0')}
+                    size="thumbnail"
+                  />
                 </div>
                 
                 <div className="p-3 sm:p-4">
@@ -234,6 +236,31 @@ const CrewsPage = () => {
           {/* Count */}
           <div className="mt-6 sm:mt-8 font-mono text-[10px] sm:text-xs text-muted-foreground">
             {filteredCrews.length} crews in archive
+          </div>
+
+          {/* Internal Linking - Hub/Spoke SEO Structure */}
+          <div className="mt-8 sm:mt-12 space-y-4">
+            <TopicalClusterLinks
+              title="Explore the Scene"
+              description="Discover more of the techno ecosystem"
+              links={[
+                { label: "Venues", path: "/venues" },
+                { label: "Festivals", path: "/festivals" },
+                { label: "Labels", path: "/labels", count: 12 },
+                { label: "Artists", path: "/artists", count: 182 },
+              ]}
+            />
+            
+            <TopicalClusterLinks
+              title="Deep Dives"
+              description="Learn more about techno culture"
+              links={[
+                { label: "Books", path: "/books", count: 49 },
+                { label: "Documentaries", path: "/documentaries", count: 31 },
+                { label: "Gear", path: "/gear", count: 99 },
+                { label: "News", path: "/news" },
+              ]}
+            />
           </div>
         </div>
       </main>

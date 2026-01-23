@@ -9,7 +9,7 @@ import PageSEO from "@/components/PageSEO";
 import { Input } from "@/components/ui/input";
 import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
-
+import festivalHeroDefault from "@/assets/festivals/festival-hero-default.jpg";
 const FestivalsPage = () => {
   const { trackClick, trackSearch } = useAnalytics();
   const { data: festivals = [], isLoading } = useFestivals();
@@ -77,12 +77,11 @@ const FestivalsPage = () => {
     }))
   };
 
-  // Get festival image - check for dedicated festival images
+  // Get festival image - check for dedicated festival images, fallback to default hero
   const getFestivalImage = (festival: typeof festivals[0]) => {
-    // Check for festival-specific images in public/festivals folder
-    const festivalSlug = festival.id.toLowerCase().replace(/\s+/g, '-');
-    // Return null to show placeholder - actual images would be in public/festivals/
-    return null;
+    // TODO: Check for festival-specific images in public/festivals folder
+    // For now, use the default festival hero image for all festivals
+    return festivalHeroDefault;
   };
 
   if (isLoading) {

@@ -11,6 +11,7 @@ import { GlitchImage, GlitchSVGFilter } from "@/components/store/GlitchImage";
 import { supabase } from "@/integrations/supabase/client";
 import { ContributeWidget } from "@/components/community/ContributeWidget";
 import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
+import artistHeroDefault from "@/assets/artists/artist-hero-default.jpg";
 
 type RegionFilter = "all" | "europe" | "north-america" | "south-america" | "asia" | "oceania" | "africa";
 
@@ -208,9 +209,13 @@ const ArtistsPage = () => {
                       size="thumbnail"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <User className="w-12 h-12 text-muted-foreground/20" />
-                    </div>
+                    <GlitchImage 
+                      src={artistHeroDefault} 
+                      alt={artist.name}
+                      className="w-full h-full"
+                      frameNumber={String(index + 1).padStart(2, '0')}
+                      size="thumbnail"
+                    />
                   )}
                 </div>
                 
