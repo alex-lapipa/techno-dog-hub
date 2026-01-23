@@ -340,6 +340,7 @@ const App = () => (
                     {/* Store */}
                     <Route path="/store" element={<Store />} />
                     <Route path="/store/product/:handle" element={<StoreProduct />} />
+                    <Route path="/product/:handle" element={<StoreProduct />} />
                     <Route path="/store/info" element={<StoreInfo />} />
                     <Route path="/store/lookbook" element={<Lookbook />} />
                     <Route path="/lookbook" element={<Lookbook />} />
