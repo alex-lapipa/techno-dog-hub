@@ -276,13 +276,20 @@ export function useShopifyStudio(): UseShopifyStudioReturn {
   const isStepComplete = useCallback((step: StudioStep): boolean => {
     switch (step) {
       case 'product-select':
-        return draft.title.length > 0 && draft.productType.length > 0;
+        // Must have title AND product type selected
+        return draft.title.trim().length > 0 && draft.productType.trim().length > 0;
       case 'variant-config':
-        return draft.variants.length > 0;
+        // Must have at least one variant with valid price
+        return draft.variants.length > 0 && draft.variants.every(v => parseFloat(v.price) > 0);
       case 'brand-design':
-        return draft.brandBook !== null;
+        // Brand book is required, mascot required only for techno-doggies
+        if (!draft.brandBook) return false;
+        if (draft.brandBook === 'techno-doggies') {
+          return draft.mascotId !== null && draft.colorLine !== null;
+        }
+        return true; // techno.dog brand doesn't require mascot
       case 'ai-enhance':
-        return true; // Optional step
+        return true; // Optional step - always complete
       case 'publish':
         return draft.status === 'published';
       default:

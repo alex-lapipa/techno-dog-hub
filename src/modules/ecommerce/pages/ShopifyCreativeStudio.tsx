@@ -4,9 +4,11 @@
  * Redesigned with a vertical scrolling layout for better UX.
  * Features: horizontal progress bar, full-width step content,
  * generous whitespace, and sticky bottom navigation.
+ * 
+ * BRAND COMPLIANCE: Hardcoded to techno.dog and techno-doggies brand books only.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Sparkles, Package, Palette, Wand2, Rocket } from 'lucide-react';
 import AdminPageLayout from '@/components/admin/AdminPageLayout';
 import { useShopifyStudio } from '../hooks/useShopifyStudio';
@@ -20,6 +22,8 @@ import {
   AIEnhancementStep,
   PublishStep,
 } from '../components/shopify-studio';
+import { type ProductTypeConfig } from '../config/shopify-product-catalog';
+import { isPrintfulSupported } from '../config/printful-integration';
 
 // Step metadata for the container
 const STEP_META = {
@@ -61,6 +65,36 @@ export function ShopifyCreativeStudio() {
   // Get current step metadata
   const currentMeta = STEP_META[studio.currentStep];
 
+  // Handle product type selection from catalog
+  const handleProductTypeSelected = useCallback((productType: ProductTypeConfig) => {
+    const isPOD = isPrintfulSupported(productType.id);
+    const defaultPrice = productType.basePrice.toFixed(2);
+    const defaultSku = `TD-${productType.id.toUpperCase().slice(0, 4)}-${Date.now().toString(36).toUpperCase()}`;
+    
+    studio.updateDraft({ 
+      shopifyProductId: null,
+      title: `New ${productType.name}`,
+      productType: productType.name,
+      description: productType.description,
+      variants: [{
+        title: 'Default Title',
+        price: defaultPrice,
+        sku: defaultSku,
+        option1: null,
+        option2: null,
+        option3: null,
+        requires_shipping: true,
+        inventory_policy: isPOD ? 'continue' : 'deny',
+        fulfillment_service: isPOD ? 'printful' : 'manual',
+      }],
+      tags: [
+        productType.category,
+        isPOD ? 'print-on-demand' : 'inventory',
+        isPOD ? 'printful' : null,
+      ].filter(Boolean) as string[],
+    });
+  }, [studio]);
+
   // Render current step content (without duplicate headers - StepContainer provides them)
   const renderStepContent = () => {
     switch (studio.currentStep) {
@@ -88,6 +122,7 @@ export function ShopifyCreativeStudio() {
                 }],
               });
             }}
+            onProductTypeSelected={handleProductTypeSelected}
           />
         );
       case 'variant-config':
