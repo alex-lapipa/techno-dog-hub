@@ -279,18 +279,31 @@ const VenueDetail = () => {
           {/* YouTube Videos */}
           <YouTubeVideos artistName={`${venue.name} ${venue.city}`} />
 
-          {/* Historic Lineups */}
+          {/* Historic Lineups - Now with artist links */}
           {venue.historicLineups && venue.historicLineups.length > 0 && (
             <section className="mb-8 sm:mb-12 border-t border-border pt-6 sm:pt-8">
-              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6">
-                Historic Lineups
+              <h2 className="font-mono text-lg sm:text-xl uppercase tracking-wide mb-4 sm:mb-6 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Featured Artists
               </h2>
+              <p className="font-mono text-xs text-muted-foreground mb-4">
+                Artists who have performed at {venue.name}
+              </p>
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                {venue.historicLineups.map((artist, i) => (
-                  <span key={i} className="font-mono text-xs sm:text-sm border border-border px-3 py-2 hover:bg-card transition-colors">
-                    {artist}
-                  </span>
-                ))}
+                {venue.historicLineups.map((artist, i) => {
+                  // Create a slug from artist name for linking
+                  const artistSlug = artist.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                  return (
+                    <Link 
+                      key={i}
+                      to={`/artists?q=${encodeURIComponent(artist)}`}
+                      className="font-mono text-xs sm:text-sm border border-border px-3 py-2 hover:bg-card hover:border-primary/50 transition-colors group flex items-center gap-1.5"
+                    >
+                      {artist}
+                      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  );
+                })}
               </div>
             </section>
           )}
