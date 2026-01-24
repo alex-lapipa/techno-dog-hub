@@ -126,13 +126,19 @@ serve(async (req) => {
       throw new Error('Missing required environment variables');
     }
 
-    const { batch_size = 10, skip_existing = true } = await req.json().catch(() => ({}));
+    const { batch_size = 15, skip_existing = true } = await req.json().catch(() => ({}));
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Fetch published books with category names
-    // Only process books that don't already have embeddings (if skip_existing)
-    const { data: books, error: fetchError } = await supabase
+    // Fetch category names first
+    const { data: categories } = await supabase
+      .from('book_categories')
+      .select('id, name');
+    
+    const categoryMap = new Map((categories || []).map(c => [c.id, c.name]));
+
+    // Get all published books
+    const { data: allBooks, error: fetchError } = await supabase
       .from('books')
       .select(`
         id,
@@ -147,55 +153,63 @@ serve(async (req) => {
         category_id
       `)
       .eq('status', 'published')
-      .limit(batch_size);
-    
-    // Fetch category names separately
-    const { data: categories } = await supabase
-      .from('book_categories')
-      .select('id, name');
-    
-    const categoryMap = new Map((categories || []).map(c => [c.id, c.name]));
+      .order('title');
 
     if (fetchError) {
       throw new Error(`Failed to fetch books: ${fetchError.message}`);
     }
 
-    if (!books || books.length === 0) {
+    if (!allBooks || allBooks.length === 0) {
       return new Response(JSON.stringify({ 
         success: true, 
         message: 'No books to process',
-        processed: 0
+        processed: 0,
+        total_books: 0
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     // Check which books already have embeddings
-    const bookIds = books.map(b => b.id);
     const { data: existingDocs } = await supabase
       .from('documents')
       .select('source')
-      .in('source', bookIds.map(id => `book-metadata:${id}`));
+      .like('source', 'book-metadata:%');
 
     const existingBookIds = new Set(
       (existingDocs || []).map(d => d.source.replace('book-metadata:', ''))
     );
 
+    // Filter to only unembedded books if skip_existing
+    const books = skip_existing 
+      ? allBooks.filter(b => !existingBookIds.has(b.id)).slice(0, batch_size)
+      : allBooks.slice(0, batch_size);
+
+    console.log(`Total books: ${allBooks.length}, Already embedded: ${existingBookIds.size}, To process: ${books.length}`);
+
+    if (books.length === 0) {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        message: 'All books already embedded',
+        processed: 0,
+        total_books: allBooks.length,
+        already_embedded: existingBookIds.size
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const results = {
       processed: 0,
       skipped: 0,
       errors: [] as string[],
-      books: [] as { id: string; title: string; status: string }[]
+      books: [] as { id: string; title: string; status: string }[],
+      total_books: allBooks.length,
+      already_embedded: existingBookIds.size,
+      remaining: allBooks.length - existingBookIds.size - books.length
     };
 
     for (const book of books) {
-      // Skip if already embedded
-      if (skip_existing && existingBookIds.has(book.id)) {
-        results.skipped++;
-        results.books.push({ id: book.id, title: book.title, status: 'skipped' });
-        continue;
-      }
-
       try {
         // Create verified knowledge document
         const knowledgeDoc = createVerifiedKnowledgeDocument({
