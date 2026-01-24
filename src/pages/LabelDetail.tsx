@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ExternalLink, Disc, MapPin, Calendar, Users, Music, Globe, Tag } from "lucide-react";
+import { ArrowLeft, ExternalLink, Disc, MapPin, Calendar, Users, Music, Globe, Tag, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getLabelById } from "@/data/labels";
 import Header from "@/components/Header";
@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ContributeWidget } from "@/components/community/ContributeWidget";
-
+import { BreadcrumbNav } from "@/components/shared/BreadcrumbNav";
+import { TopicalClusterLinks } from "@/components/shared/TopicalClusterLinks";
 interface LabelData {
   id: string;
   slug: string;
@@ -161,6 +162,15 @@ const LabelDetail = () => {
       
       <main className="pt-16 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* SEO Breadcrumb Navigation */}
+          <BreadcrumbNav 
+            items={[
+              { label: 'Labels', href: '/labels' },
+              { label: label.label_name }
+            ]}
+            className="mb-6"
+          />
+          
           {/* Back link */}
           <Link 
             to="/labels" 
@@ -289,7 +299,7 @@ const LabelDetail = () => {
                 </Card>
               )}
 
-              {/* Artists */}
+              {/* Artists - Now with cross-links */}
               {label.key_artists && label.key_artists.length > 0 && (
                 <Card className="border-border/50 bg-card/50">
                   <CardContent className="p-6">
@@ -299,11 +309,24 @@ const LabelDetail = () => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {label.key_artists.map((artist, i) => (
-                        <Badge key={i} variant="outline" className="font-mono text-xs">
-                          {artist}
-                        </Badge>
+                        <Link 
+                          key={i}
+                          to={`/artists?q=${encodeURIComponent(artist)}`}
+                          className="group"
+                        >
+                          <Badge 
+                            variant="outline" 
+                            className="font-mono text-xs hover:bg-primary/10 hover:border-primary/50 transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            <User className="w-3 h-3" />
+                            {artist}
+                          </Badge>
+                        </Link>
                       ))}
                     </div>
+                    <p className="font-mono text-[10px] text-muted-foreground mt-3">
+                      Click an artist to search our database
+                    </p>
                   </CardContent>
                 </Card>
               )}
@@ -402,6 +425,18 @@ const LabelDetail = () => {
                 entityId={label.id}
                 entityName={label.label_name}
                 variant="default"
+              />
+              
+              {/* Internal Linking - Hub/Spoke SEO Structure */}
+              <TopicalClusterLinks
+                title="Explore More"
+                description="Discover related content in the archive"
+                links={[
+                  { label: "All Labels", path: "/labels", count: 12 },
+                  { label: "Artists", path: "/artists", count: 182 },
+                  { label: "Venues", path: "/venues" },
+                  { label: "Festivals", path: "/festivals" },
+                ]}
               />
             </div>
           </div>

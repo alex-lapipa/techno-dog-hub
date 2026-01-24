@@ -229,8 +229,11 @@ const Search = () => {
           {/* Search Header */}
           <div className="max-w-2xl mx-auto mb-12">
             <h1 className="font-mono text-3xl uppercase tracking-tight text-center mb-6">
-              Search
+              Search the Archive
             </h1>
+            <p className="text-center text-muted-foreground font-mono text-sm mb-6">
+              Explore 182 artists, 99 gear items, venues, festivals, and labels
+            </p>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -252,6 +255,28 @@ const Search = () => {
               <p className="text-xs text-muted-foreground mt-2 text-center font-mono">
                 {allResults.length} results for "{query}"
               </p>
+            )}
+            
+            {/* Quick Search Suggestions */}
+            {!query && (
+              <div className="mt-6 text-center">
+                <p className="font-mono text-xs text-muted-foreground mb-3">Popular searches:</p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {['Berghain', 'Jeff Mills', 'TR-909', 'Tresor', 'Awakenings'].map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => {
+                        setQuery(term);
+                        setSearchParams({ q: term });
+                        searchArtists(term);
+                      }}
+                      className="font-mono text-xs px-3 py-1.5 border border-border hover:border-primary/50 hover:bg-card transition-colors"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
