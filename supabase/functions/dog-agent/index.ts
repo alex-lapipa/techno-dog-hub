@@ -2,6 +2,7 @@ import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared
 import { createServiceClient, getRequiredEnv, getEnv } from "../_shared/supabase.ts";
 import { getRoutingDecision, configFromDb, getTierLabel, type RoutingDecision, type RouterConfig } from "../_shared/model-router.ts";
 import { callGroq, isGroqAvailable } from "../_shared/groq-provider.ts";
+import { generateVoyageEmbedding, formatEmbeddingForStorage } from "../_shared/voyage-embeddings.ts";
 
 const GEN_Z_DOG_SLANG = `
 GEN Z + DOG LANGUAGE (blend these naturally - you're a chronically online pup):
@@ -77,31 +78,34 @@ DOG JOKES TO SPRINKLE IN:
 - "Not to be dramatic but I would literally fetch a stick for this artist"
 `;
 
-// Generate embedding for RAG searches
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+// Generate embedding for RAG searches — Voyage AI primary, OpenAI fallback
+async function generateQueryEmbedding(text: string): Promise<{ embedding: number[]; provider: string } | null> {
+  const voyageResult = await generateVoyageEmbedding(text);
+  if (voyageResult) {
+    return { embedding: voyageResult.embedding, provider: voyageResult.provider };
+  }
+  
+  const openaiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openaiKey) return null;
+  
   try {
     const response = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${openaiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
         input: text,
-        dimensions: 768
+        dimensions: 1024
       }),
     });
-
-    if (!response.ok) {
-      console.error('Embedding API error:', response.status);
-      return null;
-    }
-
+    if (!response.ok) return null;
     const data = await response.json();
-    return data.data?.[0]?.embedding || null;
-  } catch (error) {
-    console.error('Error generating embedding:', error);
+    const emb = data.data?.[0]?.embedding;
+    return emb ? { embedding: emb, provider: 'openai-fallback' } : null;
+  } catch {
     return null;
   }
 }
@@ -248,29 +252,49 @@ Deno.serve(async (req: Request) => {
     const queryText = message?.toLowerCase() || '';
     let knowledgeContext = '';
 
-    // 1. Try RAG vector search if OpenAI key available
+    // 1. Try RAG vector search with Voyage AI (primary) or OpenAI fallback
     let ragArtists: any[] = [];
     let ragDocuments: any[] = [];
+    let ragArtistDocs: any[] = [];
+    let ragGear: any[] = [];
     
-    if (openaiApiKey && message) {
-      const embedding = await generateEmbedding(message, openaiApiKey);
+    if (message) {
+      const embResult = await generateQueryEmbedding(message);
       
-      if (embedding) {
-        // Search dj_artists with vector similarity
-        const { data: artistResults } = await supabase.rpc('search_dj_artists', {
-          query_embedding: `[${embedding.join(',')}]`,
-          similarity_threshold: 0.3,
-          match_count: 5
-        });
-        if (artistResults) ragArtists = artistResults;
+      if (embResult) {
+        const embStr = formatEmbeddingForStorage(embResult.embedding);
+        console.log(`[DogAgent] Embedding via ${embResult.provider}, ${embResult.embedding.length}d`);
 
-        // Search documents with vector similarity
-        const { data: docResults } = await supabase.rpc('match_documents', {
-          query_embedding: `[${embedding.join(',')}]`,
-          match_threshold: 0.3,
-          match_count: 5
-        });
-        if (docResults) ragDocuments = docResults;
+        // Search all 4 tables in parallel via Voyage search functions (1024d)
+        const [artistRes, docRes, artistDocRes, gearRes] = await Promise.all([
+          supabase.rpc('search_dj_artists_voyage', {
+            query_embedding: embStr,
+            similarity_threshold: 0.3,
+            match_count: 5
+          }),
+          supabase.rpc('match_documents_voyage', {
+            query_embedding: embStr,
+            match_threshold: 0.3,
+            match_count: 5
+          }),
+          supabase.rpc('search_artist_documents_voyage', {
+            query_embedding: embStr,
+            match_threshold: 0.4,
+            match_count: 3
+          }),
+          supabase.rpc('search_gear_by_voyage_embedding', {
+            query_embedding: embStr,
+            match_threshold: 0.4,
+            match_count: 3
+          })
+        ]);
+
+        if (artistRes.data) ragArtists = artistRes.data;
+        if (docRes.data) ragDocuments = docRes.data;
+        if (artistDocRes.data) ragArtistDocs = artistDocRes.data;
+        if (gearRes.data) ragGear = gearRes.data;
+        
+        console.log(`[DogAgent] Voyage RAG: ${ragArtists.length} artists, ${ragDocuments.length} docs, ${ragArtistDocs.length} artist_docs, ${ragGear.length} gear`);
       }
     }
 
@@ -548,11 +572,23 @@ ${newsData.data.map((n: any) =>
 
     // RAG Documents (highest priority)
     if (ragDocuments.length > 0) {
-      contextParts.push(`## KNOWLEDGE BASE (Vector Match)
-${ragDocuments.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 500)}...`).join('\n\n')}`);
+      contextParts.push(`## KNOWLEDGE BASE (Voyage Vector Match)
+${ragDocuments.map((d: any) => `### ${d.title} (relevance: ${d.similarity ? (d.similarity * 100).toFixed(1) + '%' : 'N/A'})\n${d.content?.slice(0, 500)}...`).join('\n\n')}`);
     } else if (documentsData.data?.length) {
       contextParts.push(`## KNOWLEDGE BASE
 ${documentsData.data.map((d: any) => `### ${d.title}\n${d.content?.slice(0, 300)}...`).join('\n\n')}`);
+    }
+
+    // Voyage RAG: Artist Documents (deep knowledge from artist_documents table)
+    if (ragArtistDocs.length > 0) {
+      contextParts.push(`## ARTIST DEEP KNOWLEDGE (Voyage Vector Match)
+${ragArtistDocs.map((d: any) => `### ${d.title || d.document_type} (relevance: ${(d.similarity * 100).toFixed(1)}%)\n${d.content?.slice(0, 400)}...`).join('\n\n')}`);
+    }
+
+    // Voyage RAG: Gear results (from gear_catalog table)
+    if (ragGear.length > 0) {
+      contextParts.push(`## GEAR CATALOG (Voyage Vector Match)
+${ragGear.map((g: any) => `**${g.name}** (${g.brand}, ${g.category}) — relevance: ${(g.similarity * 100).toFixed(1)}%\n${g.short_description || ''}`).join('\n\n')}`);
     }
 
     // Books
@@ -758,7 +794,8 @@ ${d.content?.slice(0, 400)}...`
         message_length: message.length,
         response_length: dogResponse.length,
         knowledge_sections: contextParts.length,
-        had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0,
+        had_rag_results: ragArtists.length > 0 || ragDocuments.length > 0 || ragArtistDocs.length > 0 || ragGear.length > 0,
+        voyage_rag: { artists: ragArtists.length, documents: ragDocuments.length, artist_docs: ragArtistDocs.length, gear: ragGear.length },
         is_complex_query: isComplexQuery,
         is_simple_query: isSimpleQuery,
         fallbacks_available: routing.fallbacks
