@@ -7,8 +7,8 @@ import { loadArtistsSummaryUnified, loadArtistByIdUnified } from "@/data/canonic
 import { loadVenuesSummary, loadVenueById, type VenueSummary } from "@/data/venues-loader";
 import { loadFestivalsSummary, loadFestivalById, type FestivalSummary } from "@/data/festivals-loader";
 
-// Stale time configuration (10 minutes)
-const STALE_TIME = 1000 * 60 * 10;
+// Stale time configuration (30 minutes — reference data changes at most daily)
+const STALE_TIME = 1000 * 60 * 30;
 
 // ============================================================
 // ARTISTS HOOKS - Uses Canonical Database

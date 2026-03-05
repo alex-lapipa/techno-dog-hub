@@ -70,7 +70,7 @@ serve(async (req) => {
       query,
       results: data || [],
       count: data?.length || 0,
-    });
+    }, { 'Cache-Control': 'public, max-age=300' });
 
   } catch (error) {
     console.error('Search error:', error);
