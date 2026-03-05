@@ -1,5 +1,6 @@
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createServiceClient, getEnv, getRequiredEnv } from "../_shared/supabase.ts";
+import { generateVoyageEmbedding, formatEmbeddingForStorage } from "../_shared/voyage-embeddings.ts";
 
 // Rate limiting configuration
 const RATE_LIMIT_MAX_REQUESTS = 10;
@@ -79,31 +80,40 @@ async function checkPersistentRateLimit(
   }
 }
 
-// Generate embedding using OpenAI API
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
+// Generate embedding using Voyage AI (primary) with OpenAI fallback
+async function generateQueryEmbedding(text: string): Promise<{ embedding: number[]; provider: string } | null> {
+  // Try Voyage first (1024d) — matches voyage_embedding columns
+  const voyageResult = await generateVoyageEmbedding(text);
+  if (voyageResult) {
+    return { embedding: voyageResult.embedding, provider: voyageResult.provider };
+  }
+  
+  // Fallback to OpenAI at 1024d (dimension-matched to Voyage)
+  const openaiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openaiKey) return null;
+  
   try {
     const response = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${openaiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
         input: text,
-        dimensions: 768
+        dimensions: 1024
       }),
     });
-
     if (!response.ok) {
-      console.error('OpenAI Embedding API error:', response.status);
+      console.error('OpenAI Embedding fallback error:', response.status);
       return null;
     }
-
     const data = await response.json();
-    return data.data?.[0]?.embedding || null;
+    const emb = data.data?.[0]?.embedding;
+    return emb ? { embedding: emb, provider: 'openai-fallback' } : null;
   } catch (error) {
-    console.error('Error generating embedding:', error);
+    console.error('Error in OpenAI embedding fallback:', error);
     return null;
   }
 }
@@ -303,41 +313,76 @@ Deno.serve(async (req) => {
       similarity: number;
     }> | null = null;
 
-    // Generate embedding for vector searches
-    console.log('Generating embedding for query:', sanitizedQuery);
-    const queryEmbedding = OPENAI_API_KEY ? await generateEmbedding(sanitizedQuery, OPENAI_API_KEY) : null;
+    // Generate embedding for vector searches — Voyage AI primary, OpenAI fallback
+    console.log('Generating Voyage embedding for query:', sanitizedQuery);
+    const embeddingResult = await generateQueryEmbedding(sanitizedQuery);
+    const queryEmbedding = embeddingResult?.embedding || null;
+    const embeddingProvider = embeddingResult?.provider || 'none';
+    console.log(`Embedding provider: ${embeddingProvider}, dimensions: ${queryEmbedding?.length || 0}`);
 
-    // Search DJ artists using vector similarity
-    if (queryEmbedding) {
-      console.log('Searching DJ artists with vector similarity');
-      const { data: artistResults, error: artistError } = await supabase.rpc('search_dj_artists', {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
+    const embeddingStr = queryEmbedding ? formatEmbeddingForStorage(queryEmbedding) : null;
+
+    // Search DJ artists using Voyage vector similarity (1024d)
+    if (embeddingStr) {
+      console.log('Searching DJ artists with Voyage vector similarity');
+      const { data: artistResults, error: artistError } = await supabase.rpc('search_dj_artists_voyage', {
+        query_embedding: embeddingStr,
         similarity_threshold: 0.3,
         match_count: 5
       });
 
       if (!artistError && artistResults && artistResults.length > 0) {
         artists = artistResults;
-        console.log(`Found ${artistResults.length} matching artists`);
+        console.log(`Found ${artistResults.length} matching artists (Voyage)`);
       } else if (artistError) {
-        console.error('Artist search error:', artistError);
+        console.error('Artist Voyage search error:', artistError);
       }
     }
 
-    // Search documents using vector similarity
-    if (queryEmbedding) {
-      console.log('Using vector search for documents');
-      const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
-        query_embedding: `[${queryEmbedding.join(',')}]`,
+    // Search documents using Voyage vector similarity (1024d)
+    if (embeddingStr) {
+      console.log('Using Voyage vector search for documents');
+      const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents_voyage', {
+        query_embedding: embeddingStr,
         match_threshold: 0.3,
         match_count: 5
       });
 
       if (!vectorError && vectorResults && vectorResults.length > 0) {
         documents = vectorResults;
-        console.log(`Vector search found ${vectorResults.length} documents`);
+        console.log(`Voyage document search found ${vectorResults.length} documents`);
       } else if (vectorError) {
-        console.error('Vector search error:', vectorError);
+        console.error('Voyage document search error:', vectorError);
+      }
+    }
+
+    // Search artist_documents using Voyage (1024d) — NEW: unlocks 466 artist docs
+    let artistDocResults: Array<{ title: string; content: string; similarity: number }> = [];
+    if (embeddingStr) {
+      const { data: adResults, error: adError } = await supabase.rpc('search_artist_documents_voyage', {
+        query_embedding: embeddingStr,
+        match_threshold: 0.4,
+        match_count: 3
+      });
+      if (!adError && adResults && adResults.length > 0) {
+        artistDocResults = adResults;
+        console.log(`Voyage artist_documents search found ${adResults.length} results`);
+      }
+    }
+
+    // Search gear_catalog using Voyage (1024d) — NEW: unlocks 99 gear items
+    let gearResults: Array<{ name: string; brand: string; category: string; short_description: string; similarity: number }> = [];
+    if (embeddingStr) {
+      const { data: gResults, error: gError } = await supabase.rpc('search_gear_by_voyage_embedding', {
+        query_embedding: embeddingStr,
+        match_threshold: 0.4,
+        match_count: 3
+      });
+      if (!gResults || gError) {
+        if (gError) console.error('Voyage gear search error:', gError);
+      } else {
+        gearResults = gResults;
+        console.log(`Voyage gear search found ${gResults.length} results`);
       }
     }
 
@@ -376,7 +421,7 @@ Deno.serve(async (req) => {
       documents = fallbackDocs || [];
     }
 
-    console.log(`Total documents for context: ${documents?.length || 0}, artists: ${artists?.length || 0}`);
+    console.log(`Total documents: ${documents?.length || 0}, artists: ${artists?.length || 0}, artist_docs: ${artistDocResults.length}, gear: ${gearResults.length}, provider: ${embeddingProvider}`);
 
     // Build context
     let artistContext = '';
@@ -395,7 +440,23 @@ Deno.serve(async (req) => {
         .join('\n\n---\n\n');
     }
 
-    const combinedContext = [artistContext, documentContext].filter(Boolean).join('\n\n');
+    // NEW: Artist documents context (from artist_documents table via Voyage)
+    let artistDocContext = '';
+    if (artistDocResults.length > 0) {
+      artistDocContext = '## ARTIST DEEP KNOWLEDGE:\n\n' + artistDocResults
+        .map((d: any) => `[${d.title || d.document_type} (relevance: ${(d.similarity * 100).toFixed(1)}%)]\n${d.content?.slice(0, 500)}`)
+        .join('\n\n---\n\n');
+    }
+
+    // NEW: Gear context (from gear_catalog table via Voyage)
+    let gearContext = '';
+    if (gearResults.length > 0) {
+      gearContext = '## GEAR CATALOG:\n\n' + gearResults
+        .map((g: any) => `**${g.name}** (${g.brand}, ${g.category}) — relevance: ${(g.similarity * 100).toFixed(1)}%\n${g.short_description || ''}`)
+        .join('\n\n---\n\n');
+    }
+
+    const combinedContext = [artistContext, documentContext, artistDocContext, gearContext].filter(Boolean).join('\n\n');
 
     const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene. 
 

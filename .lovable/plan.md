@@ -94,11 +94,13 @@ Dog Agent, News Agent, SEO Strategy Agent, Artist Research Agent, Gear Expert Ag
 - Zero errors. Provider: primarily `voyage-3-large`, with OpenAI 1024d fallback on rate limits
 - Status endpoint confirms: `total: 0` missing
 
-### Batch 4: Wire RAG Chat & Dog Agent to Voyage
-- Update `rag-chat` to use Voyage for query embeddings and the new `search_*_voyage` DB functions
-- Update `dog-agent` similarly
-- Keep OpenAI fallback if Voyage is unavailable
-- This fixes the dimension mismatch: all queries and all stores will be 1024d
+### ✅ Batch 4: Wire RAG Chat & Dog Agent to Voyage — COMPLETED
+- Updated `rag-chat` to use Voyage for query embeddings (1024d) with OpenAI 1024d fallback
+- Updated `dog-agent` similarly with parallel Voyage searches across all 4 tables
+- Both functions now search **all 4 vector tables**: `documents`, `dj_artists`, `artist_documents`, `gear_catalog`
+- Artist search **FIXED** — was completely broken (768d query vs 1536d vectors), now unified at 1024d
+- Verified all 5 test queries return: 5 artists + 5 documents + 3 artist_docs + 3 gear items per query
+- Zero errors in logs, embedding provider confirmed as `voyage` on all requests
 
 ### Batch 5: Update All Embedding Functions to Dual-Write
 - Update `embed-book-metadata`, `artist-embedding-sync`, `artist-synthesis`, `knowledge-ingest`, `ingest-documents`, `batch-embed-documents`, `gear-expert-agent` to write both `embedding` (OpenAI, legacy) and `voyage_embedding` (Voyage, primary)
