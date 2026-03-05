@@ -519,6 +519,7 @@ export type Database = {
           source_system: string | null
           title: string | null
           updated_at: string | null
+          voyage_embedding: string | null
         }
         Insert: {
           artist_id: string
@@ -534,6 +535,7 @@ export type Database = {
           source_system?: string | null
           title?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
         }
         Update: {
           artist_id?: string
@@ -549,6 +551,7 @@ export type Database = {
           source_system?: string | null
           title?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
         }
         Relationships: [
           {
@@ -3265,6 +3268,7 @@ export type Database = {
           real_name: string | null
           subgenres: string[] | null
           top_tracks: string[] | null
+          voyage_embedding: string | null
           years_active: string | null
         }
         Insert: {
@@ -3281,6 +3285,7 @@ export type Database = {
           real_name?: string | null
           subgenres?: string[] | null
           top_tracks?: string[] | null
+          voyage_embedding?: string | null
           years_active?: string | null
         }
         Update: {
@@ -3297,6 +3302,7 @@ export type Database = {
           real_name?: string | null
           subgenres?: string[] | null
           top_tracks?: string[] | null
+          voyage_embedding?: string | null
           years_active?: string | null
         }
         Relationships: []
@@ -3425,6 +3431,7 @@ export type Database = {
           source: string | null
           title: string
           updated_at: string
+          voyage_embedding: string | null
         }
         Insert: {
           chunk_index?: number | null
@@ -3436,6 +3443,7 @@ export type Database = {
           source?: string | null
           title: string
           updated_at?: string
+          voyage_embedding?: string | null
         }
         Update: {
           chunk_index?: number | null
@@ -3447,6 +3455,7 @@ export type Database = {
           source?: string | null
           title?: string
           updated_at?: string
+          voyage_embedding?: string | null
         }
         Relationships: []
       }
@@ -4358,6 +4367,7 @@ export type Database = {
           techno_applications: string | null
           timbrality: string | null
           updated_at: string | null
+          voyage_embedding: string | null
           youtube_videos: Json | null
         }
         Insert: {
@@ -4410,6 +4420,7 @@ export type Database = {
           techno_applications?: string | null
           timbrality?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
           youtube_videos?: Json | null
         }
         Update: {
@@ -4462,6 +4473,7 @@ export type Database = {
           techno_applications?: string | null
           timbrality?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
           youtube_videos?: Json | null
         }
         Relationships: []
@@ -5507,6 +5519,7 @@ export type Database = {
           source_url: string | null
           title: string | null
           updated_at: string | null
+          voyage_embedding: string | null
         }
         Insert: {
           content: string
@@ -5520,6 +5533,7 @@ export type Database = {
           source_url?: string | null
           title?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
         }
         Update: {
           content?: string
@@ -5533,6 +5547,7 @@ export type Database = {
           source_url?: string | null
           title?: string | null
           updated_at?: string | null
+          voyage_embedding?: string | null
         }
         Relationships: [
           {
@@ -8637,9 +8652,40 @@ export type Database = {
           title: string
         }[]
       }
+      match_documents_voyage: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          metadata: Json
+          similarity: number
+          source: string
+          title: string
+        }[]
+      }
       normalize_artist_name: { Args: { name: string }; Returns: string }
       revoke_admin_role: { Args: { target_user_id: string }; Returns: boolean }
       search_artist_documents: {
+        Args: {
+          filter_artist_id?: string
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          artist_id: string
+          content: string
+          document_id: string
+          document_type: string
+          similarity: number
+          title: string
+        }[]
+      }
+      search_artist_documents_voyage: {
         Args: {
           filter_artist_id?: string
           match_count?: number
@@ -8675,7 +8721,42 @@ export type Database = {
           years_active: string
         }[]
       }
+      search_dj_artists_voyage: {
+        Args: {
+          match_count?: number
+          query_embedding: string
+          similarity_threshold?: number
+        }
+        Returns: {
+          artist_name: string
+          id: number
+          known_for: string
+          labels: string[]
+          nationality: string
+          rank: number
+          real_name: string
+          similarity: number
+          subgenres: string[]
+          top_tracks: string[]
+          years_active: string
+        }[]
+      }
       search_gear_by_embedding: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          brand: string
+          category: string
+          id: string
+          name: string
+          short_description: string
+          similarity: number
+        }[]
+      }
+      search_gear_by_voyage_embedding: {
         Args: {
           match_count?: number
           match_threshold?: number

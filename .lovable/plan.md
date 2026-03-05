@@ -68,23 +68,31 @@ Dog Agent, News Agent, SEO Strategy Agent, Artist Research Agent, Gear Expert Ag
 
 ## Implementation Plan (6 Batches, Safe & Non-Breaking)
 
-### Batch 1: Create Shared Voyage Embedding Utility
-- Create `supabase/functions/_shared/voyage-embeddings.ts` with a centralized `generateVoyageEmbedding()` function
-- Use `voyage-3-large` model at **1024 dimensions** (best quality-to-storage ratio, 9.74% better than OpenAI)
-- Include fallback to OpenAI `text-embedding-3-small` if Voyage fails
-- Add batch embedding support (Voyage supports array input natively)
+### ✅ Batch 1: Create Shared Voyage Embedding Utility — COMPLETED
+- Created `supabase/functions/_shared/voyage-embeddings.ts` with centralized `generateVoyageEmbedding()` and `generateVoyageBatchEmbeddings()`
+- Uses `voyage-3-large` model at **1024 dimensions**
+- Includes automatic fallback to OpenAI `text-embedding-3-small` at 1024d (dimension-matched)
+- Batch embedding support with `formatEmbeddingForStorage()` helper
 
-### Batch 2: Add `voyage_embedding` Columns (Additive, Non-Breaking)
-- Add new `voyage_embedding vector(1024)` columns to all 5 tables alongside existing `embedding` columns
-- Create HNSW indexes on the new columns
-- Create new DB search functions (`search_documents_voyage`, `search_artists_voyage`, etc.)
-- **Zero risk**: Existing `embedding` columns and functions remain untouched
+### ✅ Batch 2: Add `voyage_embedding` Columns — COMPLETED
+- Added `voyage_embedding vector(1024)` columns to all 5 tables
+- Created HNSW indexes with `vector_cosine_ops` (m=16, ef_construction=64)
+- Created 4 new DB search functions:
+  - `match_documents_voyage()`
+  - `search_artist_documents_voyage()`
+  - `search_dj_artists_voyage()`
+  - `search_gear_by_voyage_embedding()`
+- All existing `embedding` columns and search functions preserved (zero breaking changes)
 
-### Batch 3: Populate Voyage Embeddings
-- Create `supabase/functions/voyage-embed-sync/index.ts` to batch-populate `voyage_embedding` for all tables
-- Process in safe batches (15-20 at a time) with rate limiting
-- Status endpoint to track progress
-- Process order: `documents` (120) → `dj_artists` (99) → `gear_catalog` (99) → `artist_documents` (466)
+### ✅ Batch 3: Populate Voyage Embeddings — COMPLETED
+- Created and deployed `supabase/functions/voyage-embed-sync/index.ts`
+- Successfully embedded **all 785 rows** across 4 tables:
+  - `documents`: 120/120 ✅
+  - `dj_artists`: 99/99 ✅
+  - `gear_catalog`: 100/100 ✅
+  - `artist_documents`: 466/466 ✅
+- Zero errors. Provider: primarily `voyage-3-large`, with OpenAI 1024d fallback on rate limits
+- Status endpoint confirms: `total: 0` missing
 
 ### Batch 4: Wire RAG Chat & Dog Agent to Voyage
 - Update `rag-chat` to use Voyage for query embeddings and the new `search_*_voyage` DB functions
@@ -128,4 +136,3 @@ const response = await fetch('https://api.voyageai.com/v1/embeddings', {
 - New `voyage_embedding` columns are additive
 - Fallback chain: Voyage → OpenAI (never lose embedding capability)
 - Each batch is independently deployable and reversible
-
