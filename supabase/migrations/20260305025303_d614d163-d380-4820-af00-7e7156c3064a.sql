@@ -1,0 +1,1 @@
+ALTER TABLE public.kl_cached_search ADD CONSTRAINT kl_cached_search_query_hash_key UNIQUE (query_hash);
