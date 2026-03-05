@@ -73,8 +73,8 @@ const MODEL_ROUTING: Record<TaskCategory, ModelConfig> = {
     description: 'Image generation'
   },
   embedding: {
-    model: 'text-embedding-3-small',
-    description: 'OpenAI embeddings (direct API only)'
+    model: 'voyage-3-large',
+    description: 'Voyage AI embeddings @ 1024d (primary), OpenAI fallback'
   }
 };
 
