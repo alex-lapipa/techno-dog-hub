@@ -58,7 +58,7 @@ serve(async (req) => {
 
     console.log('Generated embedding with', embedding.length, 'dimensions');
 
-    return jsonResponse({ embedding });
+    return jsonResponse({ embedding }, { 'Cache-Control': 'private, max-age=86400' });
   } catch (error: unknown) {
     console.error('Error in generate-embedding:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';

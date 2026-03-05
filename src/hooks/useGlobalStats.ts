@@ -34,8 +34,8 @@ export function useGlobalStats() {
   return useQuery({
     queryKey: ['global-stats'],
     queryFn: fetchGlobalStats,
-    staleTime: 5 * 60 * 1000, // 5 minutes - data rarely changes
-    gcTime: 10 * 60 * 1000, // 10 minutes cache
+    staleTime: 30 * 60 * 1000, // 30 minutes — counts change infrequently
+    gcTime: 60 * 60 * 1000, // 1 hour cache
   });
 }
 

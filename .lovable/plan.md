@@ -97,11 +97,11 @@ For `rag-chat` and `dog-agent`: serve stale cached responses immediately while r
 
 ## Batch Execution Order
 
-1. **Step 1** first (one-line change, immediate global benefit)
-2. **Step 3** next (additive headers, no code logic changes)
-3. **Step 4** (prefetch wiring, small refactor)
-4. **Step 2** (knowledge cache activation, needs testing)
-5. **Step 5** (SWR pattern, most complex)
+1. ~~**Step 1** first (one-line change, immediate global benefit)~~ ✅ DONE
+2. ~~**Step 3** next (additive headers, no code logic changes)~~ ✅ DONE
+3. ~~**Step 4** (prefetch wiring, small refactor)~~ ✅ DONE
+4. ~~**Step 2** (knowledge cache activation, needs testing)~~ ✅ DONE — flag flipped to `true`
+5. **Step 5** (SWR pattern, most complex) — NEXT
 
 Each step is independently deployable and reversible. No breaking changes at any point.
 

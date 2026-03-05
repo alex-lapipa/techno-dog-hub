@@ -29,7 +29,7 @@ export interface KnowledgeFeatureFlags {
 
 // Default flags - ALL OFF for production safety
 const DEFAULT_KNOWLEDGE_FLAGS: KnowledgeFeatureFlags = {
-  KNOWLEDGE_CACHE_ENABLED: false,
+  KNOWLEDGE_CACHE_ENABLED: true, // Activated: DB-backed cache for cross-session performance
   KNOWLEDGE_ENRICHMENT_ENABLED: false,
   KNOWLEDGE_EVIDENCE_UI_ENABLED: false,
   KNOWLEDGE_ADMIN_DASHBOARD_ENABLED: false,

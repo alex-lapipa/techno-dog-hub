@@ -13,10 +13,20 @@ export function handleCors(req: Request): Response | null {
 }
 
 // Create a JSON response with CORS headers
-export function jsonResponse(data: unknown, status = 200): Response {
+export function jsonResponse(data: unknown, extraHeadersOrStatus?: number | Record<string, string>, statusCode?: number): Response {
+  let status = 200;
+  let extraHeaders: Record<string, string> = {};
+  
+  if (typeof extraHeadersOrStatus === 'number') {
+    status = extraHeadersOrStatus;
+  } else if (extraHeadersOrStatus) {
+    extraHeaders = extraHeadersOrStatus;
+    status = statusCode || 200;
+  }
+  
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...extraHeaders },
   });
 }
 

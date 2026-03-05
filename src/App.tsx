@@ -145,7 +145,16 @@ const Sitemap = lazy(() => import("./pages/Sitemap"));
 const PrivacyAgentAdmin = lazy(() => import("./pages/PrivacyAgentAdmin"));
 const OGPreview = lazy(() => import("./pages/OGPreview"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,        // 5 min — data rarely changes mid-session
+      gcTime: 30 * 60 * 1000,           // 30 min — keep unused cache longer
+      refetchOnWindowFocus: false,       // stop refetches when user tabs back
+      retry: 1,                          // reduce failed retry spam
+    },
+  },
+});
 
 // Loading fallback - VHS aesthetic loader
 const PageLoader = () => (
