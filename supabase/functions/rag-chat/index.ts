@@ -158,7 +158,7 @@ async function getCachedResponse(
     const { data, error } = await supabase
       .from('kl_cached_search')
       .select('result_json, expires_at, created_at')
-      .eq('cache_key', cacheKey)
+      .eq('query_hash', cacheKey)
       .single();
     
     if (error || !data) return null;
@@ -198,17 +198,22 @@ async function setCachedResponse(
   try {
     const expiresAt = new Date(Date.now() + CACHE_TTL_HOURS * 60 * 60 * 1000);
     
-    await supabase
+    const { error } = await supabase
       .from('kl_cached_search')
       .upsert({
-        cache_key: cacheKey,
+        query_hash: cacheKey,
         query_text: query,
+        cache_type: 'rag-chat',
         result_json: result,
         expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString()
-      }, { onConflict: 'cache_key' });
+        hit_count: 0,
+      }, { onConflict: 'query_hash' });
     
-    console.log(`Cache SET for key: ${cacheKey}, expires: ${expiresAt.toISOString()}`);
+    if (error) {
+      console.error('Cache upsert error:', JSON.stringify(error));
+    } else {
+      console.log(`Cache SET for key: ${cacheKey}, expires: ${expiresAt.toISOString()}`);
+    }
   } catch (err) {
     console.error('Cache set error:', err);
   }
