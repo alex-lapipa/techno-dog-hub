@@ -36,11 +36,19 @@ export interface GearResult {
   similarity: number;
 }
 
+export interface LabelDocResult {
+  title: string;
+  content: string;
+  document_type: string;
+  similarity: number;
+}
+
 export interface RAGContext {
   artists: ArtistResult[];
   documents: DocumentResult[];
   artistDocs: Array<{ title: string; content: string; document_type?: string; similarity: number }>;
   gear: GearResult[];
+  labelDocs: LabelDocResult[];
   embeddingProvider: string;
 }
 
