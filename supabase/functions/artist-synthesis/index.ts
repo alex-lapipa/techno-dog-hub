@@ -82,31 +82,9 @@ async function callLovableAI(messages: any[], model = 'google/gemini-2.5-flash')
 }
 
 async function generateEmbedding(text: string): Promise<number[] | null> {
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) {
-    console.warn('OPENAI_API_KEY not set, skipping embedding');
-    return null;
-  }
-
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openaiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'text-embedding-3-small',
-      input: text.slice(0, 8000),
-    }),
-  });
-
-  if (!response.ok) {
-    console.error('Embedding error:', await response.text());
-    return null;
-  }
-
-  const data = await response.json();
-  return data.data[0]?.embedding || null;
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text.slice(0, 8000));
+  return result ? result.embedding : null;
 }
 
 // Create deterministic chunk ID
@@ -272,7 +250,8 @@ async function generateRagDocs(
       // Generate embedding
       const embedding = await generateEmbedding(chunk);
       
-      // Store document chunk (chunk_id is auto-generated, don't include it)
+      // Store document chunk — dual-write voyage_embedding
+      const embStr = embedding ? `[${embedding.join(',')}]` : null;
       const { error } = await supabase
         .from('artist_documents')
         .insert({
@@ -281,7 +260,8 @@ async function generateRagDocs(
           title: doc.title,
           content: chunk,
           chunk_index: i,
-          embedding: embedding ? `[${embedding.join(',')}]` : null,
+          voyage_embedding: embStr,
+          embedding: embStr,
           source_system: 'enrichment_pipeline',
           metadata: {
             sources: sources.slice(0, 10),

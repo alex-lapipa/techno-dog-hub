@@ -1125,28 +1125,22 @@ Keep responses focused and technical but accessible. Use specific examples when 
             gear.notable_features ? `Features: ${gear.notable_features}` : ''
           ].filter(Boolean).join('. ');
 
-          // Generate embedding via OpenAI
-          const embResponse = await fetch('https://api.openai.com/v1/embeddings', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${OPENAI_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'text-embedding-3-small',
-              input: embeddingText,
-              dimensions: 1536
-            }),
-          });
+          // Generate Voyage 1024d embedding
+          const { generateVoyageEmbedding, formatEmbeddingForStorage } = await import("../_shared/voyage-embeddings.ts");
+          const embResult = await generateVoyageEmbedding(embeddingText);
 
-          const embData = await embResponse.json();
-          const embedding = embData.data[0].embedding;
+          if (!embResult) {
+            throw new Error('Embedding generation failed');
+          }
 
-          // Store embedding
+          const embStr = formatEmbeddingForStorage(embResult.embedding);
+
+          // Dual-write to voyage_embedding and embedding
           await supabase
             .from('gear_catalog')
             .update({ 
-              embedding: JSON.stringify(embedding),
+              voyage_embedding: embStr,
+              embedding: embStr,
               updated_at: new Date().toISOString()
             })
             .eq('id', gear.id);
@@ -1178,26 +1172,21 @@ Keep responses focused and technical but accessible. Use specific examples when 
 
     // RAG search for gear
     if (action === 'rag-search' && query) {
-      // Generate embedding for query
-      const embResponse = await fetch('https://api.openai.com/v1/embeddings', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'text-embedding-3-small',
-          input: query,
-          dimensions: 1536
-        }),
-      });
+      // Generate Voyage embedding for query
+      const { generateVoyageEmbedding, formatEmbeddingForStorage } = await import("../_shared/voyage-embeddings.ts");
+      const embResult = await generateVoyageEmbedding(query);
 
-      const embData = await embResponse.json();
-      const queryEmbedding = embData.data[0].embedding;
+      if (!embResult) {
+        return new Response(JSON.stringify({ error: 'Failed to generate query embedding' }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
 
-      // Search using vector similarity
-      const { data: matches, error: searchError } = await supabase.rpc('search_gear_by_embedding', {
-        query_embedding: JSON.stringify(queryEmbedding),
+      const queryEmbeddingStr = formatEmbeddingForStorage(embResult.embedding);
+
+      // Search using voyage vector similarity
+      const { data: matches, error: searchError } = await supabase.rpc('search_gear_by_voyage_embedding', {
+        query_embedding: queryEmbeddingStr,
         match_threshold: 0.5,
         match_count: 5
       });

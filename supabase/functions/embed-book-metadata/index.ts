@@ -22,33 +22,11 @@ const corsHeaders = {
  * - publisher: Verified publisher
  */
 
-// Generate embedding using OpenAI API
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text.slice(0, 8000),
-        dimensions: 768  // Match existing documents table schema
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('OpenAI Embedding API error:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    return data.data?.[0]?.embedding || null;
-  } catch (error) {
-    console.error('Error generating embedding:', error);
-    return null;
-  }
+// Generate embedding using unified Voyage pipeline
+async function generateEmbedding(text: string, _apiKey: string): Promise<number[] | null> {
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text.slice(0, 8000));
+  return result ? result.embedding : null;
 }
 
 // Create verified knowledge document from curator metadata ONLY
@@ -236,13 +214,14 @@ serve(async (req) => {
           .delete()
           .eq('source', sourceKey);
 
-        // Insert new document with verified metadata
+        // Insert — dual-write voyage_embedding
         const { error: insertError } = await supabase
           .from('documents')
           .insert({
             title: `${book.title} by ${book.author}`,
             content: knowledgeDoc,
             source: sourceKey,
+            voyage_embedding: embeddingStr,
             embedding: embeddingStr,
             metadata: {
               book_id: book.id,
@@ -252,6 +231,7 @@ serve(async (req) => {
               year_published: book.year_published,
               source_type: 'verified_metadata',
               curator_verified: true,
+              embedding_model: 'voyage-3-large',
               embedded_at: new Date().toISOString()
             }
           });
