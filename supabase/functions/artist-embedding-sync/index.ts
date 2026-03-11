@@ -25,38 +25,11 @@ interface EmbeddingResult {
   duration_ms: number;
 }
 
-// Generate embedding using OpenAI
+// Generate embedding using unified Voyage pipeline
 async function generateEmbedding(text: string): Promise<number[] | null> {
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) {
-    console.error('OPENAI_API_KEY not configured');
-    return null;
-  }
-
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text.slice(0, 8000) // Limit input length
-      })
-    });
-
-    if (!response.ok) {
-      console.error('OpenAI embedding error:', await response.text());
-      return null;
-    }
-
-    const data = await response.json();
-    return data.data[0].embedding;
-  } catch (error) {
-    console.error('Embedding generation failed:', error);
-    return null;
-  }
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text.slice(0, 8000));
+  return result ? result.embedding : null;
 }
 
 // Generate RAG documents for an artist
