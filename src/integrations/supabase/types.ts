@@ -8771,6 +8771,21 @@ export type Database = {
           similarity: number
         }[]
       }
+      search_labels_documents_voyage: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          document_type: string
+          id: string
+          label_id: string
+          similarity: number
+          title: string
+        }[]
+      }
       update_activity_streak: {
         Args: { p_profile_id: string }
         Returns: {
