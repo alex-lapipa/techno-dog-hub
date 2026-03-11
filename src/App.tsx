@@ -317,6 +317,7 @@ const App = () => (
                     <Route path="/admin/changelog" element={<ChangelogAdmin />} />
                     <Route path="/admin/brand-book" element={<BrandBookAdmin />} />
                     <Route path="/admin/doggies-brand-book" element={<DoggiesBrandBook />} />
+                    <Route path="/admin/market-valuation" element={<MarketValuation />} />
                     
                     {/* Community */}
                     <Route path="/community" element={<Community />} />
