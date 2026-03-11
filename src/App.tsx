@@ -90,6 +90,7 @@ const ChangelogAdmin = lazy(() => import("./pages/ChangelogAdmin"));
 const SEOCommandCenter = lazy(() => import("./pages/admin/SEOCommandCenter"));
 const BrandBookAdmin = lazy(() => import("./pages/admin/BrandBookAdmin"));
 const DoggiesBrandBook = lazy(() => import("./pages/admin/DoggiesBrandBook"));
+const MarketValuation = lazy(() => import("./pages/admin/MarketValuation"));
 const Architecture = lazy(() => import("./pages/Architecture"));
 
 // Agent Admin Pages
