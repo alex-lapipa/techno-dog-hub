@@ -152,10 +152,10 @@ export async function retrieveContext(
   }
 
   console.log(
-    `Context: ${artists.length} artists, ${documents.length} docs, ${artistDocs.length} artist_docs, ${gear.length} gear`
+    `Context: ${artists.length} artists, ${documents.length} docs, ${artistDocs.length} artist_docs, ${gear.length} gear, ${labelDocs.length} label_docs`
   );
 
-  return { artists, documents, artistDocs, gear, embeddingProvider: 'voyage' };
+  return { artists, documents, artistDocs, gear, labelDocs, embeddingProvider: 'voyage' };
 }
 
 /** Format a single artist into readable context */
