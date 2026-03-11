@@ -1,606 +1,133 @@
-import { corsHeaders, handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+/**
+ * rag-chat — RAG-powered techno knowledge chat endpoint.
+ * 
+ * Orchestrates: rate limiting → caching → embedding → context retrieval → AI completion.
+ * All heavy logic lives in shared modules under _shared/.
+ */
+
+import { handleCors, corsHeaders, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createServiceClient, getEnv, getRequiredEnv } from "../_shared/supabase.ts";
 import { generateVoyageEmbedding, formatEmbeddingForStorage } from "../_shared/voyage-embeddings.ts";
+import { getClientIP, checkRateLimit, isAdminRequest, rateLimitHeaders } from "../_shared/rate-limiter.ts";
+import { hashQuery, getCachedResponse, setCachedResponse } from "../_shared/rag-cache.ts";
+import { retrieveContext, buildContextString, buildArtistMeta } from "../_shared/rag-context.ts";
+import {
+  callCompletion,
+  handleCompletionError,
+  buildStreamingResponse,
+  parseNonStreamingResponse,
+} from "../_shared/rag-completion.ts";
 
-// Rate limiting configuration
-const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_MAX = 10;
 const RATE_LIMIT_ENDPOINT = 'rag-chat';
 
-// COST OPTIMIZATION: Response caching for common queries
-// Saves ~50% on repeated AI calls
-const CACHE_TTL_HOURS = 1;
-
-// Simple hash function for cache keys
-function hashQuery(query: string): string {
-  let hash = 0;
-  const normalized = query.toLowerCase().trim();
-  for (let i = 0; i < normalized.length; i++) {
-    const char = normalized.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return 'rag_' + Math.abs(hash).toString(36);
-}
-
-// Get client IP from request headers
-function getClientIP(req: Request): string {
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) return forwardedFor.split(',')[0].trim();
-  
-  const realIP = req.headers.get('x-real-ip');
-  if (realIP) return realIP.trim();
-  
-  const cfConnectingIP = req.headers.get('cf-connecting-ip');
-  if (cfConnectingIP) return cfConnectingIP.trim();
-  
-  return 'unknown';
-}
-
-// Check rate limit using persistent Supabase storage
-async function checkPersistentRateLimit(
-  supabaseUrl: string,
-  supabaseKey: string,
-  ip: string
-): Promise<{ allowed: boolean; remaining: number; resetAt: Date }> {
-  try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/check_ip_rate_limit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`
-      },
-      body: JSON.stringify({
-        p_ip_address: ip,
-        p_endpoint: RATE_LIMIT_ENDPOINT,
-        p_limit_per_minute: RATE_LIMIT_MAX_REQUESTS
-      })
-    });
-
-    if (!response.ok) {
-      console.error('Rate limit check error:', response.status);
-      return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
-    }
-
-    const data = await response.json();
-    const result = data?.[0];
-    
-    if (!result) {
-      return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
-    }
-
-    return {
-      allowed: result.allowed,
-      remaining: result.limit_remaining,
-      resetAt: new Date(result.reset_at)
-    };
-  } catch (err) {
-    console.error('Rate limit check exception:', err);
-    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
-  }
-}
-
-// Generate embedding using Voyage AI (primary) with OpenAI fallback
-async function generateQueryEmbedding(text: string): Promise<{ embedding: number[]; provider: string } | null> {
-  // Try Voyage first (1024d) — matches voyage_embedding columns
-  const voyageResult = await generateVoyageEmbedding(text);
-  if (voyageResult) {
-    return { embedding: voyageResult.embedding, provider: voyageResult.provider };
-  }
-  
-  // Fallback to OpenAI at 1024d (dimension-matched to Voyage)
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) return null;
-  
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text,
-        dimensions: 1024
-      }),
-    });
-    if (!response.ok) {
-      console.error('OpenAI Embedding fallback error:', response.status);
-      return null;
-    }
-    const data = await response.json();
-    const emb = data.data?.[0]?.embedding;
-    return emb ? { embedding: emb, provider: 'openai-fallback' } : null;
-  } catch (error) {
-    console.error('Error in OpenAI embedding fallback:', error);
-    return null;
-  }
-}
-
-// Format artist data for context
-function formatArtistContext(artist: {
-  rank: number;
-  artist_name: string;
-  real_name: string | null;
-  nationality: string | null;
-  years_active: string | null;
-  subgenres: string[] | null;
-  labels: string[] | null;
-  top_tracks: string[] | null;
-  known_for: string | null;
-  similarity: number;
-}): string {
-  const parts = [
-    `**#${artist.rank} ${artist.artist_name}**`,
-    artist.real_name ? `Real name: ${artist.real_name}` : null,
-    artist.nationality ? `Nationality: ${artist.nationality}` : null,
-    artist.years_active ? `Active: ${artist.years_active}` : null,
-    artist.subgenres?.length ? `Genres: ${artist.subgenres.join(', ')}` : null,
-    artist.labels?.length ? `Labels: ${artist.labels.join(', ')}` : null,
-    artist.top_tracks?.length ? `Key tracks: ${artist.top_tracks.join(', ')}` : null,
-    artist.known_for ? `Known for: ${artist.known_for}` : null,
-    `Relevance: ${(artist.similarity * 100).toFixed(1)}%`
-  ].filter(Boolean);
-  
-  return parts.join('\n');
-}
-
-// SWR threshold: serve stale data when >75% of TTL has elapsed, then revalidate
-const SWR_THRESHOLD = 0.75;
-
-// Check cache for existing response (with SWR support)
-async function getCachedResponse(
-  supabase: ReturnType<typeof createServiceClient>,
-  cacheKey: string
-): Promise<{ data: { answer: string; artists: unknown[]; sources: unknown[] }; stale: boolean } | null> {
-  try {
-    const { data, error } = await supabase
-      .from('kl_cached_search')
-      .select('result_json, expires_at, created_at')
-      .eq('query_hash', cacheKey)
-      .single();
-    
-    if (error || !data) return null;
-    
-    const now = Date.now();
-    const expiresAt = new Date(data.expires_at).getTime();
-    const createdAt = new Date(data.created_at).getTime();
-    
-    // Fully expired — don't serve
-    if (expiresAt < now) {
-      console.log(`Cache expired for key: ${cacheKey}`);
-      return null;
-    }
-    
-    // Check if stale (>75% of TTL elapsed) — serve but flag for revalidation
-    const totalTTL = expiresAt - createdAt;
-    const elapsed = now - createdAt;
-    const isStale = elapsed > totalTTL * SWR_THRESHOLD;
-    
-    console.log(`Cache HIT for key: ${cacheKey}${isStale ? ' (STALE — will revalidate)' : ''}`);
-    return {
-      data: data.result_json as { answer: string; artists: unknown[]; sources: unknown[] },
-      stale: isStale
-    };
-  } catch {
-    return null;
-  }
-}
-
-// Save response to cache
-async function setCachedResponse(
-  supabase: ReturnType<typeof createServiceClient>, 
-  cacheKey: string, 
-  query: string,
-  result: { answer: string; artists: unknown[]; sources: unknown[] }
-): Promise<void> {
-  try {
-    const expiresAt = new Date(Date.now() + CACHE_TTL_HOURS * 60 * 60 * 1000);
-    
-    const { error } = await supabase
-      .from('kl_cached_search')
-      .upsert({
-        query_hash: cacheKey,
-        query_text: query,
-        cache_type: 'rag-chat',
-        result_json: result,
-        expires_at: expiresAt.toISOString(),
-        hit_count: 0,
-      }, { onConflict: 'query_hash' });
-    
-    if (error) {
-      console.error('Cache upsert error:', JSON.stringify(error));
-    } else {
-      console.log(`Cache SET for key: ${cacheKey}, expires: ${expiresAt.toISOString()}`);
-    }
-  } catch (err) {
-    console.error('Cache set error:', err);
-  }
-}
-
 Deno.serve(async (req) => {
+  // --- CORS ---
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   const SUPABASE_URL = getRequiredEnv('SUPABASE_URL');
   const SUPABASE_SERVICE_ROLE_KEY = getRequiredEnv('SUPABASE_SERVICE_ROLE_KEY');
 
-  // Check for admin bypass
-  let isAdmin = false;
-  const authHeader = req.headers.get('Authorization');
-  
-  if (authHeader?.startsWith('Bearer ')) {
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/has_role`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': getEnv('SUPABASE_ANON_KEY', ''),
-          'Authorization': authHeader
-        },
-        body: JSON.stringify({
-          _user_id: null,
-          _role: 'admin'
-        })
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        isAdmin = result === true;
-        if (isAdmin) console.log('Admin user detected - bypassing rate limit');
-      }
-    } catch (err) {
-      console.error('Admin check failed:', err);
-    }
+  // --- Admin check ---
+  const isAdmin = await isAdminRequest(req, SUPABASE_URL, getEnv('SUPABASE_ANON_KEY', ''));
+  if (isAdmin) console.log('Admin user detected — bypassing rate limit');
+
+  // --- Rate limiting ---
+  const clientIP = getClientIP(req);
+  let rateLimit = { allowed: true, remaining: RATE_LIMIT_MAX, resetAt: new Date(Date.now() + 60000) };
+
+  if (!isAdmin) {
+    rateLimit = await checkRateLimit(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, clientIP, {
+      maxRequests: RATE_LIMIT_MAX,
+      endpoint: RATE_LIMIT_ENDPOINT,
+    });
   }
 
-  // Apply persistent IP-based rate limiting
-  const clientIP = getClientIP(req);
-  let rateLimit = { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS, resetAt: new Date(Date.now() + 60000) };
-  
-  if (!isAdmin) {
-    rateLimit = await checkPersistentRateLimit(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, clientIP);
-  }
-  
-  const rateLimitHeaders = {
-    'X-RateLimit-Limit': isAdmin ? 'unlimited' : RATE_LIMIT_MAX_REQUESTS.toString(),
-    'X-RateLimit-Remaining': isAdmin ? 'unlimited' : rateLimit.remaining.toString(),
-    'X-RateLimit-Reset': Math.ceil(rateLimit.resetAt.getTime() / 1000).toString(),
-  };
-  
+  const rlHeaders = rateLimitHeaders(isAdmin, rateLimit, RATE_LIMIT_MAX);
+
   if (!rateLimit.allowed) {
-    const retryAfter = Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000);
+    const retryAfter = Math.max(1, Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000));
     console.log(`Rate limit exceeded for IP: ${clientIP}`);
     return new Response(
-      JSON.stringify({ 
-        error: 'Rate limit exceeded. Please wait before making more requests.',
-        retryAfter: Math.max(1, retryAfter)
-      }), 
-      { 
-        status: 429, 
-        headers: { 
-          ...corsHeaders, 
-          ...rateLimitHeaders,
-          'Retry-After': Math.max(1, retryAfter).toString(),
-          'Content-Type': 'application/json' 
-        } 
+      JSON.stringify({ error: 'Rate limit exceeded. Please wait before making more requests.', retryAfter }),
+      {
+        status: 429,
+        headers: { ...corsHeaders, ...rlHeaders, 'Retry-After': retryAfter.toString(), 'Content-Type': 'application/json' },
       }
     );
   }
-  
+
   console.log(`Request from IP: ${clientIP}, admin: ${isAdmin}, remaining: ${isAdmin ? 'unlimited' : rateLimit.remaining}`);
 
   try {
+    // --- Parse & validate input ---
     const { query, stream = true } = await req.json();
-    
-    if (!query || typeof query !== 'string') {
-      throw new Error('Query is required');
-    }
-    
-    if (query.length > 2000) {
-      return errorResponse('Query exceeds maximum length of 2000 characters', 400);
-    }
-    
+    if (!query || typeof query !== 'string') throw new Error('Query is required');
+    if (query.length > 2000) return errorResponse('Query exceeds maximum length of 2000 characters', 400);
+
     const sanitizedQuery = query.trim().slice(0, 2000);
-
     const LOVABLE_API_KEY = getRequiredEnv('LOVABLE_API_KEY');
-    const OPENAI_API_KEY = getEnv('OPENAI_API_KEY');
-
     const supabase = createServiceClient();
 
-    // COST OPTIMIZATION: Check cache first for non-streaming requests
+    // --- Cache check (non-streaming only) ---
     const cacheKey = hashQuery(sanitizedQuery);
-    let shouldRevalidate = false;
-    
+
     if (!stream) {
       const cached = await getCachedResponse(supabase, cacheKey);
-      if (cached) {
-        if (!cached.stale) {
-          // Fresh cache — return immediately, skip AI call entirely
-          console.log('Returning fresh cached response - COST SAVED');
-          return jsonResponse({
-            ...cached.data,
-            cached: true
-          });
-        }
-        // Stale cache — return immediately but also revalidate in background
-        console.log('Returning stale cached response + scheduling revalidation');
-        shouldRevalidate = true;
-        
-        // Fire-and-forget: respond to client NOW with stale data
-        // The rest of the function will run as background revalidation
-        const staleResponse = jsonResponse({
-          ...cached.data,
-          cached: true,
-          stale: true
-        });
-        
-        // We can't truly background-process in edge functions, so for SWR
-        // we return stale data. The NEXT request after expiry will get fresh data.
-        return staleResponse;
+      if (cached && !cached.stale) {
+        console.log('Returning fresh cached response — COST SAVED');
+        return jsonResponse({ ...cached.data, cached: true });
+      }
+      if (cached?.stale) {
+        console.log('Returning stale cached response (SWR)');
+        return jsonResponse({ ...cached.data, cached: true, stale: true });
       }
     }
 
-    let documents: Array<{ title: string; content: string; source?: string; similarity?: number }> | null = null;
-    let artists: Array<{
-      rank: number;
-      artist_name: string;
-      real_name: string | null;
-      nationality: string | null;
-      years_active: string | null;
-      subgenres: string[] | null;
-      labels: string[] | null;
-      top_tracks: string[] | null;
-      known_for: string | null;
-      similarity: number;
-    }> | null = null;
-
-    // Generate embedding for vector searches — Voyage AI primary, OpenAI fallback
+    // --- Generate embedding ---
     console.log('Generating Voyage embedding for query:', sanitizedQuery);
-    const embeddingResult = await generateQueryEmbedding(sanitizedQuery);
-    const queryEmbedding = embeddingResult?.embedding || null;
-    const embeddingProvider = embeddingResult?.provider || 'none';
+    const voyageResult = await generateVoyageEmbedding(sanitizedQuery);
+    const queryEmbedding = voyageResult?.embedding || null;
+    const embeddingProvider = voyageResult?.provider || 'none';
     console.log(`Embedding provider: ${embeddingProvider}, dimensions: ${queryEmbedding?.length || 0}`);
 
-    const embeddingStr = queryEmbedding ? formatEmbeddingForStorage(queryEmbedding) : null;
+    // --- Retrieve context ---
+    let context = '';
+    let ragContext = { artists: [] as any[], documents: [] as any[], artistDocs: [] as any[], gear: [] as any[], embeddingProvider };
 
-    // Search DJ artists using Voyage vector similarity (1024d)
-    if (embeddingStr) {
-      console.log('Searching DJ artists with Voyage vector similarity');
-      const { data: artistResults, error: artistError } = await supabase.rpc('search_dj_artists_voyage', {
-        query_embedding: embeddingStr,
-        similarity_threshold: 0.3,
-        match_count: 5
-      });
-
-      if (!artistError && artistResults && artistResults.length > 0) {
-        artists = artistResults;
-        console.log(`Found ${artistResults.length} matching artists (Voyage)`);
-      } else if (artistError) {
-        console.error('Artist Voyage search error:', artistError);
-      }
+    if (queryEmbedding) {
+      const embeddingStr = formatEmbeddingForStorage(queryEmbedding);
+      ragContext = await retrieveContext(supabase, embeddingStr, sanitizedQuery);
+      context = buildContextString(ragContext);
     }
 
-    // Search documents using Voyage vector similarity (1024d)
-    if (embeddingStr) {
-      console.log('Using Voyage vector search for documents');
-      const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents_voyage', {
-        query_embedding: embeddingStr,
-        match_threshold: 0.3,
-        match_count: 5
-      });
-
-      if (!vectorError && vectorResults && vectorResults.length > 0) {
-        documents = vectorResults;
-        console.log(`Voyage document search found ${vectorResults.length} documents`);
-      } else if (vectorError) {
-        console.error('Voyage document search error:', vectorError);
-      }
-    }
-
-    // Search artist_documents using Voyage (1024d) — NEW: unlocks 466 artist docs
-    let artistDocResults: Array<{ title: string; content: string; similarity: number }> = [];
-    if (embeddingStr) {
-      const { data: adResults, error: adError } = await supabase.rpc('search_artist_documents_voyage', {
-        query_embedding: embeddingStr,
-        match_threshold: 0.4,
-        match_count: 3
-      });
-      if (!adError && adResults && adResults.length > 0) {
-        artistDocResults = adResults;
-        console.log(`Voyage artist_documents search found ${adResults.length} results`);
-      }
-    }
-
-    // Search gear_catalog using Voyage (1024d) — NEW: unlocks 99 gear items
-    let gearResults: Array<{ name: string; brand: string; category: string; short_description: string; similarity: number }> = [];
-    if (embeddingStr) {
-      const { data: gResults, error: gError } = await supabase.rpc('search_gear_by_voyage_embedding', {
-        query_embedding: embeddingStr,
-        match_threshold: 0.4,
-        match_count: 3
-      });
-      if (!gResults || gError) {
-        if (gError) console.error('Voyage gear search error:', gError);
-      } else {
-        gearResults = gResults;
-        console.log(`Voyage gear search found ${gResults.length} results`);
-      }
-    }
-
-    // Fallback to full-text search
-    if (!documents || documents.length === 0) {
-      console.log('Falling back to full-text search for:', sanitizedQuery);
-      
-      const searchTerms = sanitizedQuery
-        .toLowerCase()
-        .replace(/[¿?¡!.,;:]/g, '')
-        .split(' ')
-        .filter(word => word.length > 2)
-        .join(' | ');
-
-      const { data: textResults, error: searchError } = await supabase
-        .from('documents')
-        .select('id, title, content, source')
-        .textSearch('content', searchTerms, { type: 'websearch', config: 'english' })
-        .limit(5);
-
-      if (!searchError && textResults) {
-        documents = textResults;
-        console.log(`Full-text search found ${documents.length} documents`);
-      }
-    }
-
-    // Final fallback
-    if (!documents || documents.length === 0) {
-      console.log('Using fallback: fetching recent documents');
-      const { data: fallbackDocs } = await supabase
-        .from('documents')
-        .select('id, title, content, source')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
-      documents = fallbackDocs || [];
-    }
-
-    console.log(`Total documents: ${documents?.length || 0}, artists: ${artists?.length || 0}, artist_docs: ${artistDocResults.length}, gear: ${gearResults.length}, provider: ${embeddingProvider}`);
-
-    // Build context
-    let artistContext = '';
-    if (artists && artists.length > 0) {
-      artistContext = '## DJ ARTISTS DATABASE:\n\n' + artists.map(formatArtistContext).join('\n\n---\n\n');
-    }
-
-    let documentContext = '';
-    const usedDocs = documents || [];
-    
-    if (usedDocs.length > 0) {
-      documentContext = '## KNOWLEDGE BASE DOCUMENTS:\n\n' + usedDocs
-        .map((doc) => 
-          `[${doc.title}${doc.similarity ? ` (relevance: ${(doc.similarity * 100).toFixed(1)}%)` : ''}]\n${doc.content}`
-        )
-        .join('\n\n---\n\n');
-    }
-
-    // NEW: Artist documents context (from artist_documents table via Voyage)
-    let artistDocContext = '';
-    if (artistDocResults.length > 0) {
-      artistDocContext = '## ARTIST DEEP KNOWLEDGE:\n\n' + artistDocResults
-        .map((d: any) => `[${d.title || d.document_type} (relevance: ${(d.similarity * 100).toFixed(1)}%)]\n${d.content?.slice(0, 500)}`)
-        .join('\n\n---\n\n');
-    }
-
-    // NEW: Gear context (from gear_catalog table via Voyage)
-    let gearContext = '';
-    if (gearResults.length > 0) {
-      gearContext = '## GEAR CATALOG:\n\n' + gearResults
-        .map((g: any) => `**${g.name}** (${g.brand}, ${g.category}) — relevance: ${(g.similarity * 100).toFixed(1)}%\n${g.short_description || ''}`)
-        .join('\n\n---\n\n');
-    }
-
-    const combinedContext = [artistContext, documentContext, artistDocContext, gearContext].filter(Boolean).join('\n\n');
-
-    const systemPrompt = `You are an expert curator of underground techno music with deep knowledge of artists, labels, venues, and the global scene. 
-
-IMPORTANT: You MUST always respond in English, regardless of the language of the user's question. All responses must be in English only.
-
-Your knowledge comes from an authoritative ranking of 100 techno artists scored on underground authenticity, innovation, and scene contribution, plus a curated knowledge base of techno culture.
-
-When answering about artists, use the DJ ARTISTS DATABASE information which includes:
-- Rankings (1-100, lower is more influential/authentic)
-- Real names, nationalities, years active
-- Subgenres they represent
-- Labels they've released on
-- Key tracks
-- What they're known for
-
-Be concise, knowledgeable, and speak with authority about techno culture. Reference specific artists, labels, tracks, and venues when relevant.
-
-If asked about rankings, tiers, or comparisons, base your answers on the provided context. The artists are ranked across dimensions: commitment to underground values, resistance to commercialization, influential tracks, scene contribution, longevity, innovation, and resistance to industry trends.
-
-CONTEXT:
-${combinedContext || 'No relevant data found. Respond based on general techno knowledge.'}`;
-
-    console.log('Calling Lovable AI with model: google/gemini-2.5-flash');
-
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: sanitizedQuery }
-        ],
-        stream: stream,
-        max_tokens: 1024
-      }),
+    // --- AI completion ---
+    const aiResponse = await callCompletion({
+      query: sanitizedQuery,
+      context,
+      apiKey: LOVABLE_API_KEY,
+      stream,
     });
+
+    // Handle AI errors
+    const aiError = handleCompletionError(aiResponse);
+    if (aiError) return aiError;
 
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
       console.error('Lovable AI error:', aiResponse.status, errText);
-      
-      if (aiResponse.status === 429) {
-        return errorResponse('Rate limit exceeded. Please try again later.', 429);
-      }
-      if (aiResponse.status === 402) {
-        return errorResponse('AI credits exhausted. Please add credits to continue.', 402);
-      }
       throw new Error(`AI API request failed: ${errText}`);
     }
 
+    // --- Build response ---
     if (stream) {
-      const artistMeta = artists?.map(a => ({
-        name: a.artist_name,
-        rank: a.rank,
-        nationality: a.nationality,
-        subgenres: a.subgenres,
-        labels: a.labels
-      })) || [];
-      
-      const metaEvent = `data: ${JSON.stringify({ type: 'metadata', artists: artistMeta })}\n\n`;
-      const metaEncoder = new TextEncoder();
-      const metaBytes = metaEncoder.encode(metaEvent);
-      
-      const combinedStream = new ReadableStream({
-        async start(controller) {
-          controller.enqueue(metaBytes);
-          
-          const reader = aiResponse.body!.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              controller.enqueue(value);
-            }
-          } finally {
-            controller.close();
-          }
-        }
-      });
-      
-      return new Response(combinedStream, {
-        headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
-      });
+      const artistMeta = buildArtistMeta(ragContext.artists);
+      return buildStreamingResponse(aiResponse, artistMeta);
     } else {
-      const data = await aiResponse.json();
-      const answer = data.choices?.[0]?.message?.content || '';
-      const sources = usedDocs.map((d) => ({ title: d.title, source: d.source }));
-      const artistList = artists?.map(a => ({ name: a.artist_name, rank: a.rank })) || [];
-      
-      // COST OPTIMIZATION: Cache the response for future queries
-      const resultToCache = { answer, sources, artists: artistList };
-      await setCachedResponse(supabase, cacheKey, sanitizedQuery, resultToCache);
-      
-      return jsonResponse({
-        ...resultToCache,
-        cached: false
-      });
+      const result = await parseNonStreamingResponse(aiResponse, ragContext.documents, ragContext.artists);
+      await setCachedResponse(supabase, cacheKey, sanitizedQuery, result);
+      return jsonResponse({ ...result, cached: false });
     }
   } catch (error: unknown) {
     console.error('Error in rag-chat:', error);
