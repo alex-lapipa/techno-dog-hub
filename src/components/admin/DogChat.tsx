@@ -30,7 +30,7 @@ const DogChat = () => {
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const manualAudioRef = useRef<HTMLAudioElement | null>(null);
-  const visualizationInterval = useRef<NodeJS.Timeout | null>(null);
+  const visualizationInterval = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const { toast } = useToast();
 
