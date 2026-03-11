@@ -36,11 +36,19 @@ export interface GearResult {
   similarity: number;
 }
 
+export interface LabelDocResult {
+  title: string;
+  content: string;
+  document_type: string;
+  similarity: number;
+}
+
 export interface RAGContext {
   artists: ArtistResult[];
   documents: DocumentResult[];
   artistDocs: Array<{ title: string; content: string; document_type?: string; similarity: number }>;
   gear: GearResult[];
+  labelDocs: LabelDocResult[];
   embeddingProvider: string;
 }
 
@@ -53,8 +61,8 @@ export async function retrieveContext(
   embeddingStr: string,
   sanitizedQuery: string
 ): Promise<RAGContext> {
-  // Run all 4 vector searches in parallel
-  const [artistsPromise, docsPromise, artistDocsPromise, gearPromise] = await Promise.allSettled([
+  // Run all 5 vector searches in parallel
+  const [artistsPromise, docsPromise, artistDocsPromise, gearPromise, labelDocsPromise] = await Promise.allSettled([
     supabase.rpc('search_dj_artists_voyage', {
       query_embedding: embeddingStr,
       similarity_threshold: 0.3,
@@ -71,6 +79,11 @@ export async function retrieveContext(
       match_count: 3,
     }),
     supabase.rpc('search_gear_by_voyage_embedding', {
+      query_embedding: embeddingStr,
+      match_threshold: 0.4,
+      match_count: 3,
+    }),
+    supabase.rpc('search_labels_documents_voyage', {
       query_embedding: embeddingStr,
       match_threshold: 0.4,
       match_count: 3,
@@ -95,6 +108,11 @@ export async function retrieveContext(
   const gear: GearResult[] =
     gearPromise.status === 'fulfilled' && !gearPromise.value.error
       ? gearPromise.value.data || []
+      : [];
+
+  const labelDocs: LabelDocResult[] =
+    labelDocsPromise.status === 'fulfilled' && !labelDocsPromise.value.error
+      ? labelDocsPromise.value.data || []
       : [];
 
   // Log errors
@@ -134,10 +152,10 @@ export async function retrieveContext(
   }
 
   console.log(
-    `Context: ${artists.length} artists, ${documents.length} docs, ${artistDocs.length} artist_docs, ${gear.length} gear`
+    `Context: ${artists.length} artists, ${documents.length} docs, ${artistDocs.length} artist_docs, ${gear.length} gear, ${labelDocs.length} label_docs`
   );
 
-  return { artists, documents, artistDocs, gear, embeddingProvider: 'voyage' };
+  return { artists, documents, artistDocs, gear, labelDocs, embeddingProvider: 'voyage' };
 }
 
 /** Format a single artist into readable context */
@@ -199,6 +217,18 @@ export function buildContextString(ctx: RAGContext): string {
           .map(
             (g) =>
               `**${g.name}** (${g.brand}, ${g.category}) — relevance: ${(g.similarity * 100).toFixed(1)}%\n${g.short_description || ''}`
+          )
+          .join('\n\n---\n\n')
+    );
+  }
+
+  if (ctx.labelDocs.length > 0) {
+    sections.push(
+      '## RECORD LABELS:\n\n' +
+        ctx.labelDocs
+          .map(
+            (l) =>
+              `[${l.title} (relevance: ${(l.similarity * 100).toFixed(1)}%)]\n${l.content}`
           )
           .join('\n\n---\n\n')
     );
