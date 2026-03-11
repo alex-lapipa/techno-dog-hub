@@ -61,8 +61,8 @@ export async function retrieveContext(
   embeddingStr: string,
   sanitizedQuery: string
 ): Promise<RAGContext> {
-  // Run all 4 vector searches in parallel
-  const [artistsPromise, docsPromise, artistDocsPromise, gearPromise] = await Promise.allSettled([
+  // Run all 5 vector searches in parallel
+  const [artistsPromise, docsPromise, artistDocsPromise, gearPromise, labelDocsPromise] = await Promise.allSettled([
     supabase.rpc('search_dj_artists_voyage', {
       query_embedding: embeddingStr,
       similarity_threshold: 0.3,
@@ -79,6 +79,11 @@ export async function retrieveContext(
       match_count: 3,
     }),
     supabase.rpc('search_gear_by_voyage_embedding', {
+      query_embedding: embeddingStr,
+      match_threshold: 0.4,
+      match_count: 3,
+    }),
+    supabase.rpc('search_labels_documents_voyage', {
       query_embedding: embeddingStr,
       match_threshold: 0.4,
       match_count: 3,
