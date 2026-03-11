@@ -88,28 +88,11 @@ Focus on techno music culture. Be precise and factual.`
   }
 }
 
-// Generate embedding using OpenAI
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text.substring(0, 8000),
-        dimensions: 768
-      }),
-    });
-
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.data?.[0]?.embedding || null;
-  } catch {
-    return null;
-  }
+// Generate embedding using unified Voyage pipeline
+async function generateEmbedding(text: string, _apiKey: string): Promise<number[] | null> {
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text.substring(0, 8000));
+  return result ? result.embedding : null;
 }
 
 // Fetch Wikipedia content
