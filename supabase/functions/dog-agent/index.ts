@@ -78,36 +78,11 @@ DOG JOKES TO SPRINKLE IN:
 - "Not to be dramatic but I would literally fetch a stick for this artist"
 `;
 
-// Generate embedding for RAG searches — Voyage AI primary, OpenAI fallback
+// Generate embedding for RAG searches — unified Voyage pipeline (includes OpenAI fallback)
 async function generateQueryEmbedding(text: string): Promise<{ embedding: number[]; provider: string } | null> {
-  const voyageResult = await generateVoyageEmbedding(text);
-  if (voyageResult) {
-    return { embedding: voyageResult.embedding, provider: voyageResult.provider };
-  }
-  
-  const openaiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openaiKey) return null;
-  
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text,
-        dimensions: 1024
-      }),
-    });
-    if (!response.ok) return null;
-    const data = await response.json();
-    const emb = data.data?.[0]?.embedding;
-    return emb ? { embedding: emb, provider: 'openai-fallback' } : null;
-  } catch {
-    return null;
-  }
+  const result = await generateVoyageEmbedding(text);
+  if (!result) return null;
+  return { embedding: result.embedding, provider: result.provider };
 }
 
 // Build comprehensive system prompt with full knowledge access
