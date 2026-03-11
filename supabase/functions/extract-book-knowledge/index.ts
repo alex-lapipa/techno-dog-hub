@@ -18,31 +18,11 @@ function chunkText(text: string, chunkSize = 1200, overlap = 200): string[] {
   return chunks;
 }
 
-// Generate embedding using OpenAI
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text,
-        dimensions: 768
-      }),
-    });
-    if (!response.ok) {
-      console.error('Embedding API error:', response.status);
-      return null;
-    }
-    const data = await response.json();
-    return data.data?.[0]?.embedding || null;
-  } catch (error) {
-    console.error('Embedding error:', error);
-    return null;
-  }
+// Generate embedding using unified Voyage pipeline
+async function generateEmbedding(text: string, _apiKey: string): Promise<number[] | null> {
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text);
+  return result ? result.embedding : null;
 }
 
 // Call Anthropic Claude to extract deep knowledge from a book
