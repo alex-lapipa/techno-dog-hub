@@ -45,7 +45,7 @@ const FloatingDogButton = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const shownMessagesRef = useRef<Set<number>>(new Set());
-  const typewriterRef = useRef<NodeJS.Timeout | null>(null);
+  const typewriterRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
 
   // Hide on widget page and admin routes - keep widget/admin clean
