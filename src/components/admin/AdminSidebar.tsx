@@ -190,6 +190,7 @@ const adminSections: NavSection[] = [
       { label: 'Dashboard', path: '/analytics', icon: BarChart3, description: 'Usage metrics' },
       { label: 'SEO Command Center', path: '/admin/seo-command-center', icon: Target, description: 'Full-site audit' },
       { label: 'SEO Strategy', path: '/admin/google-organic-strategy', icon: Search, description: 'Organic growth' },
+      { label: 'Market & Valuation', path: '/admin/market-valuation', icon: BarChart3, description: 'Platform worth' },
     ],
   },
 ];
