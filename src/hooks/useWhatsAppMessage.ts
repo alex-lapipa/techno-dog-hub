@@ -28,10 +28,8 @@ const getMessageMap = async (): Promise<Record<string, DoggyMessage>> => {
 // Synchronous fallback for already-loaded messages
 const getMessageMapSync = (): Record<string, DoggyMessage> => {
   if (messageCache) return messageCache;
-  // Import synchronously as fallback
-  const { doggyMessages } = require('@/data/doggyWhatsAppMessages');
-  messageCache = doggyMessages;
-  return messageCache;
+  // Return empty object if cache not yet loaded — caller should use async version first
+  return {} as Record<string, DoggyMessage>;
 };
 
 // O(1) hashtag generation - pure function

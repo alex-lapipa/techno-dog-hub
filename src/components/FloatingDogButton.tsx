@@ -92,8 +92,8 @@ const FloatingDogButton = () => {
     // Initial delay before first bubble (8-15 seconds)
     const initialDelay = 8000 + Math.random() * 7000;
     
-    let bubbleTimeout: NodeJS.Timeout;
-    let hideTimeout: NodeJS.Timeout;
+    let bubbleTimeout: ReturnType<typeof setTimeout>;
+    let hideTimeout: ReturnType<typeof setTimeout>;
 
     const showBubble = () => {
       const message = pickRandomMessage();

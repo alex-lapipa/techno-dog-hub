@@ -54,7 +54,7 @@ export const useGTMDataLayer = () => {
   const sessionStartTime = useRef<number>(Date.now());
   const pageViewTime = useRef<number>(Date.now());
   const interactionSequence = useRef<number>(0);
-  const hoverTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const hoverTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Initialize dataLayer
   useEffect(() => {

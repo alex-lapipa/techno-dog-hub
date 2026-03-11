@@ -27,7 +27,7 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
   const optionsRef = useRef(options);
   const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const silenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isProcessingRef = useRef(false);
   const messagesRef = useRef<Message[]>([]);
 
