@@ -238,7 +238,7 @@ serve(async (req) => {
 
           const embeddingStr = embedding ? `[${embedding.join(',')}]` : null;
 
-          // Store in documents table
+          // Store in documents table — dual-write voyage_embedding
           const { error: insertError } = await supabaseAdmin
             .from('documents')
             .insert({
@@ -247,6 +247,7 @@ serve(async (req) => {
                 : `${book.title} by ${book.author}`,
               content: chunk,
               source: `book:${book.id}`,
+              voyage_embedding: embeddingStr,
               embedding: embeddingStr,
               metadata: {
                 book_id: book.id,
@@ -255,7 +256,7 @@ serve(async (req) => {
                 chunk_index: i,
                 total_chunks: chunks.length,
                 extraction_model: 'claude-sonnet-4-20250514',
-                embedding_model: 'text-embedding-3-small',
+                embedding_model: 'voyage-3-large',
                 extracted_at: new Date().toISOString()
               },
               chunk_index: i

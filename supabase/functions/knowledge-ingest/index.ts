@@ -244,6 +244,7 @@ serve(async (req) => {
               title: chunks.length > 1 ? `${title} (${i + 1}/${chunks.length})` : title,
               content: chunk,
               source: sourceUrl || source.type,
+              voyage_embedding: embeddingStr,
               embedding: embeddingStr,
               metadata: {
                 source_type: source.type,

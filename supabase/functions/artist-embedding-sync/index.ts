@@ -252,14 +252,16 @@ async function syncArtistEmbeddings(
       continue;
     }
 
-    // Upsert document with embedding
+    // Upsert document with embedding — dual-write to voyage_embedding
+    const embStr = `[${embedding.join(',')}]`;
     const documentData = {
       artist_id: artistId,
       document_type: doc.type,
       title: doc.title,
       content: doc.content,
       chunk_index: i,
-      embedding: `[${embedding.join(',')}]`,
+      voyage_embedding: embStr,
+      embedding: embStr,
       metadata: { generated_at: new Date().toISOString() },
       source_system: 'auto_generated'
     };
