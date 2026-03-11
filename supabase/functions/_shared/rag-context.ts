@@ -110,6 +110,11 @@ export async function retrieveContext(
       ? gearPromise.value.data || []
       : [];
 
+  const labelDocs: LabelDocResult[] =
+    labelDocsPromise.status === 'fulfilled' && !labelDocsPromise.value.error
+      ? labelDocsPromise.value.data || []
+      : [];
+
   // Log errors
   if (artistsPromise.status === 'fulfilled' && artistsPromise.value.error)
     console.error('Artist search error:', artistsPromise.value.error);
