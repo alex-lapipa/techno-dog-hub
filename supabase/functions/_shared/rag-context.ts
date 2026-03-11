@@ -222,6 +222,18 @@ export function buildContextString(ctx: RAGContext): string {
     );
   }
 
+  if (ctx.labelDocs.length > 0) {
+    sections.push(
+      '## RECORD LABELS:\n\n' +
+        ctx.labelDocs
+          .map(
+            (l) =>
+              `[${l.title} (relevance: ${(l.similarity * 100).toFixed(1)}%)]\n${l.content}`
+          )
+          .join('\n\n---\n\n')
+    );
+  }
+
   return sections.join('\n\n');
 }
 
