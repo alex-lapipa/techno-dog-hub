@@ -22,33 +22,11 @@ const corsHeaders = {
  * - publisher: Verified publisher
  */
 
-// Generate embedding using OpenAI API
-async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
-  try {
-    const response = await fetch('https://api.openai.com/v1/embeddings', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'text-embedding-3-small',
-        input: text.slice(0, 8000),
-        dimensions: 768  // Match existing documents table schema
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('OpenAI Embedding API error:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    return data.data?.[0]?.embedding || null;
-  } catch (error) {
-    console.error('Error generating embedding:', error);
-    return null;
-  }
+// Generate embedding using unified Voyage pipeline
+async function generateEmbedding(text: string, _apiKey: string): Promise<number[] | null> {
+  const { generateVoyageEmbedding } = await import("../_shared/voyage-embeddings.ts");
+  const result = await generateVoyageEmbedding(text.slice(0, 8000));
+  return result ? result.embedding : null;
 }
 
 // Create verified knowledge document from curator metadata ONLY
